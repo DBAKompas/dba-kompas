@@ -6,27 +6,13 @@ export async function POST(request: Request) {
   try {
     const supabase = await createClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const { priceId, mode } = await request.json()
+    const priceId = process.env.STRIPE_ONE_TIME_DBA_PRICE_ID
 
     if (!priceId) {
-      return NextResponse.json({ error: 'priceId is required' }, { status: 400 })
-    }
-
-    // Support both subscription and one-time payment modes
-    const checkoutMode = mode === 'payment' ? 'payment' : 'subscription'
-
-    const sessionParams: Record<string, unknown> = {
-      mode: checkoutMode,
-      payment_method_types: ['card', 'ideal'],
-      line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing`,
-      metadata: { user_id: user.id },
+      console.error('STRIPE_ONE_TIME_DBA_PRICE_ID not configured')
+      return NextResponse.json({ error: 'One-time purchase not configured' }, { status: 500 })
     }
 
     // Look up existing Stripe customer
@@ -35,6 +21,18 @@ export async function POST(request: Request) {
       .select('stripe_customer_id')
       .eq('user_id', user.id)
       .single()
+
+    const sessionParams: Record<string, unknown> = {
+      mode: 'payment',
+      payment_method_types: ['card', 'ideal'],
+      line_items: [{ price: priceId, quantity: 1 }],
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?one_time=success&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing`,
+      metadata: {
+        user_id: user.id,
+        product_type: 'one_time_dba',
+      },
+    }
 
     if (profile?.stripe_customer_id) {
       sessionParams.customer = profile.stripe_customer_id
@@ -48,7 +46,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ url: session.url })
   } catch (error) {
-    console.error('Checkout error:', error)
+    console.error('One-time checkout error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
