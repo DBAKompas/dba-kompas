@@ -1,0 +1,21 @@
+{
+  "corpus_version": "2024-01-15",
+  "last_updated": "2024-01-15",
+  "sources": [
+    {
+      "id": "hr_2023_deliveroo",
+      "ecli": "ECLI:NL:HR:2023:443",
+      "title": "Hoge Raad 24 maart 2023 - Deliveroo",
+      "type": "rechtspraak",
+      "file": "hr_2023_deliveroo.md"
+    },
+    {
+      "id": "belastingdienst_handhaving",
+      "title": "Belastingdienst Handhaving Arbeidsrelaties",
+      "type": "overheid",
+      "url": "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/personeel_en_loon/u_bent_inhoudingsplichtige/wanneer_bent_u_inhoudingsplichtige/er_is_sprake_van_een_dienstbetrekking/",
+      "file": "belastingdienst_handhaving.md"
+    }
+  ],
+  "maintainer_note": "Run 'npm run update-legal-corpus' to check for updates. Manual review required before updating corpus files."
+}
