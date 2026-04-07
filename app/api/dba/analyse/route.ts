@@ -8,8 +8,8 @@ export const maxDuration = 120
 
 // Rate limits per plan (analyses per 24 uur)
 const RATE_LIMITS: Record<string, number> = {
-  free: 3,
-  pro: 50,
+  free: 20,
+  pro: 100,
   enterprise: 500,
 }
 
