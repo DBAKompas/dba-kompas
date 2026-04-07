@@ -184,13 +184,13 @@ export default function Home() {
           </motion.div>
 
           <motion.h1
-            className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight"
+            className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight text-foreground"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
             {LANDING.hero.title}{" "}
-            <span className="gradient-text">{LANDING.hero.titleHighlight}</span>
+            <span className="text-primary">{LANDING.hero.titleHighlight}</span>
           </motion.h1>
 
           <motion.p
@@ -208,12 +208,13 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.35 }}
           >
-            <Button size="lg" onClick={() => setEmailCheckoutPlan("yearly")} className="btn-magnetic min-w-[200px]">
+            <Button size="lg" onClick={() => setEmailCheckoutPlan("yearly")} className="btn-magnetic min-w-[240px]">
+              <Zap className="w-4 h-4 mr-2 flex-shrink-0" />
               {LANDING.hero.ctaPrimary}
-              <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
-            <Button size="lg" variant="outline" onClick={() => document.getElementById("quick-scan")?.scrollIntoView({ behavior: "smooth" })}>
+            <Button size="lg" variant="outline" onClick={() => window.location.href = `${APP_URL}/dashboard`}>
               {LANDING.hero.ctaSecondary}
+              <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </motion.div>
 

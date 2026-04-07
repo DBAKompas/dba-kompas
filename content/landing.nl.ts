@@ -15,9 +15,9 @@ export const LANDING = {
     titleHighlight: "voordat je het gesprek aangaat",
     subtitle:
       "DBA Kompas helpt je om sneller te zien waar je opdracht vragen oproept. Je plakt je opdrachtomschrijving of uploadt een document en ontvangt een risico-indicatie, aandachtspunten en een herschreven opdrachtbrief.",
-    supporting: "Indicatief hulpmiddel voor opdrachtbeoordeling – geen juridisch advies.",
-    ctaPrimary: "Start met DBA Kompas",
-    ctaSecondary: "Bekijk hoe het werkt",
+    supporting: "Ontdek in 1 minuut of jouw opdracht op belangrijke punten vragen oproept.",
+    ctaPrimary: "Start DBA Quick Scan (1 minuut)",
+    ctaSecondary: "Start met DBA Kompas",
     trustLine: "Van opdrachtomschrijving naar duidelijke aandachtspunten en gerichte vervolgstappen.",
   },
 
