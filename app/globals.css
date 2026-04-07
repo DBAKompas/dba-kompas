@@ -207,3 +207,79 @@
     }
   }
 }
+
+/* ─────────────────────────────────────────
+   DBA Kompas — Premium landing classes
+───────────────────────────────────────── */
+
+.hero-gradient {
+  background: radial-gradient(ellipse 80% 60% at 50% -10%, hsl(217 44% 22% / 0.12) 0%, transparent 70%);
+}
+
+.hero-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.hero-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent 30%, hsl(33 100% 64% / 0.04) 50%, transparent 70%);
+  pointer-events: none;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, hsl(217 44% 20%), hsl(33 100% 55%));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.glass-card {
+  background: hsl(60 33% 97% / 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid hsl(217 44% 20% / 0.1);
+  border-radius: 1rem;
+  box-shadow: 0 2px 12px hsl(217 44% 20% / 0.06), 0 1px 3px hsl(217 44% 20% / 0.04);
+}
+
+.hover-elevate {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-elevate:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px hsl(217 44% 20% / 0.12), 0 2px 8px hsl(217 44% 20% / 0.08);
+}
+
+.pricing-glow {
+  box-shadow: 0 0 0 1px hsl(217 44% 20% / 0.2), 0 8px 32px hsl(217 44% 20% / 0.18), 0 2px 8px hsl(217 44% 20% / 0.1);
+}
+
+.pricing-popular {
+  background: hsl(217 44% 19%);
+  color: hsl(60 33% 95%);
+}
+
+.checklist-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.5rem;
+  transition: background 0.15s ease;
+}
+.checklist-row:hover {
+  background: hsl(217 44% 20% / 0.06);
+}
+
+.btn-magnetic {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.btn-magnetic:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px hsl(217 44% 20% / 0.2);
+}
+
+.section-divider {
+  border-top: 1px solid hsl(217 44% 20% / 0.08);
+}
