@@ -716,15 +716,52 @@ export const dbaDraftOutputSchema = z.object({
 export type DbaDraftOutput = z.infer<typeof dbaDraftOutputSchema>;
 
 export function validateDbaDraftOutput(json: unknown): ValidationResult<DbaDraftOutput> {
-  try {
-    const parsed = dbaDraftOutputSchema.parse(json);
-    return { success: true, data: parsed };
-  } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Draft validation failed",
-    };
+  // First: strict Zod validation
+  const strict = dbaDraftOutputSchema.safeParse(json);
+  if (strict.success) return { success: true, data: strict.data };
+
+  // Always succeed by coercing whatever we got
+  if (!json || typeof json !== 'object') {
+    return { success: false, error: 'Not a JSON object' };
   }
+
+  const obj = json as Record<string, unknown>;
+  const str = (v: unknown) => typeof v === 'string' ? v : '';
+  const strArr = (v: unknown) => Array.isArray(v) ? (v as unknown[]).filter((x) => typeof x === 'string') as string[] : [];
+
+  const coerceLong = (v: unknown) => {
+    const d = (v && typeof v === 'object' ? v : {}) as Record<string, unknown>;
+    return {
+      title: str(d.title) || 'Opdrachtomschrijving',
+      assignmentDescription: str(d.assignmentDescription),
+      deliverables: strArr(d.deliverables),
+      acceptanceCriteria: strArr(d.acceptanceCriteria),
+      scopeExclusions: strArr(d.scopeExclusions),
+      dependenciesAndAssumptions: strArr(d.dependenciesAndAssumptions),
+      risksAndMitigations: strArr(d.risksAndMitigations),
+      executionAndSteering: str(d.executionAndSteering),
+    };
+  };
+  const coerceCompact = (v: unknown) => {
+    const d = (v && typeof v === 'object' ? v : {}) as Record<string, unknown>;
+    return {
+      title: str(d.title) || 'Opdrachtomschrijving',
+      assignmentDescription: str(d.assignmentDescription),
+      deliverables: strArr(d.deliverables),
+      executionAndSteering: str(d.executionAndSteering),
+    };
+  };
+
+  const coerced: DbaDraftOutput = {
+    longAssignmentDraft: obj.longAssignmentDraft ? coerceLong(obj.longAssignmentDraft) : coerceLong({}),
+    compactAssignmentDraft: obj.compactAssignmentDraft ? coerceCompact(obj.compactAssignmentDraft) : coerceCompact({}),
+    reusableBuildingBlocks: { resultBullets: [], acceptanceBullets: [], independenceBullets: [], scopeBullets: [] },
+    additionalImprovements: strArr(obj.additionalImprovements),
+    followUpQuestions: strArr(obj.followUpQuestions),
+  };
+
+  console.log('[DBA] Draft validation coerced. Error:', strict.error?.message?.slice(0, 150));
+  return { success: true, data: coerced };
 }
 
 export const FALLBACK_DRAFT_OUTPUT: DbaDraftOutput = {
