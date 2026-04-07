@@ -761,7 +761,7 @@ function ResultsScreen({ active }: { active: boolean }) {
 /* ─────────────────────────────────────────────
    SCREEN 5 — CTA
 ───────────────────────────────────────────────── */
-function CtaScreen({ active }: { active: boolean }) {
+function CtaScreen({ active, onSubscribe }: { active: boolean; onSubscribe?: () => void }) {
   return (
     <div
       className="flex flex-col items-center justify-center h-full min-h-[400px] px-6 py-10 text-center"
@@ -819,25 +819,25 @@ function CtaScreen({ active }: { active: boolean }) {
         transition={{ delay: 0.55, duration: 0.4 }}
         className="w-full max-w-xs space-y-3"
       >
-        <motion.a
-          href={APP_URL}
+        <motion.button
+          onClick={onSubscribe ?? (() => { window.location.href = APP_URL; })}
           animate={{ scale: [1, 1.04, 1] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-bold"
+          className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-bold cursor-pointer"
           style={{ background: ORANGE, color: NAVY }}
           aria-label="Analyseer jouw opdracht nu"
           data-testid="demo-cta-link"
         >
           Analyseer jouw opdracht nu <ArrowRight className="w-4 h-4" />
-        </motion.a>
+        </motion.button>
 
-        <a
-          href={`${APP_URL}#one-time`}
-          className="block text-center text-white/60 text-xs hover:text-white transition-colors"
+        <button
+          onClick={() => { window.location.href = `${APP_URL}#one-time`; }}
+          className="block w-full text-center text-white/60 text-xs hover:text-white transition-colors cursor-pointer"
           aria-label="Eenmalige check"
         >
           Eenmalige check voor €9,95 — geen abonnement
-        </a>
+        </button>
 
       </motion.div>
     </div>
@@ -853,7 +853,7 @@ const slideVariants = {
   exit: (dir: number) => ({ opacity: 0, x: dir * -32, transition: { duration: 0.35, ease: [0.42, 0, 0.58, 1] } }),
 };
 
-export default function AppDemoShowcase() {
+export default function AppDemoShowcase({ onSubscribe }: { onSubscribe?: () => void }) {
   const [screen, setScreen] = useState(0);
   const [dir, setDir] = useState(1);
   const [started, setStarted] = useState(false);
@@ -946,7 +946,7 @@ export default function AppDemoShowcase() {
               {screen === 1 && <InputScreen active={started} onReady={() => { if (SCREEN_DURATIONS[1] != null) advance(); }} />}
               {screen === 2 && <ProcessingScreen active={started} />}
               {screen === 3 && <ResultsScreen active={started} />}
-              {screen === 4 && <CtaScreen active={started} />}
+              {screen === 4 && <CtaScreen active={started} onSubscribe={onSubscribe} />}
             </motion.div>
           </AnimatePresence>
         </div>

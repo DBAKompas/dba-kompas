@@ -15,6 +15,7 @@ import AppDemoShowcase from "@/components/marketing/AppDemoShowcase";
 import QuickScan from "@/components/marketing/QuickScan";
 import { AuthModal } from "@/components/marketing/AuthModals";
 import { EmailCheckoutModal } from "@/components/marketing/EmailCheckoutModal";
+import QuickScanModal from "@/components/marketing/QuickScanModal";
 import { useMarketingAuth as useAuth } from "@/components/marketing/useMarketingAuth";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
@@ -87,6 +88,11 @@ export default function Home() {
   const [scrolled, setScrolled] = useState(false);
   const [authModal, setAuthModal] = useState<"login" | null>(null);
   const [emailCheckoutPlan, setEmailCheckoutPlan] = useState<"monthly" | "yearly" | "one_time_dba" | null>(null);
+  const [quickScanOpen, setQuickScanOpen] = useState(false);
+
+  function scrollToPricing() {
+    document.getElementById("prijzen")?.scrollIntoView({ behavior: "smooth" });
+  }
 
   const { user } = useAuth();
 
@@ -155,7 +161,8 @@ export default function Home() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setAuthModal("login")}
+                  onClick={() => window.location.href = `${APP_URL}/login`}
+                  title="Heb je al een account? Log hier in."
                 >
                   {LANDING.nav.login}
                 </Button>
@@ -165,6 +172,7 @@ export default function Home() {
                   className="btn-magnetic"
                 >
                   {LANDING.nav.tryNow}
+                  <ArrowRight className="w-4 h-4 ml-1.5" />
                 </Button>
               </>
             )}
@@ -208,11 +216,11 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.35 }}
           >
-            <Button size="lg" onClick={() => setEmailCheckoutPlan("yearly")} className="btn-magnetic min-w-[240px]">
+            <Button size="lg" onClick={() => setQuickScanOpen(true)} className="btn-magnetic min-w-[240px]">
               <Zap className="w-4 h-4 mr-2 flex-shrink-0" />
               {LANDING.hero.ctaPrimary}
             </Button>
-            <Button size="lg" variant="outline" onClick={() => window.location.href = `${APP_URL}/dashboard`}>
+            <Button size="lg" variant="outline" onClick={scrollToPricing}>
               {LANDING.hero.ctaSecondary}
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
@@ -345,7 +353,7 @@ export default function Home() {
             transition={{ duration: 0.8 }}
             viewport={viewportConfig}
           >
-            <AppDemoShowcase />
+            <AppDemoShowcase onSubscribe={() => setEmailCheckoutPlan("yearly")} />
           </motion.div>
         </div>
       </section>
@@ -719,13 +727,14 @@ export default function Home() {
           <img src="/logo-white-v3.png" alt="DBA Kompas" className="h-10 w-auto mx-auto relative z-10" />
           <h2 className="text-3xl md:text-4xl font-bold text-white relative z-10">{LANDING.cta.title}</h2>
           <p className="text-white/70 relative z-10">{LANDING.cta.subtitle}</p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 relative z-10">
-            <Button size="lg" onClick={() => setEmailCheckoutPlan("yearly")} className="btn-magnetic min-w-[180px] bg-white text-primary hover:bg-white/90 border-0">
+          <div className="flex justify-center pt-2 relative z-10">
+            <Button
+              size="lg"
+              onClick={() => setEmailCheckoutPlan("yearly")}
+              className="btn-magnetic w-full sm:w-auto sm:min-w-[260px] bg-white text-primary border-0 hover:bg-accent hover:text-white transition-colors"
+            >
               {LANDING.cta.primary}
               <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-            <Button size="lg" variant="ghost" onClick={() => document.getElementById("quick-scan")?.scrollIntoView({ behavior: "smooth" })} className="text-white hover:bg-white/15 hover:text-white border border-white/30">
-              {LANDING.cta.secondary}
             </Button>
           </div>
           <p className="text-xs text-white/40 relative z-10">{LANDING.disclaimer}</p>
@@ -768,6 +777,8 @@ export default function Home() {
       </footer>
 
       {/* ── MODALS ─────────────────────────────── */}
+      <QuickScanModal open={quickScanOpen} onOpenChange={setQuickScanOpen} />
+
       {authModal && (
         <AuthModal
           mode={authModal}
