@@ -756,6 +756,7 @@ export default function Home() {
               <div className="space-y-3">
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/60">{LANDING.footer.contact.title}</p>
                 <a href="mailto:info@dbakompas.nl" className="block text-sm text-muted-foreground hover:text-foreground transition-colors">{LANDING.footer.contact.email}</a>
+                <p className="text-sm text-muted-foreground/60">KvK: 99964538</p>
               </div>
             </div>
           </div>
