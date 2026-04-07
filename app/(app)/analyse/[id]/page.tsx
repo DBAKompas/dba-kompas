@@ -19,23 +19,26 @@ import {
 } from 'lucide-react'
 
 interface Domain {
-  name: string
-  riskScore: number
-  riskLevel: string
-  indicators: string[]
-  improvements: string[]
+  key: string
+  title: string
+  scoreLabel: string
+  scoreColor: string
+  summary: string
+  indicatorsForRisk: string[]
+  indicatorsForIndependence: string[]
+  suggestedImprovements: string[]
 }
 
 interface Assessment {
   id: string
-  overallRiskScore: number
-  overallRiskLevel: string
-  overallSummary: string
+  overall_risk_color: string
+  overall_risk_label: string
+  overall_summary: string
   domains: Domain[]
-  topImprovements: string[]
-  compactAssignment: string
-  longAssignment: string
-  createdAt: string
+  top_improvements: string[]
+  compact_assignment_draft: string | object
+  optimized_brief: string | object
+  created_at: string
 }
 
 function getRiskColor(level: string) {
@@ -130,7 +133,15 @@ export default function AssessmentDetailPage() {
     )
   }
 
-  const RiskIcon = getRiskIcon(assessment.overallRiskLevel)
+  const RiskIcon = getRiskIcon(assessment.overall_risk_label)
+
+  // compact_assignment_draft en optimized_brief zijn JSON-strings in de DB
+  const compactText = typeof assessment.compact_assignment_draft === 'string'
+    ? (() => { try { return JSON.parse(assessment.compact_assignment_draft as string) } catch { return assessment.compact_assignment_draft } })()
+    : assessment.compact_assignment_draft
+  const longText = typeof assessment.optimized_brief === 'string'
+    ? (() => { try { return JSON.parse(assessment.optimized_brief as string) } catch { return assessment.optimized_brief } })()
+    : assessment.optimized_brief
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -158,39 +169,38 @@ export default function AssessmentDetailPage() {
               <CardTitle>Analyse Resultaat</CardTitle>
               <CardDescription>
                 Uitgevoerd op{' '}
-                {assessment.createdAt
-                  ? new Date(assessment.createdAt).toLocaleDateString('nl-NL')
+                {assessment.created_at
+                  ? new Date(assessment.created_at).toLocaleDateString('nl-NL')
                   : 'onbekend'}
               </CardDescription>
             </div>
             <div className="flex items-center gap-3">
               <RiskIcon className="size-8" />
               <div className="text-right">
-                <div className="text-3xl font-bold">{assessment.overallRiskScore}</div>
                 <span
                   className={`inline-block rounded-full px-3 py-0.5 text-xs font-medium ${getRiskColor(
-                    assessment.overallRiskLevel
+                    assessment.overall_risk_label
                   )}`}
                 >
-                  {assessment.overallRiskLevel}
+                  {assessment.overall_risk_label}
                 </span>
               </div>
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">{assessment.overallSummary}</p>
+          <p className="text-sm text-muted-foreground">{assessment.overall_summary}</p>
         </CardContent>
       </Card>
 
       {/* Domain cards */}
       <div className="space-y-3">
         <h2 className="text-lg font-semibold">Domeinen</h2>
-        {assessment.domains?.map((domain, index) => {
+        {(assessment.domains as Domain[])?.map((domain, index) => {
           const expanded = expandedDomains.has(index)
-          const DomainRiskIcon = getRiskIcon(domain.riskLevel)
+          const DomainRiskIcon = getRiskIcon(domain.scoreLabel)
           return (
-            <Card key={index}>
+            <Card key={domain.key ?? index}>
               <CardHeader
                 className="cursor-pointer"
                 onClick={() => toggleDomain(index)}
@@ -198,13 +208,13 @@ export default function AssessmentDetailPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <DomainRiskIcon className="size-5" />
-                    <CardTitle>{domain.name}</CardTitle>
+                    <CardTitle>{domain.title}</CardTitle>
                     <span
                       className={`rounded-full px-2 py-0.5 text-xs font-medium ${getRiskColor(
-                        domain.riskLevel
+                        domain.scoreLabel
                       )}`}
                     >
-                      {domain.riskLevel} ({domain.riskScore})
+                      {domain.scoreLabel}
                     </span>
                   </div>
                   {expanded ? (
@@ -213,14 +223,20 @@ export default function AssessmentDetailPage() {
                     <ChevronDown className="size-4" />
                   )}
                 </div>
+                {!expanded && domain.summary && (
+                  <CardDescription className="mt-1">{domain.summary}</CardDescription>
+                )}
               </CardHeader>
               {expanded && (
                 <CardContent className="space-y-4">
-                  {domain.indicators?.length > 0 && (
+                  {domain.summary && (
+                    <p className="text-sm text-muted-foreground">{domain.summary}</p>
+                  )}
+                  {domain.indicatorsForRisk?.length > 0 && (
                     <div>
                       <h4 className="mb-2 text-sm font-medium">Risico-indicatoren</h4>
                       <ul className="space-y-1">
-                        {domain.indicators.map((indicator, i) => (
+                        {domain.indicatorsForRisk.map((indicator, i) => (
                           <li
                             key={i}
                             className="flex items-start gap-2 text-sm text-muted-foreground"
@@ -232,11 +248,27 @@ export default function AssessmentDetailPage() {
                       </ul>
                     </div>
                   )}
-                  {domain.improvements?.length > 0 && (
+                  {domain.indicatorsForIndependence?.length > 0 && (
+                    <div>
+                      <h4 className="mb-2 text-sm font-medium">Onafhankelijkheidsindicatoren</h4>
+                      <ul className="space-y-1">
+                        {domain.indicatorsForIndependence.map((indicator, i) => (
+                          <li
+                            key={i}
+                            className="flex items-start gap-2 text-sm text-muted-foreground"
+                          >
+                            <ShieldCheck className="mt-0.5 size-3 shrink-0 text-green-500" />
+                            {indicator}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {domain.suggestedImprovements?.length > 0 && (
                     <div>
                       <h4 className="mb-2 text-sm font-medium">Verbeteringen</h4>
                       <ul className="space-y-1">
-                        {domain.improvements.map((improvement, i) => (
+                        {domain.suggestedImprovements.map((improvement, i) => (
                           <li
                             key={i}
                             className="flex items-start gap-2 text-sm text-muted-foreground"
@@ -256,7 +288,7 @@ export default function AssessmentDetailPage() {
       </div>
 
       {/* Top improvements */}
-      {assessment.topImprovements?.length > 0 && (
+      {(assessment.top_improvements as string[])?.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -266,7 +298,7 @@ export default function AssessmentDetailPage() {
           </CardHeader>
           <CardContent>
             <ol className="list-decimal space-y-2 pl-5">
-              {assessment.topImprovements.map((improvement, i) => (
+              {(assessment.top_improvements as string[]).map((improvement, i) => (
                 <li key={i} className="text-sm text-muted-foreground">
                   {improvement}
                 </li>
@@ -277,7 +309,7 @@ export default function AssessmentDetailPage() {
       )}
 
       {/* Assignment drafts */}
-      {(assessment.compactAssignment || assessment.longAssignment) && (
+      {(compactText || longText) && (
         <Card>
           <CardHeader>
             <CardTitle>Opdrachtformulering</CardTitle>
@@ -304,8 +336,8 @@ export default function AssessmentDetailPage() {
           <CardContent>
             <div className="rounded-lg bg-muted p-4 text-sm whitespace-pre-wrap">
               {activeTab === 'compact'
-                ? assessment.compactAssignment
-                : assessment.longAssignment}
+                ? (typeof compactText === 'object' ? JSON.stringify(compactText, null, 2) : String(compactText ?? ''))
+                : (typeof longText === 'object' ? JSON.stringify(longText, null, 2) : String(longText ?? ''))}
             </div>
           </CardContent>
         </Card>

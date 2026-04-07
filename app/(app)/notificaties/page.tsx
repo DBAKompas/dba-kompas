@@ -18,8 +18,8 @@ interface Notification {
   title: string
   message: string
   type: string
-  read: boolean
-  createdAt: string
+  is_read: boolean
+  created_at: string
 }
 
 function getNotificationIcon(type: string) {
@@ -48,7 +48,7 @@ export default function NotificatiesPage() {
       .catch(() => setLoading(false))
   }, [])
 
-  const unreadCount = notifications.filter((n) => !n.read).length
+  const unreadCount = notifications.filter((n) => !n.is_read).length
 
   const markAsRead = async (id: string) => {
     setMarkingRead((prev) => new Set(prev).add(id))
@@ -56,7 +56,7 @@ export default function NotificatiesPage() {
       const res = await fetch(`/api/notifications/${id}/read`, { method: 'POST' })
       if (res.ok) {
         setNotifications((prev) =>
-          prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+          prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
         )
       }
     } finally {
@@ -111,7 +111,7 @@ export default function NotificatiesPage() {
             return (
               <Card
                 key={notification.id}
-                className={notification.read ? 'opacity-60' : ''}
+                className={notification.is_read ? 'opacity-60' : ''}
               >
                 <CardHeader>
                   <div className="flex items-start justify-between gap-3">
@@ -120,16 +120,16 @@ export default function NotificatiesPage() {
                       <div>
                         <CardTitle className="flex items-center gap-2">
                           {notification.title}
-                          {!notification.read && (
+                          {!notification.is_read && (
                             <span className="size-2 rounded-full bg-blue-500" />
                           )}
                         </CardTitle>
                         <CardDescription className="mt-1">
                           {notification.message}
                         </CardDescription>
-                        {notification.createdAt && (
+                        {notification.created_at && (
                           <p className="mt-1 text-xs text-muted-foreground">
-                            {new Date(notification.createdAt).toLocaleDateString('nl-NL', {
+                            {new Date(notification.created_at).toLocaleDateString('nl-NL', {
                               day: 'numeric',
                               month: 'long',
                               year: 'numeric',
@@ -140,7 +140,7 @@ export default function NotificatiesPage() {
                         )}
                       </div>
                     </div>
-                    {!notification.read && (
+                    {!notification.is_read && (
                       <Button
                         variant="ghost"
                         size="sm"

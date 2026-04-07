@@ -70,7 +70,7 @@ export default function AnalysePage() {
         response = await fetch('/api/dba/analyse', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text }),
+          body: JSON.stringify({ inputText: text }),
         })
       }
 

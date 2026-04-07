@@ -14,10 +14,10 @@ import {
 } from 'lucide-react'
 
 interface Stats {
-  totalAnalyses: number
-  laagRisico: number
-  nieuwsUpdates: number
-  ongelezenNotificaties: number
+  totalAssessments: number
+  dbaProofCount: number
+  newUpdates: number
+  unreadNotifications: number
 }
 
 export default function DashboardPage() {
@@ -37,25 +37,25 @@ export default function DashboardPage() {
   const statCards = [
     {
       title: 'Totaal Analyses',
-      value: stats?.totalAnalyses ?? 0,
+      value: stats?.totalAssessments ?? 0,
       icon: FileSearch,
       color: 'text-blue-600',
     },
     {
-      title: 'Laag Risico',
-      value: stats?.laagRisico ?? 0,
+      title: 'DBA-proof',
+      value: stats?.dbaProofCount ?? 0,
       icon: ShieldCheck,
       color: 'text-green-600',
     },
     {
       title: 'Nieuws Updates',
-      value: stats?.nieuwsUpdates ?? 0,
+      value: stats?.newUpdates ?? 0,
       icon: Newspaper,
       color: 'text-amber-600',
     },
     {
       title: 'Ongelezen Notificaties',
-      value: stats?.ongelezenNotificaties ?? 0,
+      value: stats?.unreadNotifications ?? 0,
       icon: Bell,
       color: 'text-red-600',
     },

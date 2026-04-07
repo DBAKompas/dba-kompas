@@ -16,10 +16,10 @@ import {
 
 interface Document {
   id: string
-  name: string
+  filename: string
   status: string
-  createdAt: string
-  assessmentId?: string
+  uploaded_at: string
+  assessment_id?: string
 }
 
 function getStatusBadge(status: string) {
@@ -119,10 +119,10 @@ export default function DocumentenPage() {
                     <div className="flex items-center gap-3">
                       <FileText className="size-5 text-muted-foreground" />
                       <div>
-                        <CardTitle>{doc.name}</CardTitle>
+                        <CardTitle>{doc.filename}</CardTitle>
                         <CardDescription>
-                          {doc.createdAt
-                            ? new Date(doc.createdAt).toLocaleDateString('nl-NL', {
+                          {doc.uploaded_at
+                            ? new Date(doc.uploaded_at).toLocaleDateString('nl-NL', {
                                 day: 'numeric',
                                 month: 'long',
                                 year: 'numeric',
@@ -138,9 +138,9 @@ export default function DocumentenPage() {
                         <StatusIcon className="size-3" />
                         {statusInfo.label}
                       </span>
-                      {doc.assessmentId && (
+                      {doc.assessment_id && (
                         <Button variant="outline" size="sm" asChild>
-                          <Link href={`/analyse/${doc.assessmentId}`}>
+                          <Link href={`/analyse/${doc.assessment_id}`}>
                             Bekijk analyse
                           </Link>
                         </Button>

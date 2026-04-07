@@ -20,7 +20,7 @@ interface NewsItem {
   content: string
   impact: string
   category: string
-  publishedAt: string
+  published_at: string
 }
 
 function getImpactColor(impact: string) {
@@ -160,9 +160,9 @@ export default function NieuwsPage() {
                             {item.category}
                           </span>
                         )}
-                        {item.publishedAt && (
+                        {item.published_at && (
                           <span className="text-xs text-muted-foreground">
-                            {new Date(item.publishedAt).toLocaleDateString('nl-NL')}
+                            {new Date(item.published_at).toLocaleDateString('nl-NL')}
                           </span>
                         )}
                       </div>
