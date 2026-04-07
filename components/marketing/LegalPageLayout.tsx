@@ -24,7 +24,7 @@ export default function LegalPageLayout({
       <header className="border-b border-border/40 bg-background/95 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
           <Link href="/" className="flex items-center" data-testid="legal-link-home">
-            <BrandLogo variant="dark" className="h-9 w-auto" />
+            <BrandLogo variant="dark" className="h-11 w-auto" />
           </Link>
           <Link
             href="/"
@@ -40,9 +40,6 @@ export default function LegalPageLayout({
       {/* Document header */}
       <div className="border-b border-border/30 bg-primary/3">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10 md:py-14">
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/50 mb-3">
-            DBA Kompas — Juridische documenten
-          </p>
           <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2" data-testid="legal-page-title">
             {title}
           </h1>
@@ -84,7 +81,7 @@ export default function LegalPageLayout({
       <footer className="border-t border-border/40 mt-8">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <BrandLogo variant="dark" className="h-7 w-auto opacity-60" />
+            <BrandLogo variant="dark" className="h-9 w-auto opacity-70" />
             <nav className="flex flex-wrap gap-x-5 gap-y-2 text-xs text-muted-foreground/60">
               <Link href="/algemene-voorwaarden" className="hover:text-foreground transition-colors">Algemene Voorwaarden</Link>
               <Link href="/privacy-en-cookiebeleid" className="hover:text-foreground transition-colors">Privacy & Cookies</Link>

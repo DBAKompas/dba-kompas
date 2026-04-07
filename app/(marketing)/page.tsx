@@ -716,7 +716,7 @@ export default function Home() {
         >
           {/* shimmer overlay */}
           <div className="pointer-events-none absolute inset-0 cta-shimmer" />
-          <img src="/logo-dark-v3.png" alt="DBA Kompas" className="h-9 w-auto mx-auto relative z-10" />
+          <img src="/logo-white-v3.png" alt="DBA Kompas" className="h-10 w-auto mx-auto relative z-10" />
           <h2 className="text-3xl md:text-4xl font-bold text-white relative z-10">{LANDING.cta.title}</h2>
           <p className="text-white/70 relative z-10">{LANDING.cta.subtitle}</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 relative z-10">
