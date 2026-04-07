@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /Users/marvinzoetemelk/dba-kompas log --oneline --all -- server/services/aiService.ts)",
+      "Bash(cp /Users/marvinzoetemelk/Downloads/DBA-Kompas/legal_corpus/nl_wet_dba/hr_2023_deliveroo.md /Users/marvinzoetemelk/dba-kompas/legal_corpus/nl_wet_dba/)",
+      "Bash(cp /Users/marvinzoetemelk/Downloads/DBA-Kompas/legal_corpus/nl_wet_dba/belastingdienst_handhaving.md /Users/marvinzoetemelk/dba-kompas/legal_corpus/nl_wet_dba/)",
+      "Bash(npm install:*)",
+      "Bash(npx next:*)",
+      "Bash(npx tsc:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(mkdir -p /Users/marvinzoetemelk/dba-kompas/app/api/dba/assessments/\\\\[id\\\\]/pdf)",
+      "Bash(mkdir -p /Users/marvinzoetemelk/dba-kompas/app/api/documents/\\\\[id\\\\])",
+      "Bash(mkdir -p /Users/marvinzoetemelk/dba-kompas/app/api/notifications/\\\\[id\\\\]/read)",
+      "Bash(open:*)",
+      "Bash(npm run:*)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000)"
+    ]
+  }
+}

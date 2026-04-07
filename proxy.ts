@@ -2,7 +2,16 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 // Routes die altijd toegankelijk zijn zonder inloggen
-const PUBLIC_ROUTES = ['/login', '/auth/callback', '/api/billing/webhook']
+const PUBLIC_ROUTES = [
+  '/login',
+  '/auth/callback',
+  '/api/billing/webhook',
+  '/',
+  '/algemene-voorwaarden',
+  '/privacy-en-cookiebeleid',
+  '/ai-data-use-notice',
+  '/api/quick-scan',
+]
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
