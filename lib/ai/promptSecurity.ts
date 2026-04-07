@@ -564,9 +564,9 @@ export const dbaEngineOutputSchema = z.object({
   directionalAssessment: directionalAssessmentSchema,
   topImprovements: z.array(z.string()).min(1).max(5),
   additionalImprovements: z.array(z.string()).default([]),
-  longAssignmentDraft: longAssignmentDraftSchema,
-  compactAssignmentDraft: compactAssignmentDraftSchema,
-  reusableBuildingBlocks: reusableBuildingBlocksSchema,
+  longAssignmentDraft: longAssignmentDraftSchema.optional(),
+  compactAssignmentDraft: compactAssignmentDraftSchema.optional(),
+  reusableBuildingBlocks: reusableBuildingBlocksSchema.optional(),
   simulationFactState: simulationFactStateSchema.optional(),
   simulationHints: z.array(simulationHintSchema).default([]),
   disclaimerShort: z.string().default("Indicatieve analyse, geen juridisch advies."),
@@ -630,9 +630,41 @@ export const FALLBACK_DBA_ENGINE_OUTPUT: DbaEngineOutput = {
   },
   topImprovements: ['Probeer de analyse opnieuw uit te voeren.'],
   additionalImprovements: [],
+  simulationHints: [],
+  disclaimerShort: 'Indicatieve analyse, geen juridisch advies.',
+  followUpQuestions: ['Probeer de analyse opnieuw uit te voeren.'],
+};
+
+// ============================================================
+// Draft generation schema (Phase 2)
+// ============================================================
+
+export const dbaDraftOutputSchema = z.object({
+  longAssignmentDraft: longAssignmentDraftSchema,
+  compactAssignmentDraft: compactAssignmentDraftSchema,
+  reusableBuildingBlocks: reusableBuildingBlocksSchema,
+  additionalImprovements: z.array(z.string()).default([]),
+  followUpQuestions: z.array(z.string()).default([]),
+});
+
+export type DbaDraftOutput = z.infer<typeof dbaDraftOutputSchema>;
+
+export function validateDbaDraftOutput(json: unknown): ValidationResult<DbaDraftOutput> {
+  try {
+    const parsed = dbaDraftOutputSchema.parse(json);
+    return { success: true, data: parsed };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Draft validation failed",
+    };
+  }
+}
+
+export const FALLBACK_DRAFT_OUTPUT: DbaDraftOutput = {
   longAssignmentDraft: {
-    title: 'Opdrachtomschrijving niet beschikbaar',
-    assignmentDescription: 'Geen opdrachtomschrijving beschikbaar vanwege een technisch probleem. Probeer de analyse opnieuw.',
+    title: 'Opdrachtomschrijving',
+    assignmentDescription: 'Omschrijving kon niet automatisch worden gegenereerd.',
     deliverables: [],
     acceptanceCriteria: [],
     scopeExclusions: [],
@@ -641,8 +673,8 @@ export const FALLBACK_DBA_ENGINE_OUTPUT: DbaEngineOutput = {
     executionAndSteering: '',
   },
   compactAssignmentDraft: {
-    title: '',
-    assignmentDescription: 'Geen opdrachtomschrijving beschikbaar.',
+    title: 'Opdrachtomschrijving',
+    assignmentDescription: 'Omschrijving kon niet automatisch worden gegenereerd.',
     deliverables: [],
     executionAndSteering: '',
   },
@@ -652,7 +684,6 @@ export const FALLBACK_DBA_ENGINE_OUTPUT: DbaEngineOutput = {
     independenceBullets: [],
     scopeBullets: [],
   },
-  simulationHints: [],
-  disclaimerShort: 'Indicatieve analyse, geen juridisch advies.',
-  followUpQuestions: ['Probeer de analyse opnieuw uit te voeren.'],
+  additionalImprovements: [],
+  followUpQuestions: [],
 };

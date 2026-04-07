@@ -74,6 +74,7 @@ export default function AssessmentDetailPage() {
   const router = useRouter()
   const [assessment, setAssessment] = useState<Assessment | null>(null)
   const [loading, setLoading] = useState(true)
+  const [draftLoading, setDraftLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [expandedDomains, setExpandedDomains] = useState<Set<number>>(new Set())
   const [activeTab, setActiveTab] = useState<'compact' | 'long'>('compact')
@@ -95,6 +96,24 @@ export default function AssessmentDetailPage() {
         setLoading(false)
       })
   }, [params.id])
+
+  useEffect(() => {
+    if (!assessment || assessment.compact_assignment_draft) return
+
+    setDraftLoading(true)
+    fetch(`/api/dba/analyse/${params.id}/draft`, { method: 'POST' })
+      .then((res) => {
+        if (!res.ok) throw new Error('Draft generation failed')
+        return res.json()
+      })
+      .then((draftData) => {
+        setAssessment((prev) => prev ? { ...prev, ...draftData } : prev)
+        setDraftLoading(false)
+      })
+      .catch(() => {
+        setDraftLoading(false)
+      })
+  }, [assessment, params.id])
 
   const toggleDomain = (index: number) => {
     setExpandedDomains((prev) => {
@@ -309,13 +328,13 @@ export default function AssessmentDetailPage() {
       )}
 
       {/* Assignment drafts */}
-      {(compactText || longText) && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Opdrachtformulering</CardTitle>
-            <CardDescription>
-              Voorbeeldteksten voor uw overeenkomst
-            </CardDescription>
+      <Card>
+        <CardHeader>
+          <CardTitle>Opdrachtformulering</CardTitle>
+          <CardDescription>
+            Voorbeeldteksten voor uw overeenkomst
+          </CardDescription>
+          {!draftLoading && (compactText || longText) && (
             <div className="flex gap-2 pt-2">
               <Button
                 variant={activeTab === 'compact' ? 'default' : 'outline'}
@@ -332,16 +351,27 @@ export default function AssessmentDetailPage() {
                 Uitgebreid
               </Button>
             </div>
-          </CardHeader>
-          <CardContent>
+          )}
+        </CardHeader>
+        <CardContent>
+          {draftLoading ? (
+            <div className="flex items-center gap-3 rounded-lg bg-muted p-6 text-sm text-muted-foreground">
+              <Loader2 className="size-4 animate-spin shrink-0" />
+              Opdrachtteksten worden gegenereerd... (dit duurt circa 15-20 seconden)
+            </div>
+          ) : (compactText || longText) ? (
             <div className="rounded-lg bg-muted p-4 text-sm whitespace-pre-wrap">
               {activeTab === 'compact'
                 ? (typeof compactText === 'object' ? JSON.stringify(compactText, null, 2) : String(compactText ?? ''))
                 : (typeof longText === 'object' ? JSON.stringify(longText, null, 2) : String(longText ?? ''))}
             </div>
-          </CardContent>
-        </Card>
-      )}
+          ) : (
+            <div className="rounded-lg bg-muted p-4 text-sm text-muted-foreground">
+              Opdrachtteksten konden niet worden gegenereerd.
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Disclaimer */}
       <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-800">
