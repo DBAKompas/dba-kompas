@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Check } from 'lucide-react'
 import BrandLogo from '@/components/marketing/BrandLogo'
 import Link from 'next/link'
+import { EmailCheckoutModal } from '@/components/marketing/EmailCheckoutModal'
 
 function inputCls(error?: boolean) {
   return [
@@ -22,11 +23,12 @@ function inputCls(error?: boolean) {
 export default function LoginPage() {
   const [email, setEmail]         = useState('')
   const [password, setPassword]   = useState('')
-  const [showPw, setShowPw]       = useState(false)
-  const [loading, setLoading]     = useState(false)
-  const [sent, setSent]           = useState(false)
-  const [mode, setMode]           = useState<'password' | 'magic'>('password')
-  const [error, setError]         = useState('')
+  const [showPw, setShowPw]           = useState(false)
+  const [loading, setLoading]         = useState(false)
+  const [sent, setSent]               = useState(false)
+  const [mode, setMode]               = useState<'password' | 'magic'>('password')
+  const [error, setError]             = useState('')
+  const [checkoutOpen, setCheckoutOpen] = useState(false)
   const supabase = createClient()
   const router   = useRouter()
 
@@ -180,11 +182,22 @@ export default function LoginPage() {
         {/* Nog geen account */}
         <p className="text-center text-sm text-muted-foreground">
           Nog geen account?{' '}
-          <a href="https://dbakompas.nl/#prijzen" className="font-semibold text-foreground hover:text-accent transition-colors">
+          <button
+            onClick={() => setCheckoutOpen(true)}
+            className="font-semibold text-foreground hover:text-accent transition-colors"
+          >
             Bekijk de abonnementen
-          </a>
+          </button>
         </p>
       </div>
+
+      {/* Abonnement modal */}
+      {checkoutOpen && (
+        <EmailCheckoutModal
+          preselectedPlan="yearly"
+          onClose={() => setCheckoutOpen(false)}
+        />
+      )}
     </main>
   )
 }
