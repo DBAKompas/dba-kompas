@@ -1,4 +1,4 @@
-import OpenAI from "openai";
+import Anthropic from "@anthropic-ai/sdk";
 import {
   DBA_SCORING_SYSTEM_PROMPT,
   NEWS_REWRITE_SYSTEM_PROMPT,
@@ -26,8 +26,8 @@ import {
   formatContextForPrompt
 } from "./corpus";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || "default_key"
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY || "default_key"
 });
 
 function sanitizeMarkdown(text: string): string {
@@ -370,34 +370,30 @@ VERBODEN TERMEN:
 "garantie", "100% zeker", "definitief vastgesteld" (voor lopende wetgeving)`;
 }
 
-async function callOpenAIWithRetry<T>(
+async function callAnthropicWithRetry<T>(
   systemPrompt: string,
   userPrompt: string,
   validator: (json: unknown) => { success: boolean; data?: T; error?: string },
   fallback: T,
-  model: string = "gpt-4.1-mini",
+  model: string = "claude-opus-4-6",
   maxTokens: number = 1500
 ): Promise<T> {
   try {
-    const response = await openai.chat.completions.create({
+    const response = await anthropic.messages.create({
       model,
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt }
-      ],
-      response_format: { type: "json_object" },
-      max_completion_tokens: maxTokens,
-      store: false
+      system: systemPrompt,
+      messages: [{ role: "user", content: userPrompt }],
+      max_tokens: maxTokens,
     });
 
-    const rawContent = response.choices[0].message.content || "{}";
+    const rawContent = response.content[0].type === "text" ? response.content[0].text : "{}";
     let parsed: unknown;
 
     try {
       parsed = JSON.parse(rawContent);
     } catch {
       console.error("Failed to parse JSON response, attempting retry...");
-      return await retryWithFix(systemPrompt, userPrompt, rawContent, "Invalid JSON syntax", validator, fallback, model, maxTokens);
+      return await retryWithAnthropicFix(systemPrompt, userPrompt, rawContent, "Invalid JSON syntax", validator, fallback, model, maxTokens);
     }
 
     const validation = validator(parsed);
@@ -406,15 +402,15 @@ async function callOpenAIWithRetry<T>(
     }
 
     console.warn("Schema validation failed, attempting retry...", validation.error);
-    return await retryWithFix(systemPrompt, userPrompt, rawContent, validation.error || "Schema validation failed", validator, fallback, model, maxTokens);
+    return await retryWithAnthropicFix(systemPrompt, userPrompt, rawContent, validation.error || "Schema validation failed", validator, fallback, model, maxTokens);
 
   } catch (error) {
-    console.error("OpenAI API error:", error);
+    console.error("Anthropic API error:", error);
     return fallback;
   }
 }
 
-async function retryWithFix<T>(
+async function retryWithAnthropicFix<T>(
   systemPrompt: string,
   originalPrompt: string,
   invalidJson: string,
@@ -427,18 +423,14 @@ async function retryWithFix<T>(
   try {
     const fixPrompt = getJsonFixPrompt(originalPrompt, invalidJson, error);
 
-    const response = await openai.chat.completions.create({
+    const response = await anthropic.messages.create({
       model,
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: fixPrompt }
-      ],
-      response_format: { type: "json_object" },
-      max_completion_tokens: maxTokens,
-      store: false
+      system: systemPrompt,
+      messages: [{ role: "user", content: fixPrompt }],
+      max_tokens: maxTokens,
     });
 
-    const rawContent = response.choices[0].message.content || "{}";
+    const rawContent = response.content[0].type === "text" ? response.content[0].text : "{}";
     const parsed = JSON.parse(rawContent);
 
     const validation = validator(parsed);
@@ -536,12 +528,12 @@ export async function analyzeDbaText(
 
   const startTime = Date.now();
 
-  const result = await callOpenAIWithRetry<DbaEngineOutput>(
+  const result = await callAnthropicWithRetry<DbaEngineOutput>(
     DBA_SCORING_SYSTEM_PROMPT,
     enginePrompt,
     validateDbaEngineOutput,
     FALLBACK_DBA_ENGINE_OUTPUT,
-    "gpt-4.1-mini",
+    "claude-opus-4-6",
     4000
   );
 
@@ -578,17 +570,15 @@ FOCUS:
 VERBODEN: Gebruik nooit termen als "DBA-proof", "garantie", "100% compliant"`;
 
   try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4.1-mini",
-      messages: [
-        { role: "system", content: DBA_SCORING_SYSTEM_PROMPT },
-        { role: "user", content: prompt }
-      ],
-      response_format: { type: "json_object" },
-      store: false
+    const response = await anthropic.messages.create({
+      model: "claude-opus-4-6",
+      system: DBA_SCORING_SYSTEM_PROMPT,
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 1500,
     });
 
-    const analysis = JSON.parse(response.choices[0].message.content || "{}");
+    const rawContent = response.content[0].type === "text" ? response.content[0].text : "{}";
+    const analysis = JSON.parse(rawContent);
 
     return {
       isDBACompliant: analysis.isDBACompliant || false,
@@ -623,16 +613,14 @@ REGELS:
 - NOOIT termen als "DBA-proof" of "garantie" gebruiken`;
 
   try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4.1-mini",
-      messages: [
-        { role: "system", content: DBA_SCORING_SYSTEM_PROMPT },
-        { role: "user", content: prompt }
-      ],
-      store: false
+    const response = await anthropic.messages.create({
+      model: "claude-opus-4-6",
+      system: DBA_SCORING_SYSTEM_PROMPT,
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 4000,
     });
 
-    const result = response.choices[0].message.content || content;
+    const result = response.content[0].type === "text" ? response.content[0].text : content;
     return sanitizeBannedPhrases(result);
   } catch (error) {
     console.error("Error rewriting document:", error);
@@ -647,12 +635,12 @@ export async function rewriteNewsArticle(originalTitle: string, originalContent:
 
   const prompt = buildNewsRewritePrompt(sanitizedTitle, sanitizedContent, sanitizedUrl, sourceReliable);
 
-  const result = await callOpenAIWithRetry<NewsRewriteResponse>(
+  const result = await callAnthropicWithRetry<NewsRewriteResponse>(
     NEWS_REWRITE_SYSTEM_PROMPT,
     prompt,
     validateNewsRewriteResponse,
     FALLBACK_NEWS_RESPONSE,
-    "gpt-4.1-mini",
+    "claude-opus-4-6",
     1000
   );
 
@@ -685,16 +673,14 @@ REGELS:
 - Voeg toe: "Dit contract is indicatief en vervangt geen juridisch advies."`;
 
   try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4.1-mini",
-      messages: [
-        { role: "system", content: DBA_SCORING_SYSTEM_PROMPT },
-        { role: "user", content: prompt }
-      ],
-      store: false
+    const response = await anthropic.messages.create({
+      model: "claude-opus-4-6",
+      system: DBA_SCORING_SYSTEM_PROMPT,
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 4000,
     });
 
-    const result = response.choices[0].message.content || "Contract generatie mislukt.";
+    const result = response.content[0].type === "text" ? response.content[0].text : "Contract generatie mislukt.";
     return sanitizeBannedPhrases(result);
   } catch (error) {
     console.error("Error generating contract:", error);

@@ -20,7 +20,7 @@
     "input-otp": "^1.4.2",
     "lucide-react": "^1.7.0",
     "next": "16.2.2",
-    "openai": "^6.33.0",
+    "@anthropic-ai/sdk": "^0.54.0",
     "pdfkit": "^0.18.0",
     "posthog-js": "^1.364.7",
     "radix-ui": "^1.4.3",
