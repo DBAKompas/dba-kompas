@@ -12,6 +12,8 @@ import {
   Loader2,
   AlertTriangle,
   X,
+  HelpCircle,
+  CheckCircle,
 } from 'lucide-react'
 
 export default function AnalysePage() {
@@ -25,6 +27,11 @@ export default function AnalysePage() {
   const [error, setError] = useState<string | null>(null)
   const [showDisclaimer, setShowDisclaimer] = useState(false)
   const [dragOver, setDragOver] = useState(false)
+  const [insufficientInput, setInsufficientInput] = useState<{
+    summary: string
+    missing: string[]
+    next_needed: string[]
+  } | null>(null)
 
   const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0
   const charCount = text.length
@@ -55,6 +62,7 @@ export default function AnalysePage() {
     setShowDisclaimer(false)
     setLoading(true)
     setError(null)
+    setInsufficientInput(null)
 
     try {
       let response: Response
@@ -80,6 +88,18 @@ export default function AnalysePage() {
       }
 
       const data = await response.json()
+
+      // Afvangen: onvoldoende invoer of meer info nodig
+      if (data.status === 'insufficient_input' || data.status === 'needs_more_input') {
+        setInsufficientInput({
+          summary: data.summary || 'Meer informatie nodig om de analyse uit te voeren.',
+          missing: Array.isArray(data.missing) ? data.missing : [],
+          next_needed: Array.isArray(data.next_needed) ? data.next_needed : [],
+        })
+        setLoading(false)
+        return
+      }
+
       router.push(`/analyse/${data.id}`)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Er is een fout opgetreden')
@@ -204,6 +224,48 @@ export default function AnalysePage() {
               onChange={handleFileChange}
             />
           </CardContent>
+        </Card>
+      )}
+
+      {/* Onvoldoende invoer feedback */}
+      {insufficientInput && (
+        <Card className="border-amber-300 bg-amber-50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-amber-800">
+              <HelpCircle className="size-5" />
+              Meer informatie nodig
+            </CardTitle>
+            <CardDescription className="text-amber-700">
+              {insufficientInput.summary}
+            </CardDescription>
+          </CardHeader>
+          {(insufficientInput.next_needed.length > 0 || insufficientInput.missing.length > 0) && (
+            <CardContent className="space-y-4">
+              {insufficientInput.next_needed.length > 0 && (
+                <div>
+                  <p className="mb-2 text-sm font-medium text-amber-800">Beantwoord deze vragen in uw tekst:</p>
+                  <ul className="space-y-2">
+                    {insufficientInput.next_needed.map((q, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-amber-700">
+                        <CheckCircle className="mt-0.5 size-4 shrink-0 text-amber-500" />
+                        {q}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {insufficientInput.missing.length > 0 && (
+                <div>
+                  <p className="mb-2 text-sm font-medium text-amber-800">Ontbrekende onderwerpen:</p>
+                  <ul className="space-y-1">
+                    {insufficientInput.missing.map((m, i) => (
+                      <li key={i} className="text-sm text-amber-700">• {m}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </CardContent>
+          )}
         </Card>
       )}
 
