@@ -2,14 +2,41 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { analyzeDbaText, type DbaAnalysisResult } from '@/lib/ai'
+import { getUserPlan } from '@/modules/billing/entitlements'
 
 export const maxDuration = 120
+
+// Rate limits per plan (analyses per 24 uur)
+const RATE_LIMITS: Record<string, number> = {
+  free: 3,
+  pro: 50,
+  enterprise: 500,
+}
 
 export async function POST(request: Request) {
   try {
     const supabase = await createClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+    // Rate limiting: tel analyses van afgelopen 24 uur
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+    const { count, error: countError } = await supabaseAdmin
+      .from('dba_assessments')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .gte('created_at', since)
+
+    if (!countError) {
+      const plan = await getUserPlan()
+      const limit = RATE_LIMITS[plan] ?? RATE_LIMITS.free
+      if ((count ?? 0) >= limit) {
+        return NextResponse.json(
+          { error: 'Daglimiet bereikt', code: 'rate_limit_exceeded', limit, plan },
+          { status: 429 }
+        )
+      }
+    }
 
     const { inputText, parentAssessmentId } = await request.json()
 
@@ -30,7 +57,7 @@ export async function POST(request: Request) {
       profile?.specialisatie
     )
 
-    // If the input was insufficient or needs more info, return directly
+    // If the input was insufficient or needs more info, return directly (geen DB opslag)
     if ('status' in result && (result.status === 'insufficient_input' || result.status === 'needs_more_input')) {
       return NextResponse.json(result)
     }
@@ -52,13 +79,13 @@ export async function POST(request: Request) {
         domains: analysisResult.domains,
         directional_assessment: analysisResult.directionalAssessment,
         top_improvements: analysisResult.topImprovements,
-        additional_improvements: analysisResult.additionalImprovements,
+        additional_improvements: analysisResult.additionalImprovements ?? [],
         reusable_building_blocks: analysisResult.reusableBuildingBlocks ?? null,
-        simulation_hints: analysisResult.simulationHints,
-        follow_up_questions: analysisResult.followUpQuestions,
-        engagement_duration_module: analysisResult.engagementDurationModule,
+        simulation_hints: analysisResult.simulationHints ?? [],
+        follow_up_questions: analysisResult.followUpQuestions ?? [],
+        engagement_duration_module: analysisResult.engagementDurationModule ?? null,
         ai_analysis: {
-          simulationFactState: analysisResult.simulationFactState,
+          simulationFactState: analysisResult.simulationFactState ?? null,
           disclaimerShort: analysisResult.disclaimerShort,
         },
         parent_assessment_id: parentAssessmentId || null,

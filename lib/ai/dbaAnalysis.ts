@@ -106,56 +106,16 @@ DIRECTIONAL ASSESSMENT (typeHint kiezen):
 - "pseudo-ondernemer": laag op domein 1 maar hoog op domein 2 of 3
 - "projectmatige zelfstandige": laag op domein 1, laag op domein 2, laag of midden op domein 3
 
-SIMULATIE FACTSTATE (compact signaalextractie):
-Extraheer na de domeinanalyse een genormaliseerde factState met de volgende signalen:
-- aanstuuringNiveau: directe dagelijkse sturing door opdrachtgever ("hoog" = sterk gezag, "midden" = gemengd, "laag" = zelfstandig)
-- inhoudelijkToezicht: inhoudelijke supervisie op de werkwijze ("hoog"/"midden"/"laag")
-- teaminbedding: mate van integratie in opdrachtgeversorganisatie ("hoog"/"midden"/"laag")
-- werkplekAfhankelijkheid: gebondenheid aan locatie/tools van opdrachtgever ("hoog"/"midden"/"laag")
-- kernactiviteit: is de opdracht kernactiviteit van het bedrijf? (true/false)
-- lijnfunctie: heeft de opdrachtnemer een lijn- of managementrol? (true/false)
-- tijdelijkeVervanging: kan opdrachtnemer zich laten vervangen? (true/false)
-- paymentType: "uurtarief" | "vaste_prijs" | "gemengd" | "onbekend"
-- resultaatverplichting: "geen" | "vaag" | "concreet" | "gekwantificeerd"
-- acceptatiecriteria: zijn er expliciete acceptatiecriteria? (true/false)
-- herstelEigenRekening: is herstelwerk voor rekening van opdrachtnemer? (true/false)
-- aansprakelijkheid: is aansprakelijkheid contractueel vastgelegd? (true/false)
-- investeringen: mate van eigen investeringen/middelen ("hoog"/"midden"/"laag")
-- aantalOpdrachtgevers: "een" | "weinig" | "meerdere"
-- acquisitie: is acquisitie aantoonbaar actief? (true/false)
-- eigenBranding: heeft opdrachtnemer eigen branding/presentatie? (true/false)
-- eigenVoorwaarden: zijn er eigen algemene voorwaarden vermeld? (true/false)
-- tijdelijkeAard: is de tijdelijke aard van de opdracht benadrukt? (true/false)
-- praktijkWijktAf: wijkt de praktijk af van contractuele beschrijving? (true/false)
-Gebruik "midden" als conservatief standaard bij onduidelijkheid voor direction-level velden.
-
 DUUR EN INZETINTENSITEIT (aparte contextmodule):
 Extraheer uit de tekst:
 - monthsAtClient: geschatte duur in maanden bij deze opdrachtgever (0 als niet vermeld of onbekend)
 - averageHoursPerWeekBand: geschat gemiddeld aantal uur per week — kies precies één van: "0-4" | "4-16" | "16-24" | "24-32" | "more-than-32" (gebruik "16-24" als conservatief standaard bij onduidelijkheid)
 - summary: 1-2 zinnen over de duur/uren-context en wat dit betekent voor het totaalrisico
 
-De score wordt automatisch berekend op basis van deze extractie. Lever alleen de twee velden (monthsAtClient + averageHoursPerWeekBand + summary) aan — geen score veld invullen.
-
 VERBETERPUNTEN:
 - Maximaal 5 top-verbeterpunten (meest impactvol eerst)
-- Aanvullend max 5 extra verbeterpunten
 - Elk verbeterpunt: concreet herschrijfbaar, gebruik conditionele taal
   Voorbeeld: "ALS de aansturing wordt gewijzigd van dagelijkse rapportage naar wekelijkse resultaatbespreking, KAN het risico op domein 1 dalen"
-
-simulationHints: voor elk top-verbeterpunt een simulatiehint (max 3, align met topImprovements volgorde)
-  improvement: exact dezelfde tekst als het bijbehorende topImprovements-item (voor matching)
-  expectedEffect: "red_to_orange" | "orange_to_green" | "red_to_green" | "likely_no_change"
-    - red_to_orange: hoog risico wordt vermoedelijk midden als deze maatregel VOLLEDIG wordt doorgevoerd
-    - orange_to_green: midden risico wordt vermoedelijk laag als deze maatregel VOLLEDIG wordt doorgevoerd
-    - red_to_green: hoog risico wordt vermoedelijk laag (alleen als de maatregel een fundamentele verandering is)
-    - likely_no_change: de maatregel helpt marginaal maar verandert het risicoproffiel niet wezenlijk
-  relatedDomain: welk domein het meest verbetert ("aansturing" | "eigen_rekening_risico" | "ondernemerschap")
-  shortExplanation: 1-2 zinnen over waarom dit effect wordt verwacht. Schrijf actief en direct, zonder hoofdletterconstructies. Voorbeeld: "door de aansturing te richten op resultaat in plaats van aanwezigheid, neemt het gezagsrisico vermoedelijk af"
-  confidence: zekerheid van het verwachte effect
-    - "high": maatregel adresseert een dominante risicofactor direct
-    - "medium": maatregel helpt maar andere factoren blijven relevant
-    - "low": effect is onzeker of afhankelijk van onbekende context
 
 ${userContext}
 
@@ -212,39 +172,7 @@ VERPLICHTE JSON OUTPUT (EXACT dit schema, geen extra velden):
     "directionSummary": "2-3 zinnen met conditionele toelichting"
   },
   "topImprovements": ["top 3-5 meest impactvolle verbeterpunten als concrete zinnen"],
-  "additionalImprovements": [],
-  "simulationFactState": {
-    "aanstuuringNiveau": "hoog"|"midden"|"laag",
-    "inhoudelijkToezicht": "hoog"|"midden"|"laag",
-    "teaminbedding": "hoog"|"midden"|"laag",
-    "werkplekAfhankelijkheid": "hoog"|"midden"|"laag",
-    "kernactiviteit": true,
-    "lijnfunctie": false,
-    "tijdelijkeVervanging": false,
-    "paymentType": "uurtarief"|"vaste_prijs"|"gemengd"|"onbekend",
-    "resultaatverplichting": "geen"|"vaag"|"concreet"|"gekwantificeerd",
-    "acceptatiecriteria": false,
-    "herstelEigenRekening": false,
-    "aansprakelijkheid": false,
-    "investeringen": "hoog"|"midden"|"laag",
-    "aantalOpdrachtgevers": "een"|"weinig"|"meerdere",
-    "acquisitie": false,
-    "eigenBranding": false,
-    "eigenVoorwaarden": false,
-    "tijdelijkeAard": false,
-    "praktijkWijktAf": false
-  },
-  "simulationHints": [
-    {
-      "improvement": "exact zelfde tekst als in topImprovements",
-      "expectedEffect": "orange_to_green",
-      "relatedDomain": "aansturing",
-      "shortExplanation": "door de dagelijkse rapportage te vervangen door wekelijkse resultaatbesprekingen, neemt het gezagsrisico op het domein Aansturing vermoedelijk af.",
-      "confidence": "medium"
-    }
-  ],
-  "disclaimerShort": "Indicatieve analyse, geen juridisch advies.",
-  "followUpQuestions": ["max 3 concrete vervolgvragen voor de gebruiker"]
+  "disclaimerShort": "Indicatieve analyse, geen juridisch advies."
 }`;
 }
 
@@ -428,7 +356,14 @@ async function retryWithAnthropicFix<T>(
       const match = cleanContent.match(/\{[\s\S]*\}/);
       cleanContent = match ? match[0] : cleanContent;
     }
-    const parsed = JSON.parse(cleanContent);
+
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(cleanContent);
+    } catch (parseErr) {
+      console.error("[DBA] Retry JSON.parse failed:", parseErr, "| raw:", rawContent.slice(0, 200));
+      return fallback;
+    }
 
     const validation = validator(parsed);
     if (validation.success && validation.data) {
@@ -439,7 +374,7 @@ async function retryWithAnthropicFix<T>(
     return fallback;
 
   } catch (retryError) {
-    console.error("Retry failed:", retryError);
+    console.error("[DBA] Retry unexpected error:", retryError);
     return fallback;
   }
 }
