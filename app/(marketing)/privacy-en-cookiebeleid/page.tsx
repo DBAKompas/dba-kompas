@@ -5,7 +5,11 @@ import { PrivacyEnCookiebeleidContent } from "@/components/marketing/LegalConten
 
 export default function PrivacyEnCookiebeleidsPage() {
   return (
-    <LegalPageLayout title="Privacy- en Cookiebeleid">
+    <LegalPageLayout
+      title="Privacy- en Cookiebeleid"
+      subtitle="Hoe DBA Kompas omgaat met persoonsgegevens en cookies."
+      lastUpdated="maart 2026"
+    >
       <PrivacyEnCookiebeleidContent />
     </LegalPageLayout>
   );

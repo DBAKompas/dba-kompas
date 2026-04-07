@@ -749,8 +749,9 @@ export default function Home() {
               </div>
               <div className="space-y-3">
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/60">Juridisch</p>
-                <Link href="/algemene-voorwaarden" className="block text-sm text-muted-foreground hover:text-foreground transition-colors">Algemene Voorwaarden</Link>
-                <Link href="/privacy-en-cookiebeleid" className="block text-sm text-muted-foreground hover:text-foreground transition-colors">Privacy & Cookies</Link>
+                <Link href="/algemene-voorwaarden" className="block text-sm text-muted-foreground hover:text-accent transition-colors">Algemene Voorwaarden</Link>
+                <Link href="/privacy-en-cookiebeleid" className="block text-sm text-muted-foreground hover:text-accent transition-colors">Privacy & Cookies</Link>
+                <Link href="/ai-data-use-notice" className="block text-sm text-muted-foreground hover:text-accent transition-colors">AI & Gegevensverwerking</Link>
               </div>
               <div className="space-y-3">
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/60">{LANDING.footer.contact.title}</p>

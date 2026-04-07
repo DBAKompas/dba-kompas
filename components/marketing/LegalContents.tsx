@@ -1,8 +1,6 @@
 export function AlgemeneVoorwaardenContent() {
   return (
     <>
-      <p><strong>Laatst bijgewerkt: maart 2026</strong></p>
-
       <h2>1. Identiteit</h2>
       <p>DBA Kompas is een eenmanszaak, gevestigd aan Smitshoek 19, 6732 CG Harskamp, Nederland, ingeschreven bij de Kamer van Koophandel onder nummer 99964538.</p>
       <p>Contact: <a href="mailto:info@dbakompas.nl">info@dbakompas.nl</a></p>
@@ -230,8 +228,6 @@ export function AlgemeneVoorwaardenContent() {
 export function PrivacyEnCookiebeleidContent() {
   return (
     <>
-      <p><strong>Laatst bijgewerkt: maart 2026</strong></p>
-
       <h2>1. Verwerkingsverantwoordelijke</h2>
       <p>DBA Kompas is verwerkingsverantwoordelijke voor de verwerking van persoonsgegevens zoals beschreven in dit privacy- en cookiebeleid.</p>
       <ul>
@@ -421,8 +417,6 @@ export function PrivacyEnCookiebeleidContent() {
 export function AiDataUseNoticeContent() {
   return (
     <>
-      <p><strong>Laatst bijgewerkt: maart 2026</strong></p>
-
       <h2>1. Waarvoor DBA Kompas AI gebruikt</h2>
       <p>DBA Kompas gebruikt AI voor:</p>
       <ul>
