@@ -427,12 +427,23 @@ export function checkResponseForBannedPhrases(response: Record<string, unknown>)
 // V2 Engine Schema — domain-based DBA analysis output
 // ============================================================
 
+const VALID_DOMAIN_KEYS = ['aansturing', 'eigen_rekening_risico', 'ondernemerschap'] as const;
+
 const domainAnalysisSchema = z.object({
-  key: z.enum(['aansturing', 'eigen_rekening_risico', 'ondernemerschap']),
-  title: z.string(),
-  scoreLabel: z.enum(['laag', 'midden', 'hoog']),
-  scoreColor: z.enum(['green', 'orange', 'red']),
-  summary: z.string(),
+  key: z.preprocess(
+    (v) => VALID_DOMAIN_KEYS.includes(v as typeof VALID_DOMAIN_KEYS[number]) ? v : 'aansturing',
+    z.enum(VALID_DOMAIN_KEYS)
+  ),
+  title: z.string().default(''),
+  scoreLabel: z.preprocess(
+    (v) => ['laag', 'midden', 'hoog'].includes(v as string) ? v : 'midden',
+    z.enum(['laag', 'midden', 'hoog'])
+  ),
+  scoreColor: z.preprocess(
+    (v) => ['green', 'orange', 'red'].includes(v as string) ? v : 'orange',
+    z.enum(['green', 'orange', 'red'])
+  ),
+  summary: z.string().default(''),
   indicatorsForRisk: z.array(z.string()).default([]),
   indicatorsForIndependence: z.array(z.string()).default([]),
   suggestedImprovements: z.array(z.string()).default([]),
@@ -563,10 +574,10 @@ export const dbaEngineOutputSchema = z.object({
   overallRiskLabel: z.enum(['laag', 'midden', 'hoog']),
   overallRiskColor: z.enum(['green', 'orange', 'red']),
   overallSummary: z.string(),
-  domains: z.array(domainAnalysisSchema).length(3),
+  domains: z.array(domainAnalysisSchema).min(1).max(6).catch([]),
   engagementDurationModule: engagementDurationModuleSchema.optional(),
   directionalAssessment: directionalAssessmentSchema,
-  topImprovements: z.array(z.string()).min(1).max(5),
+  topImprovements: z.array(z.string()).max(5).default([]),
   additionalImprovements: z.array(z.string()).default([]),
   longAssignmentDraft: longAssignmentDraftSchema.optional(),
   compactAssignmentDraft: compactAssignmentDraftSchema.optional(),
@@ -580,13 +591,61 @@ export const dbaEngineOutputSchema = z.object({
 export type DbaEngineOutput = z.infer<typeof dbaEngineOutputSchema>;
 
 export function validateDbaEngineOutput(json: unknown): ValidationResult<DbaEngineOutput> {
+  // First attempt: strict validation
   try {
     const parsed = dbaEngineOutputSchema.parse(json);
     return { success: true, data: parsed };
-  } catch (error) {
+  } catch (strictError) {
+    // Second attempt: salvage partial result if core fields are present
+    if (json && typeof json === 'object') {
+      const obj = json as Record<string, unknown>;
+      if (obj.overallRiskLabel && obj.overallSummary && Array.isArray(obj.domains)) {
+        try {
+          // Build a salvaged result by merging with fallback
+          const salvaged: DbaEngineOutput = {
+            ...FALLBACK_DBA_ENGINE_OUTPUT,
+            analysisStatus: 'complete',
+            overallRiskLabel: (['laag','midden','hoog'].includes(obj.overallRiskLabel as string) ? obj.overallRiskLabel : 'midden') as 'laag'|'midden'|'hoog',
+            overallRiskColor: (['green','orange','red'].includes(obj.overallRiskColor as string) ? obj.overallRiskColor : 'orange') as 'green'|'orange'|'red',
+            overallSummary: typeof obj.overallSummary === 'string' ? obj.overallSummary : '',
+            domains: Array.isArray(obj.domains)
+              ? (obj.domains as unknown[]).map((d: unknown) => {
+                  const domain = (d && typeof d === 'object' ? d : {}) as Record<string, unknown>;
+                  return {
+                    key: (VALID_DOMAIN_KEYS.includes(domain.key as typeof VALID_DOMAIN_KEYS[number]) ? domain.key : 'aansturing') as typeof VALID_DOMAIN_KEYS[number],
+                    title: typeof domain.title === 'string' ? domain.title : '',
+                    scoreLabel: (['laag','midden','hoog'].includes(domain.scoreLabel as string) ? domain.scoreLabel : 'midden') as 'laag'|'midden'|'hoog',
+                    scoreColor: (['green','orange','red'].includes(domain.scoreColor as string) ? domain.scoreColor : 'orange') as 'green'|'orange'|'red',
+                    summary: typeof domain.summary === 'string' ? domain.summary : '',
+                    indicatorsForRisk: Array.isArray(domain.indicatorsForRisk) ? domain.indicatorsForRisk.filter((x: unknown) => typeof x === 'string') as string[] : [],
+                    indicatorsForIndependence: Array.isArray(domain.indicatorsForIndependence) ? domain.indicatorsForIndependence.filter((x: unknown) => typeof x === 'string') as string[] : [],
+                    suggestedImprovements: Array.isArray(domain.suggestedImprovements) ? domain.suggestedImprovements.filter((x: unknown) => typeof x === 'string') as string[] : [],
+                  };
+                })
+              : FALLBACK_DBA_ENGINE_OUTPUT.domains,
+            topImprovements: Array.isArray(obj.topImprovements)
+              ? obj.topImprovements.filter((x: unknown) => typeof x === 'string') as string[]
+              : [],
+            directionalAssessment: (obj.directionalAssessment && typeof obj.directionalAssessment === 'object')
+              ? {
+                  typeHint: typeof (obj.directionalAssessment as Record<string, unknown>).typeHint === 'string' ? (obj.directionalAssessment as Record<string, unknown>).typeHint as string : 'projectmatige zelfstandige',
+                  directionSummary: typeof (obj.directionalAssessment as Record<string, unknown>).directionSummary === 'string' ? (obj.directionalAssessment as Record<string, unknown>).directionSummary as string : '',
+                }
+              : FALLBACK_DBA_ENGINE_OUTPUT.directionalAssessment,
+            simulationHints: [],
+            additionalImprovements: [],
+            followUpQuestions: [],
+          };
+          console.log('[DBA] Strict validation failed, salvaged partial result. Strict error:', strictError instanceof Error ? strictError.message.slice(0, 200) : String(strictError).slice(0, 200));
+          return { success: true, data: salvaged };
+        } catch (salvageError) {
+          console.error('[DBA] Salvage also failed:', salvageError);
+        }
+      }
+    }
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Validation failed",
+      error: strictError instanceof Error ? strictError.message : "Validation failed",
     };
   }
 }
