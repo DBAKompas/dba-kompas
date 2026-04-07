@@ -26,11 +26,25 @@ const APP_URL = (process.env.NEXT_PUBLIC_APP_URL as string | undefined)?.replace
 // Sub-components
 // ─────────────────────────────────────────
 
-function SectionBadge({ children }: { children: string }) {
+function SectionBadge({ children, withIcon }: { children: string; withIcon?: boolean }) {
   return (
     <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/8 text-primary text-sm font-semibold border border-primary/12">
+      {withIcon && (
+        <img src="/logo-flat-dark.png" alt="" className="h-4 w-auto object-contain" />
+      )}
       {children}
     </span>
+  );
+}
+
+/** Kompas-icoon als subtiele bullet voor opsommingen */
+function BulletIcon() {
+  return (
+    <img
+      src="/logo-flat-dark.png"
+      alt=""
+      className="h-4 w-auto object-contain flex-shrink-0 opacity-60"
+    />
   );
 }
 
@@ -170,7 +184,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <SectionBadge>{LANDING.hero.badge}</SectionBadge>
+            <SectionBadge withIcon>{LANDING.hero.badge}</SectionBadge>
           </motion.div>
 
           <motion.h1
@@ -428,7 +442,7 @@ export default function Home() {
             <div className="flex-1 space-y-1">
               {LANDING.continuingValue.bullets.map((b, i) => (
                 <div key={i} className="checklist-row">
-                  <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                  <BulletIcon />
                   <span className="text-sm font-medium">{b}</span>
                 </div>
               ))}
@@ -532,7 +546,7 @@ export default function Home() {
             <div className="space-y-1">
               {LANDING.benefits.checklist.map((item, i) => (
                 <div key={i} className="checklist-row">
-                  <Check className="w-4 h-4 text-primary flex-shrink-0" />
+                  <BulletIcon />
                   <span className="text-sm font-medium">{item}</span>
                 </div>
               ))}
@@ -639,7 +653,10 @@ export default function Home() {
                 <ul className="space-y-2.5 mb-8 flex-1">
                   {plan.features.map((feat, fi) => (
                     <li key={fi} className="flex items-start gap-2.5 text-sm">
-                      <Check className={`w-4 h-4 mt-0.5 flex-shrink-0 ${plan.popular ? "text-accent" : "text-primary"}`} />
+                      {plan.popular
+                        ? <img src="/logo-flat-white.png" alt="" className="h-4 w-auto object-contain flex-shrink-0 opacity-80 mt-0.5" />
+                        : <BulletIcon />
+                      }
                       <span className={plan.popular ? "text-primary-foreground/85" : "text-muted-foreground"}>
                         {feat}
                       </span>
@@ -700,6 +717,7 @@ export default function Home() {
           transition={{ duration: 0.6 }}
           viewport={viewportConfig}
         >
+          <img src="/logo-dark.png" alt="DBA Kompas" className="h-9 w-auto mx-auto" />
           <h2 className="text-3xl md:text-4xl font-bold">{LANDING.cta.title}</h2>
           <p className="text-muted-foreground">{LANDING.cta.subtitle}</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
