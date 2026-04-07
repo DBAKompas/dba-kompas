@@ -1,6 +1,25 @@
 'use client'
 
-export type BrandLogoVariant = "dark" | "white" | "flatDark" | "flatWhite" | "artwork" | "flatDarkV2" | "flatDarkV3" | "flatWhiteV3";
+/**
+ * Logo varianten:
+ *   dark      — volledig logo (navy tekst + icoon) → lichte achtergronden
+ *   white     — volledig logo (witte tekst + icoon) → donkere achtergronden
+ *   iconDark  — alleen het kompas-icoon (navy) → lichte achtergronden
+ *   iconWhite — alleen het kompas-icoon (wit) → donkere achtergronden
+ *
+ * Verouderde varianten worden doorgestuurd naar de juiste bestanden.
+ */
+export type BrandLogoVariant =
+  | "dark"
+  | "white"
+  | "iconDark"
+  | "iconWhite"
+  | "flatDark"
+  | "flatWhite"
+  | "flatDarkV2"
+  | "flatDarkV3"
+  | "flatWhiteV3"
+  | "artwork";
 
 interface BrandLogoProps {
   variant?: BrandLogoVariant;
@@ -9,18 +28,22 @@ interface BrandLogoProps {
 }
 
 const srcMap: Record<BrandLogoVariant, string> = {
-  dark: "/logo-dark.png",
-  white: "/logo-white.png",
-  flatDark: "/logo-flat-dark.png",
-  flatWhite: "/logo-flat-white.png",
-  artwork: "/logo-artwork.png",
-  flatDarkV2: "/logo-dark-v2.png",
-  flatDarkV3: "/logo-dark-v3.png",
-  flatWhiteV3: "/logo-white-v3.png",
+  // Actuele varianten
+  dark:      "/logo-dark.png",           // volledig logo — lichte achtergrond
+  white:     "/logo-white.png",          // volledig logo — donkere achtergrond
+  iconDark:  "/logo-flat-dark.png",      // icoon only — lichte achtergrond
+  iconWhite: "/logo-flat-white.png",     // icoon only — donkere achtergrond
+  // Backwards-compat aliassen
+  flatDark:    "/logo-flat-dark.png",
+  flatWhite:   "/logo-flat-white.png",
+  flatDarkV2:  "/logo-dark.png",
+  flatDarkV3:  "/logo-dark.png",
+  flatWhiteV3: "/logo-white.png",
+  artwork:     "/logo-flat-dark.png",
 };
 
 export default function BrandLogo({
-  variant = "flatDarkV2",
+  variant = "dark",
   className = "",
   alt = "DBA Kompas",
 }: BrandLogoProps) {

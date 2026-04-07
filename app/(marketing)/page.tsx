@@ -109,7 +109,7 @@ export default function Home() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <BrandLogo variant="flatDarkV2" className="h-8 w-auto" />
+            <BrandLogo variant="dark" className="h-8 w-auto" />
           </Link>
 
           <nav className="hidden md:flex items-center gap-7">
@@ -720,7 +720,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row items-start justify-between gap-8 mb-8">
             <div className="space-y-2">
-              <BrandLogo variant="flatDarkV2" className="h-7 w-auto" />
+              <BrandLogo variant="dark" className="h-7 w-auto" />
               <p className="text-sm text-muted-foreground max-w-xs">{LANDING.footer.tagline}</p>
             </div>
             <div className="flex flex-wrap gap-12">
