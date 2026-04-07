@@ -123,7 +123,7 @@ export default function Home() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <BrandLogo variant="dark" className="h-8 w-auto" />
+            <BrandLogo variant="dark" className="h-9 w-auto" />
           </Link>
 
           <div className="hidden md:flex items-center gap-6">

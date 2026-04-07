@@ -29,15 +29,15 @@ interface BrandLogoProps {
 
 const srcMap: Record<BrandLogoVariant, string> = {
   // Actuele varianten
-  dark:      "/logo-dark.png",           // volledig logo — lichte achtergrond
+  dark:      "/logo-dark-v3.png",        // volledig wordmark (kompas + DBAKompas tekst) — lichte achtergrond
   white:     "/logo-white.png",          // volledig logo — donkere achtergrond
   iconDark:  "/logo-flat-dark.png",      // icoon only — lichte achtergrond
   iconWhite: "/logo-flat-white.png",     // icoon only — donkere achtergrond
   // Backwards-compat aliassen
   flatDark:    "/logo-flat-dark.png",
   flatWhite:   "/logo-flat-white.png",
-  flatDarkV2:  "/logo-dark.png",
-  flatDarkV3:  "/logo-dark.png",
+  flatDarkV2:  "/logo-dark-v3.png",
+  flatDarkV3:  "/logo-dark-v3.png",
   flatWhiteV3: "/logo-white.png",
   artwork:     "/logo-flat-dark.png",
 };
