@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { analyzeDbaText, type DbaAnalysisResult } from '@/lib/ai'
 
+export const maxDuration = 120
+
 export async function POST(request: Request) {
   try {
     const supabase = await createClient()
