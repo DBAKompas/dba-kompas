@@ -296,10 +296,10 @@ export function validateDbaInput(text: string): InputValidationResult {
 
   let status: AnalysisStatus;
 
+  // Alleen harde minimumdrempel blokkeert de analyse.
+  // Ontbrekende signalen worden als follow-up vragen getoond nádat de analyse klaar is.
   if (charCount < INTAKE_THRESHOLDS.HARD_FAIL_CHARS || wordCount < INTAKE_THRESHOLDS.HARD_FAIL_WORDS) {
     status = 'insufficient_input';
-  } else if (wordCount < INTAKE_THRESHOLDS.SOFT_FAIL_WORDS || signalCount < INTAKE_THRESHOLDS.MIN_SIGNALS) {
-    status = 'needs_more_input';
   } else {
     status = 'complete';
   }

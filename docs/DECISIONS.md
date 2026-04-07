@@ -66,6 +66,25 @@ Elke beslissing bevat: datum, beslissing, reden, alternatieven overwogen.
 
 ---
 
+## 2026-04-07 — Analyse altijd uitvoeren, follow-up vragen erna
+
+**Beslissing:** `needs_more_input` status verwijderd. Als een tekst >= 800 tekens en >= 120 woorden heeft, wordt de analyse altijd uitgevoerd. Ontbrekende signalen worden getoond als invulvelden nádat de analyse klaar is.
+
+**Reden:**
+- Gebruiker werd gefrustreerd door blokkerende "meer informatie nodig" melding
+- Analyse op basis van gedeeltelijke informatie is beter dan geen analyse
+- Haiku defaultt naar "midden" bij ontbrekende informatie — acceptabel
+- Follow-up vragen worden berekend via signaaldetectie (geen extra AI-aanroep)
+- Gebruiker kan antwoorden invullen en heranalyseren met gecombineerde tekst
+
+**Impact:**
+- Geen `needs_more_input` responses meer
+- Follow-up vragen verschijnen als invulvelden op de resultaatpagina
+- "Heranalyseer" knop voegt antwoorden toe aan originele tekst en start nieuwe analyse
+- Draft generatie alleen op expliciete knopklik — bespaart API kosten
+
+---
+
 ## 2026-04-07 — Fase 1 prompt afslanken (gepland)
 
 **Beslissing (te implementeren):** Verwijder `simulationFactState`, `simulationHints`, `followUpQuestions`, `additionalImprovements` uit fase 1 output schema.

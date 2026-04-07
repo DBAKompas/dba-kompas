@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
   ArrowLeft,
@@ -18,6 +18,8 @@ import {
   FileText,
   CheckCircle2,
   Circle,
+  HelpCircle,
+  RefreshCw,
 } from 'lucide-react'
 
 interface Domain {
@@ -49,6 +51,13 @@ interface LongDraft {
   structuralNote?: string
 }
 
+interface FollowUpQuestion {
+  key: string
+  label: string
+  question: string
+  hint: string
+}
+
 interface Assessment {
   id: string
   overall_risk_color: string
@@ -58,6 +67,8 @@ interface Assessment {
   top_improvements: string[]
   compact_assignment_draft: string | object | null
   optimized_brief: string | object | null
+  follow_up_questions: FollowUpQuestion[] | string[] | null
+  input_text: string
   created_at: string
 }
 
@@ -104,12 +115,15 @@ function riskConfig(level: string) {
 
 export default function AssessmentDetailPage() {
   const params = useParams<{ id: string }>()
+  const router = useRouter()
   const [assessment, setAssessment] = useState<Assessment | null>(null)
   const [loading, setLoading] = useState(true)
   const [draftLoading, setDraftLoading] = useState(false)
+  const [reanalyseLoading, setReanalyseLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [expandedDomains, setExpandedDomains] = useState<Set<number>>(new Set([0, 1, 2]))
   const [activeTab, setActiveTab] = useState<'compact' | 'long'>('compact')
+  const [answers, setAnswers] = useState<Record<string, string>>({})
 
   useEffect(() => {
     if (!params.id) return
@@ -122,17 +136,44 @@ export default function AssessmentDetailPage() {
       .catch((err) => { setError(err.message); setLoading(false) })
   }, [params.id])
 
-  useEffect(() => {
-    if (!assessment || assessment.compact_assignment_draft) return
+  const toggleDomain = (i: number) =>
+    setExpandedDomains((prev) => { const n = new Set(prev); n.has(i) ? n.delete(i) : n.add(i); return n })
+
+  const handleGenerateDraft = () => {
+    if (!assessment || draftLoading) return
     setDraftLoading(true)
     fetch(`/api/dba/analyse/${params.id}/draft`, { method: 'POST' })
       .then((res) => { if (!res.ok) throw new Error(); return res.json() })
       .then((d) => { setAssessment((prev) => prev ? { ...prev, ...d } : prev); setDraftLoading(false) })
       .catch(() => setDraftLoading(false))
-  }, [assessment, params.id])
+  }
 
-  const toggleDomain = (i: number) =>
-    setExpandedDomains((prev) => { const n = new Set(prev); n.has(i) ? n.delete(i) : n.add(i); return n })
+  const handleReanalyse = async () => {
+    if (!assessment || reanalyseLoading) return
+    const aanvullingen = Object.entries(answers)
+      .filter(([, v]) => v.trim())
+      .map(([k, v]) => {
+        const q = followUpQuestions.find(q => q.key === k)
+        return q ? `${q.label}: ${v.trim()}` : v.trim()
+      })
+      .join('\n')
+    if (!aanvullingen) return
+    const combinedText = `${assessment.input_text}\n\nAanvullende informatie:\n${aanvullingen}`
+    setReanalyseLoading(true)
+    try {
+      const res = await fetch('/api/dba/analyse', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ inputText: combinedText }),
+      })
+      const data = await res.json()
+      if (data.id) {
+        router.push(`/analyse/${data.id}`)
+      }
+    } finally {
+      setReanalyseLoading(false)
+    }
+  }
 
   if (loading) {
     return (
@@ -165,6 +206,14 @@ export default function AssessmentDetailPage() {
   const compactDraft = parseJson<CompactDraft>(assessment.compact_assignment_draft)
   const longDraft = parseJson<LongDraft>(assessment.optimized_brief)
   const domains = (assessment.domains as Domain[]) ?? []
+
+  // Follow-up vragen: kunnen objecten zijn (nieuw) of strings (oud)
+  const rawFollowUp = assessment.follow_up_questions
+  const followUpQuestions: FollowUpQuestion[] = Array.isArray(rawFollowUp)
+    ? rawFollowUp.filter((q): q is FollowUpQuestion => typeof q === 'object' && q !== null && 'key' in q)
+    : []
+
+  const hasAnswers = Object.values(answers).some(v => v.trim())
 
   if (isFallback) {
     return (
@@ -324,11 +373,62 @@ export default function AssessmentDetailPage() {
           </section>
         )}
 
-        {/* Assignment draft */}
+        {/* Follow-up vragen — aanvullende informatie */}
+        {followUpQuestions.length > 0 && (
+          <section>
+            <div className="flex items-center gap-2 mb-3">
+              <HelpCircle className="size-5 text-slate-400" />
+              <h2 className="text-lg font-semibold">Analyse verfijnen</h2>
+            </div>
+            <p className="text-sm text-muted-foreground mb-4">
+              Beantwoord de vragen hieronder om de analyse nauwkeuriger te maken. Vul in wat van toepassing is en klik op heranalyseer.
+            </p>
+            <div className="rounded-xl border bg-card divide-y">
+              {followUpQuestions.map((q) => (
+                <div key={q.key} className="px-5 py-4 space-y-2">
+                  <label className="text-sm font-medium text-foreground">{q.question}</label>
+                  <p className="text-xs text-muted-foreground">{q.hint}</p>
+                  <textarea
+                    className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+                    rows={2}
+                    placeholder="Uw antwoord..."
+                    value={answers[q.key] ?? ''}
+                    onChange={(e) => setAnswers(prev => ({ ...prev, [q.key]: e.target.value }))}
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="mt-3">
+              <button
+                onClick={handleReanalyse}
+                disabled={!hasAnswers || reanalyseLoading}
+                className="inline-flex items-center gap-2 rounded-lg bg-slate-800 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                {reanalyseLoading
+                  ? <><Loader2 className="size-4 animate-spin" /> Heranalyseren...</>
+                  : <><RefreshCw className="size-4" /> Heranalyseer met aanvullingen</>
+                }
+              </button>
+            </div>
+          </section>
+        )}
+
+        {/* Assignment draft — op aanvraag */}
         <section>
-          <div className="flex items-center gap-2 mb-4">
-            <FileText className="size-5 text-violet-500" />
-            <h2 className="text-lg font-semibold">Opdrachtformulering</h2>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <FileText className="size-5 text-violet-500" />
+              <h2 className="text-lg font-semibold">Opdrachtformulering</h2>
+            </div>
+            {!compactDraft && !longDraft && !draftLoading && (
+              <button
+                onClick={handleGenerateDraft}
+                className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700 transition-colors"
+              >
+                <FileText className="size-4" />
+                Genereer opdrachtomschrijving
+              </button>
+            )}
           </div>
 
           <div className="rounded-xl border bg-card overflow-hidden">
@@ -469,7 +569,7 @@ export default function AssessmentDetailPage() {
               </div>
             ) : (
               <div className="p-6 text-sm text-muted-foreground">
-                Opdrachtteksten konden niet worden gegenereerd.
+                Klik op &quot;Genereer opdrachtomschrijving&quot; om een professionele opdrachttekst te laten opstellen op basis van deze analyse.
               </div>
             )}
           </div>

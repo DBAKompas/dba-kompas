@@ -445,10 +445,8 @@ export async function analyzeDbaText(
     return createInsufficientInputResponse(validation);
   }
 
-  if (validation.status === 'needs_more_input') {
-    console.log(`Input needs more detail: ${validation.wordCount} words, ${validation.signalCount} signals`);
-    return createNeedsMoreInputResponse(validation);
-  }
+  // Bereken follow-up vragen op basis van signaaldetectie (niet via AI — bespaart tokens)
+  const followUpQuestions = buildFollowUpQuestions(validation.signals, 5);
 
   const sanitizedInput = sanitizeUserInput(inputText);
 
@@ -472,7 +470,18 @@ export async function analyzeDbaText(
 
   console.log(`DBA v2 analysis completed in ${Date.now() - startTime}ms`);
 
-  return postProcessDbaOutput(result);
+  const processed = postProcessDbaOutput(result);
+
+  // Voeg follow-up vragen toe aan het resultaat (berekend uit signaaldetectie)
+  return {
+    ...processed,
+    followUpQuestions: followUpQuestions.map(q => ({
+      key: q.key,
+      label: q.label,
+      question: q.question,
+      hint: q.hint,
+    })),
+  } as DbaEngineOutput;
 }
 
 export async function analyzeDocument(content: string, filename: string): Promise<DocumentAnalysis> {
