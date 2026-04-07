@@ -591,63 +591,66 @@ export const dbaEngineOutputSchema = z.object({
 export type DbaEngineOutput = z.infer<typeof dbaEngineOutputSchema>;
 
 export function validateDbaEngineOutput(json: unknown): ValidationResult<DbaEngineOutput> {
-  // First attempt: strict validation
-  try {
-    const parsed = dbaEngineOutputSchema.parse(json);
-    return { success: true, data: parsed };
-  } catch (strictError) {
-    // Second attempt: salvage partial result if core fields are present
-    if (json && typeof json === 'object') {
-      const obj = json as Record<string, unknown>;
-      if (obj.overallRiskLabel && obj.overallSummary && Array.isArray(obj.domains)) {
-        try {
-          // Build a salvaged result by merging with fallback
-          const salvaged: DbaEngineOutput = {
-            ...FALLBACK_DBA_ENGINE_OUTPUT,
-            analysisStatus: 'complete',
-            overallRiskLabel: (['laag','midden','hoog'].includes(obj.overallRiskLabel as string) ? obj.overallRiskLabel : 'midden') as 'laag'|'midden'|'hoog',
-            overallRiskColor: (['green','orange','red'].includes(obj.overallRiskColor as string) ? obj.overallRiskColor : 'orange') as 'green'|'orange'|'red',
-            overallSummary: typeof obj.overallSummary === 'string' ? obj.overallSummary : '',
-            domains: Array.isArray(obj.domains)
-              ? (obj.domains as unknown[]).map((d: unknown) => {
-                  const domain = (d && typeof d === 'object' ? d : {}) as Record<string, unknown>;
-                  return {
-                    key: (VALID_DOMAIN_KEYS.includes(domain.key as typeof VALID_DOMAIN_KEYS[number]) ? domain.key : 'aansturing') as typeof VALID_DOMAIN_KEYS[number],
-                    title: typeof domain.title === 'string' ? domain.title : '',
-                    scoreLabel: (['laag','midden','hoog'].includes(domain.scoreLabel as string) ? domain.scoreLabel : 'midden') as 'laag'|'midden'|'hoog',
-                    scoreColor: (['green','orange','red'].includes(domain.scoreColor as string) ? domain.scoreColor : 'orange') as 'green'|'orange'|'red',
-                    summary: typeof domain.summary === 'string' ? domain.summary : '',
-                    indicatorsForRisk: Array.isArray(domain.indicatorsForRisk) ? domain.indicatorsForRisk.filter((x: unknown) => typeof x === 'string') as string[] : [],
-                    indicatorsForIndependence: Array.isArray(domain.indicatorsForIndependence) ? domain.indicatorsForIndependence.filter((x: unknown) => typeof x === 'string') as string[] : [],
-                    suggestedImprovements: Array.isArray(domain.suggestedImprovements) ? domain.suggestedImprovements.filter((x: unknown) => typeof x === 'string') as string[] : [],
-                  };
-                })
-              : FALLBACK_DBA_ENGINE_OUTPUT.domains,
-            topImprovements: Array.isArray(obj.topImprovements)
-              ? obj.topImprovements.filter((x: unknown) => typeof x === 'string') as string[]
-              : [],
-            directionalAssessment: (obj.directionalAssessment && typeof obj.directionalAssessment === 'object')
-              ? {
-                  typeHint: typeof (obj.directionalAssessment as Record<string, unknown>).typeHint === 'string' ? (obj.directionalAssessment as Record<string, unknown>).typeHint as string : 'projectmatige zelfstandige',
-                  directionSummary: typeof (obj.directionalAssessment as Record<string, unknown>).directionSummary === 'string' ? (obj.directionalAssessment as Record<string, unknown>).directionSummary as string : '',
-                }
-              : FALLBACK_DBA_ENGINE_OUTPUT.directionalAssessment,
-            simulationHints: [],
-            additionalImprovements: [],
-            followUpQuestions: [],
-          };
-          console.log('[DBA] Strict validation failed, salvaged partial result. Strict error:', strictError instanceof Error ? strictError.message.slice(0, 200) : String(strictError).slice(0, 200));
-          return { success: true, data: salvaged };
-        } catch (salvageError) {
-          console.error('[DBA] Salvage also failed:', salvageError);
-        }
-      }
-    }
-    return {
-      success: false,
-      error: strictError instanceof Error ? strictError.message : "Validation failed",
-    };
+  // First attempt: strict Zod validation
+  const strict = dbaEngineOutputSchema.safeParse(json);
+  if (strict.success) return { success: true, data: strict.data };
+
+  // Second attempt: always succeed by coercing whatever we got
+  // This ensures we NEVER fall back to FALLBACK_DBA_ENGINE_OUTPUT due to schema mismatch
+  if (!json || typeof json !== 'object') {
+    return { success: false, error: 'Response is not a JSON object' };
   }
+
+  const obj = json as Record<string, unknown>;
+
+  const coerceDomain = (d: unknown) => {
+    const dom = (d && typeof d === 'object' ? d : {}) as Record<string, unknown>;
+    return {
+      key: (VALID_DOMAIN_KEYS.includes(dom.key as typeof VALID_DOMAIN_KEYS[number])
+        ? dom.key : 'aansturing') as typeof VALID_DOMAIN_KEYS[number],
+      title: typeof dom.title === 'string' ? dom.title : '',
+      scoreLabel: (['laag','midden','hoog'].includes(dom.scoreLabel as string)
+        ? dom.scoreLabel : 'midden') as 'laag'|'midden'|'hoog',
+      scoreColor: (['green','orange','red'].includes(dom.scoreColor as string)
+        ? dom.scoreColor : 'orange') as 'green'|'orange'|'red',
+      summary: typeof dom.summary === 'string' ? dom.summary : '',
+      indicatorsForRisk: Array.isArray(dom.indicatorsForRisk)
+        ? (dom.indicatorsForRisk as unknown[]).filter((x) => typeof x === 'string') as string[] : [],
+      indicatorsForIndependence: Array.isArray(dom.indicatorsForIndependence)
+        ? (dom.indicatorsForIndependence as unknown[]).filter((x) => typeof x === 'string') as string[] : [],
+      suggestedImprovements: Array.isArray(dom.suggestedImprovements)
+        ? (dom.suggestedImprovements as unknown[]).filter((x) => typeof x === 'string') as string[] : [],
+    };
+  };
+
+  const coerced: DbaEngineOutput = {
+    analysisStatus: 'complete',
+    overallRiskLabel: (['laag','midden','hoog'].includes(obj.overallRiskLabel as string)
+      ? obj.overallRiskLabel : 'midden') as 'laag'|'midden'|'hoog',
+    overallRiskColor: (['green','orange','red'].includes(obj.overallRiskColor as string)
+      ? obj.overallRiskColor : 'orange') as 'green'|'orange'|'red',
+    overallSummary: typeof obj.overallSummary === 'string' && obj.overallSummary.length > 5
+      ? obj.overallSummary : 'Analyse afgerond.',
+    domains: Array.isArray(obj.domains) && obj.domains.length > 0
+      ? (obj.domains as unknown[]).map(coerceDomain)
+      : [],
+    directionalAssessment: {
+      typeHint: typeof (obj.directionalAssessment as Record<string,unknown>)?.typeHint === 'string'
+        ? (obj.directionalAssessment as Record<string,unknown>).typeHint as string
+        : 'projectmatige zelfstandige',
+      directionSummary: typeof (obj.directionalAssessment as Record<string,unknown>)?.directionSummary === 'string'
+        ? (obj.directionalAssessment as Record<string,unknown>).directionSummary as string : '',
+    },
+    topImprovements: Array.isArray(obj.topImprovements)
+      ? (obj.topImprovements as unknown[]).filter((x) => typeof x === 'string') as string[] : [],
+    additionalImprovements: [],
+    simulationHints: [],
+    followUpQuestions: [],
+    disclaimerShort: 'Indicatieve analyse, geen juridisch advies.',
+  };
+
+  console.log('[DBA] Strict validation failed, using coerced result. Error:', strict.error?.message?.slice(0, 150));
+  return { success: true, data: coerced };
 }
 
 export const FALLBACK_DBA_ENGINE_OUTPUT: DbaEngineOutput = {

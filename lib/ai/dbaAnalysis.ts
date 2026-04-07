@@ -428,7 +428,8 @@ async function callAnthropicWithRetry<T>(
     return await retryWithAnthropicFix(systemPrompt, userPrompt, rawContent, validation.error || "Schema validation failed", validator, fallback, model, maxTokens);
 
   } catch (error) {
-    console.error("Anthropic API error:", error);
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("[DBA] Anthropic API error (model:", model, "):", msg);
     return fallback;
   }
 }
