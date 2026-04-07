@@ -30,7 +30,7 @@ function SectionBadge({ children, withIcon }: { children: string; withIcon?: boo
   return (
     <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/8 text-primary text-sm font-semibold border border-primary/12">
       {withIcon && (
-        <img src="/logo-flat-dark.png" alt="" className="h-4 w-auto object-contain" />
+        <img src="/logo-icon-badge.png" alt="" className="h-4 w-auto object-contain" />
       )}
       {children}
     </span>
@@ -41,9 +41,9 @@ function SectionBadge({ children, withIcon }: { children: string; withIcon?: boo
 function BulletIcon() {
   return (
     <img
-      src="/logo-flat-dark.png"
+      src="/logo-bullet.png"
       alt=""
-      className="h-4 w-auto object-contain flex-shrink-0 opacity-60"
+      className="h-3.5 w-auto object-contain flex-shrink-0 opacity-55 mt-0.5"
     />
   );
 }
@@ -126,7 +126,7 @@ export default function Home() {
             <BrandLogo variant="dark" className="h-8 w-auto" />
           </Link>
 
-          <nav className="hidden md:flex items-center gap-7">
+          <div className="hidden md:flex items-center gap-6">
             <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">
               {LANDING.nav.features}
             </a>
@@ -136,14 +136,11 @@ export default function Home() {
             <a href="#faq" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">
               {LANDING.nav.faq}
             </a>
-          </nav>
-
-          <div className="flex items-center gap-3">
             {user ? (
               <>
                 <span className="hidden sm:block text-sm text-muted-foreground">{user.email}</span>
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
                   onClick={() => window.location.href = `${APP_URL}/dashboard`}
                 >
@@ -156,10 +153,9 @@ export default function Home() {
             ) : (
               <>
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
                   onClick={() => setAuthModal("login")}
-                  className="hidden sm:flex"
                 >
                   {LANDING.nav.login}
                 </Button>
@@ -711,25 +707,27 @@ export default function Home() {
       {/* ── BOTTOM CTA ─────────────────────────── */}
       <section className="px-4 sm:px-6 py-20 md:py-28 max-w-7xl mx-auto w-full">
         <motion.div
-          className="glass-card pricing-glow text-center space-y-6 max-w-2xl mx-auto p-10 md:p-14"
+          className="cta-gradient-block text-center space-y-6 max-w-2xl mx-auto p-10 md:p-14 rounded-3xl relative overflow-hidden"
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={viewportConfig}
         >
-          <img src="/logo-dark.png" alt="DBA Kompas" className="h-9 w-auto mx-auto" />
-          <h2 className="text-3xl md:text-4xl font-bold">{LANDING.cta.title}</h2>
-          <p className="text-muted-foreground">{LANDING.cta.subtitle}</p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-            <Button size="lg" onClick={() => setEmailCheckoutPlan("yearly")} className="btn-magnetic min-w-[180px]">
+          {/* shimmer overlay */}
+          <div className="pointer-events-none absolute inset-0 cta-shimmer" />
+          <img src="/logo-dark-v3.png" alt="DBA Kompas" className="h-9 w-auto mx-auto relative z-10" />
+          <h2 className="text-3xl md:text-4xl font-bold text-white relative z-10">{LANDING.cta.title}</h2>
+          <p className="text-white/70 relative z-10">{LANDING.cta.subtitle}</p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 relative z-10">
+            <Button size="lg" onClick={() => setEmailCheckoutPlan("yearly")} className="btn-magnetic min-w-[180px] bg-white text-primary hover:bg-white/90 border-0">
               {LANDING.cta.primary}
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
-            <Button size="lg" variant="outline" onClick={() => document.getElementById("quick-scan")?.scrollIntoView({ behavior: "smooth" })}>
+            <Button size="lg" variant="ghost" onClick={() => document.getElementById("quick-scan")?.scrollIntoView({ behavior: "smooth" })} className="text-white hover:bg-white/15 hover:text-white border border-white/30">
               {LANDING.cta.secondary}
             </Button>
           </div>
-          <p className="text-xs text-muted-foreground/60">{LANDING.disclaimer}</p>
+          <p className="text-xs text-white/40 relative z-10">{LANDING.disclaimer}</p>
         </motion.div>
       </section>
 

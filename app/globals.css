@@ -283,3 +283,22 @@
 .section-divider {
   border-top: 1px solid hsl(217 44% 20% / 0.08);
 }
+
+/* ── Animated CTA gradient block ── */
+@keyframes ctaGrad {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.cta-gradient-block {
+  background: linear-gradient(135deg, #1C2D49 0%, #2D5575 45%, #C87C20 100%);
+  background-size: 300% 300%;
+  animation: ctaGrad 12s ease infinite;
+  box-shadow: 0 8px 40px hsl(217 44% 20% / 0.30), 0 2px 8px hsl(217 44% 20% / 0.15);
+}
+
+.cta-shimmer {
+  background: linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.06) 50%, transparent 70%);
+  pointer-events: none;
+}
