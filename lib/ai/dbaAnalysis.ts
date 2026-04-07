@@ -400,16 +400,22 @@ async function callAnthropicWithRetry<T>(
     });
 
     const rawContent = response.content[0].type === "text" ? response.content[0].text : "{}";
-    const cleanContent = rawContent
+    // Strip code fences, then extract the outermost {...} block if needed
+    let cleanContent = rawContent
       .replace(/^```(?:json)?\s*/i, "")
       .replace(/\s*```\s*$/, "")
       .trim();
+    if (!cleanContent.startsWith("{")) {
+      const match = cleanContent.match(/\{[\s\S]*\}/);
+      cleanContent = match ? match[0] : cleanContent;
+    }
+    console.log("[DBA] raw response length:", rawContent.length, "clean starts with:", cleanContent.slice(0, 40));
     let parsed: unknown;
 
     try {
       parsed = JSON.parse(cleanContent);
-    } catch {
-      console.error("Failed to parse JSON response, attempting retry...");
+    } catch (parseErr) {
+      console.error("[DBA] Failed to parse JSON:", parseErr, "| raw:", rawContent.slice(0, 200));
       return await retryWithAnthropicFix(systemPrompt, userPrompt, rawContent, "Invalid JSON syntax", validator, fallback, model, maxTokens);
     }
 
@@ -448,10 +454,14 @@ async function retryWithAnthropicFix<T>(
     });
 
     const rawContent = response.content[0].type === "text" ? response.content[0].text : "{}";
-    const cleanContent = rawContent
+    let cleanContent = rawContent
       .replace(/^```(?:json)?\s*/i, "")
       .replace(/\s*```\s*$/, "")
       .trim();
+    if (!cleanContent.startsWith("{")) {
+      const match = cleanContent.match(/\{[\s\S]*\}/);
+      cleanContent = match ? match[0] : cleanContent;
+    }
     const parsed = JSON.parse(cleanContent);
 
     const validation = validator(parsed);
@@ -459,7 +469,7 @@ async function retryWithAnthropicFix<T>(
       return sanitizeFullResponse(validation.data as Record<string, unknown>) as T;
     }
 
-    console.error("Retry also failed validation, using fallback");
+    console.error("[DBA] Retry also failed validation:", validation.error);
     return fallback;
 
   } catch (retryError) {
