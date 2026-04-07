@@ -443,13 +443,17 @@ const directionalAssessmentSchema = z.object({
   directionSummary: z.string(),
 });
 
-const simulationHintSchema = z.object({
-  improvement: z.string(),
-  expectedEffect: z.enum(['red_to_orange', 'orange_to_green', 'red_to_green', 'likely_no_change']),
-  relatedDomain: z.enum(['aansturing', 'eigen_rekening_risico', 'ondernemerschap']).optional(),
-  shortExplanation: z.string().optional(),
-  confidence: z.enum(['low', 'medium', 'high']).default('medium'),
-});
+const simulationHintSchema = z.preprocess(
+  // Haiku sometimes returns strings instead of objects — coerce to object
+  (val) => typeof val === 'string' ? { improvement: val, expectedEffect: 'likely_no_change' } : val,
+  z.object({
+    improvement: z.string(),
+    expectedEffect: z.enum(['red_to_orange', 'orange_to_green', 'red_to_green', 'likely_no_change']).default('likely_no_change'),
+    relatedDomain: z.enum(['aansturing', 'eigen_rekening_risico', 'ondernemerschap']).optional(),
+    shortExplanation: z.string().optional(),
+    confidence: z.enum(['low', 'medium', 'high']).default('medium'),
+  })
+);
 
 // ============================================================
 // Structured brief output schemas
