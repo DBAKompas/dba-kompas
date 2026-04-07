@@ -1,26 +1,30 @@
 # PROJECT_STATE.md
 **Laatst bijgewerkt:** 2026-04-07
-**Maturity:** 72%
+**Maturity:** 78%
 
 ---
 
 ## SAMENVATTING
 
-DBA Kompas is een Next.js 16.2 SaaS applicatie die opdrachtomschrijvingen analyseert op DBA-risico-indicatoren via de Claude Haiku AI. De kernfunctionaliteit is aanwezig en functioneel. Er zijn kritieke bugfixes doorgevoerd. De applicatie draait nog niet aantoonbaar in productie.
+DBA Kompas is een Next.js 16.2 SaaS applicatie die opdrachtomschrijvingen analyseert op DBA-risico-indicatoren via Claude Haiku. De kernfunctionaliteit is stabiel en werkt. Alle kritieke AI-bugs zijn opgelost. De applicatie is klaar voor uitgebreide functionele tests.
 
 ---
 
 ## WAT WERKT
 
 - Supabase authenticatie (email/password)
-- DBA analyse via Claude Haiku (`claude-haiku-4-5-20251001`)
-- Twee-fase architectuur: fase 1 = snelle kernanalyse, fase 2 = async opdrachtdraft
-- Input validatie (minimum 800 tekens / 120 woorden, 11 kwaliteitssignalen)
+- DBA analyse via Claude Haiku (`claude-haiku-4-5-20251001`) — alle AI functies nu op Haiku
+- Twee-fase architectuur: fase 1 = snelle kernanalyse, fase 2 = draft op aanvraag
+- Input validatie (minimum 800 tekens / 120 woorden) — `needs_more_input` blokkade verwijderd
+- Follow-up vragen als invulvelden op resultaatpagina — heranalyse met gecombineerde tekst
 - Nuclear/coerce validator — altijd succesvol voor geldige JSON objecten
 - Code fence stripping + outermost `{...}` extractie
+- JSON.parse try/catch in alle AI-functies
 - Resultaatpagina UI: colored hero banner, 3-koloms domeinkaarten, actiepunten
+- Draft generatie op expliciete knopklik (geen auto-trigger)
 - Fase 2 draft API endpoint (`POST /api/dba/analyse/[id]/draft`)
 - PDF rapport generatie (`lib/pdf/generate.ts`)
+- Rate limiting op analyse endpoint (free: 20/dag, pro: 100/dag)
 - Stripe betalingen (subscriptions + one-time) — code aanwezig, niet live getest
 - Newsfeed, notificaties, documentbeheer
 - Resend e-mail digests
@@ -30,14 +34,11 @@ DBA Kompas is een Next.js 16.2 SaaS applicatie die opdrachtomschrijvingen analys
 
 ## WAT NIET WERKT / ONZEKER
 
-- **KRITIEK**: Fase 1 prompt vraagt nog steeds om zware output (simulationFactState 18 velden + simulationHints + followUpQuestions) → kans op JSON truncation bij 2500 token limit → fallback
-- **BUG**: `retryWithAnthropicFix` heeft JSON.parse zonder try/catch — stille crash bij truncated retry JSON
-- **SECURITY**: Debug endpoint `/api/debug/ai-test` is publiek toegankelijk
-- **ONTBREEKT**: Rate limiting op analyse endpoint
-- **ONTBREEKT**: Tests (unit, integratie, e2e)
-- **ONBEKEND**: Deployment (geen Vercel config gevonden)
-- **ONBEKEND**: Stripe webhook live status
-- **ONBEKEND**: E-mail triggers live status
+- **ONTBREEKT**: Tests (unit, integratie, e2e) — regressions worden niet automatisch gedetecteerd
+- **ONBEKEND**: Deployment (geen Vercel config gedocumenteerd)
+- **ONBEKEND**: Stripe webhook live status — niet getest
+- **ONBEKEND**: E-mail digest triggers — geen cron job gevonden
+- **TRAAG**: Fase 2 draft generatie ~15-20 seconden
 
 ---
 
@@ -45,9 +46,9 @@ DBA Kompas is een Next.js 16.2 SaaS applicatie die opdrachtomschrijvingen analys
 
 | Omgeving | Status | Onderbouwing |
 |---|---|---|
-| Lokaal | MOGELIJK WERKEND | .env.local.example aanwezig |
-| Vercel Preview | ONBEKEND | Geen vercel.json |
-| Productie | ONBEKEND | Geen deployment config |
+| Lokaal | WERKEND | Bevestigd via tests |
+| Vercel (main branch) | LIVE (vermoedelijk) | Auto-deploy via GitHub |
+| Vercel config | ONGEDOCUMENTEERD | Geen vercel.json aanwezig |
 
 ---
 
@@ -55,8 +56,8 @@ DBA Kompas is een Next.js 16.2 SaaS applicatie die opdrachtomschrijvingen analys
 
 | Systeem | Code aanwezig | Geconfigureerd | Live getest |
 |---|---|---|---|
-| Supabase Auth + DB | JA | JA | ONBEKEND |
-| Anthropic Claude | JA | JA | GEDEELTELIJK |
+| Supabase Auth + DB | JA | JA | BEVESTIGD |
+| Anthropic Claude Haiku | JA | JA | BEVESTIGD |
 | Stripe | JA | JA | NEE |
 | Resend | JA | JA | NEE |
 | Loops | JA | JA | NEE |
@@ -69,10 +70,12 @@ DBA Kompas is een Next.js 16.2 SaaS applicatie die opdrachtomschrijvingen analys
 
 Correct gestructureerd:
 - Business logic in `lib/`, niet in UI components
+- Alle AI-aanroepen via `claude-haiku-4-5-20251001` — geen Opus meer
 - Supabase admin voor server-side mutaties (RLS bypass correct)
 - Entitlements via `modules/billing/entitlements.ts`
 - Prompt injection beveiliging aanwezig
+- Follow-up vragen via signaaldetectie (geen extra AI-aanroep)
 
 Aandachtspunten:
-- `callAnthropicWithRetry` default model is `claude-opus-4-6` (traag/duur) — expliciete override nodig bij elke aanroep
-- `postProcessDbaOutput` verwerkt draft-velden die fase 1 niet meer levert (no-ops maar verwarrend)
+- `postProcessDbaOutput` verwerkt draft-velden die fase 1 niet meer levert (no-ops, KI-008)
+- Fase 2 draft nog ~15-20s (PERF-001 open)

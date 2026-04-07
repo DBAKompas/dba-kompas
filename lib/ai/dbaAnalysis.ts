@@ -281,7 +281,7 @@ async function callAnthropicWithRetry<T>(
   userPrompt: string,
   validator: (json: unknown) => { success: boolean; data?: T; error?: string },
   fallback: T,
-  model: string = "claude-opus-4-6",
+  model: string = "claude-haiku-4-5-20251001",
   maxTokens: number = 1500
 ): Promise<T> {
   try {
@@ -513,18 +513,32 @@ VERBODEN: Gebruik nooit termen als "DBA-proof", "garantie", "100% compliant"`;
 
   try {
     const response = await anthropic.messages.create({
-      model: "claude-opus-4-6",
+      model: "claude-haiku-4-5-20251001",
       system: DBA_SCORING_SYSTEM_PROMPT,
       messages: [{ role: "user", content: prompt }],
       max_tokens: 1500,
     });
 
     const rawContent = response.content[0].type === "text" ? response.content[0].text : "{}";
-    const analysis = JSON.parse(rawContent);
+    let cleanContent = rawContent
+      .replace(/^```(?:json)?\s*/i, "")
+      .replace(/\s*```\s*$/, "")
+      .trim();
+    if (!cleanContent.startsWith("{")) {
+      const match = cleanContent.match(/\{[\s\S]*\}/);
+      cleanContent = match ? match[0] : cleanContent;
+    }
+    let analysis: Record<string, unknown>;
+    try {
+      analysis = JSON.parse(cleanContent);
+    } catch {
+      console.error("[DBA] analyzeDocument JSON.parse failed, using fallback");
+      return { isDBACompliant: false, riskLevel: 'medium', issues: [], suggestions: [] };
+    }
 
     return {
-      isDBACompliant: analysis.isDBACompliant || false,
-      riskLevel: analysis.riskLevel || 'medium',
+      isDBACompliant: (analysis.isDBACompliant as boolean) || false,
+      riskLevel: (analysis.riskLevel as 'low' | 'medium' | 'high') || 'medium',
       issues: (analysis.issues || []).map((i: string) => sanitizeBannedPhrases(i)),
       suggestions: (analysis.suggestions || []).map((s: string) => sanitizeBannedPhrases(s)),
     };
@@ -556,7 +570,7 @@ REGELS:
 
   try {
     const response = await anthropic.messages.create({
-      model: "claude-opus-4-6",
+      model: "claude-haiku-4-5-20251001",
       system: DBA_SCORING_SYSTEM_PROMPT,
       messages: [{ role: "user", content: prompt }],
       max_tokens: 4000,
@@ -582,7 +596,7 @@ export async function rewriteNewsArticle(originalTitle: string, originalContent:
     prompt,
     validateNewsRewriteResponse,
     FALLBACK_NEWS_RESPONSE,
-    "claude-opus-4-6",
+    "claude-haiku-4-5-20251001",
     1000
   );
 
@@ -616,7 +630,7 @@ REGELS:
 
   try {
     const response = await anthropic.messages.create({
-      model: "claude-opus-4-6",
+      model: "claude-haiku-4-5-20251001",
       system: DBA_SCORING_SYSTEM_PROMPT,
       messages: [{ role: "user", content: prompt }],
       max_tokens: 4000,

@@ -66,6 +66,21 @@ Elke beslissing bevat: datum, beslissing, reden, alternatieven overwogen.
 
 ---
 
+## 2026-04-07 — Alle AI-functies naar Claude Haiku
+
+**Beslissing:** Alle directe Anthropic API aanroepen in `dbaAnalysis.ts` gewijzigd naar `claude-haiku-4-5-20251001`. Default van `callAnthropicWithRetry` ook gewijzigd naar Haiku.
+
+**Reden:**
+- `analyzeDocument`, `rewriteDocument`, `rewriteNewsArticle`, `generateContractTemplate` gebruikten nog `claude-opus-4-6`
+- Opus is ~5x trager en duurder dan Haiku
+- Voor DBA-analyse en documentherschrijving is Haiku voldoende nauwkeurig
+
+**Impact:**
+- Alle AI-functies nu op Haiku — consistent en goedkoper
+- `analyzeDocument` kreeg ook JSON.parse try/catch + code fence stripping (ontbrak)
+
+---
+
 ## 2026-04-07 — Analyse altijd uitvoeren, follow-up vragen erna
 
 **Beslissing:** `needs_more_input` status verwijderd. Als een tekst >= 800 tekens en >= 120 woorden heeft, wordt de analyse altijd uitgevoerd. Ontbrekende signalen worden getoond als invulvelden nádat de analyse klaar is.

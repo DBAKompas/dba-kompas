@@ -73,11 +73,11 @@ try {
 **Impact:** Regressions worden niet automatisch gedetecteerd. Elke code-aanpassing is riskant.
 **Fix:** Voeg minimaal unit tests toe voor: `validateDbaInput`, `validateDbaEngineOutput`, `buildDbaFastAnalysisPrompt` output lengte.
 
-### KI-006 — `callAnthropicWithRetry` default model is claude-opus-4-6
-**Status:** OPEN
-**Bestand:** `lib/ai/dbaAnalysis.ts`, regel 356
-**Impact:** Functies die geen expliciete model parameter doorgeven (bijv. `analyzeDocument`, `rewriteNewsArticle`) gebruiken onbedoeld het trage/dure Opus model.
-**Fix:** Maak `model` een required parameter zonder default, of gebruik Haiku als default.
+### KI-006 — Alle functies gebruikten claude-opus-4-6
+**Status:** OPGELOST — 2026-04-07
+**Bestand:** `lib/ai/dbaAnalysis.ts`
+**Impact:** `analyzeDocument`, `rewriteDocument`, `rewriteNewsArticle`, `generateContractTemplate` gebruikten Opus — traag en duur.
+**Fix:** Alle aanroepen gewijzigd naar `claude-haiku-4-5-20251001`. Default van `callAnthropicWithRetry` ook gewijzigd naar Haiku. JSON.parse try/catch toegevoegd in `analyzeDocument`.
 
 ### KI-007 — Stripe webhook niet live getest
 **Status:** OPEN
