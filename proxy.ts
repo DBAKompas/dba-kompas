@@ -1,7 +1,22 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+// Routes die altijd toegankelijk zijn zonder inloggen
+const PUBLIC_ROUTES = ['/login', '/auth/callback', '/api/billing/webhook']
+
 export async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl
+
+  // Publieke routes altijd doorlaten
+  if (PUBLIC_ROUTES.some((route) => pathname.startsWith(route))) {
+    return NextResponse.next({ request })
+  }
+
+  // Overige API routes doen hun eigen auth
+  if (pathname.startsWith('/api/')) {
+    return NextResponse.next({ request })
+  }
+
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -25,14 +40,13 @@ export async function proxy(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  const isProtected = request.nextUrl.pathname.startsWith('/dashboard')
-  const isAuthPage = request.nextUrl.pathname.startsWith('/login')
-
-  if (isProtected && !user) {
+  // Niet-ingelogde gebruikers naar /login sturen
+  if (!user) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  if (isAuthPage && user) {
+  // Ingelogde gebruikers die /login bezoeken naar /dashboard sturen
+  if (user && pathname === '/login') {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
@@ -40,5 +54,7 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
 }
