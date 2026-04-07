@@ -387,10 +387,14 @@ async function callAnthropicWithRetry<T>(
     });
 
     const rawContent = response.content[0].type === "text" ? response.content[0].text : "{}";
+    const cleanContent = rawContent
+      .replace(/^```(?:json)?\s*/i, "")
+      .replace(/\s*```\s*$/, "")
+      .trim();
     let parsed: unknown;
 
     try {
-      parsed = JSON.parse(rawContent);
+      parsed = JSON.parse(cleanContent);
     } catch {
       console.error("Failed to parse JSON response, attempting retry...");
       return await retryWithAnthropicFix(systemPrompt, userPrompt, rawContent, "Invalid JSON syntax", validator, fallback, model, maxTokens);
@@ -431,7 +435,11 @@ async function retryWithAnthropicFix<T>(
     });
 
     const rawContent = response.content[0].type === "text" ? response.content[0].text : "{}";
-    const parsed = JSON.parse(rawContent);
+    const cleanContent = rawContent
+      .replace(/^```(?:json)?\s*/i, "")
+      .replace(/\s*```\s*$/, "")
+      .trim();
+    const parsed = JSON.parse(cleanContent);
 
     const validation = validator(parsed);
     if (validation.success && validation.data) {
