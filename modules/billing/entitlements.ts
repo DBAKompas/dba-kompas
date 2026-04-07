@@ -10,8 +10,8 @@ export async function getUserPlan(): Promise<Plan> {
 
   const { data: subscription } = await supabase
     .from('subscriptions')
-    .select('status, price_id')
-    .eq('account_id', user.id)
+    .select('status, plan')
+    .eq('user_id', user.id)
     .single()
 
   if (!subscription || subscription.status !== 'active') return 'free'

@@ -8,6 +8,7 @@ import {
   FileSearch,
   Newspaper,
   FolderOpen,
+  BookOpen,
   Bell,
   User,
   LogOut,
@@ -21,6 +22,7 @@ const navItems = [
   { href: '/analyse', label: 'Analyse', icon: FileSearch },
   { href: '/nieuws', label: 'Nieuws', icon: Newspaper },
   { href: '/documenten', label: 'Documenten', icon: FolderOpen },
+  { href: '/gidsen', label: 'Gidsen', icon: BookOpen },
   { href: '/notificaties', label: 'Notificaties', icon: Bell },
   { href: '/profiel', label: 'Profiel', icon: User },
 ]
