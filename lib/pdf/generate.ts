@@ -132,9 +132,9 @@ export function generateAssessmentPDF(assessment: AssessmentForPDF): PDFKit.PDFD
   const HEADER_H = 110;
   doc.rect(0, 0, PAGE_W, HEADER_H).fill(NAVY);
 
-  const logoPath = path.join(process.cwd(), "public/dba-kompas-logo.png");
+  const logoPath = path.join(process.cwd(), "public/logo-flat-white.png");
   try {
-    doc.image(logoPath, MARGIN, 18, { height: 60 });
+    doc.image(logoPath, MARGIN, 28, { height: 44, fit: [200, 44] });
   } catch {
     doc.fillColor(WHITE).font("Helvetica-Bold").fontSize(14)
       .text("DBA Kompas", MARGIN, 30);
@@ -148,9 +148,6 @@ export function generateAssessmentPDF(assessment: AssessmentForPDF): PDFKit.PDFD
     .text("Indicatieve DBA risico-inschatting (geen juridisch advies)", titleX, 58, {
       width: 350, align: "right",
     });
-
-  doc.fillColor(WHITE).font("Helvetica-Bold").fontSize(11)
-    .text("DBA Kompas", MARGIN, 84, { width: 120 });
 
   // 2. DATE + ID strip
   const STRIP_Y = HEADER_H;
@@ -211,11 +208,18 @@ export function generateAssessmentPDF(assessment: AssessmentForPDF): PDFKit.PDFD
     domains.slice(0, 3).forEach((d: any) => {
       const dLabel = d.scoreLabel === "laag" ? "Laag" : d.scoreLabel === "hoog" ? "Hoog" : "Midden";
       const dCol = riskColor(d.scoreLabel);
+      const domainName = d.title ?? d.domainName ?? d.key ?? "Domein";
       doc.fillColor(GREY).font("Helvetica").fontSize(8)
-        .text(d.domainName ?? "Domein", leftX, lY, { continued: true, width: COL_W - 40 });
+        .text(domainName, leftX, lY, { continued: true, width: COL_W - 40 });
       doc.fillColor(dCol).font("Helvetica-Bold").fontSize(8)
         .text(` ${dLabel}`, { width: 40, align: "right" });
       lY = doc.y + 2;
+      // Korte toelichting onder domein
+      if (d.summary) {
+        doc.fillColor(GREY).font("Helvetica").fontSize(7)
+          .text(truncate(d.summary, 120), leftX + 4, lY, { width: COL_W - 4, lineGap: 1 });
+        lY = doc.y + 4;
+      }
     });
   }
 
@@ -250,17 +254,26 @@ export function generateAssessmentPDF(assessment: AssessmentForPDF): PDFKit.PDFD
 
   const bTopY = Math.max(bL, bR);
 
+  const NOT_YET_GENERATED = "Nog niet gegenereerd. Klik op 'Genereer opdrachtomschrijving' in de app en download daarna de PDF opnieuw.";
+
   const compactParsed = parseDraftJson<CompactDraftJson>(assessment.compactAssignmentDraft);
   const extendedParsed = parseDraftJson<LongDraftJson>(assessment.optimizedBrief);
-  const compact = compactParsed ? truncate(formatCompactDraft(compactParsed), 1200) : null;
-  const extended = extendedParsed ? truncate(formatLongDraft(extendedParsed), 1200) : null;
+
+  // Filter fallback-waarden weg: als assignmentDescription de standaard foutmelding is, behandel als leeg
+  const FALLBACK_TEXT = "Omschrijving kon niet automatisch worden gegenereerd.";
+  const compactOk = compactParsed && compactParsed.assignmentDescription !== FALLBACK_TEXT;
+  const extendedOk = extendedParsed && extendedParsed.assignmentDescription !== FALLBACK_TEXT;
+
+  const compact = compactOk ? formatCompactDraft(compactParsed!) : null;
+  const extended = extendedOk ? formatLongDraft(extendedParsed!) : null;
 
   if (compact) {
     doc.fillColor(DARK).font("Helvetica").fontSize(8.5)
       .text(compact, leftX, bTopY, { width: COL_W, lineGap: 2.5 });
   } else {
-    doc.fillColor(GREY).font("Helvetica").fontSize(8.5)
-      .text("Geen compacte opdrachtomschrijving beschikbaar.", leftX, bTopY, { width: COL_W });
+    doc.fillColor(GREY).font("Helvetica").fontSize(8).italics()
+      .text(NOT_YET_GENERATED, leftX, bTopY, { width: COL_W, lineGap: 2 });
+    doc.font("Helvetica");
   }
   const briefLeftEnd = doc.y;
 
@@ -268,30 +281,46 @@ export function generateAssessmentPDF(assessment: AssessmentForPDF): PDFKit.PDFD
     doc.fillColor(DARK).font("Helvetica").fontSize(8.5)
       .text(extended, rightX, bTopY, { width: COL_W, lineGap: 2.5 });
   } else {
-    doc.fillColor(GREY).font("Helvetica").fontSize(8.5)
-      .text("Geen uitgebreide opdrachtomschrijving beschikbaar.", rightX, bTopY, { width: COL_W });
+    doc.fillColor(GREY).font("Helvetica").fontSize(8).italics()
+      .text(NOT_YET_GENERATED, rightX, bTopY, { width: COL_W, lineGap: 2 });
+    doc.font("Helvetica");
   }
   const briefRightEnd = doc.y;
 
   y = Math.max(briefLeftEnd, briefRightEnd) + 24;
 
-  // 6. FOOTER
-  const FOOTER_Y = Math.max(y, PAGE_H - 72);
+  // 6. FOOTER — altijd ná content, minimaal op PAGE_H - 72
+  const FOOTER_Y = Math.max(y + 16, PAGE_H - 72);
 
-  doc.moveTo(MARGIN, FOOTER_Y).lineTo(PAGE_W - MARGIN, FOOTER_Y)
-    .strokeColor("#D1D5DB").lineWidth(0.5).stroke();
-
-  doc.fillColor(GREY).font("Helvetica").fontSize(7.5)
-    .text(
-      "DBA Kompas  \u00b7  info@dbakompas.nl  \u00b7  www.dbakompas.nl",
-      MARGIN, FOOTER_Y + 8, { width: PAGE_W - MARGIN * 2, align: "center" },
-    );
-
-  doc.fillColor(GREY).font("Helvetica").fontSize(7)
-    .text(
-      "Deze rapportage is een AI-gegenereerde indicatie en geen juridisch advies. Raadpleeg altijd een professional voor definitieve beoordeling.",
-      MARGIN, FOOTER_Y + 22, { width: PAGE_W - MARGIN * 2, align: "center" },
-    );
+  // Als content de pagina overschrijdt: voeg een nieuwe pagina toe en zet footer bovenaan die pagina
+  if (FOOTER_Y + 50 > doc.page.height) {
+    doc.addPage();
+    doc.moveTo(MARGIN, 30).lineTo(PAGE_W - MARGIN, 30)
+      .strokeColor("#D1D5DB").lineWidth(0.5).stroke();
+    doc.fillColor(GREY).font("Helvetica").fontSize(7.5)
+      .text(
+        "DBA Kompas  \u00b7  info@dbakompas.nl  \u00b7  www.dbakompas.nl",
+        MARGIN, 40, { width: PAGE_W - MARGIN * 2, align: "center" },
+      );
+    doc.fillColor(GREY).font("Helvetica").fontSize(7)
+      .text(
+        "Deze rapportage is een AI-gegenereerde indicatie en geen juridisch advies. Raadpleeg altijd een professional voor definitieve beoordeling.",
+        MARGIN, 54, { width: PAGE_W - MARGIN * 2, align: "center" },
+      );
+  } else {
+    doc.moveTo(MARGIN, FOOTER_Y).lineTo(PAGE_W - MARGIN, FOOTER_Y)
+      .strokeColor("#D1D5DB").lineWidth(0.5).stroke();
+    doc.fillColor(GREY).font("Helvetica").fontSize(7.5)
+      .text(
+        "DBA Kompas  \u00b7  info@dbakompas.nl  \u00b7  www.dbakompas.nl",
+        MARGIN, FOOTER_Y + 8, { width: PAGE_W - MARGIN * 2, align: "center" },
+      );
+    doc.fillColor(GREY).font("Helvetica").fontSize(7)
+      .text(
+        "Deze rapportage is een AI-gegenereerde indicatie en geen juridisch advies. Raadpleeg altijd een professional voor definitieve beoordeling.",
+        MARGIN, FOOTER_Y + 22, { width: PAGE_W - MARGIN * 2, align: "center" },
+      );
+  }
 
   return doc;
 }

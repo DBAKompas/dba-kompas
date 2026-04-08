@@ -251,10 +251,10 @@ Geef ALLEEN deze JSON terug (geen andere tekst):
     "executionAndSteering": "1 alinea over zelfstandige uitvoering en sturing op resultaat"${isHighRisk ? ',\n    "structuralNote": "eerlijke toelichting over wat betere tekst niet oplost"' : ''}
   },
   "reusableBuildingBlocks": {
-    "resultBullets": ["2-3 herbruikbare resultaatbullets"],
-    "acceptanceBullets": ["2-3 acceptatiecriteria bullets"],
-    "independenceBullets": ["2-3 bullets over zelfstandigheid"],
-    "scopeBullets": ["1-2 scope bullets"]
+    "resultBullets": [],
+    "acceptanceBullets": [],
+    "independenceBullets": [],
+    "scopeBullets": []
   }
 }`;
 }
@@ -702,7 +702,7 @@ export async function generateAssignmentDraft(
       validateDbaDraftOutput,
       FALLBACK_DRAFT_OUTPUT,
       "claude-haiku-4-5-20251001",
-      1400  // full needs ~800-1000 tokens
+      2000  // full behoeft meer ruimte voor 2-3 alinea's assignmentDescription
     );
   }
 }
