@@ -38,6 +38,68 @@ function truncate(s: string | null | undefined, maxChars = 900): string {
   return t.length > maxChars ? t.slice(0, maxChars).trimEnd() + "\u2026" : t;
 }
 
+interface CompactDraftJson {
+  title?: string;
+  assignmentDescription?: string;
+  deliverables?: string[];
+  executionAndSteering?: string;
+  structuralNote?: string;
+}
+
+interface LongDraftJson {
+  title?: string;
+  assignmentDescription?: string;
+  deliverables?: string[];
+  acceptanceCriteria?: string[];
+  scopeExclusions?: string[];
+  executionAndSteering?: string;
+  structuralNote?: string;
+}
+
+function parseDraftJson<T>(raw: string | null | undefined): T | null {
+  if (!raw) return null;
+  try {
+    const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+    return (parsed && typeof parsed === "object") ? parsed as T : null;
+  } catch {
+    return null;
+  }
+}
+
+function formatCompactDraft(draft: CompactDraftJson): string {
+  const parts: string[] = [];
+  if (draft.title) parts.push(`\u25B6 ${draft.title}`);
+  if (draft.assignmentDescription) parts.push(draft.assignmentDescription);
+  if (draft.deliverables?.length) {
+    parts.push("Opleveringen:");
+    draft.deliverables.forEach(d => parts.push(`\u2022 ${d}`));
+  }
+  if (draft.executionAndSteering) parts.push(draft.executionAndSteering);
+  if (draft.structuralNote) parts.push(`Let op: ${draft.structuralNote}`);
+  return parts.join("\n\n");
+}
+
+function formatLongDraft(draft: LongDraftJson): string {
+  const parts: string[] = [];
+  if (draft.title) parts.push(`\u25B6 ${draft.title}`);
+  if (draft.assignmentDescription) parts.push(draft.assignmentDescription);
+  if (draft.deliverables?.length) {
+    parts.push("Opleveringen:");
+    draft.deliverables.forEach(d => parts.push(`\u2022 ${d}`));
+  }
+  if (draft.acceptanceCriteria?.length) {
+    parts.push("Acceptatiecriteria:");
+    draft.acceptanceCriteria.forEach(c => parts.push(`\u2022 ${c}`));
+  }
+  if (draft.scopeExclusions?.length) {
+    parts.push("Buiten scope:");
+    draft.scopeExclusions.forEach(s => parts.push(`\u2022 ${s}`));
+  }
+  if (draft.executionAndSteering) parts.push(draft.executionAndSteering);
+  if (draft.structuralNote) parts.push(`Let op: ${draft.structuralNote}`);
+  return parts.join("\n\n");
+}
+
 interface AssessmentForPDF {
   id: string;
   inputText: string;
@@ -188,8 +250,10 @@ export function generateAssessmentPDF(assessment: AssessmentForPDF): PDFKit.PDFD
 
   const bTopY = Math.max(bL, bR);
 
-  const compact = truncate(assessment.compactAssignmentDraft, 1200);
-  const extended = truncate(assessment.optimizedBrief, 1200);
+  const compactParsed = parseDraftJson<CompactDraftJson>(assessment.compactAssignmentDraft);
+  const extendedParsed = parseDraftJson<LongDraftJson>(assessment.optimizedBrief);
+  const compact = compactParsed ? truncate(formatCompactDraft(compactParsed), 1200) : null;
+  const extended = extendedParsed ? truncate(formatLongDraft(extendedParsed), 1200) : null;
 
   if (compact) {
     doc.fillColor(DARK).font("Helvetica").fontSize(8.5)

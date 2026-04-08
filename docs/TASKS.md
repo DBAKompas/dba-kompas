@@ -22,7 +22,7 @@
 
 ### LAAG (verbetering)
 
-- [ ] **FEAT-001**: Quick scan koppelen aan echte Claude analyse (nu keyword-based)
+- [x] **FEAT-001**: Quick scan gekoppeld aan echte Haiku analyse (was keyword-based placeholder)
 - [ ] **FEAT-002**: Admin panel voor contentbeheer (gidsen, nieuws)
 - [ ] **FEAT-003**: Gidsen content schrijven en vullen
 
