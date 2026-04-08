@@ -1,6 +1,6 @@
 # PROJECT_STATE.md
 **Laatst bijgewerkt:** 2026-04-07
-**Maturity:** 78%
+**Maturity:** 82%
 
 ---
 
@@ -22,6 +22,8 @@ DBA Kompas is een Next.js 16.2 SaaS applicatie die opdrachtomschrijvingen analys
 - JSON.parse try/catch in alle AI-functies
 - Resultaatpagina UI: colored hero banner, 3-koloms domeinkaarten, actiepunten
 - Draft generatie op expliciete knopklik (geen auto-trigger)
+- Gesplitste draft generatie: compact (max_tokens 700, ~3-5s) + uitgebreid (max_tokens 1400, ~8-12s, lazy)
+- Uitgebreide draft laadt automatisch bij eerste klik op "Uitgebreid" tab
 - Fase 2 draft API endpoint (`POST /api/dba/analyse/[id]/draft`)
 - PDF rapport generatie (`lib/pdf/generate.ts`)
 - Rate limiting op analyse endpoint (free: 20/dag, pro: 100/dag)
@@ -38,7 +40,7 @@ DBA Kompas is een Next.js 16.2 SaaS applicatie die opdrachtomschrijvingen analys
 - **ONBEKEND**: Deployment (geen Vercel config gedocumenteerd)
 - **ONBEKEND**: Stripe webhook live status — niet getest
 - **ONBEKEND**: E-mail digest triggers — geen cron job gevonden
-- **TRAAG**: Fase 2 draft generatie ~15-20 seconden
+- **OPGELOST**: Fase 2 draft generatie — compact: ~3-5s, uitgebreid: ~8-12s (lazy op tab-klik)
 
 ---
 

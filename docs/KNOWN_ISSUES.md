@@ -59,7 +59,7 @@ try {
 **Fix:** Bestand verwijderen zodra analyse stabiel is.
 
 ### KI-004 — Geen rate limiting op analyse endpoint
-**Status:** OPGELOST — 2026-04-07 (free: 3/dag, pro: 50/dag)
+**Status:** OPGELOST — 2026-04-07 (free: 20/dag, pro: 100/dag)
 **Bestand:** `app/api/dba/analyse/route.ts`
 **Symptoom:** Geen limiet op het aantal analyses per gebruiker — misbruik mogelijk, kosten onbeheersbaar
 **Fix:** Voeg Supabase-gebaseerde count-check toe: tel analyses van user in laatste 24u, vergelijk met plan-limiet.

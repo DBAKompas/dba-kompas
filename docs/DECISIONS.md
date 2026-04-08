@@ -81,6 +81,30 @@ Elke beslissing bevat: datum, beslissing, reden, alternatieven overwogen.
 
 ---
 
+## 2026-04-08 — Gesplitste draft generatie (compact + uitgebreid)
+
+**Beslissing:** `buildDbaDraftGenerationPrompt` gesplitst in twee aparte functies:
+- `buildCompactDraftPrompt`: genereert alleen `compactAssignmentDraft`, max_tokens 700
+- `buildFullDraftPrompt`: genereert alleen `longAssignmentDraft` + `reusableBuildingBlocks`, max_tokens 1400
+
+**Reden:**
+- Gecombineerde prompt (2000 tokens) duurde ~15-20 seconden — onacceptabel voor UX
+- Compact (modelovereenkomst) is het meest gebruikt — direct beschikbaar bij knopklik
+- Uitgebreid (intern gebruik) is secundair — lazy laden bij eerste tab-klik is acceptabel
+
+**Impact:**
+- Compact klaar in ~3-5s (was 15-20s totaal)
+- Uitgebreid beschikbaar in ~8-12s, alleen geladen wanneer gebruiker ernaar vraagt
+- Draft endpoint accepteert `?mode=compact|full` query param (default: compact)
+- Nuclear validator hergebruikt — ontbrekende velden worden met lege defaults gevuld
+
+**Alternatieven overwogen:**
+- Streaming: complexer, vereist UI-aanpassingen
+- Parallel calls (compact + uitgebreid tegelijk): dubbele kosten voor iets wat de gebruiker nooit ziet
+- Prompt optimalisatie in één call: beperkt effect — tokenbudget is fundamenteel probleem
+
+---
+
 ## 2026-04-07 — Analyse altijd uitvoeren, follow-up vragen erna
 
 **Beslissing:** `needs_more_input` status verwijderd. Als een tekst >= 800 tekens en >= 120 woorden heeft, wordt de analyse altijd uitgevoerd. Ontbrekende signalen worden getoond als invulvelden nádat de analyse klaar is.

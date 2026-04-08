@@ -6,7 +6,7 @@ import { generateAssignmentDraft } from '@/lib/ai'
 export const maxDuration = 120
 
 export async function POST(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -15,6 +15,11 @@ export async function POST(
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
     const { id } = await params
+
+    // Parse mode from query string — default to compact for speed
+    const url = new URL(request.url)
+    const rawMode = url.searchParams.get('mode')
+    const mode: 'compact' | 'full' = rawMode === 'full' ? 'full' : 'compact'
 
     // Fetch the assessment to get the original input and analysis data
     const { data: assessment, error: fetchError } = await supabaseAdmin
@@ -35,37 +40,57 @@ export async function POST(
     const directionalAssessment = assessment.directional_assessment as { typeHint?: string } | null
     const simulationFactState = (assessment.ai_analysis as { simulationFactState?: Record<string, unknown> } | null)?.simulationFactState ?? {}
 
-    const draft = await generateAssignmentDraft(assessment.input_text, {
-      overallRiskLabel: assessment.overall_risk_label ?? 'midden',
-      typeHint: directionalAssessment?.typeHint ?? 'projectmatige zelfstandige',
-      topImprovements: (assessment.top_improvements as string[]) ?? [],
-      simulationFactState,
-    })
+    const draft = await generateAssignmentDraft(
+      assessment.input_text,
+      {
+        overallRiskLabel: assessment.overall_risk_label ?? 'midden',
+        typeHint: directionalAssessment?.typeHint ?? 'projectmatige zelfstandige',
+        topImprovements: (assessment.top_improvements as string[]) ?? [],
+        simulationFactState,
+      },
+      mode
+    )
 
-    // Update the assessment with the generated drafts
-    const { error: updateError } = await supabaseAdmin
-      .from('dba_assessments')
-      .update({
+    // Only update the DB fields relevant for the requested mode
+    if (mode === 'compact') {
+      const { error: updateError } = await supabaseAdmin
+        .from('dba_assessments')
+        .update({
+          compact_assignment_draft: JSON.stringify(draft.compactAssignmentDraft),
+        })
+        .eq('id', id)
+
+      if (updateError) {
+        console.error('[DBA] Failed to save compact draft:', updateError)
+        return NextResponse.json({ error: 'Failed to save draft' }, { status: 500 })
+      }
+
+      return NextResponse.json({
         compact_assignment_draft: JSON.stringify(draft.compactAssignmentDraft),
+      })
+    } else {
+      const { error: updateError } = await supabaseAdmin
+        .from('dba_assessments')
+        .update({
+          optimized_brief: JSON.stringify(draft.longAssignmentDraft),
+          reusable_building_blocks: draft.reusableBuildingBlocks,
+          additional_improvements: draft.additionalImprovements,
+          follow_up_questions: draft.followUpQuestions,
+        })
+        .eq('id', id)
+
+      if (updateError) {
+        console.error('[DBA] Failed to save full draft:', updateError)
+        return NextResponse.json({ error: 'Failed to save draft' }, { status: 500 })
+      }
+
+      return NextResponse.json({
         optimized_brief: JSON.stringify(draft.longAssignmentDraft),
         reusable_building_blocks: draft.reusableBuildingBlocks,
         additional_improvements: draft.additionalImprovements,
         follow_up_questions: draft.followUpQuestions,
       })
-      .eq('id', id)
-
-    if (updateError) {
-      console.error('Failed to update assessment with drafts:', updateError)
-      return NextResponse.json({ error: 'Failed to save draft' }, { status: 500 })
     }
-
-    return NextResponse.json({
-      compact_assignment_draft: JSON.stringify(draft.compactAssignmentDraft),
-      optimized_brief: JSON.stringify(draft.longAssignmentDraft),
-      reusable_building_blocks: draft.reusableBuildingBlocks,
-      additional_improvements: draft.additionalImprovements,
-      follow_up_questions: draft.followUpQuestions,
-    })
   } catch (error) {
     console.error('Draft generation error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

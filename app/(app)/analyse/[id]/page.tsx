@@ -119,6 +119,7 @@ export default function AssessmentDetailPage() {
   const [assessment, setAssessment] = useState<Assessment | null>(null)
   const [loading, setLoading] = useState(true)
   const [draftLoading, setDraftLoading] = useState(false)
+  const [fullDraftLoading, setFullDraftLoading] = useState(false)
   const [reanalyseLoading, setReanalyseLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [expandedDomains, setExpandedDomains] = useState<Set<number>>(new Set([0, 1, 2]))
@@ -142,10 +143,27 @@ export default function AssessmentDetailPage() {
   const handleGenerateDraft = () => {
     if (!assessment || draftLoading) return
     setDraftLoading(true)
-    fetch(`/api/dba/analyse/${params.id}/draft`, { method: 'POST' })
+    fetch(`/api/dba/analyse/${params.id}/draft?mode=compact`, { method: 'POST' })
       .then((res) => { if (!res.ok) throw new Error(); return res.json() })
       .then((d) => { setAssessment((prev) => prev ? { ...prev, ...d } : prev); setDraftLoading(false) })
       .catch(() => setDraftLoading(false))
+  }
+
+  const handleGenerateFullDraft = () => {
+    if (!assessment || fullDraftLoading) return
+    setFullDraftLoading(true)
+    fetch(`/api/dba/analyse/${params.id}/draft?mode=full`, { method: 'POST' })
+      .then((res) => { if (!res.ok) throw new Error(); return res.json() })
+      .then((d) => { setAssessment((prev) => prev ? { ...prev, ...d } : prev); setFullDraftLoading(false) })
+      .catch(() => setFullDraftLoading(false))
+  }
+
+  const handleTabChange = (tab: 'compact' | 'long') => {
+    setActiveTab(tab)
+    // Lazy-load full draft when user switches to the Uitgebreid tab for the first time
+    if (tab === 'long' && assessment && !parseJson<LongDraft>(assessment.optimized_brief) && !fullDraftLoading) {
+      handleGenerateFullDraft()
+    }
   }
 
   const handleReanalyse = async () => {
@@ -437,7 +455,7 @@ export default function AssessmentDetailPage() {
                 <Loader2 className="size-5 animate-spin shrink-0" />
                 <div>
                   <p className="font-medium">Opdrachtteksten worden gegenereerd...</p>
-                  <p className="text-xs mt-0.5 text-muted-foreground/70">Dit duurt circa 15-20 seconden</p>
+                  <p className="text-xs mt-0.5 text-muted-foreground/70">Dit duurt circa 3-5 seconden</p>
                 </div>
               </div>
             ) : (compactDraft || longDraft) ? (
@@ -445,13 +463,13 @@ export default function AssessmentDetailPage() {
                 <div className="flex border-b">
                   <button
                     className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${activeTab === 'compact' ? 'bg-violet-50 text-violet-700 border-b-2 border-violet-500' : 'text-muted-foreground hover:text-foreground'}`}
-                    onClick={() => setActiveTab('compact')}
+                    onClick={() => handleTabChange('compact')}
                   >
                     Compact (modelovereenkomst)
                   </button>
                   <button
                     className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${activeTab === 'long' ? 'bg-violet-50 text-violet-700 border-b-2 border-violet-500' : 'text-muted-foreground hover:text-foreground'}`}
-                    onClick={() => setActiveTab('long')}
+                    onClick={() => handleTabChange('long')}
                   >
                     Uitgebreid (intern gebruik)
                   </button>
@@ -499,7 +517,29 @@ export default function AssessmentDetailPage() {
                   </div>
                 )}
 
-                {activeTab === 'long' && longDraft && (
+                {activeTab === 'long' && fullDraftLoading && (
+                  <div className="flex items-center gap-3 p-8 text-sm text-muted-foreground">
+                    <Loader2 className="size-5 animate-spin shrink-0" />
+                    <div>
+                      <p className="font-medium">Uitgebreide versie wordt opgesteld...</p>
+                      <p className="text-xs mt-0.5 text-muted-foreground/70">Dit duurt circa 8-12 seconden</p>
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === 'long' && !fullDraftLoading && !longDraft && (
+                  <div className="p-6 text-center space-y-3">
+                    <p className="text-sm text-muted-foreground">De uitgebreide versie kon niet worden geladen.</p>
+                    <button
+                      onClick={handleGenerateFullDraft}
+                      className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700 transition-colors"
+                    >
+                      <RefreshCw className="size-4" /> Opnieuw proberen
+                    </button>
+                  </div>
+                )}
+
+                {activeTab === 'long' && !fullDraftLoading && longDraft && (
                   <div className="p-6 space-y-5">
                     {longDraft.title && (
                       <div>

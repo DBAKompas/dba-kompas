@@ -176,17 +176,52 @@ VERPLICHTE JSON OUTPUT (EXACT dit schema, geen extra velden):
 }`;
 }
 
-function buildDbaDraftGenerationPrompt(sanitizedInput: string, analysisContext: {
+function buildCompactDraftPrompt(sanitizedInput: string, analysisContext: {
   overallRiskLabel: string;
   typeHint: string;
   topImprovements: string[];
-  simulationFactState: Record<string, unknown>;
 }): string {
   const isHighRisk = analysisContext.overallRiskLabel === 'hoog' ||
     analysisContext.typeHint === 'schijn-werknemer' ||
     analysisContext.typeHint === 'embedded specialist';
 
-  return `Je bent een DBA-opdrachttekst assistent. Schrijf een professionele opdrachtomschrijving die direct bruikbaar is als bijlage bij een modelovereenkomst.
+  return `Je bent een DBA-opdrachttekst assistent. Schrijf een beknopte opdrachtomschrijving voor gebruik bij een modelovereenkomst.
+
+REGELS:
+1. Gebruik indicatieve taal, geen juridische conclusies
+2. Verboden: "DBA-proof", "garantie", "100% compliant"
+3. Schrijf in begrijpelijk Nederlands, actieve zinnen
+4. ${isHighRisk ? 'Risico is hoog/midden — schrijf conditioneel en eerlijk' : 'Schrijf resultaatgericht en positief'}
+
+CONTEXT:
+- Risico: ${analysisContext.overallRiskLabel}
+- Profiel: ${analysisContext.typeHint}
+- Verbeterpunten: ${analysisContext.topImprovements.slice(0, 2).join('; ')}
+
+OPDRACHT:
+${wrapUserInputDelimited(sanitizedInput, "TEKST")}
+
+Geef ALLEEN deze JSON terug (geen andere tekst):
+{
+  "compactAssignmentDraft": {
+    "title": "resultaatgerichte projecttitel (geen functietitel)",
+    "assignmentDescription": "1 krachtige alinea: rol, resultaat, zelfstandige uitvoering, sturing op resultaat",
+    "deliverables": ["2-3 concrete opleveringen"],
+    "executionAndSteering": "1 korte alinea over beslissingsvrijheid opdrachtnemer"${isHighRisk ? ',\n    "structuralNote": "eerlijke toelichting over structurele beperkingen"' : ''}
+  }
+}`;
+}
+
+function buildFullDraftPrompt(sanitizedInput: string, analysisContext: {
+  overallRiskLabel: string;
+  typeHint: string;
+  topImprovements: string[];
+}): string {
+  const isHighRisk = analysisContext.overallRiskLabel === 'hoog' ||
+    analysisContext.typeHint === 'schijn-werknemer' ||
+    analysisContext.typeHint === 'embedded specialist';
+
+  return `Je bent een DBA-opdrachttekst assistent. Schrijf een uitgebreide opdrachtomschrijving voor intern gebruik.
 
 REGELS:
 1. Gebruik indicatieve taal, geen juridische conclusies
@@ -194,10 +229,10 @@ REGELS:
 3. Schrijf in begrijpelijk Nederlands, actieve zinnen
 4. ${isHighRisk ? 'Risico is hoog/midden — schrijf conditioneel en eerlijk over structurele beperkingen' : 'Schrijf resultaatgericht en positief'}
 
-CONTEXT UIT ANALYSE:
+CONTEXT:
 - Risico: ${analysisContext.overallRiskLabel}
 - Profiel: ${analysisContext.typeHint}
-- Top verbeterpunten: ${analysisContext.topImprovements.slice(0, 2).join('; ')}
+- Top verbeterpunten: ${analysisContext.topImprovements.slice(0, 3).join('; ')}
 
 OPDRACHT:
 ${wrapUserInputDelimited(sanitizedInput, "TEKST")}
@@ -214,20 +249,12 @@ Geef ALLEEN deze JSON terug (geen andere tekst):
     "risksAndMitigations": ["1-2 risico: maatregel"],
     "executionAndSteering": "1 alinea over zelfstandige uitvoering en sturing op resultaat"${isHighRisk ? ',\n    "structuralNote": "eerlijke toelichting over wat betere tekst niet oplost"' : ''}
   },
-  "compactAssignmentDraft": {
-    "title": "zelfde titel",
-    "assignmentDescription": "1 krachtige alinea: rol, resultaat, zelfstandige uitvoering, sturing op resultaat",
-    "deliverables": ["2-3 concrete opleveringen"],
-    "executionAndSteering": "1 korte alinea over beslissingsvrijheid opdrachtnemer"
-  },
   "reusableBuildingBlocks": {
-    "resultBullets": [],
-    "acceptanceBullets": [],
-    "independenceBullets": [],
-    "scopeBullets": []
-  },
-  "additionalImprovements": [],
-  "followUpQuestions": []
+    "resultBullets": ["2-3 herbruikbare resultaatbullets"],
+    "acceptanceBullets": ["2-3 acceptatiecriteria bullets"],
+    "independenceBullets": ["2-3 bullets over zelfstandigheid"],
+    "scopeBullets": ["1-2 scope bullets"]
+  }
 }`;
 }
 
@@ -651,19 +678,30 @@ export async function generateAssignmentDraft(
     typeHint: string;
     topImprovements: string[];
     simulationFactState: Record<string, unknown>;
-  }
+  },
+  mode: 'compact' | 'full' = 'compact'
 ): Promise<DbaDraftOutput> {
   const sanitizedInput = sanitizeUserInput(inputText);
-  const draftPrompt = buildDbaDraftGenerationPrompt(sanitizedInput, analysisData);
 
-  const result = await callAnthropicWithRetry<DbaDraftOutput>(
-    DBA_SCORING_SYSTEM_PROMPT,
-    draftPrompt,
-    validateDbaDraftOutput,
-    FALLBACK_DRAFT_OUTPUT,
-    "claude-haiku-4-5-20251001",
-    2000
-  );
-
-  return result;
+  if (mode === 'compact') {
+    const draftPrompt = buildCompactDraftPrompt(sanitizedInput, analysisData);
+    return callAnthropicWithRetry<DbaDraftOutput>(
+      DBA_SCORING_SYSTEM_PROMPT,
+      draftPrompt,
+      validateDbaDraftOutput,
+      FALLBACK_DRAFT_OUTPUT,
+      "claude-haiku-4-5-20251001",
+      700  // compact only needs ~300-400 tokens
+    );
+  } else {
+    const draftPrompt = buildFullDraftPrompt(sanitizedInput, analysisData);
+    return callAnthropicWithRetry<DbaDraftOutput>(
+      DBA_SCORING_SYSTEM_PROMPT,
+      draftPrompt,
+      validateDbaDraftOutput,
+      FALLBACK_DRAFT_OUTPUT,
+      "claude-haiku-4-5-20251001",
+      1400  // full needs ~800-1000 tokens
+    );
+  }
 }

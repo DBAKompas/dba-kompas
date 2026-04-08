@@ -17,7 +17,7 @@
 
 - [ ] **QUAL-001**: Unit tests toevoegen voor `validateDbaEngineOutput`, `validateDbaInput`
 - [ ] **QUAL-002**: Integration test voor volledige analyse pipeline
-- [ ] **PERF-001**: Fase 2 draft generatietijd reduceren (huidig ~15-20s)
+- [x] **PERF-001**: Fase 2 draft generatietijd gereduceerd — compact: ~3-5s, uitgebreid: ~8-12s (lazy)
 - [ ] **DOC-001**: Vercel deployment configuratie vastleggen
 
 ### LAAG (verbetering)
@@ -35,6 +35,16 @@
 ---
 
 ## DONE
+
+### Sessie 2026-04-08 — PERF-001: Draft generatie gesplitst
+
+- [x] **PERF-001**: `buildDbaDraftGenerationPrompt` gesplitst in `buildCompactDraftPrompt` (max_tokens 700) + `buildFullDraftPrompt` (max_tokens 1400)
+- [x] **PERF-001**: `generateAssignmentDraft` accepteert `mode: 'compact' | 'full'` param
+- [x] **PERF-001**: Draft endpoint `/api/dba/analyse/[id]/draft` accepteert `?mode=compact|full` query param
+- [x] **PERF-001**: `page.tsx` — compact laadt direct bij "Genereer", uitgebreid laadt lazy bij eerste tab-klik
+- [x] **DOCS**: KI-004 rate limit inconsistentie gecorrigeerd (3/dag → 20/dag)
+
+---
 
 ### Sessie 2026-04-07 — Stabilisatie & UX
 
