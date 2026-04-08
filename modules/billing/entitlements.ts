@@ -14,7 +14,7 @@ export async function getUserPlan(): Promise<Plan> {
     .eq('user_id', user.id)
     .single()
 
-  if (!subscription || subscription.status !== 'active') return 'free'
+  if (!subscription || (subscription.status !== 'active' && subscription.status !== 'trialing')) return 'free'
 
   return 'pro'
 }

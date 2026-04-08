@@ -8,10 +8,10 @@ export async function POST(request: Request) {
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const priceId = process.env.STRIPE_ONE_TIME_DBA_PRICE_ID
+    const priceId = process.env.STRIPE_PRICE_ID_ONE_TIME
 
     if (!priceId) {
-      console.error('STRIPE_ONE_TIME_DBA_PRICE_ID not configured')
+      console.error('STRIPE_PRICE_ID_ONE_TIME not configured')
       return NextResponse.json({ error: 'One-time purchase not configured' }, { status: 500 })
     }
 

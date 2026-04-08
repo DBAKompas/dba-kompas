@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -11,6 +12,8 @@ import {
   Bell,
   ArrowRight,
   Loader2,
+  CheckCircle,
+  X,
 } from 'lucide-react'
 
 interface Stats {
@@ -23,6 +26,28 @@ interface Stats {
 export default function DashboardPage() {
   const [stats, setStats] = useState<Stats | null>(null)
   const [loading, setLoading] = useState(true)
+  const [showSuccess, setShowSuccess] = useState(false)
+  const [successType, setSuccessType] = useState<'subscription' | 'one_time' | null>(null)
+
+  const searchParams = useSearchParams()
+  const router = useRouter()
+
+  useEffect(() => {
+    // Detect successful checkout return
+    const sessionId = searchParams.get('session_id')
+    const oneTime = searchParams.get('one_time')
+
+    if (sessionId) {
+      setShowSuccess(true)
+      setSuccessType(oneTime === 'success' ? 'one_time' : 'subscription')
+
+      // Clean up URL without re-render
+      const url = new URL(window.location.href)
+      url.searchParams.delete('session_id')
+      url.searchParams.delete('one_time')
+      router.replace(url.pathname + (url.search || ''), { scroll: false })
+    }
+  }, [searchParams, router])
 
   useEffect(() => {
     fetch('/api/stats')
@@ -67,6 +92,32 @@ export default function DashboardPage() {
         <h1 className="text-2xl font-semibold">Dashboard</h1>
         <p className="text-muted-foreground">Overzicht van uw DBA analyses en updates</p>
       </div>
+
+      {/* Betaal-succes banner */}
+      {showSuccess && (
+        <div className="relative flex items-start gap-3 rounded-lg border border-green-200 bg-green-50 p-4 text-green-800">
+          <CheckCircle className="mt-0.5 size-5 shrink-0 text-green-600" />
+          <div className="flex-1">
+            <p className="font-medium">
+              {successType === 'one_time'
+                ? 'Eenmalige analyse geactiveerd!'
+                : 'Abonnement geactiveerd!'}
+            </p>
+            <p className="mt-0.5 text-sm text-green-700">
+              {successType === 'one_time'
+                ? 'Uw DBA-analyse credit is gereed. Start direct een nieuwe analyse.'
+                : 'Uw Pro-abonnement is actief. U kunt nu onbeperkt analyses uitvoeren.'}
+            </p>
+          </div>
+          <button
+            onClick={() => setShowSuccess(false)}
+            className="shrink-0 rounded p-0.5 text-green-600 hover:bg-green-100"
+            aria-label="Sluiten"
+          >
+            <X className="size-4" />
+          </button>
+        </div>
+      )}
 
       {/* Stat cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
