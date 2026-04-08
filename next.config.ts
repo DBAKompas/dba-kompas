@@ -1,6 +1,9 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
+  // pdfkit gebruikt fs om fonts te laden — niet bundelen maar als externe Node.js module behandelen
+  serverExternalPackages: ['pdfkit'],
+
   // TypeScript errors in marketing componenten tijdelijk negeren
   // (framer-motion v11/v12 type mismatch) — wordt gefixed bij UI polish
   typescript: {
