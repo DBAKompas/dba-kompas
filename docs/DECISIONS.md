@@ -124,6 +124,50 @@ Elke beslissing bevat: datum, beslissing, reden, alternatieven overwogen.
 
 ---
 
+## 2026-04-08 — `trialing` telt als actief Pro-plan
+
+**Beslissing:** `getUserPlan()` in `modules/billing/entitlements.ts` herkent `trialing` als actieve Pro-status, naast `active`.
+
+**Reden:**
+- Stripe `trialing` status betekent dat een abonnement is aangemaakt maar de trial-periode nog loopt
+- Gebruikers in trial moeten dezelfde toegang hebben als betalende gebruikers
+- Zonder deze fix zouden trial-gebruikers als 'free' worden behandeld en een slechtere UX ervaren
+
+**Impact:**
+- Gebruikers met `subscription.status = 'trialing'` krijgen nu `plan = 'pro'` terug
+- Rate limit voor trial users: 100/dag (was 20/dag)
+
+---
+
+## 2026-04-08 — `STRIPE_PRICE_ID_ONE_TIME` als canonieke env var naam
+
+**Beslissing:** De one-time checkout route gebruikt `process.env.STRIPE_PRICE_ID_ONE_TIME` (was `STRIPE_ONE_TIME_DBA_PRICE_ID`).
+
+**Reden:**
+- `.env.local` en Vercel env vars gebruikten al `STRIPE_PRICE_ID_ONE_TIME`
+- Code gebruikte een afwijkende naam → one-time checkout gaf altijd HTTP 500
+- `.env.local` is leidend — code aangepast aan de bestaande conventie
+
+**Impact:**
+- One-time checkout werkt nu correct als `STRIPE_PRICE_ID_ONE_TIME` is ingesteld
+
+---
+
+## 2026-04-08 — Dashboard success banner na checkout
+
+**Beslissing:** Na een geslaagde Stripe checkout redirect (`?session_id=...`) toont het dashboard een groene banner. De `?session_id` en `?one_time` params worden daarna uit de URL verwijderd.
+
+**Reden:**
+- Gebruiker krijgt geen feedback als betaling gelukt is zonder deze banner
+- Verwijdering van URL-params voorkomt dat de banner bij elke page refresh terugkomt
+- Twee varianten: subscription-tekst en one-time-tekst
+
+**Impact:**
+- `app/(app)/dashboard/page.tsx` detecteert `searchParams.get('session_id')` in `useEffect`
+- URL wordt gecleaned via `router.replace()` zonder re-render
+
+---
+
 ## 2026-04-07 — Fase 1 prompt afslanken (gepland)
 
 **Beslissing (te implementeren):** Verwijder `simulationFactState`, `simulationHints`, `followUpQuestions`, `additionalImprovements` uit fase 1 output schema.

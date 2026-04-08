@@ -1,6 +1,6 @@
 # KNOWN_ISSUES.md
 **Bekende problemen en bugs**
-**Laatst bijgewerkt:** 2026-04-07
+**Laatst bijgewerkt:** 2026-04-08
 
 ---
 
@@ -8,45 +8,33 @@
 
 ### KI-001 — Fase 1 prompt te zwaar (TRUNCATION RISICO)
 **Status:** OPGELOST — 2026-04-07
-**Bestand:** `lib/ai/dbaAnalysis.ts`, functie `buildDbaFastAnalysisPrompt`, regels 109-248
+**Bestand:** `lib/ai/dbaAnalysis.ts`, functie `buildDbaFastAnalysisPrompt`
 **Symptoom:** Analyse geeft `FALLBACK_DBA_ENGINE_OUTPUT` terug ("Analyse kon niet worden voltooid")
-**Oorzaak:**
-Het JSON-outputschema vraagt om:
-- `simulationFactState` — 18 enum/boolean velden (~200 tokens)
-- `simulationHints` — array van objecten met 5 velden (~150 tokens)
-- `followUpQuestions` — 3 vragen (~100 tokens)
-- `additionalImprovements` — extra verbeterpunten (~20 tokens)
-Totaal: kern (~600t) + zware velden (~470t) = ~1070 tokens output bij gemiddelde invoer. Bij uitgebreide invoer of lange Haiku-antwoorden: risico op truncation bij 2500 token limit. Afgekapt JSON kan niet geparsed worden → fallback.
-
-**Fix:**
-Verwijder genoemde velden uit JSON output schema in `buildDbaFastAnalysisPrompt` én verwijder de bijbehorende instructieparagrafen uit de prompttekst.
-
-**Impact na fix:** Verwacht 0% fallback, responstijd ~3-4s.
+**Fix:** Zware velden (`simulationFactState`, `simulationHints`, `followUpQuestions`, `additionalImprovements`) verwijderd uit fase 1 output schema.
 
 ---
 
 ### KI-002 — JSON.parse zonder try/catch in retryWithAnthropicFix
 **Status:** OPGELOST — 2026-04-07
-**Bestand:** `lib/ai/dbaAnalysis.ts`, functie `retryWithAnthropicFix`, regel ~431
-**Symptoom:** Stille crash — wordt afgevangen door de outer try/catch maar logt als "Retry failed" i.p.v. "JSON parse error"
-**Oorzaak:**
-```typescript
-const parsed = JSON.parse(cleanContent); // GEEN try/catch
-```
-Als de retry ook truncated JSON teruggeeft (bij KI-001), gooit deze regel een SyntaxError. De outer catch vangt dit op en returnt de fallback, maar:
-1. De log is generiek ("Retry failed") i.p.v. specifiek
-2. Als in de toekomst code na `JSON.parse` wordt toegevoegd, kan de outer catch iets anders afvangen
+**Bestand:** `lib/ai/dbaAnalysis.ts`, functie `retryWithAnthropicFix`
+**Fix:** try/catch toegevoegd rondom `JSON.parse(cleanContent)`.
 
-**Fix:**
-```typescript
-let parsed: unknown;
-try {
-  parsed = JSON.parse(cleanContent);
-} catch (parseErr) {
-  console.error("[DBA] Retry JSON.parse failed:", parseErr);
-  return fallback;
-}
-```
+---
+
+### KI-010 — `buildFollowUpQuestions` niet geïmporteerd in dbaAnalysis.ts
+**Status:** OPGELOST — 2026-04-08 (commit `92ea711`)
+**Bestand:** `lib/ai/dbaAnalysis.ts`
+**Symptoom:** Elke analyse gaf "Internal server error" — functie werd aangeroepen maar niet geïmporteerd.
+**Fix:** `buildFollowUpQuestions` toegevoegd aan import vanuit `./inputValidation`.
+
+---
+
+### KI-011 — STRIPE_ONE_TIME_DBA_PRICE_ID mismatch
+**Status:** OPGELOST — 2026-04-08 (commit `ae44683`)
+**Bestand:** `app/api/one-time/checkout/route.ts`
+**Symptoom:** One-time checkout gaf altijd HTTP 500 ("One-time purchase not configured") omdat `process.env.STRIPE_ONE_TIME_DBA_PRICE_ID` altijd `undefined` was.
+**Oorzaak:** Code gebruikte `STRIPE_ONE_TIME_DBA_PRICE_ID`, maar `.env.local` en Vercel env vars gebruiken `STRIPE_PRICE_ID_ONE_TIME`.
+**Fix:** `STRIPE_ONE_TIME_DBA_PRICE_ID` → `STRIPE_PRICE_ID_ONE_TIME` in route.ts.
 
 ---
 
@@ -55,14 +43,21 @@ try {
 ### KI-003 — Debug endpoint publiek toegankelijk
 **Status:** OPGELOST — 2026-04-07 (bestand verwijderd)
 **Bestand:** `app/api/debug/ai-test/route.ts`
-**Symptoom:** Iedereen kan `GET /api/debug/ai-test` aanroepen en echte Claude API calls triggeren (kosten + misbruik)
-**Fix:** Bestand verwijderen zodra analyse stabiel is.
+**Fix:** Bestand verwijderd.
+
+---
 
 ### KI-004 — Geen rate limiting op analyse endpoint
 **Status:** OPGELOST — 2026-04-07 (free: 20/dag, pro: 100/dag)
 **Bestand:** `app/api/dba/analyse/route.ts`
-**Symptoom:** Geen limiet op het aantal analyses per gebruiker — misbruik mogelijk, kosten onbeheersbaar
-**Fix:** Voeg Supabase-gebaseerde count-check toe: tel analyses van user in laatste 24u, vergelijk met plan-limiet.
+**Fix:** Supabase-gebaseerde count-check toegevoegd.
+
+---
+
+### KI-007 — Stripe webhook niet live getest
+**Status:** OPEN
+**Impact:** Betalingsflow kan werken in code maar falen in productie door webhook signing, endpoint URL configuratie, of idempotency edge cases.
+**Volgende stap:** TEST-002 en TEST-003 uitvoeren — instructies staan in PROJECT_STATE.md.
 
 ---
 
@@ -71,17 +66,21 @@ try {
 ### KI-005 — Geen tests aanwezig
 **Status:** OPEN
 **Impact:** Regressions worden niet automatisch gedetecteerd. Elke code-aanpassing is riskant.
-**Fix:** Voeg minimaal unit tests toe voor: `validateDbaInput`, `validateDbaEngineOutput`, `buildDbaFastAnalysisPrompt` output lengte.
+**Fix:** Voeg minimaal unit tests toe voor: `validateDbaInput`, `validateDbaEngineOutput`, `buildDbaFastAnalysisPrompt` output lengte. (QUAL-001/002 in TASKS.md)
+
+---
 
 ### KI-006 — Alle functies gebruikten claude-opus-4-6
-**Status:** OPGELOST — 2026-04-07
-**Bestand:** `lib/ai/dbaAnalysis.ts`
-**Impact:** `analyzeDocument`, `rewriteDocument`, `rewriteNewsArticle`, `generateContractTemplate` gebruikten Opus — traag en duur.
-**Fix:** Alle aanroepen gewijzigd naar `claude-haiku-4-5-20251001`. Default van `callAnthropicWithRetry` ook gewijzigd naar Haiku. JSON.parse try/catch toegevoegd in `analyzeDocument`.
+**Status:** OPGELOST — 2026-04-07 (commit `a976d4c`)
+**Fix:** Alle aanroepen gewijzigd naar `claude-haiku-4-5-20251001`.
 
-### KI-007 — Stripe webhook niet live getest
-**Status:** OPEN
-**Impact:** Betalingsflow kan werken in code maar falen in productie door webhook signing, endpoint URL configuratie, of idempotency edge cases.
+---
+
+### KI-012 — `trialing` status niet als Pro herkend in getUserPlan()
+**Status:** OPGELOST — 2026-04-08 (commit `ae44683`)
+**Bestand:** `modules/billing/entitlements.ts`
+**Symptoom:** Gebruikers in een Stripe trial werden als 'free' behandeld.
+**Fix:** `subscription.status !== 'active'` uitgebreid naar `status !== 'active' && status !== 'trialing'`.
 
 ---
 
@@ -90,8 +89,20 @@ try {
 ### KI-008 — `postProcessDbaOutput` verwerkt niet-bestaande velden
 **Status:** OPEN (no-op, geen bug)
 **Bestand:** `lib/ai/dbaAnalysis.ts`, functie `postProcessDbaOutput`
-**Impact:** Code probeert `longAssignmentDraft` en `compactAssignmentDraft` te verwerken die fase 1 niet meer levert. Dit zijn altijd no-ops maar verwarrend.
+**Impact:** Code probeert `longAssignmentDraft` en `compactAssignmentDraft` te verwerken die fase 1 niet meer levert. Dit zijn altijd no-ops maar verwarrend bij codereview.
+**Actie:** Geen urgentie — opruimen bij volgende grote refactor.
+
+---
 
 ### KI-009 — Deployment configuratie ontbreekt
 **Status:** OPEN
 **Impact:** Geen `vercel.json` aanwezig. Deployment settings zijn ongedocumenteerd.
+**Actie:** DOC-001 in TASKS.md.
+
+---
+
+### KI-013 — Loops deduplicatie is in-memory
+**Status:** OPEN (low priority)
+**Bestand:** `lib/loops/index.ts`
+**Symptoom:** De `Map`-based deduplicatie reset bij elke server-herstart. Bij hoge load of serverless cold starts kunnen dubbele Loops events worden gestuurd.
+**Actie:** Acceptabel voor huidige schaal. Bij problemen: Redis of Supabase-gebaseerde deduplicatie.
