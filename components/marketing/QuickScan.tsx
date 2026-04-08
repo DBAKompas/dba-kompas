@@ -1,5 +1,6 @@
 'use client'
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight, ChevronRight, CheckCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -228,6 +229,7 @@ const fadeUp = {
 // ─────────────────────────────────────────────
 
 export default function QuickScan() {
+  const router = useRouter();
   const [phase, setPhase] = useState<Phase>("questions");
   const [stepIndex, setStepIndex] = useState(0);
   const [scores, setScores] = useState<(AnswerScore | null)[]>(Array(QUESTIONS.length).fill(null));
@@ -344,7 +346,7 @@ export default function QuickScan() {
               <Button
                 size="lg"
                 className="w-full h-12 text-base font-semibold"
-                onClick={() => console.log("go_to_full_analysis")}
+                onClick={() => router.push("/auth/signup")}
                 data-testid="button-go-full-analysis"
               >
                 Ga verder met de volledige analyse
@@ -354,10 +356,10 @@ export default function QuickScan() {
                 variant="outline"
                 size="lg"
                 className="w-full h-12 text-base"
-                onClick={() => console.log("nurture_only")}
+                onClick={() => router.push("/#pricing")}
                 data-testid="button-nurture-only"
               >
-                Ik wil eerst meer uitleg per e-mail
+                Bekijk wat DBA Kompas biedt
               </Button>
             </div>
 

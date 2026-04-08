@@ -23,6 +23,8 @@
 ### LAAG (verbetering)
 
 - [x] **FEAT-001**: Quick scan gekoppeld aan echte Haiku analyse (was keyword-based placeholder)
+- [x] **LOOPS-001**: `/api/loops/quick-scan` endpoint gebouwd — contact aanmaken + event sturen
+- [ ] **LOOPS-002**: Custom contactvelden instellen in Loops dashboard (quick_scan_completed, quick_scan_risk_level, quick_scan_score) en e-mailsequentie koppelen aan quick_scan_completed event
 - [ ] **FEAT-002**: Admin panel voor contentbeheer (gidsen, nieuws)
 - [ ] **FEAT-003**: Gidsen content schrijven en vullen
 
