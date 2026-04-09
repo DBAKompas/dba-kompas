@@ -1,5 +1,5 @@
 # TASKS.md
-**Laatst bijgewerkt:** 2026-04-09 (middag)
+**Laatst bijgewerkt:** 2026-04-09 (avond)
 
 ---
 
@@ -43,7 +43,11 @@
   - `vitest.config.ts` aangemaakt, `package.json` uitgebreid met test/test:watch/test:coverage scripts
   - Vitest als devDependency toegevoegd (`^2.1.0`)
   - Eerste run vereist `npm install` in projectmap
-- [ ] **QUAL-002**: Integration test voor volledige analyse pipeline
+- [x] **QUAL-002**: Integration test voor volledige analyse pipeline ✓ (2026-04-09)
+  - `__tests__/analyzeDbaText.test.ts` aangemaakt — 21 tests
+  - `analyzeDbaText`: insufficient_input zonder API-aanroep, happy path, riskLabel, retry bij ongeldige JSON, dubbele mislukking → FALLBACK, netwerkfout → FALLBACK, code fences, followUpQuestions, bedrijfstakcontext, coercering ongeldig label, model/max_tokens verificatie
+  - `generateAssignmentDraft`: compact/full mode, max_tokens 700/2000, standaard compact, API-fout → FALLBACK, retry dubbele mislukking → FALLBACK, reusableBuildingBlocks arrays, model verificatie
+  - Mock strategie: `vi.hoisted(() => vi.fn())` + `vi.mock('@anthropic-ai/sdk')` — omzeilt module-level singleton
 - [ ] **DOC-001**: Vercel deployment configuratie vastleggen (`vercel.json` + env vars documenteren)
 
 ### LAAG (verbetering)

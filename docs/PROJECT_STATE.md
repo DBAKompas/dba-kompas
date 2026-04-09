@@ -1,6 +1,6 @@
 # PROJECT_STATE.md
-**Laatst bijgewerkt:** 2026-04-09
-**Maturity:** 93%
+**Laatst bijgewerkt:** 2026-04-09 (avond)
+**Maturity:** 95%
 
 ---
 
@@ -10,22 +10,17 @@ DBA Kompas is een Next.js 16.2 SaaS applicatie die opdrachtomschrijvingen analys
 
 ---
 
-## LAATSTE ACTIE (2026-04-09 middag — geen code commit)
+## LAATSTE ACTIE (2026-04-09 avond, commit pending)
 
-**Taak:** TEST-003 deels uitgevoerd — Stripe webhook infrastructure geconfigureerd
+**Taak:** QUAL-002 — Integration tests voor volledige analyse pipeline
 
-**Wat is er gedaan (configuratie, geen code):**
-- Stripe CLI geïnstalleerd op Mac via `brew install stripe/stripe-cli/stripe`
-- `stripe login` uitgevoerd — CLI gekoppeld aan Stripe test account
-- Stripe Dashboard (test mode) → Webhooks → nieuwe destination aangemaakt:
-  - Naam: `dba-kompas-vercel-test`
-  - URL: `https://dba-kompas.vercel.app/api/billing/webhook`
-  - Events: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.paid`, `invoice.payment_failed`
-- Signing secret gekopieerd → `STRIPE_WEBHOOK_SECRET` bijgewerkt in Vercel env vars
-- Vercel redeployed
-- **NIET GEDAAN**: echte checkout + Supabase verificatie — sessie gestopt vóór voltooiing
+**Wat is er gedaan:**
+- `__tests__/analyzeDbaText.test.ts` aangemaakt (21 tests)
+- Mock strategie: `vi.hoisted(() => vi.fn())` + `vi.mock('@anthropic-ai/sdk')` — onderschept de module-level `anthropic` singleton in `dbaAnalysis.ts`
+- `analyzeDbaText` getest (11 tests): insufficient_input zonder API-aanroep, happy path, riskLabel doorgestuurd, retry bij ongeldige JSON, dubbele mislukking → FALLBACK, netwerkfout → FALLBACK, code fences, followUpQuestions uit signaaldetectie, optionele context, coercering ongeldig label, model + max_tokens
+- `generateAssignmentDraft` getest (10 tests): compact/full mode, max_tokens 700/2000, standaard compact, API-fout → FALLBACK, dubbele retry mislukking → FALLBACK, reusableBuildingBlocks arrays, model verificatie
 
-**Volgende actie:** Echte Stripe checkout doen (testkaart `4242 4242 4242 4242`) en checken of `billing_events` + `subscriptions` correct worden bijgewerkt in Supabase.
+**Volgende actie:** `npm test` draaien op lokale machine om alle 67 tests te verifiëren (46 QUAL-001 + 21 QUAL-002), daarna committen.
 
 ---
 
@@ -81,21 +76,13 @@ DBA Kompas is een Next.js 16.2 SaaS applicatie die opdrachtomschrijvingen analys
 
 ## VOLGENDE GEPLANDE STAP
 
-**TEST-003: Stripe webhook delivery voltooien**
-
-Infrastructuur is klaar:
-- Stripe Dashboard webhook geconfigureerd: `https://dba-kompas.vercel.app/api/billing/webhook` (5 events)
-- `STRIPE_WEBHOOK_SECRET` in Vercel bijgewerkt naar Dashboard signing secret
-- Vercel redeployed
+**Commit QUAL-002 + voorbereiding DOC-001**
 
 Nog te doen:
-1. Open incognito venster → `https://dba-kompas.vercel.app`
-2. Doorloop registratie + Stripe checkout met testkaart `4242 4242 4242 4242`
-3. Na betaling: check in Supabase Table Editor:
-   - `billing_events` → nieuwe rij met `event_type = checkout.session.completed`
-   - `subscriptions` → nieuwe rij met `status = active` (of `trialing`)
-   - `profiles` → `subscription_status = active`
-4. Optioneel: ga naar Stripe Dashboard → Webhooks → `dba-kompas-vercel-test` → controleer of events groen zijn (200 response)
+1. `npm test` draaien — verwacht 67 tests groen (46 QUAL-001 + 21 QUAL-002)
+2. Commit: `__tests__/analyzeDbaText.test.ts` + `docs/` updates
+3. Push naar GitHub (`git push`)
+4. Daarna: DOC-001 — `vercel.json` aanmaken + env vars documenteren
 
 **Daarna:**
 - **INFRA-001**: Custom SMTP instellen (Resend/Postmark via Supabase SMTP) — vereist vóór live launch
@@ -139,7 +126,7 @@ Nog te doen:
 
 ## WAT NIET WERKT / ONZEKER
 
-- **GEDEELTELIJK**: Unit tests aanwezig voor `validateDbaInput` en `validateDbaEngineOutput` (QUAL-001 done). Integratie- en e2e-tests nog open (QUAL-002).
+- **GEDEELTELIJK**: Unit tests + integratietests aanwezig (QUAL-001 + QUAL-002 done, 67 tests totaal). E2e-tests nog open.
 - **ONBEKEND**: Deployment Vercel config — geen `vercel.json` aanwezig (DOC-001)
 - **GETEST**: Stripe webhook delivery — TEST-003 BEVESTIGD WERKEND (2026-04-09)
 - **INFRA**: Custom SMTP niet ingesteld — Supabase ingebouwde mailservice heeft rate limits, niet geschikt voor productie. Supabase e-mailbevestiging is tijdelijk UITGESCHAKELD tijdens tests. Inschakelen zodra INFRA-001 gereed is.
