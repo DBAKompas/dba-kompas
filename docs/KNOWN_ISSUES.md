@@ -1,6 +1,6 @@
 # KNOWN_ISSUES.md
 **Bekende problemen en bugs**
-**Laatst bijgewerkt:** 2026-04-08
+**Laatst bijgewerkt:** 2026-04-09
 
 ---
 
@@ -55,9 +55,10 @@
 ---
 
 ### KI-007 — Stripe webhook niet live getest
-**Status:** OPEN (TEST-002 geslaagd, TEST-003 nog open)
-**Impact:** Webhook signing en endpoint URL niet getest in productie. TEST-002 (checkout flow) is bevestigd werkend. TEST-003 (webhook delivery) nog niet uitgevoerd.
-**Volgende stap:** TEST-003 uitvoeren — Stripe CLI webhook forwarding, zie PROJECT_STATE.md.
+**Status:** DEELS OPGELOST (2026-04-09 middag) — infrastructuur gereed, delivery nog niet bevestigd
+**Impact:** Webhook infrastructuur volledig geconfigureerd. Signing en endpoint URL zijn ingesteld. End-to-end DB-schrijftest nog niet uitgevoerd.
+**Wat gedaan:** Stripe Dashboard webhook `dba-kompas-vercel-test` aangemaakt voor `https://dba-kompas.vercel.app/api/billing/webhook`, `STRIPE_WEBHOOK_SECRET` bijgewerkt in Vercel, redeployed.
+**Volgende stap:** Echte checkout uitvoeren + `billing_events` / `subscriptions` / `profiles` in Supabase verifiëren. Zie PROJECT_STATE.md → VOLGENDE GEPLANDE STAP.
 
 ---
 

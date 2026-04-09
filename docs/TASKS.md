@@ -1,5 +1,5 @@
 # TASKS.md
-**Laatst bijgewerkt:** 2026-04-09
+**Laatst bijgewerkt:** 2026-04-09 (middag)
 
 ---
 
@@ -26,11 +26,11 @@
   - Stripe coupon `ONETIMECREDIT` aangemaakt (€9,95 off once, test mode)
   - `STRIPE_COUPON_ONE_TIME_UPGRADE=ONETIMECREDIT` in Vercel env vars
 
-- [ ] **TEST-003**: Stripe webhook delivery testen
-  - Vereist: `stripe listen --forward-to localhost:3000/api/billing/webhook` (Stripe CLI)
-  - Vereist: `whsec_...` signing secret uit CLI als `STRIPE_WEBHOOK_SECRET` in `.env.local`
-  - Trigger: `stripe trigger checkout.session.completed`
-  - Controleer: `billing_events` + `subscriptions` tabel in Supabase
+- [ ] **TEST-003**: Stripe webhook delivery testen — INFRASTRUCTUUR GEREED, TEST NOG OPEN
+  - ✅ Stripe CLI geïnstalleerd (`brew install stripe/stripe-cli/stripe`) + `stripe login` gedaan
+  - ✅ Stripe Dashboard webhook aangemaakt: `dba-kompas-vercel-test` → `https://dba-kompas.vercel.app/api/billing/webhook` (5 events)
+  - ✅ `STRIPE_WEBHOOK_SECRET` bijgewerkt in Vercel + redeployed
+  - ⏳ NOG TE DOEN: echte checkout doen (testkaart `4242 4242 4242 4242`) en checken of `billing_events` + `subscriptions` + `profiles` correct worden bijgewerkt in Supabase
 - [ ] **TEST-005**: Edge case — maximale invoerlengte testen (3000+ tekens)
 
 ### MIDDEL (kwaliteit)

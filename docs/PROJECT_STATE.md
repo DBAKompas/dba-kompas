@@ -10,7 +10,26 @@ DBA Kompas is een Next.js 16.2 SaaS applicatie die opdrachtomschrijvingen analys
 
 ---
 
-## LAATSTE ACTIE (2026-04-09, commit `5f63a53`)
+## LAATSTE ACTIE (2026-04-09 middag — geen code commit)
+
+**Taak:** TEST-003 deels uitgevoerd — Stripe webhook infrastructure geconfigureerd
+
+**Wat is er gedaan (configuratie, geen code):**
+- Stripe CLI geïnstalleerd op Mac via `brew install stripe/stripe-cli/stripe`
+- `stripe login` uitgevoerd — CLI gekoppeld aan Stripe test account
+- Stripe Dashboard (test mode) → Webhooks → nieuwe destination aangemaakt:
+  - Naam: `dba-kompas-vercel-test`
+  - URL: `https://dba-kompas.vercel.app/api/billing/webhook`
+  - Events: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.paid`, `invoice.payment_failed`
+- Signing secret gekopieerd → `STRIPE_WEBHOOK_SECRET` bijgewerkt in Vercel env vars
+- Vercel redeployed
+- **NIET GEDAAN**: echte checkout + Supabase verificatie — sessie gestopt vóór voltooiing
+
+**Volgende actie:** Echte Stripe checkout doen (testkaart `4242 4242 4242 4242`) en checken of `billing_events` + `subscriptions` correct worden bijgewerkt in Supabase.
+
+---
+
+## LAATSTE ACTIE (2026-04-09 ochtend, commit `5f63a53`)
 
 **Taak:** FEAT-004 + FEAT-005 — Paywall + one-time upsell + upgrade flow
 
@@ -62,16 +81,21 @@ DBA Kompas is een Next.js 16.2 SaaS applicatie die opdrachtomschrijvingen analys
 
 ## VOLGENDE GEPLANDE STAP
 
-**TEST-003: Stripe webhook delivery testen**
+**TEST-003: Stripe webhook delivery voltooien**
 
-Instructies:
-1. Lokaal: `stripe listen --forward-to localhost:3000/api/billing/webhook`
-2. De CLI geeft een `whsec_...` signing secret → zet als `STRIPE_WEBHOOK_SECRET` in `.env.local`
-3. Trigger: `stripe trigger checkout.session.completed`
-4. Controleer `billing_events` en `subscriptions` tabel in Supabase
+Infrastructuur is klaar:
+- Stripe Dashboard webhook geconfigureerd: `https://dba-kompas.vercel.app/api/billing/webhook` (5 events)
+- `STRIPE_WEBHOOK_SECRET` in Vercel bijgewerkt naar Dashboard signing secret
+- Vercel redeployed
 
-**Productie webhook URL:** `https://dbakompas.nl/api/billing/webhook`
-(Configureren in Stripe Dashboard → Developers → Webhooks vóór live launch)
+Nog te doen:
+1. Open incognito venster → `https://dba-kompas.vercel.app`
+2. Doorloop registratie + Stripe checkout met testkaart `4242 4242 4242 4242`
+3. Na betaling: check in Supabase Table Editor:
+   - `billing_events` → nieuwe rij met `event_type = checkout.session.completed`
+   - `subscriptions` → nieuwe rij met `status = active` (of `trialing`)
+   - `profiles` → `subscription_status = active`
+4. Optioneel: ga naar Stripe Dashboard → Webhooks → `dba-kompas-vercel-test` → controleer of events groen zijn (200 response)
 
 **Daarna:**
 - **INFRA-001**: Custom SMTP instellen (Resend/Postmark via Supabase SMTP) — vereist vóór live launch
