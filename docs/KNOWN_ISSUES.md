@@ -1,6 +1,6 @@
 # KNOWN_ISSUES.md
 **Bekende problemen en bugs**
-**Laatst bijgewerkt:** 2026-04-09
+**Laatst bijgewerkt:** 2026-04-09 (laat)
 
 ---
 
@@ -72,9 +72,11 @@
 ## MIDDEL
 
 ### KI-005 — Geen tests aanwezig
-**Status:** OPEN
-**Impact:** Regressions worden niet automatisch gedetecteerd. Elke code-aanpassing is riskant.
-**Fix:** Voeg minimaal unit tests toe voor: `validateDbaInput`, `validateDbaEngineOutput`, `buildDbaFastAnalysisPrompt` output lengte. (QUAL-001/002 in TASKS.md)
+**Status:** OPGELOST — 2026-04-09 (QUAL-001 + QUAL-002)
+**Fix:** 67 tests toegevoegd in drie bestanden:
+- `__tests__/validateDbaInput.test.ts` — 23 tests (countWords, detectSignals, validateDbaInput, buildFollowUpQuestions)
+- `__tests__/validateDbaEngineOutput.test.ts` — 23 tests (nuclear coercion validators)
+- `__tests__/analyzeDbaText.test.ts` — 21 integratietests (analyzeDbaText + generateAssignmentDraft, Anthropic gemockt)
 
 ---
 
@@ -95,17 +97,15 @@
 ## LAAG
 
 ### KI-008 — `postProcessDbaOutput` verwerkt niet-bestaande velden
-**Status:** OPEN (no-op, geen bug)
+**Status:** OPGELOST — 2026-04-09
 **Bestand:** `lib/ai/dbaAnalysis.ts`, functie `postProcessDbaOutput`
-**Impact:** Code probeert `longAssignmentDraft` en `compactAssignmentDraft` te verwerken die fase 1 niet meer levert. Dit zijn altijd no-ops maar verwarrend bij codereview.
-**Actie:** Geen urgentie — opruimen bij volgende grote refactor.
+**Fix:** Verduidelijkende comment toegevoegd boven de functie. Guards (long/compact/blocks) zijn bewust behouden voor eventueel toekomstig hergebruik vanuit fase 2.
 
 ---
 
 ### KI-009 — Deployment configuratie ontbreekt
-**Status:** OPEN
-**Impact:** Geen `vercel.json` aanwezig. Deployment settings zijn ongedocumenteerd.
-**Actie:** DOC-001 in TASKS.md.
+**Status:** OPGELOST — 2026-04-09 (DOC-001)
+**Fix:** `vercel.json` aangemaakt (regio `fra1`, www-redirect), `docs/DEPLOYMENT.md` aangemaakt met alle env vars en productielaunch checklist.
 
 ---
 

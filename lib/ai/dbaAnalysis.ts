@@ -418,6 +418,9 @@ function cleanBriefText(text: string): string {
   return s.replace(/\n{3,}/g, '\n\n').trim();
 }
 
+// KI-008: fase 1 output bevat geen draft-velden — long/compact/blocks zijn altijd undefined
+// hier. De guards (long ? ... : undefined) zijn no-ops maar bewust behouden voor toekomstig
+// hergebruik van deze functie vanuit fase 2 indien nodig.
 function postProcessDbaOutput(output: DbaEngineOutput): DbaEngineOutput {
   const long = output.longAssignmentDraft;
   const compact = output.compactAssignmentDraft;
