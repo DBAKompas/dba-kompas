@@ -1,6 +1,6 @@
 # INTEGRATIONS_STATUS.md
 **Status van alle externe integraties**
-**Laatst bijgewerkt:** 2026-04-08
+**Laatst bijgewerkt:** 2026-04-09
 
 ---
 
@@ -14,15 +14,21 @@
 | RLS op alle tabellen | GEÏMPLEMENTEERD |
 | Server-side client | GEÏMPLEMENTEERD (`lib/supabase/server.ts`) |
 | Admin client (service role) | GEÏMPLEMENTEERD (`lib/supabase/admin.ts`) |
+| Site URL | `https://dba-kompas.vercel.app` (gecorrigeerd 2026-04-09) |
+| Redirect allowlist | `https://dba-kompas.vercel.app/**` (toegevoegd 2026-04-09) |
+| E-mailbevestiging | TIJDELIJK UITGESCHAKELD (rate limit tijdens tests) |
+| Verificatiemail template | DBA Kompas huisstijl (custom HTML in Supabase Auth → Email Templates) |
 | Live getest | BEVESTIGD (auth + analyse werkt) |
 
 **Risico's:**
+- E-mailbevestiging is uitgeschakeld — inschakelen zodra INFRA-001 (custom SMTP) gereed is
 - Geen fallback als Supabase tijdelijk onbereikbaar is
 - RLS policies niet geaudit voor correctheid
 
-**Nog te testen:**
-- RLS policies (kan gebruiker A data van gebruiker B zien?)
-- Supabase connection limits onder load
+**Nog te doen:**
+- INFRA-001: Custom SMTP instellen (Resend of Postmark via Supabase Auth → Settings → SMTP)
+- Na INFRA-001: E-mailbevestiging opnieuw inschakelen
+- RLS policies auditen (kan gebruiker A data van gebruiker B zien?)
 
 ---
 
@@ -57,15 +63,19 @@
 | Aspect | Status |
 |---|---|
 | Code aanwezig | JA |
-| Env variabelen gedocumenteerd | JA (6 variabelen) |
-| Subscription checkout | GEÏMPLEMENTEERD |
+| Env variabelen gedocumenteerd | JA (7 variabelen) |
+| Huidige mode | TEST MODE (sk_test_..., pk_test_...) |
+| Subscription checkout | GEÏMPLEMENTEERD — TEST-002 BEVESTIGD WERKEND |
 | One-time checkout | GEÏMPLEMENTEERD — env var bug OPGELOST (KI-011) |
-| Webhook handler | GEÏMPLEMENTEERD (met idempotency) |
+| Webhook handler | GEÏMPLEMENTEERD (met idempotency) — TEST-003 OPEN |
 | Customer portal | GEÏMPLEMENTEERD |
 | Entitlement check | GEÏMPLEMENTEERD (`modules/billing/entitlements.ts`) |
 | `trialing` als actief plan | JA — OPGELOST (KI-012) |
+| `one_time_purchases` als Pro | JA — GEÏMPLEMENTEERD (FEAT-004) |
 | Dashboard success banner | JA — GEÏMPLEMENTEERD |
-| Live getest | NEE — klaar voor TEST-002/003 |
+| One-time upsell coupon | JA — `ONETIMECREDIT` test mode aangemaakt (FEAT-005) |
+| Upgrade-to-pro flow | JA — `/upgrade-to-pro` server component (FEAT-005) |
+| iDEAL bij subscription | VERWIJDERD (werkt niet bij recurring) |
 
 **Vereiste env vars (Vercel + lokaal):**
 ```
@@ -75,14 +85,20 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 STRIPE_PRICE_ID_MONTHLY=price_...
 STRIPE_PRICE_ID_YEARLY=price_...
 STRIPE_PRICE_ID_ONE_TIME=price_...
+STRIPE_COUPON_ONE_TIME_UPGRADE=ONETIMECREDIT
 ```
 
-**Volgende stap:** TEST-002 (checkout) + TEST-003 (webhook) — zie PROJECT_STATE.md voor exacte instructies.
+**Volgende stap:** TEST-003 (webhook delivery) — zie PROJECT_STATE.md voor exacte instructies.
+
+**Vóór live launch (productie):**
+- Stripe keys wisselen naar live mode (`sk_live_...`, `pk_live_...`) in Vercel
+- Coupon `ONETIMECREDIT` aanmaken in Stripe live mode Dashboard + `STRIPE_COUPON_ONE_TIME_UPGRADE` updaten
+- Webhook endpoint configureren in Stripe Dashboard: `https://dbakompas.nl/api/billing/webhook`
+- Stripe e-mail bevestigingsflow testen met live mode
 
 **Risico's:**
-- Webhook endpoint URL moet correct geconfigureerd zijn in Stripe Dashboard: `https://dbakompas.nl/api/billing/webhook`
-- `STRIPE_UPGRADE_CREDIT_COUPON_ID` aanwezig maar gebruik niet gecontroleerd
-- Geen test voor mislukte betalingen of chargebacks
+- TEST-003 (webhook delivery) nog niet uitgevoerd — onbekend of `billing_events` + `subscriptions` correct worden bijgewerkt
+- Coupon `ONETIMECREDIT` bestaat alleen in test mode — live launch geblokkeerd tot live coupon aangemaakt is
 
 ---
 
@@ -95,12 +111,21 @@ STRIPE_PRICE_ID_ONE_TIME=price_...
 | Wekelijkse digest | GEÏMPLEMENTEERD |
 | Maandelijkse digest | GEÏMPLEMENTEERD |
 | Urgente notificaties | GEÏMPLEMENTEERD |
-| Trigger mechanisme | ONBEKEND (geen cron job gevonden) |
+| One-time upsell e-mail | GEÏMPLEMENTEERD (`sendOneTimeUpsellEmail` in `modules/email/send.ts`) |
+| Trigger mechanisme digests | ONBEKEND (geen cron job gevonden) |
+| Upsell e-mail trigger | Stripe webhook `checkout.session.completed` (mode=payment) |
 | Live getest | NEE |
+
+**One-time upsell e-mail details:**
+- Verstuurd via: Stripe webhook → `handleCheckoutCompleted()` → `sendOneTimeUpsellEmail(email)`
+- Subject: "Je DBA-check is klaar — upgrade voor €10,05 eerste maand"
+- Inhoud: bevestiging aankoop + upgradeaanbod + knop "Upgrade voor €10,05 eerste maand" → `/upgrade-to-pro`
+- Fout afgevangen met `.catch()` — webhook fout niet bij e-mailprobleem
 
 **Risico's:**
 - Geen trigger gevonden die digests automatisch verstuurt
 - Geen unsubscribe mechanisme zichtbaar in code
+- Resend live test nog niet uitgevoerd
 
 ---
 
@@ -120,7 +145,7 @@ STRIPE_PRICE_ID_ONE_TIME=price_...
 | Live getest | NEE |
 
 **Pending:**
-- LOOPS-002: Custom contactvelden instellen in Loops dashboard (`quick_scan_completed`, `quick_scan_risk_level`, `quick_scan_score`) en e-mailsequentie koppelen aan `quick_scan_completed` event
+- LOOPS-002: Custom contactvelden instellen in Loops dashboard (`quick_scan_completed`, `quick_scan_risk_level`, `quick_scan_score`) en e-mailsequentie koppelen aan `quick_scan_completed` event — handmatige actie in Loops dashboard, geen code
 
 **Workaround Loops domain issue:**
 Gebruik het bestaande Loops account — niet een nieuwe omgeving aanmaken. De API key van het bestaande account werkt voor `dbakompas.nl`.

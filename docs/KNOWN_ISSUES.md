@@ -55,9 +55,18 @@
 ---
 
 ### KI-007 — Stripe webhook niet live getest
-**Status:** OPEN
-**Impact:** Betalingsflow kan werken in code maar falen in productie door webhook signing, endpoint URL configuratie, of idempotency edge cases.
-**Volgende stap:** TEST-002 en TEST-003 uitvoeren — instructies staan in PROJECT_STATE.md.
+**Status:** OPEN (TEST-002 geslaagd, TEST-003 nog open)
+**Impact:** Webhook signing en endpoint URL niet getest in productie. TEST-002 (checkout flow) is bevestigd werkend. TEST-003 (webhook delivery) nog niet uitgevoerd.
+**Volgende stap:** TEST-003 uitvoeren — Stripe CLI webhook forwarding, zie PROJECT_STATE.md.
+
+---
+
+### KI-017 — Geen paywall: ingelogde gebruikers zonder betaling hebben dashboard-toegang
+**Status:** OPGELOST — 2026-04-09 (commit `5f63a53`)
+**Bestand:** `app/(app)/layout.tsx`, `modules/billing/entitlements.ts`
+**Symptoom:** Elke geauthenticeerde gebruiker kan `/dashboard`, `/analyse`, `/nieuws` etc. bereiken ongeacht of ze betaald hebben. `getUserPlan()` checkt niet op `one_time_purchases`. `AppShell` checkt alleen `if (!user)`.
+**Fix:** Zie FEAT-004 plan in TASKS.md
+**Risico:** Gebruikers kunnen gratis analyses uitvoeren zonder actief abonnement of aankoop.
 
 ---
 

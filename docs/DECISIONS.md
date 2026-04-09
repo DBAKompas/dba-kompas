@@ -124,26 +124,116 @@ Elke beslissing bevat: datum, beslissing, reden, alternatieven overwogen.
 
 ---
 
-## 2026-04-09 — Conversie-funnel architectuur
+## 2026-04-09 — Conversie-funnel architectuur (geconsolideerde versie)
 
 **Beslissing:** De registratie- en checkout-flow loopt als volgt:
 
 1. **Landing page** → gebruiker klikt op plan → `EmailCheckoutModal` opent
-2. **`EmailCheckoutModal`** → stap 1: plan-selectie, stap 2: email + wachtwoord → redirect naar `/register?email=...&plan=...`
-3. **`/register`** → toont plan-info, pre-filled email, nieuw wachtwoord → `supabase.auth.signUp()`
-   - Geen e-mailverificatie vereist → directe checkout via API → Stripe
-   - E-mailverificatie vereist → "check je e-mail" scherm; `emailRedirectTo` → `/auth/callback?next=/checkout-redirect?plan=...`
-4. **`/checkout-redirect`** → auto-POST naar checkout API → Stripe
-5. **Stripe checkout** → betaald → `/dashboard?session_id=...` → groen succesbericht
+2. **`EmailCheckoutModal`** → stap 1: plan-selectie, stap 2: email + wachtwoord + legal checkbox → knop "Account aanmaken & betalen"
+   - `supabase.auth.signUp()` direct in modal (geen redirect naar externe pagina)
+   - Sessie direct beschikbaar (`data.session`) → POST naar checkout API → `window.location.href = json.url` (Stripe)
+   - Sessie nog niet beschikbaar (e-mailverificatie vereist) → `verifyMode: true` → verifyscherm binnen modal
+   - `emailRedirectTo`: `/auth/callback?next=/checkout-redirect?plan=...`
+3. **`/checkout-redirect`** → auto-POST naar checkout API → Stripe
+4. **Stripe checkout** → betaald → `/dashboard?session_id=...` → groen succesbericht
+
+**Fallback-pagina's (voor directe URL-toegang of edge cases):**
+- `/register` — volledig signup+checkout formulier met pre-filled email/plan
+- `/auth/signup` — server redirect naar `/login` (target QuickScan success screen)
 
 **Reden:**
-- `/register` en `/checkout-redirect` bestonden niet — complete 404 voor elke nieuwe gebruiker
-- Checkout API accepteerde alleen `priceId` (client moest price IDs kennen) — vervangen door `plan`-naam die server opzoekt
-- `cancel_url` → `/pricing` (404) → gecorrigeerd naar `/dashboard`
+- Oorspronkelijk: modal redirect naar `/register?email=...&plan=...` — dubbele stap, slechte UX (gebruiker moest al ingevulde email opnieuw invoeren)
+- `supabase.auth.signUp()` werkt probleemloos client-side vanuit modal
+- Verifyscherm inline in modal is beter UX dan volledige pagina-redirect
+- Stripe price IDs worden server-side opgezocht via `plan`-naam — client kent nooit de price IDs
 
 **Alternatieven overwogen:**
-- Modal direct signUp + checkout: zou vereisen dat modal API-aanroepen maakt en Supabase session afhandelt — te complex voor een client-modal component
+- Redirect naar `/register` (oude situatie): extra stap, slechte UX, redundante invulvelden
 - Aparte `/api/auth/register` endpoint: onnodige complexiteit — Supabase client-side signUp werkt prima
+
+---
+
+## 2026-04-09 — Paywall via AuthContext + AppShell (client-side)
+
+**Beslissing:** Paywall implementatie via client-side `AuthContext` plan state + `AppShell` redirect.
+
+**Mechanisme:**
+- `GET /api/user/plan` server endpoint roept `getUserPlan()` aan
+- `AuthContext` fetcht dit endpoint na user confirmatie, slaat op als `plan: 'free' | 'pro' | 'enterprise'`
+- `AppShell` in `app/(app)/layout.tsx`: als `plan === 'free'` → `router.push('/upgrade')` (uitzondering: `/profiel`)
+- `/upgrade` paywallpagina toont 3 plankaarten met directe Stripe checkout
+
+**Reden:**
+- Eenvoudig te implementeren op client-side — voldoende voor MVP
+- `getUserPlan()` checkt zowel `subscriptions` als `one_time_purchases` → correcte entitlement check
+- Uitzondering `/profiel` noodzakelijk zodat gebruikers hun account kunnen beheren ook zonder betaling
+
+**Alternatieven overwogen:**
+- Next.js middleware (server-side): robuuster (geen flicker), maar complexer — middleware heeft geen toegang tot Supabase admin; vereist eigen cookie-parsing. Te complex voor MVP.
+- Route Groups met server component check: vergelijkbaar resultaat maar meer duplicatie
+- RLS-only: onvoldoende — RLS beschermt data maar niet routes
+
+**Risico:**
+- Korte flicker (loading state) terwijl plan wordt opgehaald — acceptabel voor MVP
+- Client-side redirect kan worden omzeild door technisch vaardige gebruikers — data is alsnog beschermd via RLS en rate limiting
+
+---
+
+## 2026-04-09 — One-time upsell: upgrade-to-pro als server component
+
+**Beslissing:** `/upgrade-to-pro` is een server component zonder UI — puur server-side logica, directe Stripe redirect.
+
+**Mechanisme:**
+1. Authenticatiecheck → redirect naar `/login?next=/upgrade-to-pro` als niet ingelogd
+2. Conflict check: actief/trialing abonnement in `subscriptions` tabel → redirect naar `/dashboard`
+3. Coupon eligibilitycheck: `one_time_purchases` rij aanwezig met `status = 'purchased'` → voeg `discounts: [{ coupon: STRIPE_COUPON_ONE_TIME_UPGRADE }]` toe
+4. Bestaande `stripe_customer_id` uit profiel → `customer` parameter zodat Stripe klant herkent
+5. Stripe checkout session aanmaken → `redirect(session.url)`
+
+**Reden:**
+- Geen UI nodig — de pagina is puur een server-side actie (net als een API route, maar toegankelijk als URL)
+- Conflict check voorkomt dat iemand met actief abonnement opnieuw een abonnement aanmaakt (Stripe error)
+- Coupon server-side toegepast — client kent nooit de coupon ID
+
+**Alternatieven overwogen:**
+- API route (`POST /api/upgrade-to-pro`): vrijwel identiek maar vereist een aparte UI-pagina die de POST triggert — extra complexiteit zonder voordeel
+- Client-side checkout met coupon: onveilig — coupon ID zou client-exposed zijn
+
+---
+
+## 2026-04-09 — Stripe coupon mechanisme voor one-time upgrade korting
+
+**Beslissing:** Stripe coupon `ONETIMECREDIT` (€9,95 off, `duration: 'once'`) toegepast via `discounts` parameter bij subscription checkout.
+
+**Mechanisme:**
+- Coupon aangemaakt in Stripe Dashboard (test mode): `amount_off: 995`, `currency: EUR`, `duration: 'once'`
+- ID: `ONETIMECREDIT` (of ander ID) opgeslagen als `STRIPE_COUPON_ONE_TIME_UPGRADE` env var
+- Server-side conditionally toegevoegd in `/upgrade-to-pro` page als gebruiker `one_time_purchases` heeft
+- Stripe regelt automatisch: eerste factuur €20 − €9,95 = €10,05, daarna normaal €20/maand
+
+**Reden:**
+- Coupon logica 100% in Stripe — geen eigen factuurberekeningen nodig
+- `duration: 'once'` is de eenvoudigste en veiligste optie: exacte terugkeer naar normaalprijs gegarandeerd
+- Coupon ID server-side — client weet nooit of/welke coupon wordt toegepast
+
+**Let op voor productie:**
+- Coupon `ONETIMECREDIT` bestaat alleen in test mode — live mode equivalent aanmaken vóór launch
+- `STRIPE_COUPON_ONE_TIME_UPGRADE` env var updaten naar live mode coupon ID in Vercel
+
+---
+
+## 2026-04-09 — iDEAL verwijderd uit subscription checkout
+
+**Beslissing:** `payment_method_types: ['card', 'ideal']` verwijderd uit `app/api/billing/checkout/route.ts`.
+
+**Reden:**
+- iDEAL ondersteunt geen recurring payments — Stripe geeft een fout als iDEAL wordt opgegeven bij `mode: 'subscription'`
+- Dit was de primaire oorzaak van HTTP 500 bij elke subscription checkout
+- Zonder `payment_method_types` parameter: Stripe toont automatisch alle ondersteunde methoden voor het land van de gebruiker
+
+**Impact:**
+- iDEAL beschikbaar voor one-time checkout (waar het wel werkt)
+- Subscription checkout werkt nu correct
 
 ---
 

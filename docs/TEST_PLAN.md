@@ -1,6 +1,6 @@
 # TEST_PLAN.md
 **Testplan voor DBA Kompas**
-**Laatst bijgewerkt:** 2026-04-07
+**Laatst bijgewerkt:** 2026-04-09
 
 ---
 
@@ -159,6 +159,140 @@
 
 ---
 
+---
+
+## SCENARIO 10 — Paywall: free gebruiker geblokkeerd
+
+**Doel:** Verifieer dat een ingelogde gebruiker zonder betaling niet bij het dashboard kan komen.
+
+**Stappen:**
+1. Maak een nieuw account aan (geen betaling doen)
+2. Log in
+3. Probeer te navigeren naar `/dashboard`
+
+**Expected outcome:**
+- Redirect naar `/upgrade`
+- Paywallpagina toont 3 plankaarten (Eenmalig €9,95 / Maandelijks €20 / Jaarlijks €200)
+- Geen dashboard content zichtbaar
+
+**Extra check:**
+- Probeer `/analyse` en `/nieuws` direct — ook redirect naar `/upgrade`
+- Probeer `/profiel` — wél toegankelijk (paywall-exempt)
+
+---
+
+## SCENARIO 11 — Paywall: betalende gebruiker heeft toegang
+
+**Doel:** Verifieer dat een gebruiker met actief abonnement of one-time purchase het dashboard kan bereiken.
+
+**Stappen:**
+1. Log in als gebruiker met actief abonnement (subscription status `active` of `trialing`)
+2. Navigeer naar `/dashboard`
+
+**Expected outcome:**
+- Geen redirect naar `/upgrade`
+- Dashboard laadt normaal
+
+**Varianten:**
+- Gebruiker met `subscriptions.status = 'active'` → toegang
+- Gebruiker met `subscriptions.status = 'trialing'` → toegang
+- Gebruiker met `one_time_purchases.status = 'purchased'` → toegang
+- Gebruiker zonder betaling → redirect naar `/upgrade`
+
+---
+
+## SCENARIO 12 — Stripe webhook delivery (TEST-003)
+
+**Doel:** Verifieer dat Stripe webhooks correct worden ontvangen en verwerkt.
+
+**Voorbereiding:**
+1. Start Stripe CLI: `stripe listen --forward-to localhost:3000/api/billing/webhook`
+2. Kopieer `whsec_...` signing secret uit CLI output
+3. Zet als `STRIPE_WEBHOOK_SECRET` in `.env.local`
+4. Start dev server: `npm run dev`
+
+**Stappen:**
+1. Trigger: `stripe trigger checkout.session.completed`
+2. Controleer server logs: geen errors
+
+**Expected outcome:**
+- HTTP 200 response van webhook endpoint
+- Nieuw record in `billing_events` tabel (Supabase)
+- Geen duplicate event als dezelfde trigger nogmaals gedaan wordt (idempotency check)
+
+**Extra trigger (subscription):**
+- `stripe trigger customer.subscription.updated`
+- Verwacht: `subscriptions` tabel bijgewerkt in Supabase
+
+---
+
+## SCENARIO 13 — One-time upsell e-mail
+
+**Doel:** Verifieer dat de upsell e-mail verstuurd wordt na een one-time aankoop.
+
+**Stappen:**
+1. Voer een one-time checkout uit (Stripe test mode, product type `one_time_dba`)
+2. Stripe webhook `checkout.session.completed` (mode=payment) wordt getriggerd
+3. Controleer e-mailinbox van testgebruiker
+
+**Expected outcome:**
+- E-mail ontvangen met subject "Je DBA-check is klaar — upgrade voor €10,05 eerste maand"
+- E-mail bevat groene kortingsbox + knop "Upgrade voor €10,05 eerste maand"
+- Knop linkt naar `/upgrade-to-pro`
+
+**Faalcriteria:**
+- Geen e-mail ontvangen (controleer Resend dashboard voor errors)
+- E-mail verstuurd maar knop linkt naar verkeerde URL
+
+---
+
+## SCENARIO 14 — Upgrade-to-pro met coupon
+
+**Doel:** Verifieer dat de upgrade flow de Stripe coupon correct toepast.
+
+**Vereisten:**
+- Gebruiker heeft `one_time_purchases` rij met `status = 'purchased'`
+- `STRIPE_COUPON_ONE_TIME_UPGRADE` env var ingesteld (bijv. `ONETIMECREDIT`)
+
+**Stappen:**
+1. Log in als gebruiker met one-time purchase
+2. Navigeer naar `/upgrade-to-pro`
+3. Stripe Checkout opent
+
+**Expected outcome:**
+- Stripe Checkout toont: "Korting: -€9,95" (of vergelijkbare coupon-weergave)
+- Totaal eerste betaling: €10,05 (€20 − €9,95)
+- Na betaling: redirect naar `/dashboard?session_id=...`
+- Nieuwe rij in `subscriptions` tabel
+
+**Conflict check:**
+- Navigeer naar `/upgrade-to-pro` als gebruiker al een actief abonnement heeft
+- Expected: redirect naar `/dashboard` (geen Stripe checkout geopend)
+
+---
+
+## SCENARIO 15 — Conversie-funnel (end-to-end)
+
+**Doel:** Verifieer de volledige nieuwe gebruiker conversie-flow.
+
+**Stappen:**
+1. Open incognito venster → ga naar homepage
+2. Klik op een plan → `EmailCheckoutModal` opent
+3. Stap 1: plan bevestigen → "Doorgaan"
+4. Stap 2: e-mail + wachtwoord invullen + akkoord aanvinken → "Account aanmaken & betalen"
+   - Als e-mailbevestiging UIT: modal sluit, Stripe checkout opent direct
+   - Als e-mailbevestiging AAN: modal toont "Controleer je e-mail" scherm → verificatiemail → klikken → `/checkout-redirect` → Stripe
+5. Stripe Checkout: testkaart `4242 4242 4242 4242`
+6. Na betaling: `/dashboard?session_id=...`
+
+**Expected outcome:**
+- Groene "Abonnement geactiveerd!" banner op dashboard
+- Gebruiker aanwezig in Supabase Auth tabel
+- Gebruiker aanwezig in `subscriptions` tabel (na webhook, TEST-003)
+- Geen 404 of redirect naar verkeerde pagina in het hele proces
+
+---
+
 ## EDGE CASES
 
 | Case | Verwacht gedrag |
@@ -168,3 +302,6 @@
 | Dubbele analyse indienen | Tweede aanroep werkt normaal |
 | Analyse tijdens lage Haiku capaciteit | Retry mechanisme actief, max 2 pogingen |
 | Stripe webhook dubbel ontvangen | Idempotency check voorkomt dubbele verwerking |
+| Gebruiker met actief abonnement klikt `/upgrade-to-pro` | Redirect naar `/dashboard` (geen dubbel abonnement) |
+| Gebruiker zonder one-time purchase klikt `/upgrade-to-pro` | Checkout zonder coupon (reguliere €20/maand) |
+| `STRIPE_COUPON_ONE_TIME_UPGRADE` env var ontbreekt | Checkout zonder coupon — geen fout (coupon optioneel) |
