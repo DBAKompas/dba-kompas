@@ -1,6 +1,6 @@
 # PROJECT_STATE.md
-**Laatst bijgewerkt:** 2026-04-09 (avond)
-**Maturity:** 95%
+**Laatst bijgewerkt:** 2026-04-09 (einde sessie)
+**Maturity:** 96%
 
 ---
 
@@ -10,17 +10,26 @@ DBA Kompas is een Next.js 16.2 SaaS applicatie die opdrachtomschrijvingen analys
 
 ---
 
-## LAATSTE ACTIE (2026-04-09 avond, commit pending)
+## LAATSTE ACTIE (2026-04-09 einde sessie — commits `6477615`, `779619e`, `4ba0c6e`)
 
-**Taak:** QUAL-002 — Integration tests voor volledige analyse pipeline
+**INFRA-001 — Resend SMTP domeinverificatie GEDEELTELIJK voltooid (IN PROGRESS)**
 
-**Wat is er gedaan:**
-- `__tests__/analyzeDbaText.test.ts` aangemaakt (21 tests)
-- Mock strategie: `vi.hoisted(() => vi.fn())` + `vi.mock('@anthropic-ai/sdk')` — onderschept de module-level `anthropic` singleton in `dbaAnalysis.ts`
-- `analyzeDbaText` getest (11 tests): insufficient_input zonder API-aanroep, happy path, riskLabel doorgestuurd, retry bij ongeldige JSON, dubbele mislukking → FALLBACK, netwerkfout → FALLBACK, code fences, followUpQuestions uit signaaldetectie, optionele context, coercering ongeldig label, model + max_tokens
-- `generateAssignmentDraft` getest (10 tests): compact/full mode, max_tokens 700/2000, standaard compact, API-fout → FALLBACK, dubbele retry mislukking → FALLBACK, reusableBuildingBlocks arrays, model verificatie
+Status Resend domein `dbakompas.nl`:
+- DKIM TXT (`resend._domainkey`) → **Pending** (eerder Verified, daarna reset bij restart verification)
+- SPF TXT (`send`) → **Pending** (DNS propagatie nog bezig bij STRATO)
+- MX (`send`) → bewust overgeslagen — niet nodig voor verzenden, zou STRATO inkomende mail breken
 
-**Volgende actie:** `npm test` draaien op lokale machine om alle 67 tests te verifiëren (46 QUAL-001 + 21 QUAL-002), daarna committen.
+Wat is er gedaan:
+- Resend Dashboard: domein `dbakompas.nl` toegevoegd, regio Ireland (eu-west-1)
+- STRATO DNS: DKIM TXT + SPF TXT records toegevoegd
+- Fout ontdekt en gecorrigeerd: SPF TXT waarde begon met `=spf1` i.p.v. `v=spf1` → gecorrigeerd
+- Resend verificatie herstart → nu terug op Pending (normaal, propagatie loopt nog)
+
+**Overige taken deze sessie (alle commits gepusht):**
+- QUAL-002: `__tests__/analyzeDbaText.test.ts` (21 tests) — 67/67 groen (commit `6477615`)
+- DOC-001: `vercel.json` + `docs/DEPLOYMENT.md` + `.env.local.example` fix (commit `779619e`)
+- KI-008 opgelost: comment toegevoegd aan `postProcessDbaOutput` (commit `4ba0c6e`)
+- KNOWN_ISSUES.md: KI-005, KI-008, KI-009 gesloten
 
 ---
 
@@ -59,35 +68,55 @@ DBA Kompas is een Next.js 16.2 SaaS applicatie die opdrachtomschrijvingen analys
 
 ## LAATSTE WIJZIGING IN CODE
 
-**Bestanden (commit `5f63a53`):**
-- `modules/billing/entitlements.ts` — one_time_purchases check toegevoegd
-- `app/api/user/plan/route.ts` — NIEUW
-- `components/auth/AuthContext.tsx` — plan state toegevoegd
-- `app/(app)/layout.tsx` — paywall redirect toegevoegd
-- `app/upgrade/page.tsx` — NIEUW (standalone, geen (app) sidebar)
-- `modules/email/send.ts` — sendOneTimeUpsellEmail toegevoegd
-- `app/api/billing/webhook/route.ts` — upsell e-mail aanroep toegevoegd
-- `app/upgrade-to-pro/page.tsx` — NIEUW (server component, directe Stripe redirect)
+**Commits deze sessie:**
+
+| Commit | Bestanden | Omschrijving |
+|---|---|---|
+| `6477615` | `__tests__/analyzeDbaText.test.ts` (NIEUW), `docs/TASKS.md`, `docs/PROJECT_STATE.md` | QUAL-002: 21 integratietests voor analyzeDbaText + generateAssignmentDraft |
+| `779619e` | `vercel.json` (NIEUW), `docs/DEPLOYMENT.md` (NIEUW), `docs/TASKS.md`, `.env.local.example` | DOC-001: Vercel config + deployment docs + env.example fix |
+| `4ba0c6e` | `lib/ai/dbaAnalysis.ts`, `docs/KNOWN_ISSUES.md` | KI-008 comment + KI-005/008/009 gesloten in KNOWN_ISSUES |
 
 **Branch:** `main`
-**Status:** Gepusht naar GitHub, live op Vercel
+**Status:** Alle commits gepusht naar GitHub, live op Vercel
 
 ---
 
 ## VOLGENDE GEPLANDE STAP
 
-**Commit QUAL-002 + voorbereiding DOC-001**
+**INFRA-001 voltooien — Resend verificatie + Supabase SMTP**
 
-Nog te doen:
-1. `npm test` draaien — verwacht 67 tests groen (46 QUAL-001 + 21 QUAL-002)
-2. Commit: `__tests__/analyzeDbaText.test.ts` + `docs/` updates
-3. Push naar GitHub (`git push`)
-4. Daarna: DOC-001 — `vercel.json` aanmaken + env vars documenteren
+Exacte vervolgstappen bij volgende sessie:
 
-**Daarna:**
-- **INFRA-001**: Custom SMTP instellen (Resend/Postmark via Supabase SMTP) — vereist vóór live launch
-- Na INFRA-001: Supabase e-mailbevestiging opnieuw inschakelen
-- **Stripe coupon live mode**: `ONETIMECREDIT` equivalent aanmaken in Stripe live mode + `STRIPE_COUPON_ONE_TIME_UPGRADE` updaten voor productie
+**Stap A — Controleer Resend verificatiestatus**
+1. Ga naar [resend.com/domains](https://resend.com/domains) → `dbakompas.nl`
+2. Controleer of DKIM en SPF TXT beide **Verified** zijn
+3. Als nog Pending: klik **Restart verification** en wacht nog 15-30 min
+4. Als Failed: controleer STRATO DNS → TXT- en CNAME-records → voorvoegsel `resend._domainkey` en `send` correct aanwezig met exacte waarden
+
+**Stap B — Supabase SMTP instellen** (pas na Verified)
+1. Ga naar Supabase Dashboard → Authentication → Settings → SMTP Settings
+2. Zet **Enable Custom SMTP** aan
+3. Vul in:
+   - Host: `smtp.resend.com`
+   - Port: `465`
+   - Username: `resend`
+   - Password: Resend API key (zie Resend Dashboard → API Keys)
+   - Sender name: `DBA Kompas`
+   - Sender email: `noreply@dbakompas.nl`
+4. Klik Save
+
+**Stap C — E-mailbevestiging terug aanzetten**
+1. Supabase Dashboard → Authentication → Settings
+2. Zet **Enable email confirmations** aan
+3. Klik Save
+
+**Stap D — Testen**
+Maak een nieuw testaccount aan op `https://dba-kompas.vercel.app` met een echt e-mailadres. Verificatiemail moet binnenkomen van `noreply@dbakompas.nl`.
+
+**Daarna open:**
+- TEST-005: maximale invoerlengte testen (3000+ tekens, manueel)
+- LOOPS-002: contactvelden instellen in Loops dashboard (handmatig)
+- Stripe coupon live mode aanmaken vóór productielaunch
 
 ---
 
@@ -126,14 +155,12 @@ Nog te doen:
 
 ## WAT NIET WERKT / ONZEKER
 
-- **GEDEELTELIJK**: Unit tests + integratietests aanwezig (QUAL-001 + QUAL-002 done, 67 tests totaal). E2e-tests nog open.
-- **ONBEKEND**: Deployment Vercel config — geen `vercel.json` aanwezig (DOC-001)
-- **GETEST**: Stripe webhook delivery — TEST-003 BEVESTIGD WERKEND (2026-04-09)
-- **INFRA**: Custom SMTP niet ingesteld — Supabase ingebouwde mailservice heeft rate limits, niet geschikt voor productie. Supabase e-mailbevestiging is tijdelijk UITGESCHAKELD tijdens tests. Inschakelen zodra INFRA-001 gereed is.
-- **NIET AANGEMAAKT**: Stripe coupon `ONETIMECREDIT` bestaat alleen in test mode. Vóór live launch: live mode equivalent aanmaken + env var updaten.
+- **IN PROGRESS**: INFRA-001 — Resend domein `dbakompas.nl` verificatie loopt (DNS propagatie bij STRATO). Supabase SMTP nog niet ingesteld. E-mailbevestiging tijdelijk UITGESCHAKELD. Zie "Volgende geplande stap" voor exacte vervolgstappen.
+- **NIET AANGEMAAKT**: Stripe coupon `ONETIMECREDIT` bestaat alleen in test mode. Vóór live launch aanmaken in Stripe live mode + env var updaten.
 - **ONBEKEND**: E-mail digest triggers — geen cron job gevonden voor Resend digests
-- **PENDING**: Loops dashboard config — `quick_scan_completed`, `quick_scan_risk_level`, `quick_scan_score` contactvelden instellen + e-mailsequentie koppelen (LOOPS-002, handmatige actie)
-- **NO-OP**: `postProcessDbaOutput` verwerkt niet-bestaande velden (KI-008, geen bug)
+- **PENDING**: Loops dashboard config — contactvelden instellen + e-mailsequentie koppelen (LOOPS-002, handmatig)
+- **OPEN**: TEST-005 — maximale invoerlengte (3000+ tekens) nog niet manueel getest
+- **GEDEELTELIJK**: Alleen unit + integratietests. E2e-tests ontbreken.
 
 ---
 
@@ -141,9 +168,9 @@ Nog te doen:
 
 | Omgeving | Status | Onderbouwing |
 |---|---|---|
-| Lokaal | WERKEND | Bevestigd via tests |
-| Vercel (main branch) | LIVE | Auto-deploy via GitHub, TEST-002 bevestigd |
-| Vercel config | ONGEDOCUMENTEERD | Geen vercel.json aanwezig |
+| Lokaal | WERKEND | 67 tests groen (npm test) |
+| Vercel (main branch) | LIVE | Auto-deploy via GitHub, TEST-002 + TEST-003 bevestigd |
+| Vercel config | GEDOCUMENTEERD | `vercel.json` aanwezig (fra1, www-redirect), `docs/DEPLOYMENT.md` |
 
 ---
 
@@ -154,7 +181,8 @@ Nog te doen:
 | Supabase Auth + DB | JA | JA | BEVESTIGD |
 | Anthropic Claude Haiku | JA | JA | BEVESTIGD |
 | Stripe (checkout + webhook) | JA | JA | TEST-002 + TEST-003 BEVESTIGD ✅ |
-| Resend (digest + upsell) | JA | JA | NEE |
+| Resend (digest + upsell) | JA | JA (domein pending verificatie) | NEE |
+| Supabase SMTP (auth mail) | N.V.T. (Supabase config) | NEE — INFRA-001 IN PROGRESS | NEE |
 | Loops | JA | JA | NEE (dashboard config pending) |
 | PostHog | JA | JA | ONBEKEND |
 | Sentry | JA | JA | ONBEKEND |
@@ -174,6 +202,6 @@ Correct gestructureerd:
 - Stripe coupon via server-side `discounts` parameter (nooit client-exposed)
 
 Aandachtspunten:
-- `postProcessDbaOutput` verwerkt draft-velden die fase 1 niet meer levert (no-ops, KI-008)
-- Geen unit/integration tests aanwezig (KI-005)
+- `postProcessDbaOutput` verwerkt draft-velden die fase 1 niet levert (no-ops, gedocumenteerd via comment, KI-008 gesloten)
+- 67 unit + integratietests aanwezig — e2e ontbreekt nog
 - Paywall is client-side — server-side middleware zou robuuster zijn, maar voldoende voor MVP

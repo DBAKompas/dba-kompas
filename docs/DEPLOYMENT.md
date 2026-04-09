@@ -146,6 +146,58 @@ Actief tijdens ontwikkelingsfase. Alle Stripe-webhooks, Supabase redirect URLs e
 
 ---
 
+## INFRA-001: Custom SMTP via Resend (vereist vóór live launch)
+
+Supabase Auth gebruikt standaard een ingebouwde mailservice met rate limits (~3 mails/uur) en een `@supabase.io` afzender. Voor productie moet dit worden vervangen door Resend SMTP.
+
+### Stap 1 — Domein verifiëren in Resend
+
+1. Ga naar [resend.com/domains](https://resend.com/domains)
+2. Klik **Add Domain** → voer `dbakompas.nl` in
+3. Resend toont DNS-records (SPF, DKIM, DMARC) die je moet toevoegen bij je DNS-provider
+4. Voeg die records toe bij je domeinregistrar (Transip, Cloudflare, o.i.d.)
+5. Wacht op verificatie (meestal 5-30 minuten)
+6. Status wordt groen: **Verified**
+
+### Stap 2 — SMTP instellen in Supabase
+
+1. Ga naar [supabase.com/dashboard](https://supabase.com/dashboard) → selecteer je project
+2. Navigeer naar **Authentication → Settings → SMTP Settings**
+3. Zet **Enable Custom SMTP** op **aan**
+4. Vul in:
+
+| Veld | Waarde |
+|---|---|
+| Host | `smtp.resend.com` |
+| Port | `465` |
+| Username | `resend` |
+| Password | *(je Resend API key — zie Resend Dashboard → API Keys)* |
+| Sender name | `DBA Kompas` |
+| Sender email | `noreply@dbakompas.nl` |
+
+5. Klik **Save**
+
+### Stap 3 — E-mailbevestiging weer inschakelen
+
+1. Blijf in **Authentication → Settings**
+2. Zet **Enable email confirmations** op **aan** (was uitgeschakeld vanwege rate limits tijdens tests)
+3. Klik **Save**
+
+### Stap 4 — Verificatiemail testen
+
+1. Maak een nieuw testaccount aan op `https://dba-kompas.vercel.app` (gebruik een echt e-mailadres)
+2. Controleer of je een verificatiemail ontvangt van `noreply@dbakompas.nl`
+3. Klik de link — bevestig dat je doorgestuurd wordt naar het dashboard
+
+### Resultaat
+
+Na INFRA-001:
+- Auth-e-mails (verificatie, wachtwoord reset) vertrekken vanuit `noreply@dbakompas.nl`
+- Geen Supabase rate limits meer
+- E-mailbevestiging actief — nieuwe gebruikers moeten eerst hun e-mail bevestigen
+
+---
+
 ## Productielaunch checklist
 
 Vóór overschakelen naar `dbakompas.nl`:
@@ -157,6 +209,6 @@ Vóór overschakelen naar `dbakompas.nl`:
 5. Supabase Redirect URL bijwerken naar `https://dbakompas.nl/**`
 6. `NEXT_PUBLIC_APP_URL` updaten naar `https://dbakompas.nl`
 7. Domein `dbakompas.nl` koppelen in Vercel Dashboard → Domains
-8. E-mailbevestiging inschakelen in Supabase Auth (na INFRA-001: custom SMTP)
-9. Resend verzenddomein `dbakompas.nl` verifiëren
+8. INFRA-001 uitvoeren: Resend domein verifiëren + Supabase SMTP instellen + e-mailbevestiging inschakelen
+9. Resend verzenddomein `dbakompas.nl` verifiëren (onderdeel van INFRA-001)
 10. Stripe live mode betaling end-to-end testen

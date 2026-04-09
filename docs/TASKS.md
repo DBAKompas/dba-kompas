@@ -1,5 +1,5 @@
 # TASKS.md
-**Laatst bijgewerkt:** 2026-04-09 (avond)
+**Laatst bijgewerkt:** 2026-04-09 (laat)
 
 ---
 
@@ -55,11 +55,20 @@
 
 ### LAAG (verbetering)
 
-- [ ] **INFRA-001**: Custom SMTP instellen voor transactionele e-mails (productie)
-  - Supabase gebruikt nu de ingebouwde mail service met rate limits — niet geschikt voor productie
-  - Aanbevolen: Resend of Postmark via Supabase SMTP Settings (Authentication → Email → SMTP Settings)
-  - Vereist: SMTP host, port, user, wachtwoord van e-mailprovider
-  - Doe dit vóór live launch op `dbakompas.nl`
+- [ ] **INFRA-001**: Custom SMTP instellen voor auth-e-mails — **IN PROGRESS, HANDMATIGE ACTIE**
+  - **HUIDIGE STATUS (einde sessie 2026-04-09):**
+    - Resend domein `dbakompas.nl` toegevoegd (Ireland eu-west-1)
+    - STRATO DNS: DKIM TXT (`resend._domainkey`) + SPF TXT (`send`) records toegevoegd
+    - SPF TXT had fout (`=spf1` i.p.v. `v=spf1`) → gecorrigeerd
+    - Resend verificatie herstart → status: **Pending** (DNS propagatie loopt nog bij STRATO)
+    - MX record bewust overgeslagen (niet nodig voor verzenden, zou STRATO mail breken)
+  - **VOLGENDE ACTIE bij hervatten:**
+    1. Ga naar resend.com/domains → `dbakompas.nl` → controleer status
+    2. Als Pending: klik "Restart verification" → wacht op Verified
+    3. Als Verified: ga naar Supabase → Authentication → Settings → SMTP Settings
+    4. Vul in: host `smtp.resend.com`, port `465`, user `resend`, password = Resend API key, sender `DBA Kompas <noreply@dbakompas.nl>`
+    5. Zet "Enable email confirmations" aan in Supabase Auth Settings
+    6. Test: nieuw account aanmaken → verificatiemail van `noreply@dbakompas.nl` ontvangen
 
 - [ ] **LOOPS-002**: Custom contactvelden instellen in Loops dashboard
   - Vereist: handmatige actie in Loops dashboard (geen code)

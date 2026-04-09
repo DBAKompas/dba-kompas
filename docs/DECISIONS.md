@@ -281,6 +281,54 @@ Elke beslissing bevat: datum, beslissing, reden, alternatieven overwogen.
 
 ---
 
+## 2026-04-09 — Resend als Supabase SMTP provider (INFRA-001)
+
+**Beslissing:** Resend wordt gebruikt als SMTP provider voor Supabase Auth e-mails (verificatie, wachtwoord reset).
+
+**Reden:**
+- Resend is al in de stack voor transactionele e-mails (upsell, digests)
+- Één provider voor alle e-mail — minder complexiteit
+- Supabase ingebouwde mailservice heeft rate limits (~3/uur) — niet geschikt voor productie
+- Resend SMTP: `smtp.resend.com:465`, user `resend`, password = API key
+
+**MX record bewust overgeslagen:**
+- STRATO's MX-beheer laat geen subdomein-MX toe zonder de root MX te wijzigen
+- Root MX aanpassen zou inkomende mail (`info@dbakompas.nl`) breken
+- MX is alleen nodig voor inkomende mail via Resend (Enable Receiving) — dat is niet gewenst
+- DKIM + SPF TXT zijn voldoende voor het verzenden van e-mail
+
+**Status:** IN PROGRESS — DNS propagatie loopt nog bij STRATO
+
+---
+
+## 2026-04-09 — Vitest als testframework (QUAL-001/002)
+
+**Beslissing:** Vitest 2.1.0 als testframework toegevoegd (niet Jest).
+
+**Reden:**
+- Vitest heeft native TypeScript + ESM support — geen Babel config nodig
+- `vi.mock()` + `vi.hoisted()` pattern werkt correct met Next.js module-level singletons (Anthropic SDK)
+- Sneller dan Jest voor dit type project
+
+**Mock strategie voor Anthropic:**
+- `anthropic` is een module-level singleton in `dbaAnalysis.ts`
+- `vi.hoisted(() => vi.fn())` declareerd `mockCreate` vóór de module-hoist
+- `vi.mock('@anthropic-ai/sdk', () => ({ default: vi.fn().mockImplementation(...) }))` onderschept de constructor
+- Geen echte Anthropic API calls in tests
+
+---
+
+## 2026-04-09 — vercel.json regio fra1
+
+**Beslissing:** Vercel deployment gefixeerd op regio `fra1` (Frankfurt).
+
+**Reden:**
+- Nederlandse gebruikers — Frankfurt is de dichtstbijzijnde EU-regio
+- GDPR: data blijft in de EU
+- `maxDuration = 120` is al ingesteld in de route files zelf — niet nodig in vercel.json
+
+---
+
 ## 2026-04-07 — Fase 1 prompt afslanken (gepland)
 
 **Beslissing (te implementeren):** Verwijder `simulationFactState`, `simulationHints`, `followUpQuestions`, `additionalImprovements` uit fase 1 output schema.

@@ -1,6 +1,6 @@
 # INTEGRATIONS_STATUS.md
 **Status van alle externe integraties**
-**Laatst bijgewerkt:** 2026-04-09
+**Laatst bijgewerkt:** 2026-04-09 (einde sessie)
 
 ---
 
@@ -26,7 +26,7 @@
 - RLS policies niet geaudit voor correctheid
 
 **Nog te doen:**
-- INFRA-001: Custom SMTP instellen (Resend of Postmark via Supabase Auth → Settings → SMTP)
+- INFRA-001 IN PROGRESS: Resend domein `dbakompas.nl` verificatie loopt (DNS propagatie STRATO). Na Verified: Supabase SMTP instellen + e-mailbevestiging aanzetten. Zie TASKS.md voor exacte stappen.
 - Na INFRA-001: E-mailbevestiging opnieuw inschakelen
 - RLS policies auditen (kan gebruiker A data van gebruiker B zien?)
 
@@ -94,8 +94,6 @@ STRIPE_COUPON_ONE_TIME_UPGRADE=ONETIMECREDIT
 - Events: 5 (checkout.session.completed, customer.subscription.updated, customer.subscription.deleted, invoice.paid, invoice.payment_failed)
 - Status: aangemaakt 2026-04-09, signing secret in Vercel gezet, redeployed
 - Delivery: BEVESTIGD WERKEND (2026-04-09) — billing_events + subscriptions + profiles correct bijgewerkt
-
-**Volgende stap:** TEST-003 voltooien — echte checkout + Supabase verificatie. Zie PROJECT_STATE.md.
 
 **Vóór live launch (productie):**
 - Stripe keys wisselen naar live mode (`sk_live_...`, `pk_live_...`) in Vercel
