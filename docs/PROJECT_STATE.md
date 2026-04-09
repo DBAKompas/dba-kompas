@@ -139,7 +139,7 @@ Nog te doen:
 
 ## WAT NIET WERKT / ONZEKER
 
-- **ONTBREEKT**: Tests (unit, integratie, e2e) — regressions worden niet automatisch gedetecteerd
+- **GEDEELTELIJK**: Unit tests aanwezig voor `validateDbaInput` en `validateDbaEngineOutput` (QUAL-001 done). Integratie- en e2e-tests nog open (QUAL-002).
 - **ONBEKEND**: Deployment Vercel config — geen `vercel.json` aanwezig (DOC-001)
 - **GETEST**: Stripe webhook delivery — TEST-003 BEVESTIGD WERKEND (2026-04-09)
 - **INFRA**: Custom SMTP niet ingesteld — Supabase ingebouwde mailservice heeft rate limits, niet geschikt voor productie. Supabase e-mailbevestiging is tijdelijk UITGESCHAKELD tijdens tests. Inschakelen zodra INFRA-001 gereed is.

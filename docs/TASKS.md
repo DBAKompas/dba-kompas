@@ -37,7 +37,12 @@
 
 ### MIDDEL (kwaliteit)
 
-- [ ] **QUAL-001**: Unit tests toevoegen voor `validateDbaEngineOutput`, `validateDbaInput`
+- [x] **QUAL-001**: Unit tests toegevoegd voor `validateDbaEngineOutput`, `validateDbaInput` ✓ (2026-04-09)
+  - `__tests__/validateDbaInput.test.ts` — 18 tests: countWords, detectSignals, validateDbaInput, buildFollowUpQuestions
+  - `__tests__/validateDbaEngineOutput.test.ts` — 22 tests: validateDbaEngineOutput (nuclear coercion), validateDbaDraftOutput
+  - `vitest.config.ts` aangemaakt, `package.json` uitgebreid met test/test:watch/test:coverage scripts
+  - Vitest als devDependency toegevoegd (`^2.1.0`)
+  - Eerste run vereist `npm install` in projectmap
 - [ ] **QUAL-002**: Integration test voor volledige analyse pipeline
 - [ ] **DOC-001**: Vercel deployment configuratie vastleggen (`vercel.json` + env vars documenteren)
 
