@@ -120,7 +120,7 @@ Nog te doen:
 - Rate limiting op analyse endpoint (free: 20/dag, pro: 100/dag, enterprise: 500/dag)
 - Stripe subscription checkout — TEST-002 BEVESTIGD WERKEND
 - Stripe one-time checkout — geïmplementeerd en gecorrigeerd (KI-011)
-- Stripe webhook handler — geïmplementeerd met idempotency (TEST-003 nog open)
+- Stripe webhook handler — geïmplementeerd met idempotency — TEST-003 BEVESTIGD WERKEND
 - Conversie-funnel volledig: modal signUp → verifyscherm → checkout → `/dashboard`
 - `EmailCheckoutModal` — geconsolideerd, signUp direct in modal, verifyscherm inline
 - `/register` pagina — fallback signup + checkout (pre-filled email/plan)
@@ -141,7 +141,7 @@ Nog te doen:
 
 - **ONTBREEKT**: Tests (unit, integratie, e2e) — regressions worden niet automatisch gedetecteerd
 - **ONBEKEND**: Deployment Vercel config — geen `vercel.json` aanwezig (DOC-001)
-- **NIET GETEST**: Stripe webhook delivery (TEST-003 — zie VOLGENDE GEPLANDE STAP)
+- **GETEST**: Stripe webhook delivery — TEST-003 BEVESTIGD WERKEND (2026-04-09)
 - **INFRA**: Custom SMTP niet ingesteld — Supabase ingebouwde mailservice heeft rate limits, niet geschikt voor productie. Supabase e-mailbevestiging is tijdelijk UITGESCHAKELD tijdens tests. Inschakelen zodra INFRA-001 gereed is.
 - **NIET AANGEMAAKT**: Stripe coupon `ONETIMECREDIT` bestaat alleen in test mode. Vóór live launch: live mode equivalent aanmaken + env var updaten.
 - **ONBEKEND**: E-mail digest triggers — geen cron job gevonden voor Resend digests
@@ -166,7 +166,7 @@ Nog te doen:
 |---|---|---|---|
 | Supabase Auth + DB | JA | JA | BEVESTIGD |
 | Anthropic Claude Haiku | JA | JA | BEVESTIGD |
-| Stripe (checkout + webhook) | JA | JA | TEST-002 BEVESTIGD, TEST-003 OPEN |
+| Stripe (checkout + webhook) | JA | JA | TEST-002 + TEST-003 BEVESTIGD ✅ |
 | Resend (digest + upsell) | JA | JA | NEE |
 | Loops | JA | JA | NEE (dashboard config pending) |
 | PostHog | JA | JA | ONBEKEND |

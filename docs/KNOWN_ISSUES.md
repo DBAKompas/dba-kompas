@@ -55,10 +55,8 @@
 ---
 
 ### KI-007 — Stripe webhook niet live getest
-**Status:** DEELS OPGELOST (2026-04-09 middag) — infrastructuur gereed, delivery nog niet bevestigd
-**Impact:** Webhook infrastructuur volledig geconfigureerd. Signing en endpoint URL zijn ingesteld. End-to-end DB-schrijftest nog niet uitgevoerd.
-**Wat gedaan:** Stripe Dashboard webhook `dba-kompas-vercel-test` aangemaakt voor `https://dba-kompas.vercel.app/api/billing/webhook`, `STRIPE_WEBHOOK_SECRET` bijgewerkt in Vercel, redeployed.
-**Volgende stap:** Echte checkout uitvoeren + `billing_events` / `subscriptions` / `profiles` in Supabase verifiëren. Zie PROJECT_STATE.md → VOLGENDE GEPLANDE STAP.
+**Status:** OPGELOST — 2026-04-09
+**Wat gedaan:** Stripe Dashboard webhook `dba-kompas-vercel-test` aangemaakt, `STRIPE_WEBHOOK_SECRET` in Vercel gezet, echte checkout uitgevoerd. Alle drie DB-tabellen correct bijgewerkt: `billing_events` (checkout.session.completed + invoice.paid), `subscriptions` (status=active), `profiles` (gebruiker aanwezig).
 
 ---
 

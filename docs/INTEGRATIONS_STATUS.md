@@ -67,7 +67,7 @@
 | Huidige mode | TEST MODE (sk_test_..., pk_test_...) |
 | Subscription checkout | GEÏMPLEMENTEERD — TEST-002 BEVESTIGD WERKEND |
 | One-time checkout | GEÏMPLEMENTEERD — env var bug OPGELOST (KI-011) |
-| Webhook handler | GEÏMPLEMENTEERD (met idempotency) — TEST-003 INFRA GEREED, DELIVERY OPEN |
+| Webhook handler | GEÏMPLEMENTEERD (met idempotency) — TEST-003 BEVESTIGD WERKEND ✅ |
 | Customer portal | GEÏMPLEMENTEERD |
 | Entitlement check | GEÏMPLEMENTEERD (`modules/billing/entitlements.ts`) |
 | `trialing` als actief plan | JA — OPGELOST (KI-012) |
@@ -93,7 +93,7 @@ STRIPE_COUPON_ONE_TIME_UPGRADE=ONETIMECREDIT
 - URL: `https://dba-kompas.vercel.app/api/billing/webhook`
 - Events: 5 (checkout.session.completed, customer.subscription.updated, customer.subscription.deleted, invoice.paid, invoice.payment_failed)
 - Status: aangemaakt 2026-04-09, signing secret in Vercel gezet, redeployed
-- Delivery: nog niet bevestigd (echte checkout nog niet gedaan)
+- Delivery: BEVESTIGD WERKEND (2026-04-09) — billing_events + subscriptions + profiles correct bijgewerkt
 
 **Volgende stap:** TEST-003 voltooien — echte checkout + Supabase verificatie. Zie PROJECT_STATE.md.
 
