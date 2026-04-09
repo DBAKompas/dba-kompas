@@ -56,14 +56,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ url: session.url })
   } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error)
-    const stripeCode = (error as Record<string, unknown>)?.code
-    const stripeType = (error as Record<string, unknown>)?.type
     console.error('Checkout error:', error)
-    // TODO: verwijder debug-details na diagnose
-    return NextResponse.json({
-      error: 'Internal server error',
-      debug: { message: msg, code: stripeCode, type: stripeType }
-    }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
