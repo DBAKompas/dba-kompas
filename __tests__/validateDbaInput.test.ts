@@ -129,7 +129,8 @@ describe('validateDbaInput', () => {
   })
 
   it('retourneert juiste charCount en wordCount', () => {
-    const text = 'één twee drie ' + makeText(900)
+    // makeText(1500) geeft ~210 woorden (ruim boven de drempel van 120)
+    const text = makeText(1500)
     const result = validateDbaInput(text)
     expect(result.charCount).toBe(text.length)
     expect(result.wordCount).toBeGreaterThan(INTAKE_THRESHOLDS.HARD_FAIL_WORDS)
