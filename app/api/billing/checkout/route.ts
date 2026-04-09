@@ -29,7 +29,8 @@ export async function POST(request: Request) {
 
     const sessionParams: Record<string, unknown> = {
       mode: checkoutMode,
-      payment_method_types: ['card', 'ideal'],
+      // payment_method_types bewust weggelaten: Stripe beheert dit automatisch op basis van mode.
+      // iDEAL werkt niet voor subscription mode en mag hier niet worden meegegeven.
       line_items: [{ price: effectivePriceId, quantity: 1 }],
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
