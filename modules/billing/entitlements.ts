@@ -8,15 +8,28 @@ export async function getUserPlan(): Promise<Plan> {
 
   if (!user) return 'free'
 
+  // Check actief abonnement (maandelijks of jaarlijks)
   const { data: subscription } = await supabase
     .from('subscriptions')
     .select('status, plan')
     .eq('user_id', user.id)
     .single()
 
-  if (!subscription || (subscription.status !== 'active' && subscription.status !== 'trialing')) return 'free'
+  if (subscription && (subscription.status === 'active' || subscription.status === 'trialing')) {
+    return 'pro'
+  }
 
-  return 'pro'
+  // Check eenmalige aankoop
+  const { data: oneTimePurchase } = await supabase
+    .from('one_time_purchases')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('status', 'purchased')
+    .maybeSingle()
+
+  if (oneTimePurchase) return 'pro'
+
+  return 'free'
 }
 
 export async function requirePlan(plan: Plan): Promise<boolean> {

@@ -15,7 +15,7 @@ import {
   Loader2,
   ExternalLink,
 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import BrandLogo from '@/components/marketing/BrandLogo'
 
@@ -29,12 +29,33 @@ const navItems = [
   { href: '/profiel',      label: 'Profiel',       icon: User },
 ]
 
+// Routes die altijd toegankelijk zijn, ook zonder betaald plan
+const PAYWALL_EXEMPT = ['/profiel']
+
 function AppShell({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth()
+  const { user, loading, plan, planLoading } = useAuth()
   const pathname = usePathname()
   const router = useRouter()
 
-  if (loading) {
+  // Redirect naar login als niet ingelogd
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login')
+    }
+  }, [loading, user, router])
+
+  // Paywall: redirect naar /upgrade als ingelogd maar geen betaald plan
+  useEffect(() => {
+    if (!loading && !planLoading && user && plan === 'free') {
+      const exempt = PAYWALL_EXEMPT.some(p => pathname === p || pathname.startsWith(p + '/'))
+      if (!exempt) {
+        router.push('/upgrade')
+      }
+    }
+  }, [loading, planLoading, user, plan, pathname, router])
+
+  // Toon spinner zolang auth of plan nog laden
+  if (loading || planLoading) {
     return (
       <div className="flex h-screen items-center justify-center bg-background">
         <Loader2 className="size-7 animate-spin text-primary/40" />
@@ -43,12 +64,23 @@ function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   if (!user) {
-    router.push('/login')
     return (
       <div className="flex h-screen items-center justify-center bg-background">
         <Loader2 className="size-7 animate-spin text-primary/40" />
       </div>
     )
+  }
+
+  // Toon spinner als plan 'free' is en we gaan redirecten (niet op vrijgestelde routes)
+  if (plan === 'free') {
+    const exempt = PAYWALL_EXEMPT.some(p => pathname === p || pathname.startsWith(p + '/'))
+    if (!exempt) {
+      return (
+        <div className="flex h-screen items-center justify-center bg-background">
+          <Loader2 className="size-7 animate-spin text-primary/40" />
+        </div>
+      )
+    }
   }
 
   const handleLogout = async () => {
@@ -94,7 +126,6 @@ function AppShell({ children }: { children: React.ReactNode }) {
 
         {/* Footer */}
         <div className="border-t border-border/40 p-3 space-y-1">
-          {/* Terug naar site */}
           <a
             href="https://dbakompas.nl"
             target="_blank"
@@ -104,7 +135,6 @@ function AppShell({ children }: { children: React.ReactNode }) {
             <ExternalLink className="size-3.5 flex-shrink-0" />
             Terug naar website
           </a>
-          {/* Uitloggen */}
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
@@ -112,7 +142,6 @@ function AppShell({ children }: { children: React.ReactNode }) {
             <LogOut className="size-4 flex-shrink-0" />
             Uitloggen
           </button>
-          {/* User email */}
           {user.email && (
             <p className="px-3 pt-1 text-[11px] text-muted-foreground/40 truncate">{user.email}</p>
           )}

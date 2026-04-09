@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe/client'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { sendLoopsEvent, updateLoopsContact } from '@/lib/loops'
+import { sendOneTimeUpsellEmail } from '@/modules/email/send'
 import type Stripe from 'stripe'
 
 export async function POST(request: Request) {
@@ -116,12 +117,18 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
     const email = await getUserEmailById(userId)
     if (email) {
-      await sendLoopsEvent('one_time_purchase', {
-        email,
-        userId,
-        properties: { product_type: productType },
-        dedupKey: session.id,
-      })
+      await Promise.all([
+        sendLoopsEvent('one_time_purchase', {
+          email,
+          userId,
+          properties: { product_type: productType },
+          dedupKey: session.id,
+        }),
+        // Upsell e-mail: korting eerste maand bij upgrade naar maandabonnement
+        sendOneTimeUpsellEmail(email).catch(err =>
+          console.error('Upsell e-mail kon niet worden verstuurd:', err)
+        ),
+      ])
     }
     return
   }
