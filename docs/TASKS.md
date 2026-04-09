@@ -48,7 +48,10 @@
   - `analyzeDbaText`: insufficient_input zonder API-aanroep, happy path, riskLabel, retry bij ongeldige JSON, dubbele mislukking → FALLBACK, netwerkfout → FALLBACK, code fences, followUpQuestions, bedrijfstakcontext, coercering ongeldig label, model/max_tokens verificatie
   - `generateAssignmentDraft`: compact/full mode, max_tokens 700/2000, standaard compact, API-fout → FALLBACK, retry dubbele mislukking → FALLBACK, reusableBuildingBlocks arrays, model verificatie
   - Mock strategie: `vi.hoisted(() => vi.fn())` + `vi.mock('@anthropic-ai/sdk')` — omzeilt module-level singleton
-- [ ] **DOC-001**: Vercel deployment configuratie vastleggen (`vercel.json` + env vars documenteren)
+- [x] **DOC-001**: Vercel deployment configuratie vastleggen ✓ (2026-04-09)
+  - `vercel.json` aangemaakt: regio `fra1` (Frankfurt, GDPR), www-redirect naar canonical domein
+  - `docs/DEPLOYMENT.md` aangemaakt: alle env vars, Stripe webhook config, productielaunch checklist
+  - `.env.local.example` gecorrigeerd: `STRIPE_UPGRADE_CREDIT_COUPON_ID` → `STRIPE_COUPON_ONE_TIME_UPGRADE`
 
 ### LAAG (verbetering)
 
