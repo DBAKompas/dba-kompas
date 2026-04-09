@@ -101,6 +101,33 @@
 
 ---
 
+### KI-014 — `/register`, `/auth/signup`, `/checkout-redirect` bestonden niet
+**Status:** OPGELOST — 2026-04-09
+**Bestanden:** `app/register/page.tsx`, `app/auth/signup/page.tsx`, `app/checkout-redirect/page.tsx` (NIEUW)
+**Symptoom:** `EmailCheckoutModal` redirect naar `/register?email=...&plan=...` gaf 404. QuickScan "Ga verder" knop (`/auth/signup`) gaf 404. Volledige conversie-funnel was gebroken.
+**Fix:**
+- `app/register/page.tsx`: volledig signup+checkout formulier, pre-filled email/plan, Supabase signUp, directe checkout bij geen e-mailverificatie, emailRedirectTo naar `/checkout-redirect` bij verificatie vereist
+- `app/checkout-redirect/page.tsx`: auto-triggert checkout API na emailverificatie (`/auth/callback?next=/checkout-redirect?plan=...`)
+- `app/auth/signup/page.tsx`: server-side redirect naar `/login`
+
+---
+
+### KI-015 — `cancel_url` in checkout routes wees naar `/pricing` (404)
+**Status:** OPGELOST — 2026-04-09
+**Bestanden:** `app/api/billing/checkout/route.ts`, `app/api/one-time/checkout/route.ts`
+**Symptoom:** Na annuleren van Stripe checkout landde gebruiker op 404 (`/pricing` bestaat niet als route).
+**Fix:** `cancel_url` gewijzigd naar `/dashboard` in beide checkout routes.
+
+---
+
+### KI-016 — Checkout API accepteerde alleen `priceId`, niet `plan`
+**Status:** OPGELOST — 2026-04-09
+**Bestand:** `app/api/billing/checkout/route.ts`
+**Symptoom:** Client moest Stripe price IDs kennen om checkout te starten — niet beveiligd.
+**Fix:** `plan: 'monthly' | 'yearly'` toegevoegd als alternatief voor `priceId`. Server zoekt priceId op via env vars (`STRIPE_PRICE_ID_MONTHLY`, `STRIPE_PRICE_ID_YEARLY`). Backwards compatible — `priceId` werkt nog steeds.
+
+---
+
 ### KI-013 — Loops deduplicatie is in-memory
 **Status:** OPEN (low priority)
 **Bestand:** `lib/loops/index.ts`

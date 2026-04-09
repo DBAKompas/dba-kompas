@@ -27,7 +27,7 @@ export async function POST(request: Request) {
       payment_method_types: ['card', 'ideal'],
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?one_time=success&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
       metadata: {
         user_id: user.id,
         product_type: 'one_time_dba',

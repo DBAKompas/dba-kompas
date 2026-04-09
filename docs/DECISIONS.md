@@ -124,6 +124,29 @@ Elke beslissing bevat: datum, beslissing, reden, alternatieven overwogen.
 
 ---
 
+## 2026-04-09 — Conversie-funnel architectuur
+
+**Beslissing:** De registratie- en checkout-flow loopt als volgt:
+
+1. **Landing page** → gebruiker klikt op plan → `EmailCheckoutModal` opent
+2. **`EmailCheckoutModal`** → stap 1: plan-selectie, stap 2: email + wachtwoord → redirect naar `/register?email=...&plan=...`
+3. **`/register`** → toont plan-info, pre-filled email, nieuw wachtwoord → `supabase.auth.signUp()`
+   - Geen e-mailverificatie vereist → directe checkout via API → Stripe
+   - E-mailverificatie vereist → "check je e-mail" scherm; `emailRedirectTo` → `/auth/callback?next=/checkout-redirect?plan=...`
+4. **`/checkout-redirect`** → auto-POST naar checkout API → Stripe
+5. **Stripe checkout** → betaald → `/dashboard?session_id=...` → groen succesbericht
+
+**Reden:**
+- `/register` en `/checkout-redirect` bestonden niet — complete 404 voor elke nieuwe gebruiker
+- Checkout API accepteerde alleen `priceId` (client moest price IDs kennen) — vervangen door `plan`-naam die server opzoekt
+- `cancel_url` → `/pricing` (404) → gecorrigeerd naar `/dashboard`
+
+**Alternatieven overwogen:**
+- Modal direct signUp + checkout: zou vereisen dat modal API-aanroepen maakt en Supabase session afhandelt — te complex voor een client-modal component
+- Aparte `/api/auth/register` endpoint: onnodige complexiteit — Supabase client-side signUp werkt prima
+
+---
+
 ## 2026-04-08 — `trialing` telt als actief Pro-plan
 
 **Beslissing:** `getUserPlan()` in `modules/billing/entitlements.ts` herkent `trialing` als actieve Pro-status, naast `active`.

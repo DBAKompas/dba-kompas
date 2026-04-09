@@ -11,10 +11,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { priceId, mode } = await request.json()
+    const { priceId, plan, mode } = await request.json()
 
-    if (!priceId) {
-      return NextResponse.json({ error: 'priceId is required' }, { status: 400 })
+    // Resolve priceId from plan name if not provided directly
+    let effectivePriceId = priceId
+    if (!effectivePriceId && plan) {
+      if (plan === 'monthly') effectivePriceId = process.env.STRIPE_PRICE_ID_MONTHLY
+      else if (plan === 'yearly') effectivePriceId = process.env.STRIPE_PRICE_ID_YEARLY
+    }
+
+    if (!effectivePriceId) {
+      return NextResponse.json({ error: 'priceId or plan is required' }, { status: 400 })
     }
 
     // Support both subscription and one-time payment modes
@@ -23,9 +30,9 @@ export async function POST(request: Request) {
     const sessionParams: Record<string, unknown> = {
       mode: checkoutMode,
       payment_method_types: ['card', 'ideal'],
-      line_items: [{ price: priceId, quantity: 1 }],
+      line_items: [{ price: effectivePriceId, quantity: 1 }],
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
       metadata: { user_id: user.id },
     }
 

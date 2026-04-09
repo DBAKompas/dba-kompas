@@ -43,6 +43,16 @@
 
 ## DONE
 
+### Sessie 2026-04-09 — Conversie-funnel hersteld
+
+- [x] **FIX-014**: `app/register/page.tsx` gebouwd — volledig signup + Stripe checkout formulier; pre-filled email/plan; directe checkout bij sessie, emailRedirectTo bij verificatie vereist
+- [x] **FIX-015**: `app/checkout-redirect/page.tsx` gebouwd — auto-triggert checkout na e-mailverificatie via `/auth/callback?next=...` flow
+- [x] **FIX-016**: `app/auth/signup/page.tsx` gebouwd — server redirect naar `/login` (target van QuickScan success screen)
+- [x] **FIX-017**: `/api/billing/checkout` uitgebreid met `plan`-lookup (`monthly` → `STRIPE_PRICE_ID_MONTHLY`, `yearly` → `STRIPE_PRICE_ID_YEARLY`) — backwards compatible
+- [x] **FIX-018**: `cancel_url` in `/api/billing/checkout` en `/api/one-time/checkout` gecorrigeerd van `/pricing` (404) naar `/dashboard`
+
+---
+
 ### Sessie 2026-04-08 — Stripe fixes + Loops quick-scan + PDF
 
 - [x] **FIX-010**: `buildFollowUpQuestions` import ontbrak in `dbaAnalysis.ts` → elke analyse gaf "Internal server error" (commit `92ea711`)

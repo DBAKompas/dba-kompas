@@ -1,6 +1,6 @@
 # PROJECT_STATE.md
-**Laatst bijgewerkt:** 2026-04-08
-**Maturity:** 85%
+**Laatst bijgewerkt:** 2026-04-09
+**Maturity:** 88%
 
 ---
 
@@ -10,33 +10,42 @@ DBA Kompas is een Next.js 16.2 SaaS applicatie die opdrachtomschrijvingen analys
 
 ---
 
-## LAATSTE ACTIE (2026-04-08)
+## LAATSTE ACTIE (2026-04-09)
 
-**Commit:** `ae44683` — fix: Stripe checkout succesbericht, trialing plan, env var naam
+**Taak:** FIX-CONV — volledige conversie-funnel hersteld
 
 **Wat is er gedaan:**
-- Dashboard toont groen succesbericht na geslaagde subscription of one-time checkout (detecteert `?session_id=` URL param, cleant daarna de URL)
-- `entitlements.ts`: `trialing` status telt nu ook als actief Pro-plan (was bug: trial users kregen 'free')
-- `app/api/one-time/checkout/route.ts`: `STRIPE_ONE_TIME_DBA_PRICE_ID` → `STRIPE_PRICE_ID_ONE_TIME` (was kritieke mismatch met `.env.local` — one-time checkout zou altijd 500 geven)
+- `app/register/page.tsx` gebouwd — volledig signup + checkout formulier (target van `EmailCheckoutModal`)
+- `app/checkout-redirect/page.tsx` gebouwd — auto-triggert checkout na e-mailverificatie
+- `app/auth/signup/page.tsx` gebouwd — server redirect naar `/login` (target van QuickScan success)
+- `app/api/billing/checkout/route.ts` uitgebreid met `plan`-lookup (backwards compatible)
+- `cancel_url` in beide checkout routes gecorrigeerd van `/pricing` (404) naar `/dashboard`
 
-**Volledige lijst van commits deze sessie (2026-04-08):**
+**Eerder deze sessie (commits 2026-04-08):**
 | Commit | Beschrijving |
 |---|---|
-| `92ea711` | fix: `buildFollowUpQuestions` import ontbrak in `dbaAnalysis.ts` — elke analyse gaf "Internal server error" |
-| `910ce2d` | fix: PDF toont leesbare drafttekst i.p.v. ruwe JSON; quick scan via Haiku |
-| `b1569d3` | fix: pdfkit toegevoegd aan `serverExternalPackages` in `next.config.ts` |
+| `92ea711` | fix: `buildFollowUpQuestions` import ontbrak in `dbaAnalysis.ts` |
+| `910ce2d` | fix: PDF toont leesbare drafttekst i.p.v. ruwe JSON |
+| `b1569d3` | fix: pdfkit toegevoegd aan `serverExternalPackages` |
 | `a8c4268` | fix: PDF logo, domeinnamen, betere lege tekst, full draft max_tokens 2000 |
-| `a5bff30` | refactor: volledige PDF redesign — compact, 1 pagina, vaste uitlijning, cream achtergrond |
+| `a5bff30` | refactor: volledige PDF redesign |
 | `7c13cc5` | feat: Loops quick-scan endpoint + success screen knoppen werkend |
 | `ae44683` | fix: Stripe checkout succesbericht, trialing plan, env var naam |
+| `3cf2a24` | docs: volledige sessiesynchronisatie 2026-04-08 |
 
 ---
 
 ## LAATSTE WIJZIGING IN CODE
 
-**Bestand:** `app/(app)/dashboard/page.tsx`, `modules/billing/entitlements.ts`, `app/api/one-time/checkout/route.ts`
+**Bestanden:**
+- `app/register/page.tsx` — NIEUW
+- `app/checkout-redirect/page.tsx` — NIEUW
+- `app/auth/signup/page.tsx` — NIEUW
+- `app/api/billing/checkout/route.ts` — plan-lookup + cancel_url fix
+- `app/api/one-time/checkout/route.ts` — cancel_url fix
+
 **Branch:** `main`
-**Status:** Gecommit, nog niet gedeployed
+**Status:** Gereed voor commit
 
 ---
 
@@ -45,10 +54,16 @@ DBA Kompas is een Next.js 16.2 SaaS applicatie die opdrachtomschrijvingen analys
 **TEST-002: Stripe betalingsflow live testen in test mode**
 
 Instructies (gereed):
-1. Zet Stripe test-keys in Vercel omgevingsvariabelen (`STRIPE_SECRET_KEY=sk_test_...`, `STRIPE_PRICE_ID_MONTHLY`, `STRIPE_PRICE_ID_YEARLY`, `STRIPE_PRICE_ID_ONE_TIME`)
+1. Zet Stripe test-keys in Vercel omgevingsvariabelen:
+   - `STRIPE_SECRET_KEY=sk_test_...`
+   - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...`
+   - `STRIPE_WEBHOOK_SECRET=whsec_...`
+   - `STRIPE_PRICE_ID_MONTHLY=price_...`
+   - `STRIPE_PRICE_ID_YEARLY=price_...`
+   - `STRIPE_PRICE_ID_ONE_TIME=price_...`
 2. Deploy naar Vercel (auto-deploy bij push naar `main`)
-3. Log in als niet-betaalde testgebruiker → ga naar `/pricing`
-4. Klik op een abonnement → Stripe Checkout opent
+3. Ga naar de landingspagina → klik op een plan → `EmailCheckoutModal` → vul email/wachtwoord in → doorgestuurd naar `/register`
+4. Op `/register`: wachtwoord invullen → "Account aanmaken & betalen" → Stripe Checkout opent
 5. Gebruik testkaart `4242 4242 4242 4242`, vervaldatum in de toekomst, willekeurige CVC
 6. Na betaling: verwacht groen succesbericht op `/dashboard`
 
@@ -79,7 +94,10 @@ Instructies (gereed):
 - Fase 2 draft API endpoint (`POST /api/dba/analyse/[id]/draft?mode=compact|full`)
 - PDF rapport generatie — correct opgemaakt, leesbare tekst, consistente layout (lib/pdf/generate.ts)
 - Rate limiting op analyse endpoint (free: 20/dag, pro: 100/dag, enterprise: 500/dag)
-- Stripe betalingen (subscriptions + one-time) — code klaar, klaar voor live tests
+- Stripe betalingen (subscriptions + one-time) — code klaar, conversie-funnel volledig, klaar voor live tests
+- Registratiepagina (`/register`) — signup + plan-selectie + directe Stripe checkout
+- Checkout-redirect pagina (`/checkout-redirect`) — post-emailverificatie checkout trigger
+- `/auth/signup` — server redirect naar `/login` (QuickScan target)
 - Dashboard succesbericht na geslaagde betaling
 - `trialing` status herkend als actief Pro-plan
 - Newsfeed, notificaties, documentbeheer
