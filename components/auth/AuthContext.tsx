@@ -1,6 +1,7 @@
 'use client'
 import { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import posthog from 'posthog-js'
 import type { User } from '@supabase/supabase-js'
 
 export type Plan = 'free' | 'pro' | 'enterprise'
@@ -28,13 +29,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [planLoading, setPlanLoading] = useState(true)
   const supabase = createClient()
 
-  const fetchPlan = useCallback(async () => {
+  const fetchPlan = useCallback(async (userId?: string, email?: string) => {
     setPlanLoading(true)
     try {
       const res = await fetch('/api/user/plan')
       if (res.ok) {
         const data = await res.json()
-        setPlan(data.plan ?? 'free')
+        const resolvedPlan: Plan = data.plan ?? 'free'
+        setPlan(resolvedPlan)
+
+        // PostHog: plan als person property bijwerken
+        if (userId) {
+          posthog.identify(userId, { email })
+          posthog.setPersonPropertiesForFlags({ plan: resolvedPlan })
+          posthog.setPersonProperties({ plan: resolvedPlan })
+        }
       } else {
         setPlan('free')
       }
@@ -50,20 +59,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(user)
       setLoading(false)
       if (user) {
-        fetchPlan()
+        // PostHog: identify terugkerende gebruiker bij app-load
+        posthog.identify(user.id, { email: user.email })
+        fetchPlan(user.id, user.email)
       } else {
         setPlan(null)
         setPlanLoading(false)
       }
     })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null)
       if (session?.user) {
-        fetchPlan()
+        posthog.identify(session.user.id, { email: session.user.email })
+        fetchPlan(session.user.id, session.user.email)
       } else {
         setPlan(null)
         setPlanLoading(false)
+        // PostHog: reset na uitloggen zodat de volgende sessie anoniem start
+        if (event === 'SIGNED_OUT') {
+          posthog.reset()
+        }
       }
     })
 
@@ -71,7 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [fetchPlan])
 
   return (
-    <AuthContext.Provider value={{ user, loading, plan, planLoading, refreshPlan: fetchPlan }}>
+    <AuthContext.Provider value={{ user, loading, plan, planLoading, refreshPlan: () => fetchPlan(user?.id, user?.email) }}>
       {children}
     </AuthContext.Provider>
   )
