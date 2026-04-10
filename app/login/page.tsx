@@ -1,7 +1,7 @@
 'use client'
 
 import { createClient } from '@/lib/supabase/client'
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Check } from 'lucide-react'
 import BrandLogo from '@/components/marketing/BrandLogo'
@@ -20,7 +20,7 @@ function inputCls(error?: boolean) {
   ].join(' ')
 }
 
-export default function LoginPage() {
+function LoginPageContent() {
   const [email, setEmail]         = useState('')
   const [password, setPassword]   = useState('')
   const [showPw, setShowPw]           = useState(false)
@@ -201,5 +201,13 @@ export default function LoginPage() {
         />
       )}
     </main>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginPageContent />
+    </Suspense>
   )
 }
