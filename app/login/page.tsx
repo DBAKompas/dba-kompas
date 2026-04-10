@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/client'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Check } from 'lucide-react'
 import BrandLogo from '@/components/marketing/BrandLogo'
 import Link from 'next/link'
@@ -31,6 +31,8 @@ export default function LoginPage() {
   const [checkoutOpen, setCheckoutOpen] = useState(false)
   const supabase = createClient()
   const router   = useRouter()
+  const searchParams = useSearchParams()
+  const nextPath = searchParams.get('next') ?? '/dashboard'
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
@@ -42,7 +44,7 @@ export default function LoginPage() {
       if (error) {
         setError('Ongeldig e-mailadres of wachtwoord.')
       } else {
-        router.push('/dashboard')
+        router.push(nextPath)
       }
     } else {
       const { error } = await supabase.auth.signInWithOtp({

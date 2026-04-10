@@ -4,13 +4,15 @@ import { NextResponse, type NextRequest } from 'next/server'
 // Routes die altijd toegankelijk zijn zonder inloggen
 const PUBLIC_ROUTES = [
   '/login',
-  '/auth/callback',
+  '/register',
+  '/auth/',
   '/api/billing/webhook',
   '/',
   '/algemene-voorwaarden',
   '/privacy-en-cookiebeleid',
   '/ai-data-use-notice',
   '/api/quick-scan',
+  '/api/loops/',
 ]
 
 export async function proxy(request: NextRequest) {
@@ -49,13 +51,15 @@ export async function proxy(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Niet-ingelogde gebruikers naar /login sturen
+  // Niet-ingelogde gebruikers naar /login sturen met ?next= voor redirect na inloggen
   if (!user) {
-    return NextResponse.redirect(new URL('/login', request.url))
+    const loginUrl = new URL('/login', request.url)
+    if (pathname !== '/') loginUrl.searchParams.set('next', pathname)
+    return NextResponse.redirect(loginUrl)
   }
 
   // Ingelogde gebruikers die /login bezoeken naar /dashboard sturen
-  if (user && pathname === '/login') {
+  if (pathname === '/login') {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
