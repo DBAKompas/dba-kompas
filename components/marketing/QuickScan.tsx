@@ -44,6 +44,12 @@ interface RiskResult {
   cta: string;
 }
 
+/** Copy for the success screen, tailored to risk level. */
+interface SuccessCopy {
+  headline: string;
+  body: string;
+}
+
 /** Payload emitted on form submission — ready for Loops / analytics / API. */
 interface QuickScanPayload {
   eventName: "quick_scan_completed";
@@ -125,6 +131,25 @@ const QUESTIONS: Question[] = [
 // ─────────────────────────────────────────────
 // Result copy & styles
 // ─────────────────────────────────────────────
+
+// ─────────────────────────────────────────────
+// Success screen copy (per risk level)
+// ─────────────────────────────────────────────
+
+const SUCCESS_COPY: Record<RiskLevel, SuccessCopy> = {
+  low: {
+    headline: "Je scoort laag risico — maar details bepalen of de Belastingdienst het daarmee eens is",
+    body: "Een volledige analyse brengt precies in kaart wat er goed staat en waar je formulering nog sterker kan. Zo ga je het gesprek met vertrouwen in.",
+  },
+  medium: {
+    headline: "Je opdracht heeft risicofactoren die bij een beoordeling vragen oproepen",
+    body: "Een analyse helpt je zien wat je kunt aanpassen — vóórdat een inspecteur dat voor je doet. Kleine aanpassingen maken een groot verschil.",
+  },
+  high: {
+    headline: "Je opdracht toont meerdere kenmerken van afhankelijkheid. Dat kan duur worden.",
+    body: "Naheffingen, boetes en terugvorderingen zijn reëel. Een analyse wijst exact uit wat je nú kunt aanpassen om je positie te versterken.",
+  },
+};
 
 const RISK_RESULTS: Record<RiskLevel, RiskResult> = {
   low: {
@@ -323,8 +348,12 @@ export default function QuickScan() {
       });
 
       if (!res.ok) throw new Error("request_failed");
-      // PostHog: quick scan volledig voltooid (naam + email ingevuld, naar Loops gestuurd)
-      posthog?.capture('quick_scan_completed', {
+      // PostHog: e-mail ingediend → persoon identificeren + event loggen
+      posthog?.identify(payload.email, {
+        email: payload.email,
+        firstName: payload.firstName,
+      });
+      posthog?.capture('quick_scan_email_submitted', {
         risk_level: payload.riskLevel,
         score: payload.score,
       });
@@ -343,50 +372,73 @@ export default function QuickScan() {
   // ── Render: success screen ──
 
   if (phase === "success") {
+    const successCopy = SUCCESS_COPY[riskLevel];
+    const encodedEmail = encodeURIComponent(email);
+
     return (
       <div className="w-full max-w-xl mx-auto" data-testid="quickscan-success">
         <motion.div {...fadeUp} className="bg-card border border-border/50 rounded-2xl shadow-lg overflow-hidden">
-          <div className="px-6 pt-6 pb-2">
-            <span className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full border bg-green-50 border-green-200 text-green-700">
-              <CheckCircle className="w-3.5 h-3.5" />
+          <div className="px-6 pt-6 pb-2 flex items-center gap-2">
+            <span className={`inline-block text-xs font-bold px-3 py-1 rounded-full border ${riskResult.badgeStyle}`}>
+              {riskResult.badge}
+            </span>
+            <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full bg-green-50 border border-green-200 text-green-700">
+              <CheckCircle className="w-3 h-3" />
               Opgeslagen
             </span>
           </div>
 
-          <div className="px-6 py-5">
-            <h3 className="text-xl font-bold text-foreground mb-3 leading-snug">
-              Je quick scan is opgeslagen
+          <div className="px-6 pt-4 pb-5">
+            <h3 className="text-xl font-bold text-foreground mb-2 leading-snug">
+              {successCopy.headline}
             </h3>
             <p className="text-muted-foreground text-sm leading-relaxed mb-6">
-              We gebruiken je uitkomst om je gerichter te helpen met de volgende stap.
+              {successCopy.body}
             </p>
 
+            {/* Primary CTA: eenmalige check */}
             <div className="flex flex-col gap-3">
-              <Button
-                size="lg"
-                className="w-full h-12 text-base font-semibold"
-                onClick={() => {
-                  posthog?.capture('quick_scan_signup_clicked', { source: 'success_screen' });
-                  router.push("/auth/signup");
-                }}
-                data-testid="button-go-full-analysis"
-              >
-                Ga verder met de volledige analyse
-                <ArrowRight className="w-4 h-4 ml-1" />
-              </Button>
+              <div className="relative">
+                <span className="absolute -top-2.5 left-4 text-[11px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">
+                  Aanbevolen
+                </span>
+                <Button
+                  size="lg"
+                  className="w-full h-14 text-base font-semibold rounded-xl pt-1"
+                  onClick={() => {
+                    posthog?.capture('quick_scan_checkout_clicked', {
+                      plan: 'one_time_dba',
+                      risk_level: riskLevel,
+                    });
+                    router.push(`/register?plan=one_time_dba&email=${encodedEmail}`);
+                  }}
+                  data-testid="button-onetime-checkout"
+                >
+                  Analyseer mijn opdracht — €9,95
+                  <ArrowRight className="w-4 h-4 ml-1" />
+                </Button>
+              </div>
+
+              {/* Secondary CTA: maandabonnement */}
               <Button
                 variant="outline"
                 size="lg"
                 className="w-full h-12 text-base"
-                onClick={() => router.push("/#pricing")}
-                data-testid="button-nurture-only"
+                onClick={() => {
+                  posthog?.capture('quick_scan_checkout_clicked', {
+                    plan: 'monthly',
+                    risk_level: riskLevel,
+                  });
+                  router.push(`/register?plan=monthly&email=${encodedEmail}`);
+                }}
+                data-testid="button-monthly-checkout"
               >
-                Bekijk wat DBA Kompas biedt
+                Of start een maandabonnement — €20/maand
               </Button>
             </div>
 
             <p className="text-xs text-muted-foreground/70 italic border-l-2 border-border pl-3 mt-5">
-              De volledige analyse geeft je meer context, concrete verbeterpunten en een sterkere opdrachtomschrijving.
+              Je e-mailadres is opgeslagen. Je ontvangt ook aanvullende tips die aansluiten op je uitkomst.
             </p>
           </div>
         </motion.div>
