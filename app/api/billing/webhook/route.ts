@@ -124,6 +124,10 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           properties: { product_type: productType },
           dedupKey: session.id,
         }),
+        updateLoopsContact(email, {
+          plan: 'one_time',
+          subscription_status: 'active',
+        }, `one-time-${userId}`),
         // Upsell e-mail: korting eerste maand bij upgrade naar maandabonnement
         sendOneTimeUpsellEmail(email).catch(err =>
           console.error('Upsell e-mail kon niet worden verstuurd:', err)
@@ -217,8 +221,14 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
 
   const email = await getUserEmailById(existingSub.user_id)
   if (email) {
+    const loopsStatus =
+      subscription.status === 'active' || subscription.status === 'trialing'
+        ? 'active'
+        : subscription.status === 'canceled'
+          ? 'canceled'
+          : 'inactive'
     await updateLoopsContact(email, {
-      subscription_status: subscription.status === 'active' ? 'active' : 'inactive',
+      subscription_status: loopsStatus,
       plan: plan as 'monthly' | 'yearly',
     }, `sub-update-${subscription.id}-${subscription.status}`)
   }
