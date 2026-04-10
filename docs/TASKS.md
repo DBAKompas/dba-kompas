@@ -1,5 +1,5 @@
 # TASKS.md
-**Laatst bijgewerkt:** 2026-04-09 (laat)
+**Laatst bijgewerkt:** 2026-04-10 (sessie 2 — avond)
 
 ---
 
@@ -56,24 +56,40 @@
 ### LAAG (verbetering)
 
 - [ ] **INFRA-001**: Custom SMTP instellen voor auth-e-mails — **IN PROGRESS, HANDMATIGE ACTIE**
-  - **HUIDIGE STATUS (einde sessie 2026-04-09):**
-    - Resend domein `dbakompas.nl` toegevoegd (Ireland eu-west-1)
-    - STRATO DNS: DKIM TXT (`resend._domainkey`) + SPF TXT (`send`) records toegevoegd
-    - SPF TXT had fout (`=spf1` i.p.v. `v=spf1`) → gecorrigeerd
-    - Resend verificatie herstart → status: **Pending** (DNS propagatie loopt nog bij STRATO)
-    - MX record bewust overgeslagen (niet nodig voor verzenden, zou STRATO mail breken)
+  - **HUIDIGE STATUS (2026-04-10):**
+    - DNS migratie naar Cloudflare gestart (STRATO kon geen subdomain MX)
+    - Cloudflare: domein toegevoegd, alle records geïmporteerd, Resend MX record toegevoegd (`send` → amazonses.com, prio 10)
+    - STRATO DNSSEC: deactivatie aangevraagd, status "Wordt gedeactiveerd" (verwerking loopt)
+    - Nameserver-wissel nog niet doorgevoerd — wacht op DNSSEC deactivatie
   - **VOLGENDE ACTIE bij hervatten:**
-    1. Ga naar resend.com/domains → `dbakompas.nl` → controleer status
-    2. Als Pending: klik "Restart verification" → wacht op Verified
-    3. Als Verified: ga naar Supabase → Authentication → Settings → SMTP Settings
-    4. Vul in: host `smtp.resend.com`, port `465`, user `resend`, password = Resend API key, sender `DBA Kompas <noreply@dbakompas.nl>`
-    5. Zet "Enable email confirmations" aan in Supabase Auth Settings
-    6. Test: nieuw account aanmaken → verificatiemail van `noreply@dbakompas.nl` ontvangen
+    1. Check STRATO → DNS → DNSSEC: is status verdwenen of "Niet actief"?
+    2. Zo ja: STRATO → DNS → NS-record → "Eigen nameservers" → `brett.ns.cloudflare.com` + `peaches.ns.cloudflare.com` → opslaan
+    3. Cloudflare: klik "I updated my nameservers"
+    4. Wacht op DNS propagatie + Cloudflare activatie (15 min tot 24 uur)
+    5. Resend: herstart domeinverificatie → wacht op DKIM + SPF + MX alle Verified
+    6. Supabase SMTP: host `smtp.resend.com`, port `465`, user `resend`, password = Resend API key, sender `DBA Kompas <noreply@dbakompas.nl>`
+    7. Supabase: zet "Enable email confirmations" aan
+    8. Test: nieuw account → verificatiemail van `noreply@dbakompas.nl`
+- [ ] **MAIL-001**: `info@dbakompas.nl` instellen in Apple Mail — **NIEUW**
+  - Doel: e-mail centraal ontvangen/versturen via Apple Mail i.p.v. STRATO webmail
+  - IMAP: `imap.strato.de`, poort `993`, SSL/TLS
+  - SMTP: `smtp.strato.de`, poort `465`, SSL/TLS
+  - Gebruikersnaam: `info@dbakompas.nl`, wachtwoord: STRATO e-mailwachtwoord
+  - Uitvoeren na voltooiing INFRA-001 (DNS stabiel)
 
-- [ ] **LOOPS-002**: Custom contactvelden instellen in Loops dashboard
-  - Vereist: handmatige actie in Loops dashboard (geen code)
-  - Velden: `quick_scan_completed` (boolean), `quick_scan_risk_level` (string), `quick_scan_score` (number)
-  - E-mailsequentie koppelen aan `quick_scan_completed` event
+- [~] **LOOPS-002**: Loops journeys aangemaakt — **GEDEELTELIJK KLAAR, wacht op livegang**
+  - Journey B "DBA Kompas — Quick Scan Gemiddeld risico": ACTIEF + GETEST ✅
+  - Journey A "DBA Kompas — Quick Scan Hoog risico": GEBOUWD, in Draft
+  - Journey C "DBA Kompas — Quick Scan Laag risico": GEBOUWD, in Draft
+  - **Resterende acties bij livegang op `dbakompas.nl`:**
+    1. Journey A + C activeren via "Resume" in Loops
+    2. In alle 9 emails CTA-URLs omzetten van `dba-kompas.vercel.app` naar `dbakompas.nl`
+    3. Oude loops verwijderen: `quick_scan_completed - high`, `quick_scan_completed - medium`, `quick_scan_completed - low`
+
+- [ ] **LOOPS-003**: Digest trigger mechanisme implementeren — **NIEUW**
+  - Probleem: `sendWeeklyDigest()` en `sendMonthlyDigest()` zijn geïmplementeerd in `modules/email/send.ts` maar er is geen cron job die ze aanroept
+  - Oplossing: Vercel Cron Job toevoegen (`vercel.json` uitbreiden) of externe scheduler (bijv. GitHub Actions, Supabase pg_cron)
+  - Prioriteit: LAAG — niet blokkerend voor MVP launch
 - [ ] **FEAT-002**: Admin panel voor contentbeheer (gidsen, nieuws)
 - [ ] **FEAT-003**: Gidsen content schrijven en vullen
 
@@ -187,11 +203,24 @@ Stripe webhook (checkout.session.completed, mode=payment)
 
 ## IN PROGRESS
 
-*(leeg)*
+- **INFRA-001**: DNS migratie naar Cloudflare — STRATO DNSSEC deactivatie afwachten, daarna NS-records wisselen. Zie TASKS.md LAAG sectie + PROJECT_STATE.md voor exacte stappen.
 
 ---
 
 ## DONE
+
+### Sessie 2026-04-10 (avond) — Loops e-mailsequenties v2 + journeys gebouwd
+
+- [x] **LOOPS-002 (deels)**: 9 e-mailsequenties herschreven (v2) — eerlijk over scan-beperkingen, urgentie, maandabonnement positionering
+- [x] **LOOPS-002 (deels)**: Journey B "DBA Kompas — Quick Scan Gemiddeld risico" aangemaakt, geconfigureerd en geactiveerd in Loops — Send test verstuurd en ontvangen ✅
+- [x] **LOOPS-002 (deels)**: Journey A "DBA Kompas — Quick Scan Hoog risico" gebouwd met volledige flow (in Draft — activeren bij livegang)
+- [x] **LOOPS-002 (deels)**: Journey C "DBA Kompas — Quick Scan Laag risico" gebouwd met volledige flow (in Draft — activeren bij livegang)
+- [x] **Loops flow-architectuur vastgesteld**: Branch + Audience filter (`subscription_status does not equal "active"`, All following nodes) als conversiestop — geen aparte Goal-functie in Loops
+- [x] **Loops CTA-buttons**: echte Button blocks in emails i.p.v. platte tekst-links
+- [x] **Register-link getest**: `/register?plan=one_time_dba&email=...` werkt correct (plan + email worden verwerkt), merge tag `{contact.email}` werkt alleen in echte verzonden mail
+- [x] **Loops merge tag syntax bevestigd**: `{contact.email}` (één haakjeset in editor), niet `{{contact.email}}`
+
+---
 
 ### Sessie 2026-04-09 — Conversie-funnel hersteld + modal geconsolideerd
 

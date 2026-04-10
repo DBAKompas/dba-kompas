@@ -1,6 +1,6 @@
 # KNOWN_ISSUES.md
 **Bekende problemen en bugs**
-**Laatst bijgewerkt:** 2026-04-09 (laat)
+**Laatst bijgewerkt:** 2026-04-10 (sessie 2 — avond)
 
 ---
 
@@ -141,3 +141,11 @@
 **Bestand:** `lib/loops/index.ts`
 **Symptoom:** De `Map`-based deduplicatie reset bij elke server-herstart. Bij hoge load of serverless cold starts kunnen dubbele Loops events worden gestuurd.
 **Actie:** Acceptabel voor huidige schaal. Bij problemen: Redis of Supabase-gebaseerde deduplicatie.
+
+---
+
+### KI-018 — Digest e-mails hebben geen trigger
+**Status:** OPEN (low priority)
+**Bestanden:** `modules/email/send.ts` — `sendWeeklyDigest()`, `sendMonthlyDigest()`
+**Symptoom:** Functies zijn geïmplementeerd maar er is geen cron job of scheduler die ze aanroept. Digests worden nooit verstuurd.
+**Actie (LOOPS-003):** Vercel Cron Job toevoegen in `vercel.json`, of externe scheduler (GitHub Actions, Supabase pg_cron). Niet blokkerend voor MVP-launch.

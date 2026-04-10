@@ -5,6 +5,71 @@ Elke beslissing bevat: datum, beslissing, reden, alternatieven overwogen.
 
 ---
 
+## 2026-04-10 — Loops conversiestop via Audience filter, niet via Goal
+
+**Beslissing:** Flow-stopzetting bij conversie (aankoop/abonnement) wordt geïmplementeerd via een `Audience filter` node na elke `Branch` node — niet via een aparte "Goal event" instelling.
+
+**Mechanisme:**
+- Na elke `Send email` node: `Branch (1 branch)` → `Audience filter: subscription_status does not equal "active"` (scope: All following nodes) → Timer → volgende email
+- Als `subscription_status` wijzigt naar `active` (via Stripe webhook → Loops contact update): contact passeert de Audience filter niet → flow stopt automatisch
+- De "active" tak van de Branch is verwijderd (was overbodig en veroorzaakte Loops-validatiefout)
+
+**Reden:**
+- Loops heeft geen aparte "Goal event" UI-knop die de flow stopt bij een event
+- De `subscription_status` contact property wordt al correct bijgewerkt vanuit de Stripe webhook (`handleCheckoutCompleted` → `updateLoopsContact`)
+- "All following nodes" scope zorgt dat conversie op elk punt in de flow de rest stopt
+
+**Alternatieven overwogen:**
+- Goal event in Loops: bestaat niet als dedicated feature
+- DELETE contact via Loops API bij aankoop: te destructief (verwijdert contact volledig)
+- Branch met twee takken (active → Loop completed, not active → doorgaan): technisch correct maar Loops klaagt over "Extra node does not ultimately lead to any emails sent" als de active-tak naar Loop completed gaat zonder email ertussen. Opgelost door de active-tak te verwijderen en alleen de Audience filter te gebruiken.
+
+**Impact:**
+- Geconverteerde contacts ontvangen geen verdere emails in de journey
+- Architectuur is eenvoudiger dan Branch met twee takken
+
+---
+
+## 2026-04-10 — Loops CTA-URLs tijdelijk op Vercel-URL
+
+**Beslissing:** CTA-buttons in alle 9 Loops-emails wijzen tijdelijk naar `https://dba-kompas.vercel.app/register?plan=...&email={contact.email}` in plaats van `https://dbakompas.nl/register?...`.
+
+**Reden:**
+- Productiedomein `dbakompas.nl` is nog niet live (wacht op INFRA-001 — DNS migratie Cloudflare)
+- De `/register` pagina op Vercel werkt al volledig correct (plan + email query params verwerkt)
+- Testen is mogelijk via Vercel URL
+
+**Actie bij livegang:**
+- In alle 9 Loops-emails de URL-prefix omzetten van `dba-kompas.vercel.app` naar `dbakompas.nl`
+- Dit is een handmatige actie in het Loops dashboard (per email, per button)
+
+---
+
+## 2026-04-10 — Loops merge tag syntax: single curly braces
+
+**Beslissing:** In Loops-emails wordt `{contact.email}` gebruikt (één haakjeset), niet `{{contact.email}}` (twee haakjesets).
+
+**Reden:**
+- Loops' editor toont en verwerkt merge tags met één haakjeset
+- In URL-velden van Button blocks: `https://dbakompas.nl/register?plan=one_time_dba&email={contact.email}`
+- Dubbele haakjes (`{{contact.email}}`) zijn de Loops-documentatienotatie maar de editor zelf gebruikt enkelvoudige haakjes
+
+---
+
+## 2026-04-10 — Oude Loops journeys bewust intact gelaten
+
+**Beslissing:** De drie bestaande loops (`quick_scan_completed - high`, `quick_scan_completed - medium`, `quick_scan_completed - low`) worden NIET verwijderd tijdens deze fase.
+
+**Reden:**
+- Deze loops zijn gekoppeld aan de oude Replit-versie van de quick scan
+- De nieuwe DBA Kompas app stuurt events naar de nieuwe journeys (DBA Kompas — Quick Scan Hoog/Gemiddeld/Laag risico)
+- Verwijdering pas bij livegang op `dbakompas.nl` — dan is de overgang definitief
+
+**Actie bij livegang:**
+- Verwijder `quick_scan_completed - high`, `quick_scan_completed - medium`, `quick_scan_completed - low` uit Loops
+
+---
+
 ## 2026-04-07 — Overstap naar Claude Haiku
 
 **Beslissing:** `analyzeDbaText` gebruikt `claude-haiku-4-5-20251001` in plaats van `claude-opus-4-6`

@@ -1,6 +1,6 @@
 # PROJECT_STATE.md
-**Laatst bijgewerkt:** 2026-04-09 (einde sessie)
-**Maturity:** 96%
+**Laatst bijgewerkt:** 2026-04-10 (sessie 2 — avond)
+**Maturity:** 97%
 
 ---
 
@@ -10,20 +10,64 @@ DBA Kompas is een Next.js 16.2 SaaS applicatie die opdrachtomschrijvingen analys
 
 ---
 
-## LAATSTE ACTIE (2026-04-09 einde sessie — commits `6477615`, `779619e`, `4ba0c6e`)
+## LAATSTE ACTIE (2026-04-10 sessie 2 — Loops e-mailsequenties gebouwd + Journey B live)
 
-**INFRA-001 — Resend SMTP domeinverificatie GEDEELTELIJK voltooid (IN PROGRESS)**
+**LOOPS-002 — Loops journeys aangemaakt en grotendeels geconfigureerd**
 
-Status Resend domein `dbakompas.nl`:
-- DKIM TXT (`resend._domainkey`) → **Pending** (eerder Verified, daarna reset bij restart verification)
-- SPF TXT (`send`) → **Pending** (DNS propagatie nog bezig bij STRATO)
-- MX (`send`) → bewust overgeslagen — niet nodig voor verzenden, zou STRATO inkomende mail breken
+Wat is er gedaan (sessie 2026-04-10 avond):
 
-Wat is er gedaan:
-- Resend Dashboard: domein `dbakompas.nl` toegevoegd, regio Ireland (eu-west-1)
-- STRATO DNS: DKIM TXT + SPF TXT records toegevoegd
-- Fout ontdekt en gecorrigeerd: SPF TXT waarde begon met `=spf1` i.p.v. `v=spf1` → gecorrigeerd
-- Resend verificatie herstart → nu terug op Pending (normaal, propagatie loopt nog)
+**E-mailsequenties v2 herschreven:**
+- 9 e-mails (3 per risiconiveau: hoog / gemiddeld / laag) volledig herschreven
+- Toon: eerlijk over beperking Quick Scan (5 meerkeuze-vragen = indicatie, geen oordeel), urgentie voor verder onderzoek, maandabonnement gepositioneerd als "nieuws + alles op één plek"
+- Document gegenereerd: `DBA Kompas — Loops e-mailsequenties v2.docx`
+- CTA-URLs: `https://dba-kompas.vercel.app/register?plan=one_time_dba&email={contact.email}` (tijdelijk Vercel URL, wordt dbakompas.nl bij livegang)
+
+**Loops journeys aangemaakt in Loops dashboard (handmatig):**
+- Journey A: "DBA Kompas — Quick Scan Hoog risico" — trigger: `quick_scan_completed`, filter: `Quick_scan_risk_level = hoog` — **DRAFT** (activeren bij livegang)
+- Journey B: "DBA Kompas — Quick Scan Gemiddeld risico" — trigger: `quick_scan_completed`, filter: `Quick_scan_risk_level = gemiddeld` — **ACTIEF + GETEST**
+- Journey C: "DBA Kompas — Quick Scan Laag risico" — trigger: `quick_scan_completed`, filter: `Quick_scan_risk_level = laag` — **DRAFT** (activeren bij livegang)
+
+**Flow-architectuur per journey:**
+- `Event received` → `Audience filter (risk_level)` → `Send email X1` → `Branch (1 branch)` → `Audience filter (subscription_status does not equal "active", All following nodes)` → `Timer 4d` → `Send email X2` → `Branch (1 branch)` → `Audience filter (subscription_status does not equal "active", All following nodes)` → `Timer 7d` → `Send email X3` → `Loop completed`
+- Branch nodes stoppen geconverteerde contacts: als `subscription_status = active` → contact passeert Audience filter niet → flow stopt
+
+**Bevestigd werkend:**
+- `plan` + `email` query params correct verwerkt door `/register` pagina
+- `subscription_started` en `one_time_purchase` events al aanwezig in Stripe webhook
+- `subscription_status` contact property wordt bijgewerkt via webhook bij betaling
+- Journey B Send test verstuurd en ontvangen — opmaak correct
+
+**Pending bij livegang op dbakompas.nl:**
+- Journey A + C activeren via "Resume"
+- CTA-URLs in alle 9 emails omzetten van Vercel-URL naar `dbakompas.nl`
+- Oude Loops journeys verwijderen: `quick_scan_completed - high`, `quick_scan_completed - medium`, `quick_scan_completed - low`
+
+---
+
+## LAATSTE ACTIE (2026-04-10 sessie 1 — INFRA-001 DNS migratie naar Cloudflare)
+
+**INFRA-001 — DNS migratie naar Cloudflare IN PROGRESS**
+
+Wat is er gedaan (sessie 2026-04-10):
+- Vastgesteld dat STRATO geen subdomain MX records ondersteunt → besloten: DNS migreren naar Cloudflare
+- Cloudflare free account aangemaakt, domein `dbakompas.nl` toegevoegd
+- Cloudflare heeft automatisch alle bestaande DNS records geïmporteerd (A, CNAME, MX, TXT, SRV)
+- Resend MX record toegevoegd in Cloudflare: `send` → `feedback-smtp.[...].amazonses.com`, priority 10
+- DNSSEC uitgeschakeld bij STRATO (status: "Wordt gedeactiveerd" — verwerking loopt)
+- Nameserver-wissel nog niet doorgevoerd (wacht op DNSSEC deactivatie bij STRATO)
+
+Pending acties voor INFRA-001:
+1. Wacht tot STRATO DNSSEC volledig gedeactiveerd is
+2. STRATO NS-record → "Eigen nameservers" → `brett.ns.cloudflare.com` + `peaches.ns.cloudflare.com`
+3. Cloudflare: klik "I updated my nameservers"
+4. Wacht op DNS propagatie + Cloudflare activatie (15 min tot 24 uur)
+5. Resend: herstart domeinverificatie → wacht op DKIM + SPF + MX alle Verified
+6. Supabase SMTP instellen: host `smtp.resend.com`, port `465`, user `resend`, password = Resend API key, sender `noreply@dbakompas.nl`
+7. Supabase: e-mailbevestiging opnieuw inschakelen
+8. Test: nieuw account → verificatiemail van `noreply@dbakompas.nl`
+
+Extra taak toegevoegd:
+- MAIL-001: `info@dbakompas.nl` instellen in Apple Mail via STRATO IMAP/SMTP (imap.strato.de:993 + smtp.strato.de:465)
 
 **Overige taken deze sessie (alle commits gepusht):**
 - QUAL-002: `__tests__/analyzeDbaText.test.ts` (21 tests) — 67/67 groen (commit `6477615`)
@@ -85,6 +129,9 @@ Wat is er gedaan:
 
 **INFRA-001 voltooien — Resend verificatie + Supabase SMTP**
 
+> Dit is de huidige blokkade voor livegang op `dbakompas.nl`. Zodra dit klaar is, volgen automatisch de Loops- en Stripe live-stappen.
+
+
 Exacte vervolgstappen bij volgende sessie:
 
 **Stap A — Controleer Resend verificatiestatus**
@@ -113,10 +160,14 @@ Exacte vervolgstappen bij volgende sessie:
 **Stap D — Testen**
 Maak een nieuw testaccount aan op `https://dba-kompas.vercel.app` met een echt e-mailadres. Verificatiemail moet binnenkomen van `noreply@dbakompas.nl`.
 
-**Daarna open:**
+**Daarna open (na INFRA-001):**
+- Journey A + C activeren in Loops (Resume)
+- CTA-URLs in alle 9 Loops-emails omzetten van Vercel naar `dbakompas.nl`
+- Stripe webhook endpoint configureren voor live mode: `https://dbakompas.nl/api/billing/webhook`
+- Stripe coupon `ONETIMECREDIT` aanmaken in live mode + env var updaten
+- Stripe keys wisselen naar live mode in Vercel
+- Oude Loops journeys verwijderen (`quick_scan_completed - high/medium/low`)
 - TEST-005: maximale invoerlengte testen (3000+ tekens, manueel)
-- LOOPS-002: contactvelden instellen in Loops dashboard (handmatig)
-- Stripe coupon live mode aanmaken vóór productielaunch
 
 ---
 
@@ -158,7 +209,7 @@ Maak een nieuw testaccount aan op `https://dba-kompas.vercel.app` met een echt e
 - **IN PROGRESS**: INFRA-001 — Resend domein `dbakompas.nl` verificatie loopt (DNS propagatie bij STRATO). Supabase SMTP nog niet ingesteld. E-mailbevestiging tijdelijk UITGESCHAKELD. Zie "Volgende geplande stap" voor exacte vervolgstappen.
 - **NIET AANGEMAAKT**: Stripe coupon `ONETIMECREDIT` bestaat alleen in test mode. Vóór live launch aanmaken in Stripe live mode + env var updaten.
 - **ONBEKEND**: E-mail digest triggers — geen cron job gevonden voor Resend digests
-- **PENDING**: Loops dashboard config — contactvelden instellen + e-mailsequentie koppelen (LOOPS-002, handmatig)
+- **GEDEELTELIJK KLAAR**: Loops journeys — Journey B actief + getest. Journey A + C gebouwd maar in Draft (activeren bij livegang dbakompas.nl). CTA-URLs nog op Vercel-URL.
 - **OPEN**: TEST-005 — maximale invoerlengte (3000+ tekens) nog niet manueel getest
 - **GEDEELTELIJK**: Alleen unit + integratietests. E2e-tests ontbreken.
 
@@ -183,7 +234,7 @@ Maak een nieuw testaccount aan op `https://dba-kompas.vercel.app` met een echt e
 | Stripe (checkout + webhook) | JA | JA | TEST-002 + TEST-003 BEVESTIGD ✅ |
 | Resend (digest + upsell) | JA | JA (domein pending verificatie) | NEE |
 | Supabase SMTP (auth mail) | N.V.T. (Supabase config) | NEE — INFRA-001 IN PROGRESS | NEE |
-| Loops | JA | JA | NEE (dashboard config pending) |
+| Loops | JA | JA | GEDEELTELIJK — Journey B live + getest, A+C bij livegang |
 | PostHog | JA | JA | ONBEKEND |
 | Sentry | JA | JA | ONBEKEND |
 

@@ -1,6 +1,6 @@
 # INTEGRATIONS_STATUS.md
 **Status van alle externe integraties**
-**Laatst bijgewerkt:** 2026-04-09 (einde sessie)
+**Laatst bijgewerkt:** 2026-04-10 (sessie 2 — avond)
 
 ---
 
@@ -145,15 +145,41 @@ STRIPE_COUPON_ONE_TIME_UPGRADE=ONETIMECREDIT
 | `subscription_canceled` event | GEÏMPLEMENTEERD (webhook handler) |
 | `payment_failed` event | GEÏMPLEMENTEERD (webhook handler) |
 | `one_time_purchase` event | GEÏMPLEMENTEERD (webhook handler) |
+| `subscription_status` contact property update | GEÏMPLEMENTEERD (webhook handler bij aankoop) |
 | Deduplicatie | JA (Map-based, in-memory — zie KI-013) |
-| Loops account geconfigureerd | PENDING — "Domain in use" issue bij setup nieuwe omgeving |
-| Live getest | NEE |
+| Journey A (Hoog risico) | GEBOUWD in Loops dashboard — DRAFT (activeren bij livegang) |
+| Journey B (Gemiddeld risico) | GEBOUWD + ACTIEF + GETEST ✅ |
+| Journey C (Laag risico) | GEBOUWD in Loops dashboard — DRAFT (activeren bij livegang) |
+| E-mailsequenties v2 | 9 emails geschreven (3 per niveau) — in journeys geladen |
+| CTA-buttons | Button blocks met Vercel-URL (omzetten naar dbakompas.nl bij livegang) |
+| Conversiestop flow | Audience filter `subscription_status does not equal "active"` na elke Branch |
+| Merge tag syntax | `{contact.email}` (één haakjeset in Loops editor) |
+| Live getest | Journey B: Send test ontvangen ✅ |
 
-**Pending:**
-- LOOPS-002: Custom contactvelden instellen in Loops dashboard (`quick_scan_completed`, `quick_scan_risk_level`, `quick_scan_score`) en e-mailsequentie koppelen aan `quick_scan_completed` event — handmatige actie in Loops dashboard, geen code
+**Journey flow-architectuur (alle 3 journeys):**
+```
+Event received (quick_scan_completed, one time)
+  → Audience filter (Quick_scan_risk_level = hoog/gemiddeld/laag, All following nodes)
+  → Send email X1
+  → Branch (1 branch)
+  → Audience filter (subscription_status does not equal "active", All following nodes)
+  → Timer (4 days)
+  → Send email X2
+  → Branch (1 branch)
+  → Audience filter (subscription_status does not equal "active", All following nodes)
+  → Timer (7 days)
+  → Send email X3
+  → Loop completed
+```
 
-**Workaround Loops domain issue:**
-Gebruik het bestaande Loops account — niet een nieuwe omgeving aanmaken. De API key van het bestaande account werkt voor `dbakompas.nl`.
+**Resterende acties bij livegang op `dbakompas.nl`:**
+1. Journey A + C activeren via "Resume"
+2. In alle 9 emails CTA-URLs omzetten van `dba-kompas.vercel.app` naar `dbakompas.nl`
+3. Oude loops verwijderen: `quick_scan_completed - high`, `quick_scan_completed - medium`, `quick_scan_completed - low`
+
+**Risico's:**
+- KI-013: Loops deduplicatie is in-memory (Map) — reset bij cold start. Acceptabel voor huidige schaal.
+- Digest trigger (LOOPS-003): `sendWeeklyDigest()` + `sendMonthlyDigest()` hebben geen cron job trigger.
 
 ---
 
