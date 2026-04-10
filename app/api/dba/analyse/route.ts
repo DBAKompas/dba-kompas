@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { analyzeDbaText, type DbaAnalysisResult } from '@/lib/ai'
 import { getUserPlan } from '@/modules/billing/entitlements'
+import { updateLoopsContact } from '@/lib/loops'
 
 export const maxDuration = 120
 
@@ -96,6 +97,22 @@ export async function POST(request: Request) {
     if (insertError) {
       console.error('Failed to insert assessment:', insertError)
       return NextResponse.json({ error: 'Failed to save assessment' }, { status: 500 })
+    }
+
+    // Fire-and-forget: Loops contact bijwerken na succesvolle analyse
+    if (user.email) {
+      supabaseAdmin
+        .from('dba_assessments')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .then(({ count }) => {
+          updateLoopsContact(user.email!, {
+            analysis_completed: true,
+            last_analysis_at: new Date().toISOString(),
+            analysis_count: count ?? 1,
+          }).catch(err => console.error('[LOOPS] analyse tracking error:', err))
+        })
+        .catch(err => console.error('[LOOPS] analyse count error:', err))
     }
 
     return NextResponse.json({ id: assessment.id, ...analysisResult })
