@@ -396,34 +396,44 @@ export default function QuickScan() {
               {successCopy.body}
             </p>
 
-            {/* Primary CTA: eenmalige check */}
+            {/* Pricing tiles */}
             <div className="flex flex-col gap-3">
-              <div className="relative">
-                <span className="absolute -top-2.5 left-4 text-[11px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">
+
+              {/* Tile 1: Eenmalige check — aanbevolen */}
+              <button
+                type="button"
+                onClick={() => {
+                  posthog?.capture('quick_scan_checkout_clicked', {
+                    plan: 'one_time_dba',
+                    risk_level: riskLevel,
+                  });
+                  router.push(`/register?plan=one_time_dba&email=${encodedEmail}`);
+                }}
+                data-testid="button-onetime-checkout"
+                className="w-full text-left rounded-xl bg-primary text-primary-foreground p-5 hover:bg-primary/90 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <span className="inline-block text-[11px] font-bold bg-white/20 text-white px-2.5 py-0.5 rounded-full mb-3">
                   Aanbevolen
                 </span>
-                <Button
-                  size="lg"
-                  className="w-full h-14 text-base font-semibold rounded-xl pt-1"
-                  onClick={() => {
-                    posthog?.capture('quick_scan_checkout_clicked', {
-                      plan: 'one_time_dba',
-                      risk_level: riskLevel,
-                    });
-                    router.push(`/register?plan=one_time_dba&email=${encodedEmail}`);
-                  }}
-                  data-testid="button-onetime-checkout"
-                >
-                  Analyseer mijn opdracht — €9,95
-                  <ArrowRight className="w-4 h-4 ml-1" />
-                </Button>
-              </div>
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="font-bold text-base leading-tight">Eenmalige check</p>
+                    <p className="text-sm text-primary-foreground/75 mt-0.5">Geen abonnement, direct klaar</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-2xl font-bold">€9,95</p>
+                    <p className="text-xs text-primary-foreground/70">eenmalig</p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between mt-4 pt-3 border-t border-white/20">
+                  <span className="text-sm font-semibold">Analyseer mijn opdracht</span>
+                  <ArrowRight className="w-4 h-4" />
+                </div>
+              </button>
 
-              {/* Secondary CTA: maandabonnement */}
-              <Button
-                variant="outline"
-                size="lg"
-                className="w-full h-12 text-base"
+              {/* Tile 2: Maandabonnement */}
+              <button
+                type="button"
                 onClick={() => {
                   posthog?.capture('quick_scan_checkout_clicked', {
                     plan: 'monthly',
@@ -432,9 +442,24 @@ export default function QuickScan() {
                   router.push(`/register?plan=monthly&email=${encodedEmail}`);
                 }}
                 data-testid="button-monthly-checkout"
+                className="w-full text-left rounded-xl border border-border bg-background p-5 hover:border-primary/40 hover:bg-muted/30 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                Of start een maandabonnement — €20/maand
-              </Button>
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="font-bold text-base text-foreground leading-tight">Maandabonnement</p>
+                    <p className="text-sm text-muted-foreground mt-0.5">Flexibel opzegbaar, onbeperkt analyses</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-2xl font-bold text-foreground">€20</p>
+                    <p className="text-xs text-muted-foreground">/maand</p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between mt-4 pt-3 border-t border-border/60">
+                  <span className="text-sm font-medium text-muted-foreground">Start abonnement</span>
+                  <ArrowRight className="w-4 h-4 text-muted-foreground" />
+                </div>
+              </button>
+
             </div>
 
             <p className="text-xs text-muted-foreground/70 italic border-l-2 border-border pl-3 mt-5">
