@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight, ChevronRight, CheckCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { usePostHog } from "posthog-js/react";
 
 // ─────────────────────────────────────────────
 // Types
@@ -230,11 +231,13 @@ const fadeUp = {
 
 export default function QuickScan() {
   const router = useRouter();
+  const posthog = usePostHog();
   const [phase, setPhase] = useState<Phase>("questions");
   const [stepIndex, setStepIndex] = useState(0);
   const [scores, setScores] = useState<(AnswerScore | null)[]>(Array(QUESTIONS.length).fill(null));
   const [selectedAnswerIndex, setSelectedAnswerIndex] = useState<number | null>(null);
   const [slideDirection, setSlideDirection] = useState<1 | -1>(1);
+  const [scanStarted, setScanStarted] = useState(false);
 
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
@@ -254,6 +257,11 @@ export default function QuickScan() {
 
   function handleSelectAnswer(answerIndex: number) {
     setSelectedAnswerIndex(answerIndex);
+    // PostHog: eerste antwoord = scan gestart
+    if (!scanStarted) {
+      setScanStarted(true);
+      posthog?.capture('quick_scan_started', { input_method: 'questions' });
+    }
   }
 
   function handleNext() {
@@ -275,6 +283,12 @@ export default function QuickScan() {
       setSelectedAnswerIndex(restoredAnswerIndex);
     } else {
       setPhase("result");
+      // PostHog: resultaat bekeken
+      const finalScore = calcTotalScore(QUESTIONS, updatedScores);
+      posthog?.capture('quick_scan_result_viewed', {
+        risk_level: getRiskLevel(finalScore),
+        score: finalScore,
+      });
     }
   }
 
@@ -309,6 +323,11 @@ export default function QuickScan() {
       });
 
       if (!res.ok) throw new Error("request_failed");
+      // PostHog: quick scan volledig voltooid (naam + email ingevuld, naar Loops gestuurd)
+      posthog?.capture('quick_scan_completed', {
+        risk_level: payload.riskLevel,
+        score: payload.score,
+      });
       setPhase("success");
     } catch {
       setSubmitError("Er ging iets mis. Probeer het opnieuw.");
@@ -346,7 +365,10 @@ export default function QuickScan() {
               <Button
                 size="lg"
                 className="w-full h-12 text-base font-semibold"
-                onClick={() => router.push("/auth/signup")}
+                onClick={() => {
+                  posthog?.capture('quick_scan_signup_clicked', { source: 'success_screen' });
+                  router.push("/auth/signup");
+                }}
                 data-testid="button-go-full-analysis"
               >
                 Ga verder met de volledige analyse
@@ -400,7 +422,13 @@ export default function QuickScan() {
             {phase === "result" && (
               <Button
                 className="w-full h-12 text-base font-semibold"
-                onClick={() => setPhase("form")}
+                onClick={() => {
+                  setPhase("form");
+                  posthog?.capture('quick_scan_cta_clicked', {
+                    risk_level: riskLevel,
+                    cta_label: riskResult.cta,
+                  });
+                }}
                 data-testid="quickscan-cta-button"
               >
                 {riskResult.cta}
