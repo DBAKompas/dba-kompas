@@ -37,12 +37,13 @@ function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
 
-  // Redirect naar login als niet ingelogd
+  // Redirect naar login als niet ingelogd, met ?next= voor redirect na inloggen
   useEffect(() => {
     if (!loading && !user) {
-      router.push('/login')
+      const next = encodeURIComponent(pathname)
+      router.push(`/login?next=${next}`)
     }
-  }, [loading, user, router])
+  }, [loading, user, router, pathname])
 
   // Paywall: redirect naar /upgrade als ingelogd maar geen betaald plan
   useEffect(() => {
