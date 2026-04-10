@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/client'
 import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { usePostHog } from 'posthog-js/react'
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Check } from 'lucide-react'
 import BrandLogo from '@/components/marketing/BrandLogo'
 import Link from 'next/link'
@@ -31,6 +32,7 @@ function LoginPageContent() {
   const [checkoutOpen, setCheckoutOpen] = useState(false)
   const supabase = createClient()
   const router   = useRouter()
+  const posthog  = usePostHog()
   const searchParams = useSearchParams()
   const nextPath = searchParams.get('next') ?? '/dashboard'
 
@@ -40,10 +42,18 @@ function LoginPageContent() {
     setError('')
 
     if (mode === 'password') {
-      const { error } = await supabase.auth.signInWithPassword({ email, password })
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password })
       if (error) {
         setError('Ongeldig e-mailadres of wachtwoord.')
       } else {
+        if (data.user) {
+          posthog?.identify(data.user.id, { email: data.user.email })
+          posthog?.capture('login_completed', {
+            user_id: data.user.id,
+            account_id: data.user.id,
+            login_method: 'password',
+          })
+        }
         router.push(nextPath)
       }
     } else {

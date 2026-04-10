@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe/client'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { sendLoopsEvent, updateLoopsContact } from '@/lib/loops'
+import { captureServerEvent } from '@/lib/posthog'
 import { sendOneTimeUpsellEmail } from '@/modules/email/send'
 import type Stripe from 'stripe'
 
@@ -182,6 +183,20 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       }, `sub-start-${userId}`),
     ])
   }
+
+  // PostHog: abonnement gestart
+  captureServerEvent({
+    event: 'subscription_started',
+    distinct_id: userId,
+    properties: {
+      user_id: userId,
+      account_id: userId,
+      subscription_id: subscriptionId,
+      plan_id: plan,
+      billing_interval: plan,
+      origin_checkout_type: 'subscription',
+    },
+  })
 }
 
 async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
@@ -270,6 +285,17 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
       }, `sub-cancel-${existingSub.user_id}`),
     ])
   }
+
+  // PostHog: abonnement opgezegd
+  captureServerEvent({
+    event: 'subscription_canceled',
+    distinct_id: existingSub.user_id,
+    properties: {
+      user_id: existingSub.user_id,
+      account_id: existingSub.user_id,
+      subscription_id: subscription.id,
+    },
+  })
 }
 
 async function handleInvoicePaid(invoice: Stripe.Invoice) {
@@ -313,4 +339,15 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
       dedupKey: `pf-${invoice.id}`,
     })
   }
+
+  // PostHog: betaling mislukt
+  captureServerEvent({
+    event: 'payment_failed',
+    distinct_id: existingSub.user_id,
+    properties: {
+      user_id: existingSub.user_id,
+      account_id: existingSub.user_id,
+      subscription_id: subscriptionId,
+    },
+  })
 }

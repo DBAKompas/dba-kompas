@@ -4,6 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
 import { analyzeDbaText, type DbaAnalysisResult } from '@/lib/ai'
 import { getUserPlan } from '@/modules/billing/entitlements'
 import { updateLoopsContact } from '@/lib/loops'
+import { captureServerEvent } from '@/lib/posthog'
 
 export const maxDuration = 120
 
@@ -44,6 +45,18 @@ export async function POST(request: Request) {
     if (!inputText || typeof inputText !== 'string') {
       return NextResponse.json({ error: 'inputText is required' }, { status: 400 })
     }
+
+    // PostHog: analyse gestart
+    captureServerEvent({
+      event: 'analysis_started',
+      distinct_id: user.id,
+      properties: {
+        user_id: user.id,
+        account_id: user.id,
+        analysis_type: parentAssessmentId ? 'follow_up' : 'new',
+        input_method: 'text',
+      },
+    })
 
     // Get user profile for context
     const { data: profile } = await supabase
@@ -98,6 +111,20 @@ export async function POST(request: Request) {
       console.error('Failed to insert assessment:', insertError)
       return NextResponse.json({ error: 'Failed to save assessment' }, { status: 500 })
     }
+
+    // PostHog: analyse voltooid
+    captureServerEvent({
+      event: 'analysis_completed',
+      distinct_id: user.id,
+      properties: {
+        user_id: user.id,
+        account_id: user.id,
+        analysis_id: assessment.id,
+        analysis_type: parentAssessmentId ? 'follow_up' : 'new',
+        risk_label: analysisResult.overallRiskLabel as string | undefined,
+        result_category: analysisResult.analysisStatus as string | undefined,
+      },
+    })
 
     // Fire-and-forget: Loops contact bijwerken na succesvolle analyse
     if (user.email) {

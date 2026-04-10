@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { stripe } from '@/lib/stripe/client'
+import { captureServerEvent } from '@/lib/posthog'
 
 export async function POST() {
   const supabase = await createClient()
@@ -23,6 +24,17 @@ export async function POST() {
   const portalSession = await stripe.billingPortal.sessions.create({
     customer: subscription.stripe_customer_id,
     return_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
+  })
+
+  // PostHog: billing portal geopend
+  captureServerEvent({
+    event: 'portal_opened',
+    distinct_id: user.id,
+    properties: {
+      user_id: user.id,
+      account_id: user.id,
+      entry_context: 'profiel',
+    },
   })
 
   return NextResponse.json({ url: portalSession.url })

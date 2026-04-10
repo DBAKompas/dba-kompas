@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { stripe } from '@/lib/stripe/client'
+import { captureServerEvent } from '@/lib/posthog'
 
 export async function POST(request: Request) {
   try {
@@ -53,6 +54,19 @@ export async function POST(request: Request) {
     const session = await stripe.checkout.sessions.create(
       sessionParams as Parameters<typeof stripe.checkout.sessions.create>[0]
     )
+
+    // PostHog: checkout gestart
+    captureServerEvent({
+      event: 'checkout_started',
+      distinct_id: user.id,
+      properties: {
+        user_id: user.id,
+        account_id: user.id,
+        checkout_type: checkoutMode,
+        plan_id: effectivePriceId,
+        billing_interval: plan ?? null,
+      },
+    })
 
     return NextResponse.json({ url: session.url })
   } catch (error) {
