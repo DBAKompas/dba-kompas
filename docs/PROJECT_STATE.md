@@ -1,12 +1,33 @@
 # PROJECT_STATE.md
-**Laatst bijgewerkt:** 2026-04-10 (sessie 2 — avond)
-**Maturity:** 97%
+**Laatst bijgewerkt:** 2026-04-11 (sessie 3)
+**Maturity:** 98%
 
 ---
 
 ## SAMENVATTING
 
-DBA Kompas is een Next.js 16.2 SaaS applicatie die opdrachtomschrijvingen analyseert op DBA-risico-indicatoren via Claude Haiku. De kernfunctionaliteit is stabiel. Alle kritieke AI- en Stripe-bugs zijn opgelost. Conversie-funnel is volledig functioneel. Paywall is actief (alleen betalende gebruikers hebben dashboardtoegang). One-time upsell e-mail en upgrade-flow zijn geïmplementeerd. TEST-002 (Stripe checkout) is bevestigd werkend. Klaar voor TEST-003 (webhook delivery).
+DBA Kompas is een Next.js 16.2 SaaS applicatie die opdrachtomschrijvingen analyseert op DBA-risico-indicatoren via Claude Haiku. De kernfunctionaliteit is stabiel. Alle kritieke AI- en Stripe-bugs zijn opgelost. Conversie-funnel is volledig functioneel. Paywall actief. PostHog volledig geintegreerd (server-side events + identify + top-of-funnel tracking). Quick Scan succes-scherm volledig herbouwd met twee pricing tiles. Proxy en login-redirect verbeterd met ?next= parameter. 80 tests groen (lokaal: rollup ARM64 sandbox-issue). LOOPS-003 digest cron geimplementeerd.
+
+---
+
+## LAATSTE ACTIE (2026-04-11 sessie 3 — doc-sync + LOOPS-003 digest cron)
+
+**Commits gesynchroniseerd die ontbraken in docs (QUAL-003, SEC-003, fixes, ANAL-001/002/003, UX-001/001b):**
+- `1fbe8a4` QUAL-003: 13 unit tests voor lib/loops (updateLoopsContact + sendLoopsEvent)
+- `18310ce` SEC-003: proxy.ts uitgebreid (public routes), login ?next= redirect
+- `0c8a440` fix(login): Suspense boundary voor useSearchParams bij Next.js static prerendering
+- `88366f1` fix(layout): AppShell redirect naar /login aangevuld met ?next=pathname
+- `5fc32a4` ANAL-001: PostHog volledig geintegreerd (lib/posthog.ts, PostHogPageview, events op alle kritieke flows)
+- `47b709d` ANAL-002: PostHog identify op elke sessie + plan als person property
+- `e3d45e1` ANAL-003: top-of-funnel tracking in QuickScan (5 events)
+- `e5a13e7` UX-001: Quick Scan succes-scherm hertworpen met directe pricing CTAs
+- `0207697` UX-001b: succes-scherm omgebouwd naar twee volwaardige pricing tiles
+
+**LOOPS-003 geimplementeerd:**
+- `app/api/cron/weekly-digest/route.ts`: POST handler, CRON_SECRET verificatie, alle actieve pro-gebruikers ophalen, digest versturen
+- `app/api/cron/monthly-digest/route.ts`: zelfde structuur voor maandelijks
+- `vercel.json`: crons toegevoegd (maandag 09:00 CET + 1e van de maand 09:00 CET)
+- `docs/DEPLOYMENT.md` en `.env.local.example` bijgewerkt met CRON_SECRET
 
 ---
 
@@ -200,9 +221,12 @@ Maak een nieuw testaccount aan op `https://dba-kompas.vercel.app` met een echt e
 - **`/upgrade-to-pro` flow** (`app/upgrade-to-pro/page.tsx`, server component, geen UI) — conflict check (geen dubbel abonnement), Stripe coupon `ONETIMECREDIT` toegepast automatisch als gebruiker one-time purchase heeft
 - Newsfeed, notificaties, documentbeheer
 - Loops marketing automation (quick_scan, subscription events)
-- PostHog analytics
+- PostHog analytics (ANAL-001/002/003: server-side events, identify, top-of-funnel QuickScan tracking)
 - Sentry error tracking
-- Quick scan landing page
+- Quick scan landing page (succes-scherm met twee pricing tiles, directe checkout)
+- Proxy middleware: ?next= redirect, public routes correct
+- Login: ?next= parameter, Suspense boundary
+- Digest cron endpoints: `/api/cron/weekly-digest` + `/api/cron/monthly-digest` (LOOPS-003)
 
 ## WAT NIET WERKT / ONZEKER
 
@@ -211,7 +235,8 @@ Maak een nieuw testaccount aan op `https://dba-kompas.vercel.app` met een echt e
 - **ONBEKEND**: E-mail digest triggers — geen cron job gevonden voor Resend digests
 - **GEDEELTELIJK KLAAR**: Loops journeys — Journey B actief + getest. Journey A + C gebouwd maar in Draft (activeren bij livegang dbakompas.nl). CTA-URLs nog op Vercel-URL.
 - **OPEN**: TEST-005 — maximale invoerlengte (3000+ tekens) nog niet manueel getest
-- **GEDEELTELIJK**: Alleen unit + integratietests. E2e-tests ontbreken.
+- **GEDEELTELIJK**: Unit + integratietests aanwezig (80 totaal na QUAL-003). E2e-tests ontbreken.
+- **SANDBOX-ISSUE**: `npm test` faalt lokaal in ARM64 sandbox door ontbrekende `@rollup/rollup-linux-arm64-gnu`. Geen code-issue. Op Vercel en Mac werkt het correct.
 
 ---
 

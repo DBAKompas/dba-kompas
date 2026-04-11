@@ -6,6 +6,17 @@
 
 ## Vercel configuratie
 
+### Cron Jobs
+
+Geconfigureerd in `vercel.json`:
+
+| Endpoint | Schedule | Wanneer |
+|---|---|---|
+| `/api/cron/weekly-digest` | `0 7 * * 1` | Elke maandag 07:00 UTC (09:00 CET) |
+| `/api/cron/monthly-digest` | `0 7 1 * *` | Elke 1e van de maand 07:00 UTC |
+
+Vereist: `CRON_SECRET` env var ingesteld in Vercel. Vercel stuurt dit automatisch als Bearer token.
+
 ### vercel.json
 
 ```json
@@ -135,6 +146,14 @@ Standaard host: `https://eu.i.posthog.com` (EU-regio).
 | Variabele | Scope | Waarde |
 |---|---|---|
 | `NEXT_PUBLIC_APP_URL` | Client + Server | `https://dbakompas.nl` (productie) |
+| `CRON_SECRET` | Server only | Willekeurige string (minimaal 32 tekens) |
+
+**CRON_SECRET genereren:**
+```bash
+openssl rand -hex 32
+```
+
+Vercel stuurt deze waarde automatisch als `Authorization: Bearer <CRON_SECRET>` bij elk cron-verzoek. Zonder geldige secret wordt het verzoek afgewezen (HTTP 401).
 
 ---
 

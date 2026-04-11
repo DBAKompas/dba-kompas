@@ -127,8 +127,13 @@ STRIPE_COUPON_ONE_TIME_UPGRADE=ONETIMECREDIT
 - Inhoud: bevestiging aankoop + upgradeaanbod + knop "Upgrade voor €10,05 eerste maand" → `/upgrade-to-pro`
 - Fout afgevangen met `.catch()` — webhook fout niet bij e-mailprobleem
 
+**Digest trigger (LOOPS-003 opgelost):**
+- `app/api/cron/weekly-digest/route.ts`: GET handler, elke maandag 07:00 UTC
+- `app/api/cron/monthly-digest/route.ts`: GET handler, elke 1e van de maand 07:00 UTC
+- Beveiligd via `CRON_SECRET` (Vercel Bearer token)
+- `vercel.json` uitgebreid met `crons` sectie
+
 **Risico's:**
-- Geen trigger gevonden die digests automatisch verstuurt
 - Geen unsubscribe mechanisme zichtbaar in code
 - Resend live test nog niet uitgevoerd
 

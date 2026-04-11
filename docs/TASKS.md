@@ -1,5 +1,5 @@
 # TASKS.md
-**Laatst bijgewerkt:** 2026-04-10 (sessie 2 — avond)
+**Laatst bijgewerkt:** 2026-04-11 (sessie 3)
 
 ---
 
@@ -77,6 +77,12 @@
   - Gebruikersnaam: `info@dbakompas.nl`, wachtwoord: STRATO e-mailwachtwoord
   - Uitvoeren na voltooiing INFRA-001 (DNS stabiel)
 
+- [x] **LOOPS-003**: Digest trigger geimplementeerd via Vercel Cron Jobs ✓ (2026-04-11)
+  - `app/api/cron/weekly-digest/route.ts`: CRON_SECRET verificatie + alle actieve pro-gebruikers + sendWeeklyDigest
+  - `app/api/cron/monthly-digest/route.ts`: zelfde voor maandelijks
+  - `vercel.json` uitgebreid met cron: maandag 09:00 CET + 1e van de maand 09:00 CET
+  - `CRON_SECRET` env var toegevoegd aan DEPLOYMENT.md + .env.local.example
+
 - [~] **LOOPS-002**: Loops journeys aangemaakt — **GEDEELTELIJK KLAAR, wacht op livegang**
   - Journey B "DBA Kompas — Quick Scan Gemiddeld risico": ACTIEF + GETEST ✅
   - Journey A "DBA Kompas — Quick Scan Hoog risico": GEBOUWD, in Draft
@@ -86,10 +92,6 @@
     2. In alle 9 emails CTA-URLs omzetten van `dba-kompas.vercel.app` naar `dbakompas.nl`
     3. Oude loops verwijderen: `quick_scan_completed - high`, `quick_scan_completed - medium`, `quick_scan_completed - low`
 
-- [ ] **LOOPS-003**: Digest trigger mechanisme implementeren — **NIEUW**
-  - Probleem: `sendWeeklyDigest()` en `sendMonthlyDigest()` zijn geïmplementeerd in `modules/email/send.ts` maar er is geen cron job die ze aanroept
-  - Oplossing: Vercel Cron Job toevoegen (`vercel.json` uitbreiden) of externe scheduler (bijv. GitHub Actions, Supabase pg_cron)
-  - Prioriteit: LAAG — niet blokkerend voor MVP launch
 - [ ] **FEAT-002**: Admin panel voor contentbeheer (gidsen, nieuws)
 - [ ] **FEAT-003**: Gidsen content schrijven en vullen
 
@@ -208,6 +210,27 @@ Stripe webhook (checkout.session.completed, mode=payment)
 ---
 
 ## DONE
+
+### Sessie 2026-04-11 — Doc-sync + LOOPS-003
+
+- [x] **LOOPS-003**: Vercel Cron Jobs aangemaakt voor weekly/monthly digest trigger
+- [x] **Doc-sync**: 9 commits gesynchroniseerd die ontbraken in docs
+
+---
+
+### Sessie 2026-04-10 (na 7ceea92) — PostHog, QuickScan UX, security
+
+- [x] **QUAL-003**: 13 unit tests voor `lib/loops` — `updateLoopsContact` + `sendLoopsEvent` (commit `1fbe8a4`)
+- [x] **SEC-003**: proxy.ts verbeterd: `/register`, `/auth/`, `/api/loops/` als public route; login redirect met `?next=pathname` (commit `18310ce`)
+- [x] **FIX-021**: `useSearchParams` in login page gewrapped in Suspense boundary voor Next.js static prerendering (commit `0c8a440`)
+- [x] **FIX-022**: AppShell redirect naar `/login` aangevuld met `?next=pathname` zodat gebruiker na inloggen terugkomt op bedoelde pagina (commit `88366f1`)
+- [x] **ANAL-001**: PostHog volledig geintegreerd — `lib/posthog.ts` server-side helper, `PostHogPageview` component, events op login / analyse / checkout / webhook (commit `5fc32a4`)
+- [x] **ANAL-002**: PostHog identify op elke sessie + plan als person property, reset bij uitloggen (commit `47b709d`)
+- [x] **ANAL-003**: Top-of-funnel QuickScan tracking — 5 events: `quick_scan_started`, `quick_scan_result_viewed`, `quick_scan_cta_clicked`, `quick_scan_completed`, `quick_scan_signup_clicked` (commit `e3d45e1`)
+- [x] **UX-001**: Quick Scan succes-scherm hertworpen: risico-specifieke copy + twee directe betaalopties (eenmalig €9,95 / maandelijks €20) beide linkend naar `/register?plan=xxx&email=xxx` (commit `e5a13e7`)
+- [x] **UX-001b**: Succes-scherm omgebouwd naar twee volwaardige pricing tiles — visueel consistent met design system (commit `0207697`)
+
+---
 
 ### Sessie 2026-04-10 (avond) — Loops e-mailsequenties v2 + journeys gebouwd
 
