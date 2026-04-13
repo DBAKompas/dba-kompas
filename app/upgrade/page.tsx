@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Check, ArrowRight, Loader2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import BrandLogo from '@/components/marketing/BrandLogo'
 
 const PLANS = [
   {
@@ -96,9 +97,7 @@ export default function UpgradePage() {
 
       {/* Logo */}
       <div className="mb-10 text-center">
-        <span className="text-2xl font-extrabold tracking-tight text-foreground">
-          <span className="text-accent">DBA</span>Kompas
-        </span>
+        <BrandLogo variant="dark" className="h-10 w-auto mx-auto" />
       </div>
 
       {/* Header */}
