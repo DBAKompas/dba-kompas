@@ -17,7 +17,37 @@ export async function GET() {
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
     }
 
-    return NextResponse.json(profile)
+    // Haal abonnementsstatus op
+    const { data: subscription } = await supabase
+      .from('subscriptions')
+      .select('status, plan')
+      .eq('user_id', user.id)
+      .in('status', ['active', 'trialing'])
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    // Haal eenmalige aankoop op als geen abonnement gevonden
+    let subscriptionInfo = null
+
+    if (subscription) {
+      const planLabel = subscription.plan === 'yearly' ? 'Jaarabonnement' : 'Maandabonnement'
+      subscriptionInfo = { plan: planLabel, status: 'Actief' }
+    } else {
+      const { data: oneTime } = await supabase
+        .from('one_time_purchases')
+        .select('status, product_type')
+        .eq('user_id', user.id)
+        .eq('status', 'purchased')
+        .limit(1)
+        .maybeSingle()
+
+      if (oneTime) {
+        subscriptionInfo = { plan: 'Eenmalige check', status: 'Actief' }
+      }
+    }
+
+    return NextResponse.json({ ...profile, subscription: subscriptionInfo })
   } catch (error) {
     console.error('Profile fetch error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
