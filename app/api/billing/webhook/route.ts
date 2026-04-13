@@ -3,7 +3,7 @@ import { stripe } from '@/lib/stripe/client'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { sendLoopsEvent, updateLoopsContact } from '@/lib/loops'
 import { captureServerEvent } from '@/lib/posthog'
-import { sendOneTimeUpsellEmail, sendPurchaseWelcomeEmail } from '@/modules/email/send'
+import { sendPurchaseWelcomeEmail } from '@/modules/email/send'
 import type Stripe from 'stripe'
 
 export async function POST(request: Request) {
@@ -129,13 +129,9 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           plan: 'one_time',
           subscription_status: 'active',
         }, `one-time-${userId}`),
-        // Welkomstmail: bevestiging aankoop + CTA naar dashboard
+        // Welkomstmail: bevestiging aankoop + upsell aanbod + CTA naar dashboard
         sendPurchaseWelcomeEmail(email, 'one_time').catch(err =>
           console.error('Welkomstmail (one_time) kon niet worden verstuurd:', err)
-        ),
-        // Upsell e-mail: korting eerste maand bij upgrade naar maandabonnement
-        sendOneTimeUpsellEmail(email).catch(err =>
-          console.error('Upsell e-mail kon niet worden verstuurd:', err)
         ),
       ])
     }
