@@ -14,6 +14,7 @@ import {
   LogOut,
   Loader2,
   ExternalLink,
+  Settings2,
 } from 'lucide-react'
 import { useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -30,10 +31,10 @@ const navItems = [
 ]
 
 // Routes die altijd toegankelijk zijn, ook zonder betaald plan
-const PAYWALL_EXEMPT = ['/profiel']
+const PAYWALL_EXEMPT = ['/profiel', '/admin']
 
 function AppShell({ children }: { children: React.ReactNode }) {
-  const { user, loading, plan, planLoading } = useAuth()
+  const { user, loading, plan, planLoading, isAdmin } = useAuth()
   const pathname = usePathname()
   const router = useRouter()
 
@@ -123,6 +124,24 @@ function AppShell({ children }: { children: React.ReactNode }) {
               </Link>
             )
           })}
+
+          {/* Admin nav — alleen zichtbaar voor beheerder */}
+          {isAdmin && (
+            <>
+              <div className="mx-3 my-2 border-t border-border/40" />
+              <Link
+                href="/admin/emails"
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                  pathname.startsWith('/admin')
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                }`}
+              >
+                <Settings2 className="size-4 flex-shrink-0" />
+                E-mailbeheer
+              </Link>
+            </>
+          )}
         </nav>
 
         {/* Footer */}

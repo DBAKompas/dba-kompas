@@ -16,6 +16,12 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  // Digest is uitgeschakeld totdat DIGEST_ENABLED=true is ingesteld in Vercel
+  if (process.env.DIGEST_ENABLED !== 'true') {
+    console.log('[cron/monthly-digest] overgeslagen — DIGEST_ENABLED is niet ingesteld op true')
+    return NextResponse.json({ skipped: true, reason: 'DIGEST_ENABLED is not true' })
+  }
+
   const startedAt = Date.now()
   let sent = 0
   let failed = 0
