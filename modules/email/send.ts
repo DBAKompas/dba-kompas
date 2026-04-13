@@ -58,10 +58,27 @@ function buildPurchaseWelcomeHtml(plan: PurchasePlan): string {
 }
 
 export async function sendPurchaseWelcomeEmail(to: string, plan: PurchasePlan) {
+  const templateIds: Record<PurchasePlan, string | undefined> = {
+    one_time: process.env.RESEND_TEMPLATE_WELCOME_ONE_TIME,
+    monthly:  process.env.RESEND_TEMPLATE_WELCOME_MONTHLY,
+    yearly:   process.env.RESEND_TEMPLATE_WELCOME_YEARLY,
+  }
+
   const subjects: Record<PurchasePlan, string> = {
     one_time: 'Je DBA-check is geactiveerd — welkom bij DBA Kompas',
-    monthly: 'Welkom bij DBA Kompas Pro — je maandabonnement is actief',
-    yearly: 'Welkom bij DBA Kompas Pro — je jaarabonnement is actief',
+    monthly:  'Welkom bij DBA Kompas Pro — je maandabonnement is actief',
+    yearly:   'Welkom bij DBA Kompas Pro — je jaarabonnement is actief',
+  }
+
+  const templateId = templateIds[plan]
+
+  // Gebruik Resend template als ID beschikbaar is, anders inline HTML
+  if (templateId) {
+    return resend.emails.send({
+      from: 'DBA Kompas <noreply@dbakompas.nl>',
+      to,
+      template_id: templateId,
+    } as Parameters<typeof resend.emails.send>[0])
   }
 
   return resend.emails.send({
