@@ -1,5 +1,5 @@
 # TASKS.md
-**Laatst bijgewerkt:** 2026-04-11 (sessie 3)
+**Laatst bijgewerkt:** 2026-04-12 (sessie 6)
 
 ---
 
@@ -55,21 +55,21 @@
 
 ### LAAG (verbetering)
 
-- [ ] **INFRA-001**: Custom SMTP instellen voor auth-e-mails — **IN PROGRESS, HANDMATIGE ACTIE**
-  - **HUIDIGE STATUS (2026-04-10):**
-    - DNS migratie naar Cloudflare gestart (STRATO kon geen subdomain MX)
-    - Cloudflare: domein toegevoegd, alle records geïmporteerd, Resend MX record toegevoegd (`send` → amazonses.com, prio 10)
-    - STRATO DNSSEC: deactivatie aangevraagd, status "Wordt gedeactiveerd" (verwerking loopt)
-    - Nameserver-wissel nog niet doorgevoerd — wacht op DNSSEC deactivatie
-  - **VOLGENDE ACTIE bij hervatten:**
-    1. Check STRATO → DNS → DNSSEC: is status verdwenen of "Niet actief"?
-    2. Zo ja: STRATO → DNS → NS-record → "Eigen nameservers" → `brett.ns.cloudflare.com` + `peaches.ns.cloudflare.com` → opslaan
-    3. Cloudflare: klik "I updated my nameservers"
-    4. Wacht op DNS propagatie + Cloudflare activatie (15 min tot 24 uur)
-    5. Resend: herstart domeinverificatie → wacht op DKIM + SPF + MX alle Verified
-    6. Supabase SMTP: host `smtp.resend.com`, port `465`, user `resend`, password = Resend API key, sender `DBA Kompas <noreply@dbakompas.nl>`
-    7. Supabase: zet "Enable email confirmations" aan
-    8. Test: nieuw account → verificatiemail van `noreply@dbakompas.nl`
+- [~] **INFRA-001**: DNS migratie + e-mailinrichting — **GROTENDEELS KLAAR, 4 handmatige acties resterend**
+  - Cloudflare: actief ✅, NS-records correct ✅
+  - Resend: domein `dbakompas.nl` geverifieerd ✅
+  - Loops: sending domain gewijzigd naar `dbakompas.nl`, alle DNS-records geverifieerd ✅
+  - Supabase SMTP: ingesteld via Resend (`smtp.resend.com`, port 465, user `resend`) ✅
+  - Supabase Site URL + Redirect URL bijgewerkt naar `dbakompas.nl` ✅
+  - Supabase Confirm email: ingeschakeld ✅
+  - Supabase email template: DBA Kompas huisstijl (donker navy, Rethink Sans, oranje CTA) ✅
+  - Vercel custom domain `dbakompas.nl`: gekoppeld, SSL actief ✅
+  - SPF-record: gecombineerd `v=spf1 include:amazonses.com include:_spf.strato.com ~all` ✅
+  - **RESTERENDE ACTIES (eerste taak volgende sessie — in volgorde uitvoeren):**
+    1. Logo in Supabase e-mailtemplate updaten: Authentication → Email Templates → Confirm signup → Source → `img src` → `https://dbakompas.nl/logo-flat-white.png` → Save changes
+    2. `NEXT_PUBLIC_APP_URL` updaten in Vercel env vars naar `https://dbakompas.nl` → Redeploy
+    3. Resend API key "DBA Kompas" toevoegen als `RESEND_API_KEY` in Vercel env vars → Redeploy
+    4. Testaccount aanmaken op `https://dbakompas.nl` → verificatiemail van `noreply@dbakompas.nl` controleren (logo correct, CTA-link werkt)
 - [ ] **MAIL-001**: `info@dbakompas.nl` instellen in Apple Mail — **NIEUW**
   - Doel: e-mail centraal ontvangen/versturen via Apple Mail i.p.v. STRATO webmail
   - IMAP: `imap.strato.de`, poort `993`, SSL/TLS
@@ -83,14 +83,63 @@
   - `vercel.json` uitgebreid met cron: maandag 09:00 CET + 1e van de maand 09:00 CET
   - `CRON_SECRET` env var toegevoegd aan DEPLOYMENT.md + .env.local.example
 
-- [~] **LOOPS-002**: Loops journeys aangemaakt — **GEDEELTELIJK KLAAR, wacht op livegang**
+- [~] **LOOPS-002**: Loops journeys aangemaakt — **VRIJWEL KLAAR, één actie bij livegang**
   - Journey B "DBA Kompas — Quick Scan Gemiddeld risico": ACTIEF + GETEST ✅
-  - Journey A "DBA Kompas — Quick Scan Hoog risico": GEBOUWD, in Draft
-  - Journey C "DBA Kompas — Quick Scan Laag risico": GEBOUWD, in Draft
-  - **Resterende acties bij livegang op `dbakompas.nl`:**
-    1. Journey A + C activeren via "Resume" in Loops
-    2. In alle 9 emails CTA-URLs omzetten van `dba-kompas.vercel.app` naar `dbakompas.nl`
-    3. Oude loops verwijderen: `quick_scan_completed - high`, `quick_scan_completed - medium`, `quick_scan_completed - low`
+  - Journey A "DBA Kompas — Quick Scan Hoog risico": ACTIEF ✅
+  - Journey C "DBA Kompas — Quick Scan Laag risico": ACTIEF ✅
+  - Alle 9 CTA-URLs omgezet van `dba-kompas.vercel.app` naar `dbakompas.nl` ✅ (2026-04-11)
+  - **Resterende actie bij livegang:**
+    - Oude journeys verwijderen: `quick_scan_completed - high`, `quick_scan_completed - medium`, `quick_scan_completed - low`
+
+- [ ] **STRIPE-LIVE**: Stripe omzetten naar live mode — **VEREIST VOOR LIVEGANG**
+  - Stripe live keys instellen in Vercel: `STRIPE_SECRET_KEY` (sk_live_...), `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` (pk_live_...)
+  - Live webhook aanmaken in Stripe Dashboard: `https://dbakompas.nl/api/billing/webhook` (5 events)
+  - Nieuw `STRIPE_WEBHOOK_SECRET` uit live webhook kopiëren naar Vercel
+  - Live price IDs instellen: `STRIPE_PRICE_ID_MONTHLY`, `STRIPE_PRICE_ID_YEARLY`, `STRIPE_PRICE_ID_ONE_TIME`
+  - Coupon `ONETIMECREDIT` aanmaken in Stripe live mode
+  - End-to-end live betaling testen
+
+- [ ] **LEGAL-001**: Juridische documenten herzien op basis van nieuwe infrastructuur — **GEEN HAAST, APARTE SESSIE**
+  - Privacy policy herzien: Cloudflare als CDN/DNS, Resend als e-mailverwerker, Loops als marketingautomatisering
+  - Verwerkersovereenkomsten controleren voor alle nieuwe partijen
+  - Algemene voorwaarden controleren op DBA-wetgeving implicaties na herinrichting
+  - Cookie-beleid controleren (Cloudflare analytics/cookies)
+
+- [ ] **BILLING-002**: Analyse-limieten + credit top-up — **BRIEFING EERST, DAN BOUWEN**
+
+  > **Werkwijze:** Niet starten met bouwen. Begin de sessie met een briefing: wat levert dit op, wat kost het, welke keuzes liggen er nog open? Pas daarna starten met implementatie en de gebruiker meenemen in elke stap.
+
+  **Achtergrond:**
+  - API-kosten (Anthropic) lopen op naarmate gebruik groeit. Zonder limiet is elke analyse een ongecontroleerde kostenpost.
+  - Huidig model heeft geen enkele rem op het aantal analyses per gebruiker.
+
+  **Beoogd model (startpunt voor bespreking):**
+  | Plan | Analyses inbegrepen | Extra credits |
+  |---|---|---|
+  | Eenmalige check | 1 | n.v.t. |
+  | Maand | 15/maand | €1,50 per stuk |
+  | Jaar | 20/maand | €1,50 per stuk |
+
+  **Openstaande keuzes (bespreken vóór bouw):**
+  - Is 15/maand genoeg voor de doelgroep (zzp'ers met meerdere opdrachten)?
+  - Bundels of losse credits? (bijv. 5 credits voor €6,50 vs. €1,50/stuk)
+  - Wat gebeurt er als limiet bereikt is: harde blokkade of zachte melding met betaalknop?
+  - Jaarabonnees: meer credits dan maandabonnees of gelijk?
+  - Moeten ongebruikte credits doorschuiven naar de volgende maand?
+  - Wil je een dashboard-weergave ("Je hebt nog 8 van 15 analyses over")?
+
+  **Technische bouwblokken (na beslissingen):**
+  1. Supabase: `analyses_used`, `period_resets_at`, `extra_credits` kolommen op `profiles`
+  2. API route `/api/dba/analyse`: limietcheck vóór elke analyse
+  3. Supabase pg_cron: maandelijkse reset van teller
+  4. Stripe: nieuw one-time product "Analyse credits" voor top-up
+  5. UI: banner/teller in dashboard + blokkadescherm bij limiet
+
+- [ ] **AUTH-002**: 2FA aanbevelen (niet verplicht) — banner in dashboard
+  - Supabase TOTP-check: `supabase.auth.mfa.listFactors()`
+  - Als geen verified factor: banner bovenin dashboard met "Beveilig je account"
+  - Knop linkt naar `/dashboard/beveiliging` met TOTP-setup flow
+  - Wegklikbaar (dismissed state opslaan in `profiles`)
 
 - [ ] **FEAT-002**: Admin panel voor contentbeheer (gidsen, nieuws)
 - [ ] **FEAT-003**: Gidsen content schrijven en vullen
@@ -205,11 +254,28 @@ Stripe webhook (checkout.session.completed, mode=payment)
 
 ## IN PROGRESS
 
-- **INFRA-001**: DNS migratie naar Cloudflare — STRATO DNSSEC deactivatie afwachten, daarna NS-records wisselen. Zie TASKS.md LAAG sectie + PROJECT_STATE.md voor exacte stappen.
+- **INFRA-001**: 4 resterende handmatige acties — zie LAAG sectie hierboven + PROJECT_STATE.md EERSTE TAAK VOLGENDE SESSIE.
 
 ---
 
 ## DONE
+
+### Sessie 2026-04-12 (sessie 6) — Documentatiesync
+
+- Geen codewijzigingen. Volledige docs-sync: PROJECT_STATE, TASKS, KNOWN_ISSUES, DECISIONS, INTEGRATIONS_STATUS bijgewerkt.
+
+### Sessie 2026-04-12 (sessie 5) — INFRA-001 DNS migratie + Supabase template
+
+- [x] Cloudflare actief (NS-records gepropageerd) ✅
+- [x] Resend domein `dbakompas.nl` geverifieerd ✅
+- [x] Loops sending domain gewijzigd naar `dbakompas.nl`, alle 5 DNS-records geverifieerd ✅
+- [x] Supabase SMTP geconfigureerd via Resend ✅
+- [x] Supabase Site URL + Redirect URL bijgewerkt naar `dbakompas.nl` ✅
+- [x] Supabase e-mailbevestiging ingeschakeld ✅
+- [x] Supabase email template: DBA Kompas huisstijl (donker navy, Rethink Sans, oranje CTA) ✅
+- [x] Vercel custom domain `dbakompas.nl` gekoppeld + SSL actief ✅
+- [x] SPF-record gecombineerd voor Resend + STRATO ✅
+- [x] Envelope MX-record aangemaakt voor Loops (subdomain `envelope`) ✅
 
 ### Sessie 2026-04-11 — Doc-sync + LOOPS-003
 
