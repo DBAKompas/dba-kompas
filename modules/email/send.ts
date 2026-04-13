@@ -2,16 +2,73 @@ import { Resend } from 'resend'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
-export async function sendWelcomeEmail(to: string, name: string) {
+type PurchasePlan = 'one_time' | 'monthly' | 'yearly'
+
+function buildPurchaseWelcomeHtml(plan: PurchasePlan): string {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://dbakompas.nl'
+  const dashboardUrl = `${appUrl}/dashboard`
+  const logoUrl = `${appUrl}/logo-white-v3-full.png`
+
+  const content: Record<PurchasePlan, { heading: string; body: string; cta: string }> = {
+    one_time: {
+      heading: 'Je DBA-check is geactiveerd',
+      body: 'Bedankt voor je aankoop. Je eenmalige DBA-check staat klaar. Plak je opdrachtomschrijving in het analyseveld en krijg direct inzicht in je DBA-risico\'s.',
+      cta: 'Ga naar je dashboard',
+    },
+    monthly: {
+      heading: 'Welkom bij DBA Kompas Pro',
+      body: 'Je maandabonnement is actief. Je hebt nu onbeperkt toegang tot alle DBA-analyses, gidsen en het laatste nieuws over DBA-wetgeving. Analyseer zoveel opdrachten als je wilt.',
+      cta: 'Ga naar je dashboard',
+    },
+    yearly: {
+      heading: 'Welkom bij DBA Kompas Pro',
+      body: 'Je jaarabonnement is actief. Je hebt een vol jaar onbeperkt toegang tot alle DBA-analyses, gidsen en het laatste nieuws over DBA-wetgeving. Analyseer zoveel opdrachten als je wilt.',
+      cta: 'Ga naar je dashboard',
+    },
+  }
+
+  const { heading, body, cta } = content[plan]
+
+  return `
+<div style="font-family: 'Rethink Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background-color: #1a2332; padding: 60px 24px; min-height: 100vh; margin: 0;">
+  <div style="max-width: 580px; margin: 0 auto;">
+
+    <div style="margin-bottom: 52px;">
+      <img src="${logoUrl}" alt="DBA Kompas" width="200" style="display: block; height: auto; border: 0;" />
+    </div>
+
+    <p style="color: #ffffff; font-size: 22px; font-weight: 700; line-height: 1.3; margin: 0 0 24px 0;">${heading}</p>
+
+    <p style="color: #ffffff; font-size: 17px; line-height: 1.75; margin: 0 0 40px 0;">${body}</p>
+
+    <div style="margin-bottom: 52px;">
+      <a href="${dashboardUrl}" style="display: inline-block; background-color: #d4782a; color: #ffffff; font-family: 'Rethink Sans', sans-serif; font-size: 16px; font-weight: 700; text-decoration: none; padding: 16px 40px; border-radius: 8px; letter-spacing: 0.01em;">${cta}</a>
+    </div>
+
+    <hr style="border: none; border-top: 1px solid #2e3f55; margin: 0 0 40px 0;" />
+
+    <p style="color: #ffffff; font-size: 15px; line-height: 1.75; margin: 0;">
+      Met vriendelijke groet,<br>
+      Het DBA Kompas team
+    </p>
+
+  </div>
+</div>
+  `.trim()
+}
+
+export async function sendPurchaseWelcomeEmail(to: string, plan: PurchasePlan) {
+  const subjects: Record<PurchasePlan, string> = {
+    one_time: 'Je DBA-check is geactiveerd — welkom bij DBA Kompas',
+    monthly: 'Welkom bij DBA Kompas Pro — je maandabonnement is actief',
+    yearly: 'Welkom bij DBA Kompas Pro — je jaarabonnement is actief',
+  }
+
   return resend.emails.send({
     from: 'DBA Kompas <noreply@dbakompas.nl>',
     to,
-    subject: 'Welkom bij DBA Kompas',
-    html: `
-      <h1>Welkom, ${name}!</h1>
-      <p>Je account is aangemaakt. Je kunt nu inloggen via DBA Kompas.</p>
-      <p>Met vriendelijke groet,<br>Het DBA Kompas team</p>
-    `,
+    subject: subjects[plan],
+    html: buildPurchaseWelcomeHtml(plan),
   })
 }
 
