@@ -3,6 +3,7 @@
 import { Suspense, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { translateAuthError } from '@/lib/auth-errors'
 import Link from 'next/link'
 import { Lock, Eye, EyeOff, ArrowRight, Check, Loader2, Mail } from 'lucide-react'
 import BrandLogo from '@/components/marketing/BrandLogo'
@@ -75,12 +76,7 @@ function RegisterForm() {
     })
 
     if (signUpError) {
-      const msg = signUpError.message.toLowerCase()
-      if (msg.includes('already registered') || msg.includes('already in use')) {
-        setError('Dit e-mailadres is al in gebruik. Log in via de inlogpagina.')
-      } else {
-        setError(`Er is een fout opgetreden: ${signUpError.message}`)
-      }
+      setError(translateAuthError(signUpError.message))
       setLoading(false)
       return
     }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { translateAuthError } from "@/lib/auth-errors";
 import { X, ArrowRight, ArrowLeft, Mail, Lock, Eye, EyeOff, Check, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -130,7 +131,7 @@ export function EmailCheckoutModal({ onClose, preselectedPlan = "yearly" }: Emai
       });
 
       if (error) {
-        setApiError(error.message);
+        setApiError(translateAuthError(error.message));
         setLoading(false);
         return;
       }
