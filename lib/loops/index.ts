@@ -1,5 +1,5 @@
 const LOOPS_API_KEY = process.env.LOOPS_API_KEY;
-const LOOPS_EVENTS_URL = "https://app.loops.so/api/v1/events";
+const LOOPS_EVENTS_URL = "https://app.loops.so/api/v1/events/send";
 const LOOPS_CONTACTS_URL = "https://app.loops.so/api/v1/contacts/update";
 
 const sentEvents = new Map<string, Set<string>>();
