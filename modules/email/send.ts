@@ -35,54 +35,30 @@ function buildPurchaseWelcomeHtml(plan: PurchasePlan): string {
   return `
 <div style="width: 100%; background-color: #1a2332; margin: 0; padding: 0;">
   <div style="max-width: 580px; margin: 0 auto; padding: 60px 24px;">
-
     <div style="margin-bottom: 52px;">
       <img src="${logoUrl}" alt="DBA Kompas" width="200" style="display: block; height: auto; border: 0;" />
     </div>
-
     <p style="color: #ffffff; font-family: 'Rethink Sans', sans-serif; font-size: 22px; font-weight: 700; line-height: 1.3; margin: 0 0 24px 0;">${heading}</p>
-
     <p style="color: #ffffff; font-family: 'Rethink Sans', sans-serif; font-size: 17px; line-height: 1.75; margin: 0 0 16px 0;">${body1}</p>
-
     <p style="color: #ffffff; font-family: 'Rethink Sans', sans-serif; font-size: 17px; line-height: 1.75; margin: 0 0 40px 0;">${body2}</p>
-
     <div style="margin-bottom: 52px;">
       <a href="${dashboardUrl}" style="display: inline-block; background-color: #d4782a; color: #ffffff; font-family: 'Rethink Sans', sans-serif; font-size: 16px; font-weight: 700; text-decoration: none; padding: 16px 40px; border-radius: 8px; letter-spacing: 0.01em;">${cta}</a>
     </div>
-
     <hr style="border: none; border-top: 1px solid #2e3f55; margin: 0 0 40px 0;" />
-
     <p style="color: #ffffff; font-family: 'Rethink Sans', sans-serif; font-size: 15px; line-height: 1.75; margin: 0;">Met vriendelijke groet,<br>Het DBA Kompas team</p>
-
   </div>
 </div>
   `.trim()
 }
 
 export async function sendPurchaseWelcomeEmail(to: string, plan: PurchasePlan) {
-  const templateIds: Record<PurchasePlan, string | undefined> = {
-    one_time: process.env.RESEND_TEMPLATE_WELCOME_ONE_TIME,
-    monthly:  process.env.RESEND_TEMPLATE_WELCOME_MONTHLY,
-    yearly:   process.env.RESEND_TEMPLATE_WELCOME_YEARLY,
-  }
-
   const subjects: Record<PurchasePlan, string> = {
     one_time: 'DBA Kompas — Je check staat klaar',
     monthly:  'DBA Kompas — Je maandabonnement is actief',
     yearly:   'DBA Kompas — Je jaarabonnement is actief',
   }
 
-  const templateId = templateIds[plan]
-
-  // Gebruik Resend template als ID beschikbaar is, anders inline HTML
-  if (templateId) {
-    return resend.emails.send({
-      from: 'DBA Kompas <noreply@dbakompas.nl>',
-      to,
-      template_id: templateId,
-    } as Parameters<typeof resend.emails.send>[0])
-  }
-
+  // Resend SDK ondersteunt template_id niet in emails.send() — altijd inline HTML
   return resend.emails.send({
     from: 'DBA Kompas <noreply@dbakompas.nl>',
     to,
@@ -107,4 +83,3 @@ export async function sendEmail({
     html,
   })
 }
-
