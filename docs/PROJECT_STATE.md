@@ -148,7 +148,7 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
   - `npm uninstall resend` + `npm install postmark` uitgevoerd
   - `modules/email/send.ts` volledig herschreven met Postmark SDK
   - Cloudflare DNS: DKIM TXT + Return-Path CNAME toegevoegd → beide VERIFIED ✅
-  - Postmark Server Token: `17cca152-59d5-45f0-8867-3991696f53e1`
+  - Postmark Server Token: `[POSTMARK_SERVER_TOKEN]`
   - Code gepusht naar GitHub (auto-deploy Vercel)
 
 ### Sessie 2026-04-14 — POSTMARK-001 voltooiing (sessie 9)
