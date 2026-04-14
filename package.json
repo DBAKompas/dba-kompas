@@ -12,6 +12,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.54.0",
     "@hookform/resolvers": "^5.2.2",
     "@sentry/nextjs": "^10.47.0",
     "@supabase/ssr": "^0.10.0",
@@ -23,14 +24,13 @@
     "input-otp": "^1.4.2",
     "lucide-react": "^1.7.0",
     "next": "16.2.2",
-    "@anthropic-ai/sdk": "^0.54.0",
     "pdfkit": "^0.18.0",
     "posthog-js": "^1.364.7",
+    "postmark": "^4.0.7",
     "radix-ui": "^1.4.3",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-hook-form": "^7.72.1",
-    "resend": "^6.10.0",
     "shadcn": "^4.1.2",
     "stripe": "^22.0.0",
     "tailwind-merge": "^3.5.0",
@@ -44,11 +44,11 @@
     "@types/pdfkit": "^0.17.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitest/coverage-v8": "^2.1.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.2",
     "tailwindcss": "^4",
     "typescript": "^5",
-    "vitest": "^2.1.0",
-    "@vitest/coverage-v8": "^2.1.0"
+    "vitest": "^2.1.0"
   }
 }
