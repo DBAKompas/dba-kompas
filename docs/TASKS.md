@@ -1,6 +1,6 @@
 # TASKS.md
 
-**Laatste update:** 2026-04-14 (sessie 9)
+**Laatste update:** 2026-04-14 (sessie 10)
 
 ---
 
@@ -74,6 +74,13 @@
 ---
 
 ## DONE
+
+### Sessie 2026-04-14 (sessie 10) — Security incident + build fix
+- [x] **SEC-INC-001**: Postmark token geroteerd na GitGuardian alert ✅
+- [x] Nieuwe token in Vercel + Supabase SMTP bijgewerkt ✅
+- [x] Tokenwaarde verwijderd uit docs (commit `e5f165d`) ✅
+- [x] `lib/email/index.ts` + `modules/email/send.ts`: Resend → Postmark SDK (commit `4f9df24`) ✅
+- [x] Deployment: Ready op `dbakompas.nl` ✅
 
 ### Sessie 2026-04-14 (sessie 9) — POSTMARK-001 voltooiing
 - [x] **POSTMARK-001 VOLLEDIG AFGEROND** ✅

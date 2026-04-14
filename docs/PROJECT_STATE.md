@@ -1,6 +1,6 @@
 # PROJECT_STATE.md
 
-**Laatste update:** 2026-04-14 (sessie 9)
+**Laatste update:** 2026-04-14 (sessie 10)
 **Maturity:** ~99% (live op dbakompas.nl, Stripe in test mode, Postmark volledig actief)
 
 ---
@@ -151,6 +151,14 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
   - Postmark Server Token: `[POSTMARK_SERVER_TOKEN]`
   - Code gepusht naar GitHub (auto-deploy Vercel)
 
+### Sessie 2026-04-14 — Security incident + build fix (sessie 10)
+- **SEC-INC-001 OPGELOST** ✅: Postmark Server Token per ongeluk in docs opgenomen → GitGuardian alert
+  - Token direct geroteerd in Postmark dashboard
+  - Nieuwe token gezet in Vercel + Supabase SMTP bijgewerkt
+  - Tokenwaarde verwijderd uit docs (commit `e5f165d`)
+- **BUILD-FIX** ✅: `lib/email/index.ts` importeerde nog steeds `resend` → Postmark doorgevoerd (commit `4f9df24`)
+- Deployment: Ready op `dbakompas.nl` ✅
+
 ### Sessie 2026-04-14 — POSTMARK-001 voltooiing (sessie 9)
 - **POSTMARK-001 VOLLEDIG AFGEROND** ✅
   - `POSTMARK_SERVER_TOKEN` toegevoegd in Vercel (All Environments)
@@ -162,8 +170,10 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
 
 ## LAATSTE ACTIE
 
-**Sessie:** 2026-04-14
+**Sessie:** 2026-04-14 (sessie 10)
 **Laatste commits:**
+- `4f9df24` — "fix: vervang Resend door Postmark in email modules"
+- `e5f165d` — "security: verwijder blootgestelde Postmark token uit docs"
 - `b766fb7` — "fix: welkomstmail via inline HTML — Resend SDK ondersteunt template_id niet"
 - `0545c90` — "fix: Loops events endpoint URL — /send ontbrak"
 - (Postmark send.ts commit — naam onbekend, gepusht door Marvin)
