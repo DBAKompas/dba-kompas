@@ -1,6 +1,6 @@
 # INTEGRATIONS_STATUS.md
 **Status van alle externe integraties**
-**Laatst bijgewerkt:** 2026-04-10 (sessie 2 — avond)
+**Laatst bijgewerkt:** 2026-04-13 (sessie 7)
 
 ---
 
@@ -14,20 +14,19 @@
 | RLS op alle tabellen | GEÏMPLEMENTEERD |
 | Server-side client | GEÏMPLEMENTEERD (`lib/supabase/server.ts`) |
 | Admin client (service role) | GEÏMPLEMENTEERD (`lib/supabase/admin.ts`) |
-| Site URL | `https://dba-kompas.vercel.app` (gecorrigeerd 2026-04-09) |
-| Redirect allowlist | `https://dba-kompas.vercel.app/**` (toegevoegd 2026-04-09) |
-| E-mailbevestiging | TIJDELIJK UITGESCHAKELD (rate limit tijdens tests) |
-| Verificatiemail template | DBA Kompas huisstijl (custom HTML in Supabase Auth → Email Templates) |
-| Live getest | BEVESTIGD (auth + analyse werkt) |
+| Site URL | `https://dbakompas.nl` ✅ (bijgewerkt 2026-04-12) |
+| Redirect allowlist | `https://dba-kompas.vercel.app/**` + `https://dbakompas.nl/**` ✅ |
+| E-mailbevestiging | INGESCHAKELD ✅ (2026-04-12) |
+| Custom SMTP | Resend — `smtp.resend.com:465`, user `resend` ✅ (2026-04-12) |
+| Verificatiemail template | DBA Kompas huisstijl: donker navy, Rethink Sans, oranje CTA, v3 full logo ✅ |
+| Logo in template | `https://dbakompas.nl/logo-white-v3-full.png` ✅ (bijgewerkt 2026-04-13) |
+| Live getest | BEVESTIGD ✅ — verificatiemail end-to-end werkend (2026-04-13) |
 
 **Risico's:**
-- E-mailbevestiging is uitgeschakeld — inschakelen zodra INFRA-001 (custom SMTP) gereed is
 - Geen fallback als Supabase tijdelijk onbereikbaar is
 - RLS policies niet geaudit voor correctheid
 
 **Nog te doen:**
-- INFRA-001 IN PROGRESS: Resend domein `dbakompas.nl` verificatie loopt (DNS propagatie STRATO). Na Verified: Supabase SMTP instellen + e-mailbevestiging aanzetten. Zie TASKS.md voor exacte stappen.
-- Na INFRA-001: E-mailbevestiging opnieuw inschakelen
 - RLS policies auditen (kan gebruiker A data van gebruiker B zien?)
 
 ---
@@ -102,7 +101,7 @@ STRIPE_COUPON_ONE_TIME_UPGRADE=ONETIMECREDIT
 - Stripe e-mail bevestigingsflow testen met live mode
 
 **Risico's:**
-- TEST-003 (webhook delivery) nog niet uitgevoerd — onbekend of `billing_events` + `subscriptions` correct worden bijgewerkt
+- TEST-003 BEVESTIGD WERKEND (2026-04-09) — `billing_events` + `subscriptions` + `profiles` correct bijgewerkt ✅
 - Coupon `ONETIMECREDIT` bestaat alleen in test mode — live launch geblokkeerd tot live coupon aangemaakt is
 
 ---
@@ -117,9 +116,16 @@ STRIPE_COUPON_ONE_TIME_UPGRADE=ONETIMECREDIT
 | Maandelijkse digest | GEÏMPLEMENTEERD |
 | Urgente notificaties | GEÏMPLEMENTEERD |
 | One-time upsell e-mail | GEÏMPLEMENTEERD (`sendOneTimeUpsellEmail` in `modules/email/send.ts`) |
-| Trigger mechanisme digests | ONBEKEND (geen cron job gevonden) |
+| Welkomstmail eenmalige check | GEÏMPLEMENTEERD — Resend Template `103d7be2-e2a6-48e6-9c29-5db48de2b338` ✅ |
+| Welkomstmail maandabonnement | GEÏMPLEMENTEERD — Resend Template `11387950-bdd2-4e81-bf5c-fde9f60d1baa` ✅ |
+| Welkomstmail jaarabonnement | GEÏMPLEMENTEERD — Resend Template `02824f32-0da5-407c-b44e-3b89c0ea2d52` ✅ |
+| Domein geverifieerd | `dbakompas.nl` VERIFIED ✅ (2026-04-12) |
+| Trigger mechanisme digests | GEÏMPLEMENTEERD via Vercel Cron Jobs (LOOPS-003) ✅ |
 | Upsell e-mail trigger | Stripe webhook `checkout.session.completed` (mode=payment) |
-| Live getest | NEE |
+| Welkomstmail trigger | Stripe webhook `checkout.session.completed` (mode=payment + subscription) |
+| `RESEND_API_KEY` in Vercel | INGESTELD ✅ (2026-04-13) |
+| Resend template env vars | INGESTELD in Vercel ✅ (2026-04-13) |
+| Live getest | GEDEELTELIJK — Supabase SMTP verificatiemail werkend ✅, welkomstmails wachten op live Stripe betaling |
 
 **One-time upsell e-mail details:**
 - Verstuurd via: Stripe webhook → `handleCheckoutCompleted()` → `sendOneTimeUpsellEmail(email)`
@@ -127,15 +133,17 @@ STRIPE_COUPON_ONE_TIME_UPGRADE=ONETIMECREDIT
 - Inhoud: bevestiging aankoop + upgradeaanbod + knop "Upgrade voor €10,05 eerste maand" → `/upgrade-to-pro`
 - Fout afgevangen met `.catch()` — webhook fout niet bij e-mailprobleem
 
-**Digest trigger (LOOPS-003 opgelost):**
-- `app/api/cron/weekly-digest/route.ts`: GET handler, elke maandag 07:00 UTC
-- `app/api/cron/monthly-digest/route.ts`: GET handler, elke 1e van de maand 07:00 UTC
-- Beveiligd via `CRON_SECRET` (Vercel Bearer token)
-- `vercel.json` uitgebreid met `crons` sectie
+**Digest trigger (LOOPS-003 AFGEROND):**
+- `app/api/cron/weekly-digest/route.ts`: elke maandag 07:00 UTC, beveiligd via `CRON_SECRET`
+- `app/api/cron/monthly-digest/route.ts`: elke 1e van de maand 07:00 UTC, beveiligd via `CRON_SECRET`
+- `vercel.json` uitgebreid met `crons` sectie ✅
+
+**SPF-record (gecombineerd):**
+`v=spf1 include:amazonses.com include:_spf.strato.com ~all` — dekt zowel Resend (Amazon SES) als STRATO (Apple Mail inbound)
 
 **Risico's:**
 - Geen unsubscribe mechanisme zichtbaar in code
-- Resend live test nog niet uitgevoerd
+- Welkomstmails nog niet live getest — volgt automatisch bij eerste live Stripe betaling (na STRIPE-LIVE)
 
 ---
 
@@ -177,14 +185,21 @@ Event received (quick_scan_completed, one time)
   → Loop completed
 ```
 
-**Resterende acties bij livegang op `dbakompas.nl`:**
-1. Journey A + C activeren via "Resume"
-2. In alle 9 emails CTA-URLs omzetten van `dba-kompas.vercel.app` naar `dbakompas.nl`
-3. Oude loops verwijderen: `quick_scan_completed - high`, `quick_scan_completed - medium`, `quick_scan_completed - low`
+**Afgerond (2026-04-11):**
+- Journey A + C geactiveerd ✅
+- Alle 9 CTA-URLs omgezet naar `dbakompas.nl` ✅
+
+**Resterende actie bij livegang:**
+- Oude journeys verwijderen: `quick_scan_completed - high`, `quick_scan_completed - medium`, `quick_scan_completed - low`
+
+**DNS-afhankelijkheid (AFGEROND):**
+- Sending domain gewijzigd naar `dbakompas.nl` in Loops Dashboard ✅
+- Alle 5 DNS-records aangemaakt in Cloudflare en geverifieerd door Loops ✅
+- Envelope MX-record probleem opgelost: expliciete MX voor `envelope.dbakompas.nl` overschrijft wildcard ✅
 
 **Risico's:**
 - KI-013: Loops deduplicatie is in-memory (Map) — reset bij cold start. Acceptabel voor huidige schaal.
-- Digest trigger (LOOPS-003): `sendWeeklyDigest()` + `sendMonthlyDigest()` hebben geen cron job trigger.
+- Digest trigger: OPGELOST via LOOPS-003 (Vercel Cron Jobs, commit `c853b45`) ✅
 
 ---
 
@@ -194,7 +209,7 @@ Event received (quick_scan_completed, one time)
 |---|---|
 | Code aanwezig | JA |
 | Provider geconfigureerd | JA (`components/providers/posthog-provider.tsx`) |
-| Events getracked | ONBEKEND (geen specifieke event calls gevonden) |
+| Events getracked | JA — ANAL-001/002/003: login, analyse, checkout, quick_scan (5 events), identify + plan |
 | Live getest | ONBEKEND |
 
 ---

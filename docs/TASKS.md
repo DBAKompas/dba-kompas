@@ -1,5 +1,5 @@
 # TASKS.md
-**Laatst bijgewerkt:** 2026-04-12 (sessie 6)
+**Laatst bijgewerkt:** 2026-04-13 (sessie 7)
 
 ---
 
@@ -55,21 +55,18 @@
 
 ### LAAG (verbetering)
 
-- [~] **INFRA-001**: DNS migratie + e-mailinrichting — **GROTENDEELS KLAAR, 4 handmatige acties resterend**
-  - Cloudflare: actief ✅, NS-records correct ✅
+- [x] **INFRA-001**: DNS migratie + e-mailinrichting — **VOLLEDIG AFGEROND** ✅ (2026-04-13)
+  - Cloudflare: actief ✅
   - Resend: domein `dbakompas.nl` geverifieerd ✅
-  - Loops: sending domain gewijzigd naar `dbakompas.nl`, alle DNS-records geverifieerd ✅
+  - Loops: sending domain `dbakompas.nl`, alle DNS-records geverifieerd ✅
   - Supabase SMTP: ingesteld via Resend (`smtp.resend.com`, port 465, user `resend`) ✅
   - Supabase Site URL + Redirect URL bijgewerkt naar `dbakompas.nl` ✅
   - Supabase Confirm email: ingeschakeld ✅
-  - Supabase email template: DBA Kompas huisstijl (donker navy, Rethink Sans, oranje CTA) ✅
-  - Vercel custom domain `dbakompas.nl`: gekoppeld, SSL actief ✅
-  - SPF-record: gecombineerd `v=spf1 include:amazonses.com include:_spf.strato.com ~all` ✅
-  - **RESTERENDE ACTIES (eerste taak volgende sessie — in volgorde uitvoeren):**
-    1. Logo in Supabase e-mailtemplate updaten: Authentication → Email Templates → Confirm signup → Source → `img src` → `https://dbakompas.nl/logo-flat-white.png` → Save changes
-    2. `NEXT_PUBLIC_APP_URL` updaten in Vercel env vars naar `https://dbakompas.nl` → Redeploy
-    3. Resend API key "DBA Kompas" toevoegen als `RESEND_API_KEY` in Vercel env vars → Redeploy
-    4. Testaccount aanmaken op `https://dbakompas.nl` → verificatiemail van `noreply@dbakompas.nl` controleren (logo correct, CTA-link werkt)
+  - Supabase email template: DBA Kompas huisstijl, logo v3 full horizontal ✅
+  - Go html/template parse error opgelost (single-line `<img>` tag) ✅
+  - `NEXT_PUBLIC_APP_URL=https://dbakompas.nl` in Vercel ✅
+  - `RESEND_API_KEY` in Vercel ✅
+  - Verificatiemail end-to-end getest en werkend ✅
 - [ ] **MAIL-001**: `info@dbakompas.nl` instellen in Apple Mail — **NIEUW**
   - Doel: e-mail centraal ontvangen/versturen via Apple Mail i.p.v. STRATO webmail
   - IMAP: `imap.strato.de`, poort `993`, SSL/TLS
@@ -254,11 +251,29 @@ Stripe webhook (checkout.session.completed, mode=payment)
 
 ## IN PROGRESS
 
-- **INFRA-001**: 4 resterende handmatige acties — zie LAAG sectie hierboven + PROJECT_STATE.md EERSTE TAAK VOLGENDE SESSIE.
+- **STRIPE-LIVE**: Stripe omzetten naar live mode — zie TASKS.md VEREIST VOOR LIVEGANG sectie + PROJECT_STATE.md EERSTE TAAK VOLGENDE SESSIE.
 
 ---
 
 ## DONE
+
+### Sessie 2026-04-13 (sessie 7) — INFRA-001 afgerond + welkomstmails + Resend Templates
+
+- [x] **INFRA-001**: Volledig afgerond ✅
+  - Logo bijgewerkt naar `logo-white-v3-full.png` (v3 full horizontal) in Supabase template
+  - Go html/template parse error opgelost (single-line `<img>` tag)
+  - `NEXT_PUBLIC_APP_URL=https://dbakompas.nl` + `RESEND_API_KEY` in Vercel → Redeploy
+  - Verificatiemail end-to-end werkend van `noreply@dbakompas.nl`
+- [x] **EMAIL-001**: Nederlandstalige foutmeldingen auth
+  - `lib/auth-errors.ts` aangemaakt met `translateAuthError()`
+  - Gebruikt in `EmailCheckoutModal.tsx` + `app/register/page.tsx`
+- [x] **EMAIL-002**: Welkomstmails voor alle drie aankoopsoorten
+  - `modules/email/send.ts` volledig herschreven (`sendPurchaseWelcomeEmail`, `buildPurchaseWelcomeHtml`)
+  - `app/api/billing/webhook/route.ts` uitgebreid met welkomstmail-aanroep
+  - Resend Templates handmatig aangemaakt (3 stuks) en gekoppeld via env vars
+  - Volledige breedte fix (`width: 100%`) toegepast
+  - Copy: geen "onbeperkt", geen WTTA, open professionele toon
+  - Template IDs in Vercel env vars + `.env.local.example`
 
 ### Sessie 2026-04-12 (sessie 6) — Documentatiesync
 

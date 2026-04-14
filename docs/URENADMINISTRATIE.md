@@ -1,6 +1,6 @@
 # Urenadministratie DBA Kompas
-**Periode:** Architectuurfase t/m Loops e-mailsequenties afgerond
-**Bijgewerkt:** 2026-04-10
+**Periode:** Architectuurfase t/m app live op dbakompas.nl
+**Bijgewerkt:** 2026-04-12
 
 ---
 
@@ -338,6 +338,34 @@ Na elke sessie heb ik alle projectdocumenten bijgewerkt zodat de volgende sessie
 
 ---
 
+## 14. NS-wissel STRATO naar Cloudflare voltooien + LOOPS-002 afronden (2026-04-11)
+
+**Toelichting:**
+DNSSEC was al gedeactiveerd in de vorige sessie. In deze sessie heb ik de NS-records definitief omgezet en alle openstaande Loops-taken afgerond. De DNS-propagatie loopt nog op het moment van afsluiten.
+
+**Taken uitgevoerd:**
+
+*INFRA-001 voortgezet:*
+- Bevestigd dat DNSSEC "niet actief" staat in STRATO
+- NS-records in STRATO omgezet naar `brett.ns.cloudflare.com` en `peaches.ns.cloudflare.com`
+- Cloudflare "Check nameservers now" gestart, propagatie lopend
+- CRON_SECRET aangemaakt via `openssl rand -base64 32` en toegevoegd als env var in Vercel Dashboard
+- Vercel project geredeployed na toevoeging CRON_SECRET
+- Resend domain status gecontroleerd: staat op "Failed" door eerdere verificatiepoging voor NS-wissel, wordt herbevestigd zodra Cloudflare actief is
+
+*LOOPS-002 afgerond:*
+- Alle 9 CTA-URLs in Loops omgezet van `dba-kompas.vercel.app` naar `dbakompas.nl`
+- Journey A "Hoog risico" geactiveerd
+- Journey C "Laag risico" geactiveerd
+- Journey B was al actief
+
+**Uitdagingen:**
+DNS-propagatie bij STRATO duurt langer dan verwacht. DNSChecker toonde nog de oude STRATO-nameservers, maar de STRATO-interface bevestigde dat de juiste Cloudflare-waarden al zijn opgeslagen. Dit is een TTL-kwestie waarbij de globale DNS-cache moet verlopen. Er is geen actie mogelijk anders dan wachten.
+
+**Tijdsinschatting (mens):** 2,5 uur
+
+---
+
 ## Totaaloverzicht
 
 | # | Werkzaamheid | Datum | Uren |
@@ -355,4 +383,5 @@ Na elke sessie heb ik alle projectdocumenten bijgewerkt zodat de volgende sessie
 | 11 | Loops journeys A, B en C aanmaken en configureren | 2026-04-10 | 10,0 |
 | 12 | Journey B testen en activeren | 2026-04-10 | 1,0 |
 | 13 | Documentatie en projectregistratie (doorlopend) | Doorlopend | 4,0 |
-| | **Totaal** | | **95,5** |
+| 14 | NS-wissel Cloudflare + LOOPS-002 afronden | 2026-04-11 | 2,5 |
+| | **Totaal** | | **98,0** |

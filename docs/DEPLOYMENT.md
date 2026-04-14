@@ -165,6 +165,55 @@ Actief tijdens ontwikkelingsfase. Alle Stripe-webhooks, Supabase redirect URLs e
 
 ---
 
+## E-mail architectuur en DNS-afhankelijkheden
+
+DBA Kompas heeft drie onafhankelijke e-mailstromen die elk hun eigen DNS-records nodig hebben. Ze mogen elkaar niet verstoren. Hieronder staat per stroom wat er in Cloudflare DNS aanwezig moet zijn.
+
+### Stroom 1 — Transactionele e-mail via Resend (`noreply@dbakompas.nl`)
+
+Verstuurt: auth-verificatie (via Supabase SMTP), one-time upsell, wekelijkse/maandelijkse digest.
+
+Vereiste DNS-records in Cloudflare:
+- `TXT` SPF: bevat Resend's Amazon SES IP-ranges (`include:amazonses.com`)
+- `TXT` DKIM: Resend-specifieke DKIM-sleutel (Resend toont de exacte records na domeinverificatie)
+- `TXT` DMARC: `v=DMARC1; p=none; rua=mailto:info@dbakompas.nl`
+
+### Stroom 2 — STRATO mailbox (`info@dbakompas.nl`) voor Apple Mail
+
+Verstuurt en ontvangt: handmatige e-mail via Apple Mail op STRATO IMAP/SMTP.
+
+Vereiste DNS-records in Cloudflare:
+- `MX` records: moeten wijzen naar STRATO-mailservers (worden automatisch geimporteerd door Cloudflare bij domein toevoegen — VERIFICEREN voordat INFRA-001 afgerond wordt)
+- `TXT` SPF: moet STRATO's verzend-IP's bevatten naast Resend
+
+**Kritiek: gecombineerde SPF**
+
+Als alleen Resend's SPF wordt toegevoegd, falen e-mails verstuurd via Apple Mail (STRATO SMTP) de SPF-check en landen ze in spam. Het SPF-record moet beide bronnen combineren:
+
+```
+v=spf1 include:amazonses.com include:_spf.strato.de ~all
+```
+
+Voeg dit in als één enkel TXT-record op `dbakompas.nl`. Nooit twee aparte SPF-records aanmaken — dat breekt SPF-validatie.
+
+### Stroom 3 — Loops lifecycle e-mails (journeys A/B/C)
+
+Verstuurt: quick scan follow-up sequenties via Loops infrastructure.
+
+Loops verstuurt standaard via eigen servers (`em.loops.so` of vergelijkbaar). Er zijn geen extra DNS-records vereist in Cloudflare tenzij Loops een custom sending domain instelt.
+
+Controleer in Loops Dashboard → Settings → Sending Domain of `dbakompas.nl` daar geconfigureerd staat als custom domain. Zo ja: Loops toont extra DKIM-records die in Cloudflare DNS moeten worden toegevoegd.
+
+### Verificatiechecklist vóór INFRA-001 afronden
+
+Controleer dit in Cloudflare DNS Records vóórdat je Resend verificatie start:
+
+- [ ] MX-records voor `dbakompas.nl` aanwezig (STRATO mailservers)
+- [ ] Geen conflicterende of dubbele SPF-records aanwezig
+- [ ] Loops custom sending domain controleren in Loops Dashboard
+
+---
+
 ## INFRA-001: Custom SMTP via Resend (vereist vóór live launch)
 
 Supabase Auth gebruikt standaard een ingebouwde mailservice met rate limits (~3 mails/uur) en een `@supabase.io` afzender. Voor productie moet dit worden vervangen door Resend SMTP.

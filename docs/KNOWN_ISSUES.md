@@ -1,6 +1,6 @@
 # KNOWN_ISSUES.md
 **Bekende problemen en bugs**
-**Laatst bijgewerkt:** 2026-04-10 (sessie 2 — avond)
+**Laatst bijgewerkt:** 2026-04-13 (sessie 7)
 
 ---
 
@@ -136,6 +136,14 @@
 
 ---
 
+### KI-019 — Welkomstmails nog niet live getest na Stripe live betaling
+**Status:** OPEN (blokkeert niet)
+**Bestand:** `modules/email/send.ts`, `app/api/billing/webhook/route.ts`
+**Symptoom:** Welkomstmails zijn geïmplementeerd en Resend Templates zijn aangemaakt, maar de volledige flow (Stripe webhook → `sendPurchaseWelcomeEmail` → Resend template) is alleen te testen na een echte live Stripe betaling.
+**Actie:** Testen als onderdeel van STRIPE-LIVE end-to-end test.
+
+---
+
 ### KI-013 — Loops deduplicatie is in-memory
 **Status:** OPEN (low priority)
 **Bestand:** `lib/loops/index.ts`
@@ -145,7 +153,10 @@
 ---
 
 ### KI-018 — Digest e-mails hebben geen trigger
-**Status:** OPEN (low priority)
-**Bestanden:** `modules/email/send.ts` — `sendWeeklyDigest()`, `sendMonthlyDigest()`
-**Symptoom:** Functies zijn geïmplementeerd maar er is geen cron job of scheduler die ze aanroept. Digests worden nooit verstuurd.
-**Actie (LOOPS-003):** Vercel Cron Job toevoegen in `vercel.json`, of externe scheduler (GitHub Actions, Supabase pg_cron). Niet blokkerend voor MVP-launch.
+**Status:** OPGELOST — 2026-04-11 (LOOPS-003, commit `c853b45`)
+**Bestanden:** `app/api/cron/weekly-digest/route.ts` (NIEUW), `app/api/cron/monthly-digest/route.ts` (NIEUW), `vercel.json` (uitgebreid)
+**Oplossing:** Vercel Cron Jobs aangemaakt:
+- `GET /api/cron/weekly-digest` — elke maandag 07:00 UTC, beveiligd via `CRON_SECRET`
+- `GET /api/cron/monthly-digest` — elke 1e van de maand 07:00 UTC, beveiligd via `CRON_SECRET`
+- `vercel.json` uitgebreid met `crons` sectie
+- `CRON_SECRET` env var gedocumenteerd in `.env.local.example` + `docs/DEPLOYMENT.md`

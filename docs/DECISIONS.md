@@ -5,6 +5,160 @@ Elke beslissing bevat: datum, beslissing, reden, alternatieven overwogen.
 
 ---
 
+## 2026-04-13 — Nederlandstalige foutmeldingen via centrale vertaalfunctie
+
+**Beslissing:** Supabase Auth geeft altijd Engelse foutmeldingen terug. Deze worden vertaald via een centrale `translateAuthError(message)` functie in `lib/auth-errors.ts`.
+
+**Mechanisme:**
+- `translateAuthError` ontvangt de Engelse error message string van Supabase
+- Bekende patronen worden gematcht en vertaald naar Nederlands
+- Fallback: "Er is een fout opgetreden. Probeer het opnieuw."
+- Gebruikt in `EmailCheckoutModal.tsx` en `app/register/page.tsx`
+
+**Reden:**
+- Supabase biedt geen native i18n voor Auth errors
+- Engelse foutmeldingen zijn onprofessioneel voor een Nederlandstalige doelgroep
+- Centrale aanpak voorkomt verspreide if/else blokken per component
+
+**Alternatieven overwogen:**
+- Per-component if/else vertaling: te verspreid, lastig onderhouden
+- Supabase custom error messages: niet beschikbaar via standaard Auth config
+
+---
+
+## 2026-04-13 — Welkomstmails via Resend Templates met inline HTML fallback
+
+**Beslissing:** Welkomstmails worden verstuurd via Resend Templates (beheersbaar via Resend dashboard). Als een template ID ontbreekt in env vars, valt de code terug op inline HTML.
+
+**Template IDs:**
+- `RESEND_TEMPLATE_WELCOME_ONE_TIME`: `103d7be2-e2a6-48e6-9c29-5db48de2b338`
+- `RESEND_TEMPLATE_WELCOME_MONTHLY`: `11387950-bdd2-4e81-bf5c-fde9f60d1baa`
+- `RESEND_TEMPLATE_WELCOME_YEARLY`: `02824f32-0da5-407c-b44e-3b89c0ea2d52`
+
+**Reden:**
+- Resend Templates zijn bewerkbaar via dashboard zonder deployment
+- Resend heeft geen public REST API voor template aanmaak — handmatig aangemaakt via dashboard
+- Inline HTML fallback zorgt dat e-mails werken ook zonder template env vars (lokale dev)
+
+**Alternatieven overwogen:**
+- Altijd inline HTML: minder flexibel, elke copy-wijziging vereist deployment
+- Loops voor welkomstmails: Loops is voor marketing automation, niet voor transactionele betalingsbevestigingen
+
+---
+
+## 2026-04-13 — Welkomstmail copy: geen limieten, geen WTTA
+
+**Beslissing:** Welkomstmails vermelden geen analyse-limieten en geen WTTA-referentie.
+
+**Reden (limieten):**
+- `BILLING-002` (analyse-limieten) is nog niet gebouwd — limieten zijn nu nog niet van toepassing
+- Als limieten later worden geïntroduceerd, worden de templates via Resend dashboard bijgewerkt
+
+**Reden (WTTA):**
+- De welkomstmail is niet de plek voor productuitleg — één taak: gebruiker naar dashboard krijgen
+- WTTA-nieuws ontdekken gebruikers vanzelf in het product
+
+**Reden (geen "onbeperkt"):**
+- "Onbeperkt" is een belofte — met BILLING-002 in de backlog is dit prematuur
+- Neutrale formulering ("je hebt toegang tot DBA-analyses") is toekomstbestendig
+
+---
+
+## 2026-04-13 — BILLING-002: briefing-eerst aanpak
+
+**Beslissing:** `BILLING-002` (analyse-limieten + credit top-up) wordt NIET gebouwd zonder voorafgaande briefingsessie.
+
+**Werkwijze:**
+1. Begin sessie: schets het model (kosten/baten, limieten per plan, bundelkeuzes)
+2. Bespreek openstaande keuzes (doorrol credits, bundels vs. losse credits, harde/zachte blokkade)
+3. Pas dan: implementatie stap voor stap met begeleiding
+
+**Reden:**
+- Verkeerde aannames hier kosten twee keer werk
+- Business impact (API-kosten vs. gebruikersretentie) moet eerst helder zijn
+
+---
+
+## 2026-04-12 — DNS migratie naar Cloudflare (INFRA-001)
+
+**Beslissing:** DNS van `dbakompas.nl` wordt beheerd via Cloudflare, niet meer via STRATO.
+
+**Reden:**
+- STRATO biedt geen wildcard MX-records en ondersteunt geen subdomein-specifieke MX-records (nodig voor Loops `envelope` subdomain)
+- Cloudflare Free biedt CNAME-flattening op root-domein, DDoS-beveiliging, snelle propagatie
+- Cloudflare maakt DNS-beheer eenvoudiger en visueler dan STRATO
+
+**Mechanisme:**
+- STRATO NS-records gewijzigd naar `brett.ns.cloudflare.com` + `peaches.ns.cloudflare.com`
+- Cloudflare importeerde automatisch alle bestaande DNS-records vanuit STRATO
+- Vercel custom domain: CNAME-flattening op root (`@`) naar Vercel-specifieke CNAME — Cloudflare proxy uitgeschakeld (grijs wolk)
+- Apple Mail (STRATO IMAP/SMTP) onaangetast: MX-records voor `dbakompas.nl` intact, SPF-record gecombineerd
+
+**SPF-record (gecombineerd):**
+`v=spf1 include:amazonses.com include:_spf.strato.com ~all`
+- `include:amazonses.com` dekt Resend (verstuurt via Amazon SES)
+- `include:_spf.strato.com` dekt Apple Mail / STRATO outbound
+
+**Alternatieven overwogen:**
+- STRATO DNS behouden: blokkeerde Loops envelope-subdomain MX
+- Andere DNS-providers (Hetzner, TransIP): niet overwogen — Cloudflare Free voldoet volledig
+
+---
+
+## 2026-04-12 — Loops sending domain gewijzigd naar root dbakompas.nl
+
+**Beslissing:** Loops verstuurt e-mails vanuit `dbakompas.nl` (root), niet vanuit `app.dbakompas.nl` (subdomain).
+
+**Reden:**
+- E-mails vanuit subdomein ogen minder professioneel
+- Root domain `dbakompas.nl` sluit aan bij de rest van de communicatie (`noreply@dbakompas.nl`, `info@dbakompas.nl`)
+
+**Vereiste DNS-records (toegevoegd aan Cloudflare):**
+- MX voor `envelope.dbakompas.nl` → `feedback-smtp.us-east-1.amazonses.com`, priority 10
+- TXT `envelope.dbakompas.nl` → SPF waarde van Loops
+- CNAME `loopspk1._domainkey.dbakompas.nl` → DKIM-waarde
+- CNAME `loopspk2._domainkey.dbakompas.nl` → DKIM-waarde
+- CNAME `loopspk3._domainkey.dbakompas.nl` → DKIM-waarde
+- TXT `_dmarc.dbakompas.nl` → DMARC-policy
+
+**Let op — wildcard MX oplossing:**
+Cloudflare had een wildcard MX-record (`*`) dat `smtp.rzone.de` (STRATO) retourneerde voor `envelope.dbakompas.nl`. Fix: expliciete MX aangemaakt voor `envelope` subdomain — specifiek record overschrijft wildcard.
+
+---
+
+## 2026-04-12 — Supabase e-mailtemplate: DBA Kompas huisstijl
+
+**Beslissing:** Supabase Confirm signup e-mailtemplate gebruikt volledig eigen HTML met DBA Kompas huisstijl.
+
+**Kenmerken:**
+- Achtergrond: donker navy `#1a2332`
+- Tekst: wit `#ffffff`, subtekst: `#6b7a8d`
+- Lettertype: `Rethink Sans` (met systemfont-fallback)
+- CTA-knop: oranje `#d4782a`, wit tekst, border-radius 8px
+- Logo: `https://dbakompas.nl/logo-flat-white.png` (tijdelijk nog op Vercel-URL — stap 1 volgende sessie)
+
+**Reden:**
+- Supabase standaard template heeft geen branding
+- Consistentie met de rest van de DBA Kompas communicatie
+- Loops-emails ook in DBA Kompas huisstijl
+
+---
+
+## 2026-04-12 — Resend als Supabase SMTP provider (INFRA-001 AFGEROND)
+
+**Status update:** Beslissing was al vastgelegd op 2026-04-09 als IN PROGRESS. Inmiddels GECONFIGUREERD.
+
+**Wat is gedaan:**
+- Supabase SMTP ingesteld: host `smtp.resend.com`, port `465`, username `resend`, password = Resend API key
+- Sender name: `DBA Kompas`, sender email: `noreply@dbakompas.nl`
+- E-mailbevestiging ingeschakeld in Supabase
+
+**Nog te doen (volgende sessie):**
+- `RESEND_API_KEY` env var toevoegen in Vercel (voor transactionele Resend calls vanuit code)
+- End-to-end test: verificatiemail ontvangen van `noreply@dbakompas.nl`
+
+---
+
 ## 2026-04-10 — Loops conversiestop via Audience filter, niet via Goal
 
 **Beslissing:** Flow-stopzetting bij conversie (aankoop/abonnement) wordt geïmplementeerd via een `Audience filter` node na elke `Branch` node — niet via een aparte "Goal event" instelling.
@@ -362,7 +516,7 @@ Elke beslissing bevat: datum, beslissing, reden, alternatieven overwogen.
 - MX is alleen nodig voor inkomende mail via Resend (Enable Receiving) — dat is niet gewenst
 - DKIM + SPF TXT zijn voldoende voor het verzenden van e-mail
 
-**Status:** IN PROGRESS — DNS propagatie loopt nog bij STRATO
+**Status:** AFGEROND — DNS propagatie voltooid, Cloudflare actief, Resend geverifieerd, Supabase SMTP geconfigureerd (2026-04-12)
 
 ---
 
