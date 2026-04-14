@@ -1,212 +1,189 @@
 # PROJECT_STATE.md
-**Laatst bijgewerkt:** 2026-04-13 (sessie 7)
-**Maturity:** 99%
+
+**Laatste update:** 2026-04-14 (sessie 9)
+**Maturity:** ~99% (live op dbakompas.nl, Stripe in test mode, Postmark volledig actief)
 
 ---
 
 ## SAMENVATTING
 
-DBA Kompas is een Next.js SaaS applicatie die opdrachtomschrijvingen analyseert op DBA-risico-indicatoren via Claude Haiku. De kernfunctionaliteit is stabiel en live op `dbakompas.nl`. INFRA-001 is volledig afgerond. Welkomstmails zijn gebouwd voor alle drie aankoopsoorten. Resend Templates aangemaakt en gekoppeld. Stripe staat nog in test mode. Volgende blok: STRIPE-LIVE.
+DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die opdrachtomschrijvingen analyseert op DBA-risico-indicatoren via Claude Haiku. De app is volledig functioneel:
 
----
+- Authenticatie (Supabase, custom SMTP via Postmark, dbakompas.nl URL, email template met DBA huisstijl)
+- DBA analyse via Claude Haiku (two-phase, nuclear validator, PDF export)
+- Paywall (free → /upgrade redirect)
+- Stripe subscription + one-time checkout (TEST bevestigd)
+- Welkomstmails na betaling (Postmark — volledig actief ✅)
+- Loops marketing automation (3 journeys actief, events endpoint gerepareerd)
+- PostHog analytics + Sentry error tracking
+- 80 unit + integratietests
+- Control Tower fase 1 (admin e-mailbeheer, rolgebaseerde toegang)
+- Vercel Cron Jobs (weekly/monthly digest triggers)
 
-## EERSTE TAAK VOLGENDE SESSIE — STRIPE-LIVE
-
-1. Stripe live keys instellen in Vercel: `STRIPE_SECRET_KEY` (sk_live_...), `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` (pk_live_...)
-2. Live webhook aanmaken in Stripe Dashboard: `https://dbakompas.nl/api/billing/webhook` (5 events: checkout.session.completed, customer.subscription.updated, customer.subscription.deleted, invoice.paid, invoice.payment_failed)
-3. Nieuw `STRIPE_WEBHOOK_SECRET` uit live webhook kopiëren naar Vercel
-4. Live price IDs instellen: `STRIPE_PRICE_ID_MONTHLY`, `STRIPE_PRICE_ID_YEARLY`, `STRIPE_PRICE_ID_ONE_TIME`
-5. Coupon `ONETIMECREDIT` aanmaken in Stripe live mode Dashboard
-6. `STRIPE_COUPON_ONE_TIME_UPGRADE` updaten naar live mode coupon ID in Vercel
-7. End-to-end live betaling testen (echte kaart, kleine bedragen indien mogelijk)
-
----
-
-## LAATSTE ACTIE (2026-04-13 sessie 7 — INFRA-001 afgerond + welkomstmails + Resend Templates)
-
-### INFRA-001 VOLLEDIG AFGEROND ✅
-
-- Supabase verificatiemail: logo bijgewerkt naar v3 full horizontal (`logo-white-v3-full.png`) ✅
-- Go html/template parse error opgelost: `<img>` tag op één regel gezet ✅
-- `NEXT_PUBLIC_APP_URL` bijgewerkt naar `https://dbakompas.nl` in Vercel ✅
-- `RESEND_API_KEY` toegevoegd aan Vercel env vars ✅
-- Redeploy doorgevoerd, verificatiemail werkend van `noreply@dbakompas.nl` ✅
-- `public/logo-white-v3-full.png` toegevoegd aan repository ✅
-
-### Nederlandstalige foutmeldingen geïmplementeerd
-
-- `lib/auth-errors.ts` aangemaakt — centrale `translateAuthError(message)` functie
-- Alle Supabase Engelse foutmeldingen worden vertaald naar Nederlands
-- Gebruikt in `components/marketing/EmailCheckoutModal.tsx` en `app/register/page.tsx`
-
-### Welkomstmails gebouwd (alle drie aankoopsoorten)
-
-- `modules/email/send.ts` volledig herschreven:
-  - `PurchasePlan = 'one_time' | 'monthly' | 'yearly'` type toegevoegd
-  - `buildPurchaseWelcomeHtml(plan)` — DBA Kompas huisstijl HTML per plan (full-width, no "onbeperkt")
-  - `sendPurchaseWelcomeEmail(to, plan)` — gebruikt Resend template ID via env var, valt terug op inline HTML
-- `app/api/billing/webhook/route.ts` uitgebreid — `sendPurchaseWelcomeEmail()` aangeroepen bij:
-  - `mode=payment` (one_time): na `one_time_purchases` INSERT
-  - `mode=subscription`: in `Promise.all` bij subscription activatie
-
-### Resend Templates aangemaakt en gekoppeld
-
-- Template 1 (eenmalige check): `103d7be2-e2a6-48e6-9c29-5db48de2b338`
-- Template 2 (maandabonnement): `11387950-bdd2-4e81-bf5c-fde9f60d1baa`
-- Template 3 (jaarabonnement): `02824f32-0da5-407c-b44e-3b89c0ea2d52`
-- Template IDs toegevoegd aan `.env.local.example`
-- Template IDs als env vars in Vercel ingesteld + redeploy doorgevoerd
-
-### Email copy en breedte gecorrigeerd
-
-- Outer div: `width: 100%` — donkere achtergrond vult volle emailbreedte (was `max-width: 580px`)
-- `min-height: 100vh` verwijderd (niet geschikt voor e-mail)
-- Tekst: geen "onbeperkt", geen WTTA-referentie, open professionele toon
-- Subjects: "DBA Kompas — Je check staat klaar", "— Je maandabonnement is actief", "— Je jaarabonnement is actief"
-
-### Backlog uitgebreid
-
-- `BILLING-002` toegevoegd aan TASKS.md: analyse-limieten + credit top-up (briefing-eerst aanpak)
-- `AUTH-002` toegevoegd aan TASKS.md: 2FA banner in dashboard (aanbevolen, niet verplicht)
-
----
-
-## VORIGE ACTIE (2026-04-12 sessie 6 — Documentatiesync, geen codewijzigingen)
-
-Sessie 6 is uitsluitend gebruikt voor documentatiesync. Er zijn geen codewijzigingen of configuratiewijzigingen doorgevoerd.
-
----
-
-## VORIGE ACTIE (2026-04-12 sessie 5 — INFRA-001 DNS migratie afgerond + Supabase template)
-
-- Cloudflare actief ✅, NS-records correct ✅
-- Resend domein `dbakompas.nl` geverifieerd ✅
-- Loops sending domain gewijzigd naar `dbakompas.nl`, alle 5 DNS-records geverifieerd ✅
-- Supabase SMTP geconfigureerd via Resend (`smtp.resend.com`, port 465, user `resend`) ✅
-- Supabase Site URL + Redirect URL bijgewerkt naar `dbakompas.nl` ✅
-- Supabase e-mailbevestiging ingeschakeld ✅
-- Supabase Confirm signup template: DBA Kompas donker navy huisstijl ✅
-- Vercel custom domain `dbakompas.nl`: gekoppeld, SSL actief ✅
-- SPF-record gecombineerd voor Resend + STRATO ✅
-
----
-
-## LAATSTE WIJZIGING IN CODE
-
-**Bestanden gewijzigd in sessie 7:**
-
-| Bestand | Type | Omschrijving |
-|---|---|---|
-| `lib/auth-errors.ts` | NIEUW | `translateAuthError()` — Supabase errors → Nederlands |
-| `components/marketing/EmailCheckoutModal.tsx` | GEWIJZIGD | `translateAuthError` gebruikt bij foutafhandeling |
-| `app/register/page.tsx` | GEWIJZIGD | `translateAuthError` gebruikt bij foutafhandeling |
-| `public/logo-white-v3-full.png` | NIEUW | v3 full horizontal wit DBA Kompas logo |
-| `modules/email/send.ts` | VOLLEDIG HERSCHREVEN | Welkomstmails voor alle drie plannen + Resend template support |
-| `app/api/billing/webhook/route.ts` | GEWIJZIGD | `sendPurchaseWelcomeEmail()` aangeroepen bij one_time + subscription |
-| `.env.local.example` | GEWIJZIGD | Resend template IDs ingevuld |
-| `docs/TASKS.md` | GEWIJZIGD | BILLING-002 + AUTH-002 toegevoegd aan backlog |
-
-**Vercel env vars toegevoegd in sessie 7:**
-- `RESEND_TEMPLATE_WELCOME_ONE_TIME=103d7be2-e2a6-48e6-9c29-5db48de2b338`
-- `RESEND_TEMPLATE_WELCOME_MONTHLY=11387950-bdd2-4e81-bf5c-fde9f60d1baa`
-- `RESEND_TEMPLATE_WELCOME_YEARLY=02824f32-0da5-407c-b44e-3b89c0ea2d52`
-
-**Branch:** `main`
-**Status:** Gepusht naar GitHub, live op Vercel
-
----
-
-## VOLGENDE GEPLANDE STAP
-
-**STRIPE-LIVE** — zie "EERSTE TAAK VOLGENDE SESSIE" bovenin.
-
-Na STRIPE-LIVE:
-- LEGAL-001 (aparte sessie): privacy policy, verwerkersovereenkomsten, algemene voorwaarden, cookie-beleid
-- BILLING-002 (aparte sessie — briefing eerst): analyse-limieten + credit top-up
-- AUTH-002: 2FA banner in dashboard
-
----
-
-## WAT WERKT
-
-- Supabase authenticatie (email/password) — verificatiemail via Resend SMTP
-- DBA analyse via Claude Haiku (`claude-haiku-4-5-20251001`)
-- Twee-fase architectuur: fase 1 = snelle kernanalyse (~5-8s), fase 2 = draft op aanvraag
-- Input validatie (minimum 800 tekens / 120 woorden)
-- Follow-up vragen als invulvelden op resultaatpagina
-- Nuclear/coerce validator — altijd succesvol voor geldige JSON objecten
-- Resultaatpagina UI: colored hero banner, 3-koloms domeinkaarten, actiepunten
-- Draft generatie op expliciete knopklik
-- Gesplitste draft generatie: compact (max_tokens 700) + uitgebreid (max_tokens 2000, lazy)
-- Fase 2 draft API endpoint (`POST /api/dba/analyse/[id]/draft?mode=compact|full`)
-- PDF rapport generatie
-- Rate limiting op analyse endpoint (free: 20/dag, pro: 100/dag, enterprise: 500/dag)
-- Stripe subscription checkout — TEST-002 BEVESTIGD WERKEND
-- Stripe one-time checkout
-- Stripe webhook handler — TEST-003 BEVESTIGD WERKEND
-- Conversie-funnel: modal signUp → verifyscherm → checkout → `/dashboard`
-- Paywall — `/upgrade` paywallpagina met 3 plankaarten
-- One-time upsell e-mail via Resend
-- Welkomstmails voor alle drie plannen via Resend Templates
-- Nederlandstalige foutmeldingen (auth-errors.ts)
-- Newsfeed, notificaties, documentbeheer
-- Loops marketing automation (quick_scan, subscription events, 3 journeys actief)
-- PostHog analytics (ANAL-001/002/003)
-- Sentry error tracking
-- Quick scan landing page (twee pricing tiles)
-- Proxy middleware: ?next= redirect, public routes correct
-- Digest cron endpoints: weekly + monthly (LOOPS-003)
-
-## WAT NIET WERKT / ONZEKER
-
-- **STRIPE-LIVE**: Stripe staat nog in test mode. Vereist vóór productieomzetting.
-- **OPEN**: TEST-005 — maximale invoerlengte (3000+ tekens) nog niet manueel getest.
-- **OPEN**: MAIL-001 — `info@dbakompas.nl` instellen in Apple Mail. Niet blokkerend.
-- **OPEN**: LOOPS-002 resterende actie — oude journeys verwijderen bij definitieve livegang.
-- **GEDEELTELIJK**: Unit + integratietests aanwezig (80 totaal). E2e-tests ontbreken.
-- **SANDBOX-ISSUE**: `npm test` faalt lokaal in ARM64 sandbox door ontbrekende `@rollup/rollup-linux-arm64-gnu`. Op Vercel en Mac werkt het correct.
+**Status e-mailinfrastructuur:** Postmark volledig operationeel. DKIM + Return-Path geverifieerd, `POSTMARK_SERVER_TOKEN` in Vercel, Supabase SMTP bijgewerkt. Resend volledig verwijderd.
 
 ---
 
 ## DEPLOYMENT STATUS
 
-| Omgeving | Status | Onderbouwing |
-|---|---|---|
-| Lokaal | WERKEND | 80 tests groen (QUAL-001/002/003) |
-| Vercel (main branch) | LIVE op `dbakompas.nl` | Auto-deploy via GitHub, custom domain + SSL actief |
-| Vercel config | GEDOCUMENTEERD | `vercel.json` aanwezig (fra1, www-redirect, crons) |
-| DNS | Cloudflare ACTIVE | Nameservers: brett + peaches.ns.cloudflare.com |
+| Omgeving | Status |
+|---|---|
+| Vercel (main branch) | **LIVE** op `dbakompas.nl` — auto-deploy via GitHub |
+| Supabase Auth | **ACTIEF** — custom SMTP via Postmark (`smtp.postmarkapp.com:587`) ✅ |
+| Stripe | **TEST MODE BEVESTIGD** (TEST-002 + TEST-003) — live mode pending |
+| Resend | **VOLLEDIG VERWIJDERD** — code, npm package en alle Vercel env vars weg |
+| Postmark | **VOLLEDIG ACTIEF** ✅ — DKIM + Return-Path verified, token in Vercel, Supabase SMTP bijgewerkt |
+| Loops | **ACTIEF** — events endpoint gecorrigeerd (was `/events`, nu `/events/send`) |
+| PostHog | **GEÏNTEGREERD** — live |
+| Sentry | **GEÏNTEGREERD** — live |
 
 ---
 
-## INTEGRATIE STATUS
+## WAT WERKT
 
-| Systeem | Code aanwezig | Geconfigureerd | Live getest |
-|---|---|---|---|
-| Supabase Auth + DB | JA | JA | BEVESTIGD |
-| Supabase SMTP (Resend) | N.V.T. | JA — smtp.resend.com:465 ✅ | BEVESTIGD ✅ (sessie 7) |
-| Anthropic Claude Haiku | JA | JA | BEVESTIGD |
-| Stripe (checkout + webhook) | JA | JA (test mode) | TEST-002 + TEST-003 BEVESTIGD ✅ |
-| Resend (transactioneel) | JA | JA — domein + API key + templates ✅ | GEDEELTELIJK |
-| Loops | JA | JA — dbakompas.nl sending domain ✅ | Journey B live + getest ✅ |
-| PostHog | JA | JA | ONBEKEND |
-| Sentry | JA | JA | ONBEKEND |
+- Supabase authenticatie (email/password, magic link, verificatiemail van noreply@dbakompas.nl)
+- DBA analyse via Claude Haiku (`claude-haiku-4-5-20251001`), two-phase architectuur
+- Input validatie (minimum 800 tekens / 120 woorden)
+- Follow-up vragen als invulvelden, heranalyse
+- Nuclear/coerce validator — altijd succesvol voor geldige JSON
+- Resultaatpagina UI: colored hero banner, 3-koloms domeinen, actiepunten
+- Draft generatie (compact / full mode, lazy loading)
+- PDF rapport generatie (correct opgemaakt, leesbare tekst)
+- Rate limiting (free: 20/dag, pro: 100/dag, enterprise: 500/dag)
+- Stripe subscription checkout — TEST-002 BEVESTIGD ✅
+- Stripe one-time checkout — gecorrigeerd en werkend
+- Stripe webhook handler — TEST-003 BEVESTIGD ✅
+- Conversie-funnel: modal signUp → verifyscherm → checkout → /dashboard
+- Paywall (plan=free → redirect /upgrade)
+- /upgrade paywallpagina (3 plankaarten, directe Stripe checkout)
+- /upgrade-to-pro flow (coupon ONETIMECREDIT, server-side)
+- Profielpagina: correct plan weergeven (eenmalig/maand/jaar)
+- Nederlandse foutmeldingen voor Supabase auth errors
+- Control Tower fase 1 (admin e-mailbeheer + rolgebaseerde sidebar-toegang)
+- PostHog analytics (server-side events, identify, top-of-funnel QuickScan)
+- Loops automation (3 journeys: hoog/gemiddeld/laag risico — alle actief)
+- Quick Scan landing page (succes-scherm met twee pricing tiles)
+- Sentry error tracking
+- Vercel Cron Jobs (weekly/monthly digest endpoints)
+- 80 unit + integratietests
+- NEXT_PUBLIC_APP_URL correct ingesteld in Vercel ✅
+- Loops `subscription_started` event endpoint gecorrigeerd ✅
+
+## WAT NIET WERKT / PENDING
+
+- **STRIPE LIVE MODE**: niet geconfigureerd — VEREIST VOOR ECHTE BETALINGEN
+- **Loops**: 3 oude journeys nog te verwijderen (laag risico)
+- **TEST-005**: maximale invoerlengte (3000+ tekens) nog niet handmatig getest
+- **MAIL-001**: info@dbakompas.nl nog niet in Apple Mail
+- **Welkomstmails**: nog niet end-to-end getest (test-betaling uitvoeren om te verifiëren)
 
 ---
 
-## ARCHITECTUUR OORDEEL
+## SESSIEHISTORIE
 
-Correct gestructureerd:
-- Business logic in `lib/` en `modules/`, niet in UI components
-- Alle AI-aanroepen via `claude-haiku-4-5-20251001`
-- Supabase admin voor server-side mutaties (RLS bypass correct)
-- Entitlements via `modules/billing/entitlements.ts`
-- Paywall via `AuthContext` plan state + `AppShell` redirect (client-side, voldoende voor MVP)
-- Prompt injection beveiliging aanwezig
-- Stripe coupon via server-side `discounts` parameter (nooit client-exposed)
-- Auth foutmeldingen centraal vertaald via `lib/auth-errors.ts`
+### Sessie 2026-04-06 — Initiële migratie
+- 10 migratiefases van Replit naar Next.js 16 / Supabase / Vercel via Claude Code (46 min)
 
-Aandachtspunten:
-- `postProcessDbaOutput` verwerkt draft-velden die fase 1 niet levert (no-ops, gedocumenteerd)
-- 80 unit + integratietests aanwezig — e2e ontbreekt nog
-- Paywall is client-side — server-side middleware zou robuuster zijn, voldoende voor MVP
+### Sessie 2026-04-07 — Stabilisatie, AI, landing page
+- AI-fixes (JSON, retry, truncation), two-phase architectuur
+- OpenAI → Anthropic Claude Haiku
+- Landing page gemigreerd naar Next.js marketing route group
+- Rate limiting, security, debug endpoint verwijderd
+
+### Sessie 2026-04-08 — Stripe, PDF, Loops
+- Stripe checkout fixes (critieke env var mismatch opgelost)
+- PDF volledig redesigned (compact, correct opgemaakt)
+- Loops quick-scan endpoint gebouwd
+- PERF-001: draft gesplitst in compact/full mode
+
+### Sessie 2026-04-09 — Conversie-funnel, paywall, tests
+- Volledige conversie-funnel hersteld (register, checkout-redirect, signup)
+- EmailCheckoutModal geconsolideerd
+- FEAT-004: Paywall geïmplementeerd
+- FEAT-005: One-time upsell e-mail + upgrade flow
+- Stripe TEST-002 + TEST-003 bevestigd werkend ✅
+- QUAL-001 + QUAL-002: 67 tests aangemaakt
+- DOC-001: vercel.json + DEPLOYMENT.md aangemaakt
+
+### Sessie 2026-04-10 — DNS migratie, PostHog, Loops journeys
+- INFRA-001: DNS migratie naar Cloudflare gestart
+- ANAL-001/002/003: PostHog volledig geïntegreerd
+- UX-001/001b: Quick Scan succes-scherm herbouwd
+- LOOPS-002: 3 Loops journeys aangemaakt
+- QUAL-003: 13 unit tests voor lib/loops
+- SEC-003: proxy.ts verbeterd, ?next= redirect
+
+### Sessie 2026-04-11 — LOOPS-003, doc-sync
+- LOOPS-003: Vercel Cron Jobs voor digest trigger
+- Doc-sync: 9 commits gesynchroniseerd
+
+### Sessie 2026-04-12 — INFRA-001 voltooiing + doc-sync
+- Cloudflare NS actief, Resend domein geverifieerd
+- Supabase SMTP ingesteld, e-mailtemplate DBA huisstijl
+- Vercel custom domain dbakompas.nl gekoppeld
+- App is LIVE op dbakompas.nl ✅
+- Doc-sync sessie 6
+
+### Sessie 2026-04-13 — Welkomstmails + Control Tower fase 1
+- Nederlandse foutmeldingen voor Supabase auth errors
+- Welkomstmails na betaling via Resend Templates (subscription + one-time)
+- Logo-white-v3-full.png toegevoegd aan public map
+- Welkomstmail copy + template IDs + full-width fix
+- Resend Templates integratie voor welkomstmails
+- Gecombineerd: één welkomstmail na eenmalige aankoop (welcome + upsell in één template)
+- Profielpagina: correct plan tonen (eenmalig/maand/jaar) + logo upgrade pagina fix
+- BrandLogo component op upgrade pagina
+- **Control Tower fase 1**: admin e-mailbeheer + rolgebaseerde sidebar-toegang
+
+### Sessie 2026-04-14 — Bugfixes + Postmark migratie (sessie 8)
+- **INFRA-001 VOLLEDIG AFGEROND** ✅
+  - NEXT_PUBLIC_APP_URL en RESEND_API_KEY waren al correct in Vercel
+  - Supabase logo al correct ingesteld
+  - Testaccount aangemaakt → welkomstmail bug ontdekt
+- **BUG-001 OPGELOST**: Resend SDK ondersteunt `template_id` niet → inline HTML geforceerd
+  - Commit: `b766fb7` — `modules/email/send.ts`
+- **BUG-002 OPGELOST**: Loops events endpoint URL miste `/send`
+  - Commit: `0545c90` — `lib/loops/index.ts`
+- **POSTMARK MIGRATIE GESTART (80% klaar)**:
+  - `npm uninstall resend` + `npm install postmark` uitgevoerd
+  - `modules/email/send.ts` volledig herschreven met Postmark SDK
+  - Cloudflare DNS: DKIM TXT + Return-Path CNAME toegevoegd → beide VERIFIED ✅
+  - Postmark Server Token: `17cca152-59d5-45f0-8867-3991696f53e1`
+  - Code gepusht naar GitHub (auto-deploy Vercel)
+
+### Sessie 2026-04-14 — POSTMARK-001 voltooiing (sessie 9)
+- **POSTMARK-001 VOLLEDIG AFGEROND** ✅
+  - `POSTMARK_SERVER_TOKEN` toegevoegd in Vercel (All Environments)
+  - Supabase SMTP bijgewerkt: host `smtp.postmarkapp.com`, port `587`, username/password = Server Token
+  - Alle Resend Vercel env vars verwijderd (`RESEND_API_KEY`, `RESEND_TEMPLATE_WELCOME_*`)
+  - Resend volledig verwijderd uit stack
+
+---
+
+## LAATSTE ACTIE
+
+**Sessie:** 2026-04-14
+**Laatste commits:**
+- `b766fb7` — "fix: welkomstmail via inline HTML — Resend SDK ondersteunt template_id niet"
+- `0545c90` — "fix: Loops events endpoint URL — /send ontbrak"
+- (Postmark send.ts commit — naam onbekend, gepusht door Marvin)
+
+**Laatste wijziging in code:**
+- `modules/email/send.ts`: volledig herschreven van Resend naar Postmark SDK
+- `lib/loops/index.ts`: LOOPS_EVENTS_URL gecorrigeerd naar `/api/v1/events/send`
+- `package.json` + `package-lock.json`: `resend` verwijderd, `postmark` toegevoegd
+
+## VOLGENDE GEPLANDE STAP
+
+**EERSTE TAAK: Welkomstmail end-to-end testen + daarna STRIPE-LIVE**
+
+### Stap 1 — Welkomstmail testen (POSTMARK-001 verificatie)
+- Doe een test-betaling op dbakompas.nl (Stripe test card)
+- Verifieer welkomstmail in inbox
+- Check Postmark Activity feed: mail zichtbaar?
+- Check Vercel logs: geen `[MAIL] skipped` of errors
+
+### Stap 2 — STRIPE-LIVE configureren (vereist voor echte betalingen)
+- Live Stripe keys in Vercel: `STRIPE_SECRET_KEY` (sk_live_...) + `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
+- Live webhook aanmaken: `https://dbakompas.nl/api/billing/webhook`
+- Live price IDs + coupon `ONETIMECREDIT` in Stripe live mode
