@@ -1,6 +1,6 @@
-import { Resend } from 'resend'
+import * as postmark from 'postmark'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+const client = new postmark.ServerClient(process.env.POSTMARK_SERVER_TOKEN!)
 
 type PurchasePlan = 'one_time' | 'monthly' | 'yearly'
 
@@ -58,12 +58,12 @@ export async function sendPurchaseWelcomeEmail(to: string, plan: PurchasePlan) {
     yearly:   'DBA Kompas — Je jaarabonnement is actief',
   }
 
-  // Resend SDK ondersteunt template_id niet in emails.send() — altijd inline HTML
-  return resend.emails.send({
-    from: 'DBA Kompas <noreply@dbakompas.nl>',
-    to,
-    subject: subjects[plan],
-    html: buildPurchaseWelcomeHtml(plan),
+  return client.sendEmail({
+    From: 'DBA Kompas <noreply@dbakompas.nl>',
+    To: to,
+    Subject: subjects[plan],
+    HtmlBody: buildPurchaseWelcomeHtml(plan),
+    MessageStream: 'outbound',
   })
 }
 
@@ -76,10 +76,11 @@ export async function sendEmail({
   subject: string
   html: string
 }) {
-  return resend.emails.send({
-    from: 'DBA Kompas <noreply@dbakompas.nl>',
-    to,
-    subject,
-    html,
+  return client.sendEmail({
+    From: 'DBA Kompas <noreply@dbakompas.nl>',
+    To: to,
+    Subject: subject,
+    HtmlBody: html,
+    MessageStream: 'outbound',
   })
 }

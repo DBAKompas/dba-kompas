@@ -1,6 +1,8 @@
-import { Resend } from 'resend';
+import * as postmark from 'postmark';
 
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+const client = process.env.POSTMARK_SERVER_TOKEN
+  ? new postmark.ServerClient(process.env.POSTMARK_SERVER_TOKEN)
+  : null;
 const DEFAULT_FROM = 'DBA Kompas <noreply@dbakompas.nl>';
 
 interface EmailParams {
@@ -23,19 +25,19 @@ interface DigestData {
 
 export async function sendEmail(params: EmailParams): Promise<boolean> {
   try {
-    if (!resend) {
-      console.log('[EMAIL] Resend not configured, email skipped');
+    if (!client) {
+      console.log('[EMAIL] Postmark not configured, email skipped');
       return false;
     }
 
-    const emailOptions: Record<string, unknown> = {
-      from: DEFAULT_FROM,
-      to: params.to,
-      subject: params.subject,
-    };
-    if (params.html) emailOptions.html = params.html;
-    if (params.text) emailOptions.text = params.text;
-    await resend.emails.send(emailOptions as any);
+    await client.sendEmail({
+      From: DEFAULT_FROM,
+      To: params.to,
+      Subject: params.subject,
+      ...(params.html ? { HtmlBody: params.html } : {}),
+      ...(params.text ? { TextBody: params.text } : {}),
+      MessageStream: 'outbound',
+    });
     console.log('[EMAIL] sent successfully');
     return true;
   } catch (error) {
