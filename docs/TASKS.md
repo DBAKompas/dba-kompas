@@ -1,10 +1,16 @@
 # TASKS.md
 
-**Laatste update:** 2026-04-14 (sessie 10)
+**Laatste update:** 2026-04-15 (sessie 11)
 
 ---
 
 ## IN PROGRESS
+
+### POSTMARK-002 — Code koppelen aan Postmark templates
+- [ ] `modules/email/send.ts`: `sendPurchaseWelcomeEmail()` aanpassen naar `sendEmailWithTemplate()`
+- [ ] Per plan juiste alias aanroepen: `welkomstmail-eenmalig`, `welkomstmail-maand`, `welkomstmail-jaar`
+- [ ] Inline HTML verwijderen uit `send.ts`
+- [ ] Committen en pushen
 
 ### TEST-006 — Welkomstmail end-to-end testen via Postmark
 - [ ] Test-betaling uitvoeren op dbakompas.nl (Stripe test card)
@@ -74,6 +80,10 @@
 ---
 
 ## DONE
+
+### Sessie 2026-04-15 (sessie 11) — Postmark templates
+- [x] 3 standalone Postmark templates aangemaakt ✅
+- [x] Welkomstmailteksten goedgekeurd en verwerkt ✅
 
 ### Sessie 2026-04-14 (sessie 10) — Security incident + build fix
 - [x] **SEC-INC-001**: Postmark token geroteerd na GitGuardian alert ✅

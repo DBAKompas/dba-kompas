@@ -1,6 +1,6 @@
 # PROJECT_STATE.md
 
-**Laatste update:** 2026-04-14 (sessie 10)
+**Laatste update:** 2026-04-15 (sessie 11)
 **Maturity:** ~99% (live op dbakompas.nl, Stripe in test mode, Postmark volledig actief)
 
 ---
@@ -75,7 +75,7 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
 - **Loops**: 3 oude journeys nog te verwijderen (laag risico)
 - **TEST-005**: maximale invoerlengte (3000+ tekens) nog niet handmatig getest
 - **MAIL-001**: info@dbakompas.nl nog niet in Apple Mail
-- **Welkomstmails**: nog niet end-to-end getest (test-betaling uitvoeren om te verifiëren)
+- **Welkomstmails**: Postmark templates klaar (`welkomstmail-eenmalig`, `welkomstmail-maand`, `welkomstmail-jaar`), code nog niet aangepast naar `sendEmailWithTemplate()`, end-to-end test nog uitvoeren
 
 ---
 
@@ -150,6 +150,11 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
   - Cloudflare DNS: DKIM TXT + Return-Path CNAME toegevoegd → beide VERIFIED ✅
   - Postmark Server Token: `[POSTMARK_SERVER_TOKEN]`
   - Code gepusht naar GitHub (auto-deploy Vercel)
+
+### Sessie 2026-04-15 — Postmark templates (sessie 11)
+- 3 standalone Postmark templates aangemaakt: `welkomstmail-eenmalig`, `welkomstmail-maand`, `welkomstmail-jaar`
+- Welkomstmailteksten geschreven en goedgekeurd
+- `modules/email/send.ts` nog aan te passen naar `sendEmailWithTemplate()` (volgende sessie)
 
 ### Sessie 2026-04-14 — Security incident + build fix (sessie 10)
 - **SEC-INC-001 OPGELOST** ✅: Postmark Server Token per ongeluk in docs opgenomen → GitGuardian alert
