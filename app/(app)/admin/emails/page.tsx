@@ -20,7 +20,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
-const RESEND_TEMPLATE_BASE = 'https://resend.com/emails/templates'
+const POSTMARK_DASHBOARD = 'https://account.postmarkapp.com/servers'
 
 const welcomeTemplates = [
   {
@@ -28,21 +28,21 @@ const welcomeTemplates = [
     label: 'Eenmalige check',
     subject: 'DBA Kompas — Je check staat klaar',
     trigger: 'Direct na aankoop eenmalige check',
-    templateId: process.env.NEXT_PUBLIC_RESEND_TEMPLATE_WELCOME_ONE_TIME,
+    alias: 'welkomstmail-eenmalig',
   },
   {
     id: 'monthly',
     label: 'Maandabonnement',
     subject: 'DBA Kompas — Je maandabonnement is actief',
     trigger: 'Direct na afsluiten maandabonnement',
-    templateId: process.env.NEXT_PUBLIC_RESEND_TEMPLATE_WELCOME_MONTHLY,
+    alias: 'welkomstmail-maand',
   },
   {
     id: 'yearly',
     label: 'Jaarabonnement',
     subject: 'DBA Kompas — Je jaarabonnement is actief',
     trigger: 'Direct na afsluiten jaarabonnement',
-    templateId: process.env.NEXT_PUBLIC_RESEND_TEMPLATE_WELCOME_YEARLY,
+    alias: 'welkomstmail-jaar',
   },
 ]
 
@@ -229,7 +229,7 @@ export default function AdminEmailsPage() {
             Welkomstmails
           </h2>
           <p className="text-xs text-muted-foreground/70 mt-0.5">
-            Automatisch verstuurd via Resend direct na aankoop. Bewerk het ontwerp en de inhoud in de Resend-editor.
+            Automatisch verstuurd via Postmark direct na aankoop. Bewerk het ontwerp en de inhoud in het Postmark-dashboard.
           </p>
         </div>
 
@@ -254,13 +254,13 @@ export default function AdminEmailsPage() {
                   </div>
                 </div>
                 <a
-                  href={RESEND_TEMPLATE_BASE}
+                  href={POSTMARK_DASHBOARD}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   <Button variant="outline" size="sm" className="w-full gap-2 text-xs">
                     <ExternalLink className="size-3.5" />
-                    Bewerk in Resend
+                    Bewerk in Postmark
                   </Button>
                 </a>
               </CardContent>
