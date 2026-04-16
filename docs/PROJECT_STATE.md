@@ -1,6 +1,6 @@
 # PROJECT_STATE.md
 
-**Laatste update:** 2026-04-15 (sessie 11)
+**Laatste update:** 2026-04-16 (sessie 12)
 **Maturity:** ~99% (live op dbakompas.nl, Stripe in test mode, Postmark volledig actief)
 
 ---
@@ -151,10 +151,24 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
   - Postmark Server Token: `[POSTMARK_SERVER_TOKEN]`
   - Code gepusht naar GitHub (auto-deploy Vercel)
 
+### Sessie 2026-04-16 — Auth flows + e-mailtemplates (sessie 12)
+- **AUTH-003 AFGEROND** ✅: auth/callback route + update-password pagina aangemaakt
+- Wachtwoord vergeten flow: forgot-password pagina + link op loginpagina
+- Supabase reset-password e-mailtemplate aangemaakt (DBA huisstijl)
+- Postmark templates gekoppeld via `sendEmailWithTemplate()` (POSTMARK-002 ✅)
+- Postmark account in afwachting van goedkeuring (test mode)
+
 ### Sessie 2026-04-15 — Postmark templates (sessie 11)
 - 3 standalone Postmark templates aangemaakt: `welkomstmail-eenmalig`, `welkomstmail-maand`, `welkomstmail-jaar`
 - Welkomstmailteksten geschreven en goedgekeurd
 - `modules/email/send.ts` nog aan te passen naar `sendEmailWithTemplate()` (volgende sessie)
+
+### Sessie 2026-04-16 — Auth flows + e-mailtemplates (sessie 12)
+- **AUTH-003 AFGEROND** ✅: auth/callback route + update-password pagina aangemaakt
+- Wachtwoord vergeten flow: forgot-password pagina + link op loginpagina
+- Supabase reset-password e-mailtemplate aangemaakt (DBA huisstijl)
+- Postmark templates gekoppeld via `sendEmailWithTemplate()` (POSTMARK-002 ✅)
+- Postmark account in afwachting van goedkeuring (test mode)
 
 ### Sessie 2026-04-15 — Postmark templates (sessie 11)
 - 3 standalone Postmark templates aangemaakt: `welkomstmail-eenmalig`, `welkomstmail-maand`, `welkomstmail-jaar`

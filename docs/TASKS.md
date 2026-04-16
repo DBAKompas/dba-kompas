@@ -1,6 +1,6 @@
 # TASKS.md
 
-**Laatste update:** 2026-04-15 (sessie 11)
+**Laatste update:** 2026-04-16 (sessie 12)
 
 ---
 
@@ -81,9 +81,21 @@
 
 ## DONE
 
+### Sessie 2026-04-16 (sessie 12) — Auth flows + e-mailtemplates
+- [x] **AUTH-003 AFGEROND** ✅: auth/callback + update-password pagina
+- [x] Wachtwoord vergeten flow: forgot-password pagina + loginpagina link ✅
+- [x] Supabase reset-password e-mailtemplate (DBA huisstijl) ✅
+- [x] **POSTMARK-002 AFGEROND** ✅: sendEmailWithTemplate() in send.ts
+
 ### Sessie 2026-04-15 (sessie 11) — Postmark templates
 - [x] 3 standalone Postmark templates aangemaakt ✅
 - [x] Welkomstmailteksten goedgekeurd en verwerkt ✅
+
+### Sessie 2026-04-16 (sessie 12) — Auth flows + e-mailtemplates
+- [x] **AUTH-003 AFGEROND** ✅: auth/callback + update-password pagina
+- [x] Wachtwoord vergeten flow: forgot-password pagina + loginpagina link ✅
+- [x] Supabase reset-password e-mailtemplate (DBA huisstijl) ✅
+- [x] **POSTMARK-002 AFGEROND** ✅: sendEmailWithTemplate() in send.ts
 
 ### Sessie 2026-04-15 (sessie 11) — Postmark templates
 - [x] 3 standalone Postmark templates aangemaakt ✅
