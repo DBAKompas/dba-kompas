@@ -156,6 +156,11 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
 - Welkomstmailteksten geschreven en goedgekeurd
 - `modules/email/send.ts` nog aan te passen naar `sendEmailWithTemplate()` (volgende sessie)
 
+### Sessie 2026-04-15 — Postmark templates (sessie 11)
+- 3 standalone Postmark templates aangemaakt: `welkomstmail-eenmalig`, `welkomstmail-maand`, `welkomstmail-jaar`
+- Welkomstmailteksten geschreven en goedgekeurd
+- `modules/email/send.ts` nog aan te passen naar `sendEmailWithTemplate()` (volgende sessie)
+
 ### Sessie 2026-04-14 — Security incident + build fix (sessie 10)
 - **SEC-INC-001 OPGELOST** ✅: Postmark Server Token per ongeluk in docs opgenomen → GitGuardian alert
   - Token direct geroteerd in Postmark dashboard

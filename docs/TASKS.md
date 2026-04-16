@@ -85,6 +85,10 @@
 - [x] 3 standalone Postmark templates aangemaakt ✅
 - [x] Welkomstmailteksten goedgekeurd en verwerkt ✅
 
+### Sessie 2026-04-15 (sessie 11) — Postmark templates
+- [x] 3 standalone Postmark templates aangemaakt ✅
+- [x] Welkomstmailteksten goedgekeurd en verwerkt ✅
+
 ### Sessie 2026-04-14 (sessie 10) — Security incident + build fix
 - [x] **SEC-INC-001**: Postmark token geroteerd na GitGuardian alert ✅
 - [x] Nieuwe token in Vercel + Supabase SMTP bijgewerkt ✅
