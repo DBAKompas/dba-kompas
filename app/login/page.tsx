@@ -135,6 +135,7 @@ function LoginPageContent() {
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <label className="text-sm font-semibold text-foreground">Wachtwoord</label>
+                  <Link href="/forgot-password" className="text-xs text-muted-foreground hover:text-accent transition-colors">Wachtwoord vergeten?</Link>
                 </div>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3.5 w-4 h-4 text-muted-foreground pointer-events-none" />
