@@ -1,6 +1,6 @@
 # PROJECT_STATE.md
 
-**Laatste update:** 2026-04-16 (sessie 12)
+**Laatste update:** 2026-04-16 (sessie 13)
 **Maturity:** ~99% (live op dbakompas.nl, Stripe in test mode, Postmark volledig actief)
 
 ---
@@ -11,14 +11,15 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
 
 - Authenticatie (Supabase, custom SMTP via Postmark, dbakompas.nl URL, email template met DBA huisstijl)
 - DBA analyse via Claude Haiku (two-phase, nuclear validator, PDF export)
-- Paywall (free → /upgrade redirect)
+- Paywall (free → /upgrade redirect, admins vrijgesteld)
 - Stripe subscription + one-time checkout (TEST bevestigd)
-- Welkomstmails na betaling (Postmark — volledig actief ✅)
+- Welkomstmails na betaling (Postmark inline HTML — volledig actief ✅)
 - Loops marketing automation (3 journeys actief, events endpoint gerepareerd)
 - PostHog analytics + Sentry error tracking
 - 80 unit + integratietests
-- Control Tower fase 1 (admin e-mailbeheer, rolgebaseerde toegang)
+- Control Tower fase 1 t/m 3 (statistieken, funnel, gebruikersbeheer, analyses-overzicht)
 - Vercel Cron Jobs (weekly/monthly digest triggers)
+- Quick scan funnel volledig meetbaar (Supabase + Loops)
 
 **Status e-mailinfrastructuur:** Postmark volledig operationeel. DKIM + Return-Path geverifieerd, `POSTMARK_SERVER_TOKEN` in Vercel, Supabase SMTP bijgewerkt. Resend volledig verwijderd.
 
@@ -54,15 +55,17 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
 - Stripe one-time checkout — gecorrigeerd en werkend
 - Stripe webhook handler — TEST-003 BEVESTIGD ✅
 - Conversie-funnel: modal signUp → verifyscherm → checkout → /dashboard
-- Paywall (plan=free → redirect /upgrade)
+- Paywall (plan=free → redirect /upgrade, admins vrijgesteld)
 - /upgrade paywallpagina (3 plankaarten, directe Stripe checkout)
 - /upgrade-to-pro flow (coupon ONETIMECREDIT, server-side)
 - Profielpagina: correct plan weergeven (eenmalig/maand/jaar)
 - Nederlandse foutmeldingen voor Supabase auth errors
-- Control Tower fase 1 (admin e-mailbeheer + rolgebaseerde sidebar-toegang)
+- Auth flows: forgot-password, auth/callback (PKCE + token hash), update-password ✅
+- **Control Tower fase 1 t/m 3** (admin root + gebruikersbeheer + statistieken + funnel + analyses) ✅
 - PostHog analytics (server-side events, identify, top-of-funnel QuickScan)
 - Loops automation (3 journeys: hoog/gemiddeld/laag risico — alle actief)
 - Quick Scan landing page (succes-scherm met twee pricing tiles)
+- Quick scan data opgeslagen in Supabase (`quick_scan_leads`) + Loops ✅
 - Sentry error tracking
 - Vercel Cron Jobs (weekly/monthly digest endpoints)
 - 80 unit + integratietests
@@ -75,149 +78,69 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
 - **Loops**: 3 oude journeys nog te verwijderen (laag risico)
 - **TEST-005**: maximale invoerlengte (3000+ tekens) nog niet handmatig getest
 - **MAIL-001**: info@dbakompas.nl nog niet in Apple Mail
-- **Welkomstmails**: Postmark templates klaar (`welkomstmail-eenmalig`, `welkomstmail-maand`, `welkomstmail-jaar`), code nog niet aangepast naar `sendEmailWithTemplate()`, end-to-end test nog uitvoeren
+- **TEST-006**: Welkomstmail end-to-end test — blocked op Postmark goedkeuring
 
 ---
 
 ## SESSIEHISTORIE
 
-### Sessie 2026-04-06 — Initiële migratie
-- 10 migratiefases van Replit naar Next.js 16 / Supabase / Vercel via Claude Code (46 min)
+### Sessie 2026-04-16 (sessie 13) — Control Tower fase 2 + 3
+- **Control Tower fase 2**: gebruikersbeheer (`/admin/gebruikers` + API), admin root page `/admin` (fix 404) ✅
+- Admin emails pagina bijgewerkt (Resend-referenties verwijderd, Postmark-info) ✅
+- Paywall fix: admins omzeilen de paywall (layout.tsx) ✅
+- Admin role gezet via Supabase SQL ✅
+- Directe repo-toegang ingesteld via `mcp__cowork__request_cowork_directory` ✅
+- **Control Tower fase 3**: statistieken, funnelrij, analyses-overzicht ✅
+  - `/api/admin/stats` — geaggregeerde data (plan breakdown, conversie, analyses)
+  - `/api/admin/analyses` — per-gebruiker analyse-overzicht
+  - `/admin/analyses` — analyses pagina
+  - Funnelrij: Quick Scan → Registraties → Betaald → Analyses → Risico
+- **Quick scan funnel**: `quick_scan_leads` tabel aangemaakt in Supabase ✅
+- Quick-scan route schrijft ook naar Supabase (fire-and-forget) ✅
+- Stats API uitgebreid met quick scan counts ✅
 
-### Sessie 2026-04-07 — Stabilisatie, AI, landing page
-- AI-fixes (JSON, retry, truncation), two-phase architectuur
-- OpenAI → Anthropic Claude Haiku
-- Landing page gemigreerd naar Next.js marketing route group
-- Rate limiting, security, debug endpoint verwijderd
+### Sessie 2026-04-16 (sessie 12) — Auth flows + e-mailtemplates
+- **AUTH-003 AFGEROND** ✅: auth/callback route + update-password pagina aangemaakt
+- Wachtwoord vergeten flow: forgot-password pagina + link op loginpagina
+- Supabase reset-password e-mailtemplate aangemaakt (DBA huisstijl)
+- **POSTMARK-002 AFGEROND** ✅: sendEmailWithTemplate() in send.ts
 
-### Sessie 2026-04-08 — Stripe, PDF, Loops
-- Stripe checkout fixes (critieke env var mismatch opgelost)
-- PDF volledig redesigned (compact, correct opgemaakt)
-- Loops quick-scan endpoint gebouwd
-- PERF-001: draft gesplitst in compact/full mode
+### Sessie 2026-04-15 (sessie 11) — Postmark templates
+- 3 standalone Postmark templates aangemaakt: `welkomstmail-eenmalig`, `welkomstmail-maand`, `welkomstmail-jaar`
+- Welkomstmailteksten geschreven en goedgekeurd
 
-### Sessie 2026-04-09 — Conversie-funnel, paywall, tests
-- Volledige conversie-funnel hersteld (register, checkout-redirect, signup)
-- EmailCheckoutModal geconsolideerd
-- FEAT-004: Paywall geïmplementeerd
-- FEAT-005: One-time upsell e-mail + upgrade flow
-- Stripe TEST-002 + TEST-003 bevestigd werkend ✅
-- QUAL-001 + QUAL-002: 67 tests aangemaakt
-- DOC-001: vercel.json + DEPLOYMENT.md aangemaakt
+### Sessie 2026-04-14 (sessie 10) — Security incident + build fix
+- **SEC-INC-001 OPGELOST** ✅: Postmark Server Token per ongeluk in docs opgenomen → GitGuardian alert
+- Token direct geroteerd, nieuwe token in Vercel + Supabase SMTP bijgewerkt
+- **BUILD-FIX** ✅: `lib/email/index.ts` importeerde nog steeds `resend` → Postmark doorgevoerd
 
-### Sessie 2026-04-10 — DNS migratie, PostHog, Loops journeys
-- INFRA-001: DNS migratie naar Cloudflare gestart
-- ANAL-001/002/003: PostHog volledig geïntegreerd
-- UX-001/001b: Quick Scan succes-scherm herbouwd
-- LOOPS-002: 3 Loops journeys aangemaakt
-- QUAL-003: 13 unit tests voor lib/loops
-- SEC-003: proxy.ts verbeterd, ?next= redirect
+### Sessie 2026-04-14 (sessie 9) — POSTMARK-001 voltooiing
+- **POSTMARK-001 VOLLEDIG AFGEROND** ✅
+- `POSTMARK_SERVER_TOKEN` toegevoegd in Vercel, Supabase SMTP bijgewerkt, Resend verwijderd
 
-### Sessie 2026-04-11 — LOOPS-003, doc-sync
-- LOOPS-003: Vercel Cron Jobs voor digest trigger
-- Doc-sync: 9 commits gesynchroniseerd
-
-### Sessie 2026-04-12 — INFRA-001 voltooiing + doc-sync
-- Cloudflare NS actief, Resend domein geverifieerd
-- Supabase SMTP ingesteld, e-mailtemplate DBA huisstijl
-- Vercel custom domain dbakompas.nl gekoppeld
-- App is LIVE op dbakompas.nl ✅
-- Doc-sync sessie 6
+### Sessie 2026-04-14 (sessie 8) — Bugfixes + Postmark migratie
+- BUG-001 + BUG-002 opgelost
+- Postmark account aangemaakt, domein geverifieerd (DKIM + Return-Path)
 
 ### Sessie 2026-04-13 — Welkomstmails + Control Tower fase 1
-- Nederlandse foutmeldingen voor Supabase auth errors
-- Welkomstmails na betaling via Resend Templates (subscription + one-time)
-- Logo-white-v3-full.png toegevoegd aan public map
-- Welkomstmail copy + template IDs + full-width fix
-- Resend Templates integratie voor welkomstmails
-- Gecombineerd: één welkomstmail na eenmalige aankoop (welcome + upsell in één template)
-- Profielpagina: correct plan tonen (eenmalig/maand/jaar) + logo upgrade pagina fix
-- BrandLogo component op upgrade pagina
-- **Control Tower fase 1**: admin e-mailbeheer + rolgebaseerde sidebar-toegang
+- Welkomstmails na betaling, Control Tower fase 1
 
-### Sessie 2026-04-14 — Bugfixes + Postmark migratie (sessie 8)
-- **INFRA-001 VOLLEDIG AFGEROND** ✅
-  - NEXT_PUBLIC_APP_URL en RESEND_API_KEY waren al correct in Vercel
-  - Supabase logo al correct ingesteld
-  - Testaccount aangemaakt → welkomstmail bug ontdekt
-- **BUG-001 OPGELOST**: Resend SDK ondersteunt `template_id` niet → inline HTML geforceerd
-  - Commit: `b766fb7` — `modules/email/send.ts`
-- **BUG-002 OPGELOST**: Loops events endpoint URL miste `/send`
-  - Commit: `0545c90` — `lib/loops/index.ts`
-- **POSTMARK MIGRATIE GESTART (80% klaar)**:
-  - `npm uninstall resend` + `npm install postmark` uitgevoerd
-  - `modules/email/send.ts` volledig herschreven met Postmark SDK
-  - Cloudflare DNS: DKIM TXT + Return-Path CNAME toegevoegd → beide VERIFIED ✅
-  - Postmark Server Token: `[POSTMARK_SERVER_TOKEN]`
-  - Code gepusht naar GitHub (auto-deploy Vercel)
-
-### Sessie 2026-04-16 — Auth flows + e-mailtemplates (sessie 12)
-- **AUTH-003 AFGEROND** ✅: auth/callback route + update-password pagina aangemaakt
-- Wachtwoord vergeten flow: forgot-password pagina + link op loginpagina
-- Supabase reset-password e-mailtemplate aangemaakt (DBA huisstijl)
-- Postmark templates gekoppeld via `sendEmailWithTemplate()` (POSTMARK-002 ✅)
-- Postmark account in afwachting van goedkeuring (test mode)
-
-### Sessie 2026-04-15 — Postmark templates (sessie 11)
-- 3 standalone Postmark templates aangemaakt: `welkomstmail-eenmalig`, `welkomstmail-maand`, `welkomstmail-jaar`
-- Welkomstmailteksten geschreven en goedgekeurd
-- `modules/email/send.ts` nog aan te passen naar `sendEmailWithTemplate()` (volgende sessie)
-
-### Sessie 2026-04-16 — Auth flows + e-mailtemplates (sessie 12)
-- **AUTH-003 AFGEROND** ✅: auth/callback route + update-password pagina aangemaakt
-- Wachtwoord vergeten flow: forgot-password pagina + link op loginpagina
-- Supabase reset-password e-mailtemplate aangemaakt (DBA huisstijl)
-- Postmark templates gekoppeld via `sendEmailWithTemplate()` (POSTMARK-002 ✅)
-- Postmark account in afwachting van goedkeuring (test mode)
-
-### Sessie 2026-04-15 — Postmark templates (sessie 11)
-- 3 standalone Postmark templates aangemaakt: `welkomstmail-eenmalig`, `welkomstmail-maand`, `welkomstmail-jaar`
-- Welkomstmailteksten geschreven en goedgekeurd
-- `modules/email/send.ts` nog aan te passen naar `sendEmailWithTemplate()` (volgende sessie)
-
-### Sessie 2026-04-14 — Security incident + build fix (sessie 10)
-- **SEC-INC-001 OPGELOST** ✅: Postmark Server Token per ongeluk in docs opgenomen → GitGuardian alert
-  - Token direct geroteerd in Postmark dashboard
-  - Nieuwe token gezet in Vercel + Supabase SMTP bijgewerkt
-  - Tokenwaarde verwijderd uit docs (commit `e5f165d`)
-- **BUILD-FIX** ✅: `lib/email/index.ts` importeerde nog steeds `resend` → Postmark doorgevoerd (commit `4f9df24`)
-- Deployment: Ready op `dbakompas.nl` ✅
-
-### Sessie 2026-04-14 — POSTMARK-001 voltooiing (sessie 9)
-- **POSTMARK-001 VOLLEDIG AFGEROND** ✅
-  - `POSTMARK_SERVER_TOKEN` toegevoegd in Vercel (All Environments)
-  - Supabase SMTP bijgewerkt: host `smtp.postmarkapp.com`, port `587`, username/password = Server Token
-  - Alle Resend Vercel env vars verwijderd (`RESEND_API_KEY`, `RESEND_TEMPLATE_WELCOME_*`)
-  - Resend volledig verwijderd uit stack
+### Sessies 2026-04-06 t/m 2026-04-12
+- Initiële migratie, stabilisatie, Stripe, PDF, Loops, DNS, PostHog, Sentry
 
 ---
 
 ## LAATSTE ACTIE
 
-**Sessie:** 2026-04-14 (sessie 10)
+**Sessie:** 2026-04-16 (sessie 13)
 **Laatste commits:**
-- `4f9df24` — "fix: vervang Resend door Postmark in email modules"
-- `e5f165d` — "security: verwijder blootgestelde Postmark token uit docs"
-- `b766fb7` — "fix: welkomstmail via inline HTML — Resend SDK ondersteunt template_id niet"
-- `0545c90` — "fix: Loops events endpoint URL — /send ontbrak"
-- (Postmark send.ts commit — naam onbekend, gepusht door Marvin)
-
-**Laatste wijziging in code:**
-- `modules/email/send.ts`: volledig herschreven van Resend naar Postmark SDK
-- `lib/loops/index.ts`: LOOPS_EVENTS_URL gecorrigeerd naar `/api/v1/events/send`
-- `package.json` + `package-lock.json`: `resend` verwijderd, `postmark` toegevoegd
+- `feat(admin): volledige funnel — quick scan → registratie → betaald → analyses`
+- `feat(admin): Control Tower fase 3 — statistieken, funnel en analyses-overzicht`
+- `fix(auth): admin omzeilt paywall, sidebar link naar /admin`
+- `feat(admin): Control Tower fase 2 — gebruikersbeheer + admin root page`
 
 ## VOLGENDE GEPLANDE STAP
 
-**EERSTE TAAK: Welkomstmail end-to-end testen + daarna STRIPE-LIVE**
-
-### Stap 1 — Welkomstmail testen (POSTMARK-001 verificatie)
-- Doe een test-betaling op dbakompas.nl (Stripe test card)
-- Verifieer welkomstmail in inbox
-- Check Postmark Activity feed: mail zichtbaar?
-- Check Vercel logs: geen `[MAIL] skipped` of errors
-
-### Stap 2 — STRIPE-LIVE configureren (vereist voor echte betalingen)
-- Live Stripe keys in Vercel: `STRIPE_SECRET_KEY` (sk_live_...) + `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
-- Live webhook aanmaken: `https://dbakompas.nl/api/billing/webhook`
-- Live price IDs + coupon `ONETIMECREDIT` in Stripe live mode
+1. **TEST-006**: Welkomstmail end-to-end testen (wacht op Postmark account goedkeuring)
+2. **STRIPE-LIVE**: Stripe omzetten naar live mode (vereist voor echte betalingen)
+3. **LOOPS-002**: 3 oude Loops journeys verwijderen
