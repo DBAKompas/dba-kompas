@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { updateLoopsContact, sendLoopsEvent } from "@/lib/loops";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 
 const LOOPS_API_KEY = process.env.LOOPS_API_KEY;
 const LOOPS_CONTACTS_URL = "https://app.loops.so/api/v1/contacts/update";
@@ -28,6 +29,19 @@ export async function POST(request: Request) {
 
     const riskNL = riskLevel === "low" ? "laag" : riskLevel === "high" ? "hoog" : "gemiddeld";
 
+    // Sla op in Supabase voor funnel-analytics (fire-and-forget, geen harde fout bij mislukken)
+    supabaseAdmin
+      .from("quick_scan_leads")
+      .insert({
+        email,
+        first_name: firstName,
+        risk_level: riskNL,
+        score,
+      })
+      .then(({ error }) => {
+        if (error) console.warn("[QUICK SCAN] Supabase insert mislukt:", error.message);
+      });
+
     // Contact aanmaken of updaten in Loops (met firstName als standaardveld)
     if (LOOPS_API_KEY) {
       await fetch(LOOPS_CONTACTS_URL, {
@@ -39,7 +53,6 @@ export async function POST(request: Request) {
         body: JSON.stringify({
           email,
           firstName,
-          // Custom Loops-velden — stel deze in als contacteigenschappen in Loops
           quick_scan_completed: true,
           quick_scan_risk_level: riskNL,
           quick_scan_score: score,

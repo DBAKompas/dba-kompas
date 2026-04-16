@@ -44,6 +44,8 @@ export async function GET() {
     totaalAnalyses,
     analysesDezeWeek,
     risicoVerdeling,
+    totaalQuickScans,
+    quickScansDezeWeek,
   ] = await Promise.all([
     // Totaal gebruikers
     admin.from('profiles').select('id', { count: 'exact', head: true }),
@@ -62,6 +64,12 @@ export async function GET() {
 
     // Risicoverdeling
     admin.from('dba_assessments').select('overall_risk_label'),
+
+    // Totaal quick scans
+    admin.from('quick_scan_leads').select('id', { count: 'exact', head: true }),
+
+    // Quick scans afgelopen 7 dagen
+    admin.from('quick_scan_leads').select('id', { count: 'exact', head: true }).gte('created_at', zevenDagenGeleden),
   ])
 
   // Plan breakdown berekenen
@@ -82,7 +90,17 @@ export async function GET() {
     risicoCounts[label] = (risicoCounts[label] ?? 0) + 1
   }
 
+  const quickScanTotaal = totaalQuickScans.count ?? 0
+  const quickScanNaarRegistratie = quickScanTotaal > 0
+    ? Math.round((totaal / quickScanTotaal) * 100)
+    : 0
+
   return NextResponse.json({
+    quickScans: {
+      totaal: quickScanTotaal,
+      dezeWeek: quickScansDezeWeek.count ?? 0,
+      naarRegistratieRate: quickScanNaarRegistratie,
+    },
     gebruikers: {
       totaal,
       nieuwDezeWeek: nieuwDezeWeek.count ?? 0,

@@ -8,6 +8,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Loader2, Users, Mail, FileSearch, TrendingUp, ArrowRight } from 'lucide-react'
 
 type Stats = {
+  quickScans: {
+    totaal: number
+    dezeWeek: number
+    naarRegistratieRate: number
+  }
   gebruikers: {
     totaal: number
     nieuwDezeWeek: number
@@ -142,32 +147,46 @@ export default function AdminPage() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2 flex-wrap">
-              {/* Stap 1: Registraties */}
+
+              {/* Stap 1: Quick Scan */}
+              <div className="flex-1 min-w-[100px] rounded-lg bg-muted/50 border border-border/50 px-4 py-3 text-center">
+                <p className="text-2xl font-bold text-foreground">{s.quickScans.totaal}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Quick scans</p>
+                <p className="text-xs text-muted-foreground/60 mt-0.5">+{s.quickScans.dezeWeek} deze week</p>
+              </div>
+
+              <ArrowRight className="size-4 text-muted-foreground flex-shrink-0" />
+
+              {/* Stap 2: Registraties */}
               <div className="flex-1 min-w-[100px] rounded-lg bg-muted/50 border border-border/50 px-4 py-3 text-center">
                 <p className="text-2xl font-bold text-foreground">{s.gebruikers.totaal}</p>
                 <p className="text-xs text-muted-foreground mt-0.5">Registraties</p>
+                {s.quickScans.totaal > 0 && (
+                  <p className="text-xs text-primary font-medium mt-0.5">{s.quickScans.naarRegistratieRate}%</p>
+                )}
               </div>
 
               <ArrowRight className="size-4 text-muted-foreground flex-shrink-0" />
 
-              {/* Stap 2: Betaald */}
+              {/* Stap 3: Betaald */}
               <div className="flex-1 min-w-[100px] rounded-lg bg-muted/50 border border-border/50 px-4 py-3 text-center">
                 <p className="text-2xl font-bold text-foreground">{s.gebruikers.betaald}</p>
                 <p className="text-xs text-muted-foreground mt-0.5">Betaald</p>
-                <p className="text-xs text-primary font-medium">{s.gebruikers.conversieRate}%</p>
+                <p className="text-xs text-primary font-medium mt-0.5">{s.gebruikers.conversieRate}%</p>
               </div>
 
               <ArrowRight className="size-4 text-muted-foreground flex-shrink-0" />
 
-              {/* Stap 3: Analyses */}
+              {/* Stap 4: Analyses */}
               <div className="flex-1 min-w-[100px] rounded-lg bg-muted/50 border border-border/50 px-4 py-3 text-center">
                 <p className="text-2xl font-bold text-foreground">{s.analyses.totaal}</p>
                 <p className="text-xs text-muted-foreground mt-0.5">Analyses</p>
+                <p className="text-xs text-muted-foreground/60 mt-0.5">+{s.analyses.dezeWeek} deze week</p>
               </div>
 
               <ArrowRight className="size-4 text-muted-foreground flex-shrink-0" />
 
-              {/* Risico breakdown */}
+              {/* Stap 5: Risico breakdown */}
               <div className="flex-1 min-w-[140px] rounded-lg bg-muted/50 border border-border/50 px-4 py-3">
                 <p className="text-xs text-muted-foreground mb-1.5">Risico-uitkomsten</p>
                 {Object.entries(RISICO_LABELS).map(([key, { label, kleur }]) => (
