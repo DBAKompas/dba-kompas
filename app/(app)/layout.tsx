@@ -47,14 +47,15 @@ function AppShell({ children }: { children: React.ReactNode }) {
   }, [loading, user, router, pathname])
 
   // Paywall: redirect naar /upgrade als ingelogd maar geen betaald plan
+  // Admins omzeilen de paywall altijd
   useEffect(() => {
-    if (!loading && !planLoading && user && plan === 'free') {
+    if (!loading && !planLoading && user && plan === 'free' && !isAdmin) {
       const exempt = PAYWALL_EXEMPT.some(p => pathname === p || pathname.startsWith(p + '/'))
       if (!exempt) {
         router.push('/upgrade')
       }
     }
-  }, [loading, planLoading, user, plan, pathname, router])
+  }, [loading, planLoading, user, plan, isAdmin, pathname, router])
 
   // Toon spinner zolang auth of plan nog laden
   if (loading || planLoading) {
@@ -73,8 +74,8 @@ function AppShell({ children }: { children: React.ReactNode }) {
     )
   }
 
-  // Toon spinner als plan 'free' is en we gaan redirecten (niet op vrijgestelde routes)
-  if (plan === 'free') {
+  // Toon spinner als plan 'free' is en we gaan redirecten (niet op vrijgestelde routes, niet voor admins)
+  if (plan === 'free' && !isAdmin) {
     const exempt = PAYWALL_EXEMPT.some(p => pathname === p || pathname.startsWith(p + '/'))
     if (!exempt) {
       return (
@@ -130,7 +131,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
             <>
               <div className="mx-3 my-2 border-t border-border/40" />
               <Link
-                href="/admin/emails"
+                href="/admin"
                 className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                   pathname.startsWith('/admin')
                     ? 'bg-primary text-primary-foreground shadow-sm'
@@ -138,7 +139,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
                 }`}
               >
                 <Settings2 className="size-4 flex-shrink-0" />
-                E-mailbeheer
+                Control Tower
               </Link>
             </>
           )}
