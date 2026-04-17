@@ -1,68 +1,204 @@
 'use client'
 
 import { useParams, useRouter } from 'next/navigation'
-import { ArrowLeft } from 'lucide-react'
+import {
+  ArrowLeft,
+  Clock,
+  Lightbulb,
+  AlertTriangle,
+  AlertCircle,
+  BookOpen,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { getGuide, type GuideBlock, type GuideDifficulty } from '@/lib/guides/content'
 
-const GUIDE_CONTENT: Record<string, { title: string; content: string[] }> = {
-  'wat-is-wet-dba': {
-    title: 'Wat is de Wet DBA?',
-    content: [
-      'De Wet Deregulering Beoordeling Arbeidsrelaties (Wet DBA) is in 2016 ingevoerd ter vervanging van de Verklaring Arbeidsrelatie (VAR). Het doel is om schijnzelfstandigheid tegen te gaan en duidelijkheid te scheppen over arbeidsrelaties tussen opdrachtgevers en zzp\'ers.',
-      'Onder de Wet DBA zijn zowel de opdrachtgever als de opdrachtnemer verantwoordelijk voor de juiste kwalificatie van hun arbeidsrelatie. Als de Belastingdienst vaststelt dat er sprake is van een dienstbetrekking in plaats van zelfstandig ondernemerschap, kunnen er naheffingen en boetes volgen.',
-      'De drie belangrijkste criteria die de Belastingdienst beoordeelt zijn: de mate van gezag (wie bepaalt hoe het werk wordt gedaan), de mogelijkheid tot vervanging (mag de zzp\'er zich laten vervangen), en het ondernemersrisico (draagt de zzp\'er financieel risico).',
-      'DBA Kompas helpt je bij het analyseren van je opdrachtomschrijving op basis van deze criteria en geeft concrete verbeterpunten.',
-    ],
+// ─── Difficulty badge ─────────────────────────────────────────
+
+const DIFFICULTY_LABEL: Record<GuideDifficulty, string> = {
+  basis: 'Basis',
+  gevorderd: 'Gevorderd',
+  expert: 'Expert',
+}
+const DIFFICULTY_CLASS: Record<GuideDifficulty, string> = {
+  basis:
+    'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
+  gevorderd:
+    'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+  expert: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+}
+
+// ─── Callout config ───────────────────────────────────────────
+
+const CALLOUT_CONFIG = {
+  tip: {
+    icon: Lightbulb,
+    border: 'border-blue-400 dark:border-blue-500',
+    bg: 'bg-blue-50 dark:bg-blue-950/20',
+    title: 'text-blue-800 dark:text-blue-300',
+    text: 'text-blue-900 dark:text-blue-200',
+    icon_class: 'text-blue-500',
+    default_title: 'Tip',
   },
-  'gezagsverhouding': {
-    title: 'Gezagsverhouding herkennen',
-    content: [
-      'Een gezagsverhouding is een van de drie kernkenmerken van een dienstbetrekking. Als er sprake is van een gezagsverhouding, wijst dat op een arbeidsrelatie in plaats van zelfstandig ondernemerschap.',
-      'Signalen van een gezagsverhouding zijn onder meer: de opdrachtgever bepaalt werktijden, de opdrachtgever geeft directe instructies over hoe het werk moet worden uitgevoerd, er is sprake van een hiërarchische verhouding, en de opdrachtnemer moet toestemming vragen voor afwezigheid.',
-      'Als zelfstandige is het belangrijk om afspraken vast te leggen over wat er wordt opgeleverd (resultaatsverplichting) in plaats van hoe het werk wordt gedaan (inspanningsverplichting).',
-    ],
+  warning: {
+    icon: AlertTriangle,
+    border: 'border-amber-400 dark:border-amber-500',
+    bg: 'bg-amber-50 dark:bg-amber-950/20',
+    title: 'text-amber-800 dark:text-amber-300',
+    text: 'text-amber-900 dark:text-amber-200',
+    icon_class: 'text-amber-500',
+    default_title: 'Let op',
   },
-  'zelfstandigheid-aantonen': {
-    title: 'Zelfstandigheid aantonen',
-    content: [
-      'Om je zelfstandigheid als zzp\'er te onderbouwen, zijn er meerdere factoren die je kunt benadrukken in je opdrachtomschrijving en werkwijze.',
-      'Werk voor meerdere opdrachtgevers. Dit is een van de sterkste indicatoren van zelfstandigheid. Documenteer je opdrachtenportfolio.',
-      'Gebruik je eigen materialen en gereedschap. Werk met je eigen laptop, software-licenties en apparatuur. Factureer geen materiaalkosten aan de opdrachtgever tenzij projectspecifiek.',
-      'Draag financieel risico. Dit kan zijn door aansprakelijkheidsverzekering, het risico van onbetaalde uren, of investeringen in je onderneming.',
-      'Zorg voor een duidelijke resultaatsverplichting. Definieer oplevermomenten en kwaliteitscriteria in plaats van "beschikbaarheid" of "inzet".',
-    ],
+  example: {
+    icon: BookOpen,
+    border: 'border-emerald-400 dark:border-emerald-500',
+    bg: 'bg-emerald-50 dark:bg-emerald-950/20',
+    title: 'text-emerald-800 dark:text-emerald-300',
+    text: 'text-emerald-900 dark:text-emerald-200',
+    icon_class: 'text-emerald-500',
+    default_title: 'Voorbeeld',
   },
-  'opdrachtomschrijving-verbeteren': {
-    title: 'Opdrachtomschrijving verbeteren',
-    content: [
-      'Een goede opdrachtomschrijving is cruciaal voor DBA-compliance. De tekst moet duidelijk maken dat er sprake is van een opdracht aan een zelfstandige, niet van een arbeidsrelatie.',
-      'Beschrijf het resultaat, niet het proces. In plaats van "de opdrachtnemer werkt van 9-17 op kantoor" schrijf je "de opdrachtnemer levert binnen 6 weken een werkend prototype op".',
-      'Vermijd termen die wijzen op een dienstverband. Woorden als "leidinggevende", "functioneringsgesprek", "verlofaanvraag" en "werktijden" zijn rode vlaggen.',
-      'Neem een vervangingsclausule op. De mogelijkheid om je te laten vervangen door een andere professional is een sterke indicator van zelfstandigheid.',
-      'Gebruik DBA Kompas om je opdrachtomschrijving te laten analyseren en ontvang een verbeterde versie die beter voldoet aan de DBA-criteria.',
-    ],
-  },
-  'handhaving-belastingdienst': {
-    title: 'Handhaving door de Belastingdienst',
-    content: [
-      'Sinds het opheffen van het handhavingsmoratorium controleert de Belastingdienst actiever op schijnzelfstandigheid. Dit betekent dat zowel opdrachtgevers als zzp\'ers risico lopen op naheffingen.',
-      'Bij een controle beoordeelt de Belastingdienst de feitelijke situatie, niet alleen de contractuele afspraken. Als de praktijk afwijkt van het contract, kan alsnog een dienstbetrekking worden vastgesteld.',
-      'Mogelijke gevolgen zijn: naheffing loonbelasting en premies volksverzekeringen, boetes tot 100% van de naheffing bij opzet, en herziening van eerder toegekende aftrekposten.',
-      'Voorbereiding is essentieel. Zorg dat je opdrachtomschrijving klopt, bewaar documentatie van je zelfstandigheid, en evalueer regelmatig of je werkrelatie nog voldoet aan de criteria.',
-    ],
+  important: {
+    icon: AlertCircle,
+    border: 'border-red-400 dark:border-red-500',
+    bg: 'bg-red-50 dark:bg-red-950/20',
+    title: 'text-red-800 dark:text-red-300',
+    text: 'text-red-900 dark:text-red-200',
+    icon_class: 'text-red-500',
+    default_title: 'Belangrijk',
   },
 }
+
+// ─── Block renderer ───────────────────────────────────────────
+
+function RenderBlock({ block }: { block: GuideBlock }) {
+  switch (block.type) {
+    case 'paragraph':
+      return (
+        <p className="text-muted-foreground leading-relaxed text-[15px]">
+          {block.text}
+        </p>
+      )
+
+    case 'heading':
+      if (block.level === 3) {
+        return (
+          <h3 className="text-base font-semibold mt-6 mb-2 text-foreground">
+            {block.text}
+          </h3>
+        )
+      }
+      return (
+        <h2 className="text-lg font-bold mt-8 mb-3 text-foreground border-b pb-1.5">
+          {block.text}
+        </h2>
+      )
+
+    case 'list':
+      if (block.ordered) {
+        return (
+          <ol className="space-y-2 pl-1">
+            {block.items.map((item, i) => (
+              <li key={i} className="flex gap-3 text-[15px] text-muted-foreground leading-relaxed">
+                <span className="shrink-0 mt-0.5 size-5 rounded-full bg-primary/10 text-primary text-xs font-semibold flex items-center justify-center">
+                  {i + 1}
+                </span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ol>
+        )
+      }
+      return (
+        <ul className="space-y-2 pl-1">
+          {block.items.map((item, i) => (
+            <li key={i} className="flex gap-3 text-[15px] text-muted-foreground leading-relaxed">
+              <span className="shrink-0 mt-2 size-1.5 rounded-full bg-primary/60" />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      )
+
+    case 'callout': {
+      const cfg = CALLOUT_CONFIG[block.variant]
+      const Icon = cfg.icon
+      const title = block.title ?? cfg.default_title
+      return (
+        <div
+          className={`rounded-lg border-l-4 px-4 py-3.5 ${cfg.border} ${cfg.bg}`}
+        >
+          <div className="flex items-start gap-2.5">
+            <Icon className={`size-4 shrink-0 mt-0.5 ${cfg.icon_class}`} />
+            <div className="space-y-1">
+              {title && (
+                <p className={`text-sm font-semibold ${cfg.title}`}>{title}</p>
+              )}
+              <p className={`text-sm leading-relaxed whitespace-pre-line ${cfg.text}`}>
+                {block.text}
+              </p>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    case 'table':
+      return (
+        <div className="overflow-x-auto rounded-lg border">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b bg-muted/50">
+                {block.headers.map((h, i) => (
+                  <th
+                    key={i}
+                    className="px-4 py-2.5 text-left font-semibold text-foreground whitespace-nowrap"
+                  >
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {block.rows.map((row, ri) => (
+                <tr
+                  key={ri}
+                  className="border-b last:border-0 hover:bg-muted/30 transition-colors"
+                >
+                  {row.map((cell, ci) => (
+                    <td
+                      key={ci}
+                      className="px-4 py-3 text-muted-foreground leading-relaxed align-top"
+                    >
+                      {cell}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )
+
+    case 'divider':
+      return <hr className="border-border my-2" />
+
+    default:
+      return null
+  }
+}
+
+// ─── Page ─────────────────────────────────────────────────────
 
 export default function GuideDetailPage() {
   const params = useParams()
   const router = useRouter()
   const slug = params.slug as string
-  const guide = GUIDE_CONTENT[slug]
+  const guide = getGuide(slug)
 
   if (!guide) {
     return (
       <div className="space-y-4">
-        <Button variant="ghost" onClick={() => router.push('/gidsen')}>
+        <Button variant="ghost" size="sm" onClick={() => router.push('/gidsen')}>
           <ArrowLeft className="size-4 mr-2" />
           Terug naar gidsen
         </Button>
@@ -72,20 +208,70 @@ export default function GuideDetailPage() {
   }
 
   return (
-    <div className="max-w-2xl space-y-6">
-      <Button variant="ghost" onClick={() => router.push('/gidsen')}>
+    <div className="max-w-2xl">
+      {/* Terug */}
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => router.push('/gidsen')}
+        className="mb-6 -ml-2"
+      >
         <ArrowLeft className="size-4 mr-2" />
         Terug naar gidsen
       </Button>
 
-      <h1 className="text-2xl font-bold">{guide.title}</h1>
+      {/* Header */}
+      <div className="mb-8 pb-6 border-b">
+        <div className="flex flex-wrap items-center gap-2 mb-3">
+          <span className="text-xs text-muted-foreground bg-muted px-2.5 py-0.5 rounded-full">
+            {guide.category}
+          </span>
+          <span
+            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${DIFFICULTY_CLASS[guide.difficulty]}`}
+          >
+            {DIFFICULTY_LABEL[guide.difficulty]}
+          </span>
+          <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Clock className="size-3.5" />
+            {guide.readingTime} min leestijd
+          </span>
+        </div>
 
-      <div className="space-y-4">
-        {guide.content.map((paragraph, i) => (
-          <p key={i} className="text-muted-foreground leading-relaxed">
-            {paragraph}
-          </p>
+        <h1 className="text-2xl font-bold leading-tight mb-2">{guide.title}</h1>
+        <p className="text-muted-foreground text-[15px]">{guide.subtitle}</p>
+
+        {guide.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mt-4">
+            {guide.tags.map((tag) => (
+              <span
+                key={tag}
+                className="text-[11px] px-2 py-0.5 rounded-md bg-secondary text-secondary-foreground"
+              >
+                #{tag}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Content */}
+      <div className="space-y-5">
+        {guide.blocks.map((block, i) => (
+          <RenderBlock key={i} block={block} />
         ))}
+      </div>
+
+      {/* Footer CTA */}
+      <div className="mt-10 pt-6 border-t">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => router.push('/gidsen')}
+          className="-ml-2"
+        >
+          <ArrowLeft className="size-4 mr-2" />
+          Alle gidsen bekijken
+        </Button>
       </div>
     </div>
   )
