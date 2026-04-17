@@ -116,7 +116,8 @@ export async function GET() {
     },
   })
   } catch (err) {
-    console.error('[admin/stats] onverwachte fout:', err)
-    return NextResponse.json({ error: 'Interne fout' }, { status: 500 })
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error('[admin/stats] onverwachte fout:', msg)
+    return NextResponse.json({ error: 'Interne fout', detail: msg }, { status: 500 })
   }
 }

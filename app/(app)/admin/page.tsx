@@ -88,7 +88,10 @@ export default function AdminPage() {
     if (!loading && isAdmin) {
       fetch('/api/admin/stats')
         .then(r => r.json())
-        .then(setStats)
+        .then(data => {
+          if (data?.gebruikers) setStats(data)
+          else console.error('[admin] stats API fout:', data)
+        })
         .catch(console.error)
         .finally(() => setStatsLoading(false))
     }
