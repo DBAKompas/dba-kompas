@@ -1,6 +1,6 @@
 # TASKS.md
 
-**Laatste update:** 2026-04-17 (sessie 14)
+**Laatste update:** 2026-04-17 (sessie 14 — afsluiting)
 
 ---
 
@@ -21,6 +21,18 @@
 
 ### HOOG — Vereist voor productie-livegang
 
+**GROWTH-001: Referral-engine (na STRIPE-LIVE)**
+> Volledig plan in `docs/GROWTHPLAN_UITVOERING.md`. Nog niet beginnen tot STRIPE-LIVE klaar is.
+- [ ] Supabase migratie 004: `referral_codes`, `referral_rewards`, `referral_tracking` tabellen
+- [ ] `GET /api/referral/code` — eigen referralcode ophalen/aanmaken
+- [ ] `POST /api/referral/track` — `?ref=CODE` opslaan bij registratie
+- [ ] Webhook `checkout.session.completed` uitbreiden: referral qualificeren + reward schrijven
+- [ ] Anti-fraud guards (zelfverwijzing, bestaande users, dubbele webhook)
+- [ ] Stripe coupon `REFERRAL_MONTH_DISCOUNT` aanmaken
+- [ ] GROWTH-002: referral widget na analyse (ReferralWidget.tsx)
+- [ ] GROWTH-003: `?ref=CODE` tracking door funnel (cookie → registratie → checkout)
+- [ ] Loops: referral milestone e-mails aanmaken (events: `referral_milestone_1/3/5`)
+
 **STRIPE-LIVE: Stripe omzetten naar live mode**
 - [ ] Live Stripe keys instellen in Vercel: `STRIPE_SECRET_KEY` (sk_live_...) + `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` (pk_live_...)
 - [ ] Live webhook aanmaken in Stripe Dashboard: `https://dbakompas.nl/api/billing/webhook` (5 events)
@@ -28,6 +40,78 @@
 - [ ] Live price IDs: `STRIPE_PRICE_ID_MONTHLY`, `STRIPE_PRICE_ID_YEARLY`, `STRIPE_PRICE_ID_ONE_TIME`
 - [ ] Coupon `ONETIMECREDIT` aanmaken in Stripe live mode + env var
 - [ ] End-to-end live betaling testen
+
+### HOOG — Infrastructuur & Operationeel (parallel aan product)
+
+> Volledig plan in `docs/MASTERPLAN_SAAS_PROFESSIONAL.md`
+
+**INFRA-001: Control Tower meegroeien met product**
+- [ ] CT-root herinrichten met categoriegroepen zodra >6 tegels (Beheer / Analytics / Acties)
+- [ ] Tegel "Nieuws" → `/admin/nieuws` toevoegen (bij PROD-001)
+- [ ] Tegel "Gidsen" → `/admin/gidsen` toevoegen (bij PROD-002)
+- [ ] Tegel "Referral" → `/admin/referral` toevoegen (bij GROWTH-001)
+- [ ] Actiepunten-widget altijd bovenaan CT-root
+
+**INFRA-002: Admin actiepunten & e-mailalerts**
+- [ ] Supabase migratie 006: `admin_alerts` tabel
+- [ ] `lib/admin/alerts.ts`: `createAlert()` + `sendAlertEmail()` via Postmark
+- [ ] `app/api/admin/alerts/route.ts`: GET openstaande alerts
+- [ ] `components/admin/AlertsWidget.tsx`: widget bovenaan CT-root
+- [ ] Webhook uitbreiden: alert bij betalingsfout + e-mail naar marvin.zoetemelk@icloud.com
+- [ ] Cron uitbreiden: alert bij mislukking
+- [ ] Alert bij vermoedelijke referral-fraude (na GROWTH-001)
+- [ ] Alert bij onverwacht nieuwe admin-rol
+
+**INFRA-003: E-maillogo en BIMI**
+- [ ] Niveau 1 (direct): DBA Kompas-logo consistent in alle Postmark-templates (welkomst, digest, alert, reset)
+- [ ] Niveau 2 (later): DMARC controleren/instellen op `p=quarantine` bij Cloudflare
+- [ ] SVG-logo aanmaken in BIMI Tiny PS-formaat
+- [ ] SVG hosten op `dbakompas.nl/bimi-logo.svg`
+- [ ] BIMI DNS-record toevoegen: `default._bimi.dbakompas.nl TXT "v=BIMI1; l=https://dbakompas.nl/bimi-logo.svg"`
+- [ ] Testen via bimigroup.org/bimi-generator/
+- [ ] DNS-acties: Marvin voert uit bij Cloudflare
+
+**INFRA-004: Mobiele navigatie marketing site**
+- [ ] Hamburger-icoon in header (alleen `md:hidden`)
+- [ ] Slide-in / dropdown menu met alle navigatiepunten
+- [ ] "Ga naar de app"-knop zichtbaar in mobiel menu
+- [ ] Sluiten via kruisje of klik buiten menu
+- [ ] Desktop volledig ongewijzigd (`hidden md:flex`)
+- [ ] Bestanden: `components/marketing/Header.tsx` of `app/(marketing)/layout.tsx`
+
+### HOOG — Product klaarstomen (vóór marktlancering)
+
+> Volledig plan in `docs/MASTERPLAN_SAAS_PROFESSIONAL.md`
+
+**PROD-001: Nieuws vullen**
+- [ ] Admin pagina `/admin/nieuws`: toevoegen/bewerken nieuwsberichten
+- [ ] `/api/admin/nieuws/route.ts` (GET + POST)
+- [ ] Handmatig 15-20 berichten invoeren (initieel vullen)
+- [ ] Make-scenario: RSS/scraper → AI samenvatting → Supabase insert (wekelijks)
+
+**PROD-002: Gidsen — diepe content + DB-backed**
+- [ ] Supabase migratie 005: `guides` tabel (slug, title, sections jsonb, category, difficulty, is_published)
+- [ ] Gids-detail pagina refactoren: DB query i.p.v. hardcoded object
+- [ ] Admin gids-editor `/admin/gidsen` (Markdown of WYSIWYG)
+- [ ] 15 diepgaande gidsen schrijven (DBA, fiscaal, administratief, contracten, ondernemen)
+- [ ] Publicatievlag per gids
+
+**PROD-003: Notificaties als levend systeem**
+- [ ] Trigger bij analyse: "Je analyse is klaar"
+- [ ] Trigger bij hoog-impact nieuws: "Nieuw DBA-nieuws"
+- [ ] Trigger bij betalingsfout: "Betaling mislukt"
+- [ ] Trigger bij abonnementsverlenging
+
+**QUAL-001: Analyse-ervaring verdiepen**
+- [ ] Follow-up vragen flow na analyse (heranalyse met diff)
+- [ ] Vergelijkingsgeschiedenis (v1 vs. v2)
+- [ ] Word-download naast PDF
+- [ ] Sector-context in analyse-output (IT vs. publiek domein)
+
+**QUAL-004: Onboarding flow**
+- [ ] Welkomstscherm na eerste login (3 bullets, 30 seconden)
+- [ ] Direct naar analyse met voorbeeldtekst
+- [ ] Na eerste analyse → referral-widget
 
 ### MIDDEL
 
