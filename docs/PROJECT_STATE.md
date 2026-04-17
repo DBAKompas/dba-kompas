@@ -1,6 +1,6 @@
 # PROJECT_STATE.md
 
-**Laatste update:** 2026-04-16 (sessie 13)
+**Laatste update:** 2026-04-17 (sessie 14)
 **Maturity:** ~99% (live op dbakompas.nl, Stripe in test mode, Postmark volledig actief)
 
 ---
@@ -18,6 +18,8 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
 - PostHog analytics + Sentry error tracking
 - 80 unit + integratietests
 - Control Tower fase 1 t/m 3 (statistieken, funnel, gebruikersbeheer, analyses-overzicht)
+- Sales Funnel als aparte tegel (`/admin/funnel`) met conversie per stap, plan-breakdown, risico-uitkomsten
+- Paywall race condition gefixed (`roleLoading` in AuthContext)
 - Vercel Cron Jobs (weekly/monthly digest triggers)
 - Quick scan funnel volledig meetbaar (Supabase + Loops)
 

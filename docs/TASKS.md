@@ -1,16 +1,12 @@
 # TASKS.md
 
-**Laatste update:** 2026-04-16 (sessie 13)
+**Laatste update:** 2026-04-17 (sessie 14)
 
 ---
 
 ## IN PROGRESS
 
-### CT-001 — Statistieken en funnel zichtbaar maken in Control Tower
-- [ ] Controleer of laatste commits zijn gepusht (`feat(admin): volledige funnel...` + `feat(admin): Control Tower fase 3...`)
-- [ ] Na deploy: verifieer dat statcards en funnelrij zichtbaar zijn op `/admin`
-- [ ] Quick scan data verschijnt pas na de eerste nieuwe quick scan (tabel `quick_scan_leads` is leeg bij aanvang)
-- [ ] Eventueel: historische quick scan data backfillen vanuit Loops contacts API
+*(geen actieve taken)*
 
 ### TEST-006 — Welkomstmail end-to-end testen via Postmark
 - [ ] Wacht op Postmark account goedkeuring (aangevraagd)
@@ -73,6 +69,16 @@
 ---
 
 ## DONE
+
+### Sessie 2026-04-17 (sessie 14) — Sales Funnel tegel + paywall race condition fix
+- [x] **CT-002: Sales Funnel als aparte pagina** ✅
+  - `/admin/funnel/page.tsx` — volledige funnel: stappen, plan-breakdown, risico-uitkomsten, conversie-samenvatting
+  - Admin root: funnelkaart verwijderd, Funnel tegel toegevoegd als 4e tegel
+  - Grid responsive: 1 → 2 → 4 kolommen
+- [x] **Paywall race condition gefixed** ✅
+  - `AuthContext.tsx`: `roleLoading` state toegevoegd aan `fetchRole`
+  - `layout.tsx`: wacht nu op `!roleLoading` voor paywall-redirect
+  - Root oorzaak: `fetchPlan` en `fetchRole` lopen parallel; als plan eerder terugkwam dan role, was `isAdmin` nog `false` → redirect naar `/upgrade`
 
 ### Sessie 2026-04-16 (sessie 13) — Control Tower fase 2 + 3
 - [x] **Control Tower fase 2** ✅
