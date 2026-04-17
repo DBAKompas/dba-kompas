@@ -26,6 +26,7 @@ async function requireAdmin(): Promise<{ error: NextResponse } | { userId: strin
 }
 
 export async function GET() {
+  try {
   const check = await requireAdmin()
   if ('error' in check) return check.error
 
@@ -65,11 +66,11 @@ export async function GET() {
     // Risicoverdeling
     admin.from('dba_assessments').select('overall_risk_label'),
 
-    // Totaal quick scans
-    admin.from('quick_scan_leads').select('id', { count: 'exact', head: true }),
+    // Totaal quick scans (tabel is nieuw — fout wordt afgevangen)
+    admin.from('quick_scan_leads').select('id', { count: 'exact', head: true }).then(r => r).catch(() => ({ count: 0, data: null, error: null })),
 
     // Quick scans afgelopen 7 dagen
-    admin.from('quick_scan_leads').select('id', { count: 'exact', head: true }).gte('created_at', zevenDagenGeleden),
+    admin.from('quick_scan_leads').select('id', { count: 'exact', head: true }).gte('created_at', zevenDagenGeleden).then(r => r).catch(() => ({ count: 0, data: null, error: null })),
   ])
 
   // Plan breakdown berekenen
@@ -114,4 +115,8 @@ export async function GET() {
       perRisico: risicoCounts,
     },
   })
+  } catch (err) {
+    console.error('[admin/stats] onverwachte fout:', err)
+    return NextResponse.json({ error: 'Interne fout' }, { status: 500 })
+  }
 }
