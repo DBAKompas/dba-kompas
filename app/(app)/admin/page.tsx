@@ -5,39 +5,19 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/components/auth/AuthContext'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Loader2, Users, Mail, FileSearch, TrendingUp, ArrowRight } from 'lucide-react'
+import { Loader2, Users, Mail, FileSearch, TrendingUp } from 'lucide-react'
 
 type Stats = {
-  quickScans: {
-    totaal: number
-    dezeWeek: number
-    naarRegistratieRate: number
-  }
   gebruikers: {
     totaal: number
     nieuwDezeWeek: number
     betaald: number
     conversieRate: number
-    perPlan: Record<string, number>
   }
   analyses: {
     totaal: number
     dezeWeek: number
-    perRisico: Record<string, number>
   }
-}
-
-const PLAN_LABELS: Record<string, string> = {
-  free: 'Gratis',
-  one_time: 'Eenmalig',
-  monthly: 'Maand',
-  yearly: 'Jaar',
-}
-
-const RISICO_LABELS: Record<string, { label: string; kleur: string }> = {
-  laag:      { label: 'Laag risico',      kleur: 'text-emerald-600' },
-  gemiddeld: { label: 'Gemiddeld risico', kleur: 'text-amber-600' },
-  hoog:      { label: 'Hoog risico',      kleur: 'text-red-600' },
 }
 
 const tiles = [
@@ -52,6 +32,12 @@ const tiles = [
     title: 'Analyses',
     description: 'Overzicht van alle DBA-analyses per gebruiker.',
     icon: <FileSearch className="size-5" />,
+  },
+  {
+    href: '/admin/funnel',
+    title: 'Sales Funnel',
+    description: 'Conversie van quick scan naar registratie, betaling en analyse.',
+    icon: <TrendingUp className="size-5" />,
   },
   {
     href: '/admin/emails',
@@ -139,83 +125,8 @@ export default function AdminPage() {
         </div>
       ) : null}
 
-      {/* Funnel */}
-      {s && (
-        <Card className="border-border/50 mb-8">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold flex items-center gap-2">
-              <TrendingUp className="size-4 text-muted-foreground" />
-              Funnel
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2 flex-wrap">
-
-              {/* Stap 1: Quick Scan */}
-              <div className="flex-1 min-w-[100px] rounded-lg bg-muted/50 border border-border/50 px-4 py-3 text-center">
-                <p className="text-2xl font-bold text-foreground">{s.quickScans.totaal}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">Quick scans</p>
-                <p className="text-xs text-muted-foreground/60 mt-0.5">+{s.quickScans.dezeWeek} deze week</p>
-              </div>
-
-              <ArrowRight className="size-4 text-muted-foreground flex-shrink-0" />
-
-              {/* Stap 2: Registraties */}
-              <div className="flex-1 min-w-[100px] rounded-lg bg-muted/50 border border-border/50 px-4 py-3 text-center">
-                <p className="text-2xl font-bold text-foreground">{s.gebruikers.totaal}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">Registraties</p>
-                {s.quickScans.totaal > 0 && (
-                  <p className="text-xs text-primary font-medium mt-0.5">{s.quickScans.naarRegistratieRate}%</p>
-                )}
-              </div>
-
-              <ArrowRight className="size-4 text-muted-foreground flex-shrink-0" />
-
-              {/* Stap 3: Betaald */}
-              <div className="flex-1 min-w-[100px] rounded-lg bg-muted/50 border border-border/50 px-4 py-3 text-center">
-                <p className="text-2xl font-bold text-foreground">{s.gebruikers.betaald}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">Betaald</p>
-                <p className="text-xs text-primary font-medium mt-0.5">{s.gebruikers.conversieRate}%</p>
-              </div>
-
-              <ArrowRight className="size-4 text-muted-foreground flex-shrink-0" />
-
-              {/* Stap 4: Analyses */}
-              <div className="flex-1 min-w-[100px] rounded-lg bg-muted/50 border border-border/50 px-4 py-3 text-center">
-                <p className="text-2xl font-bold text-foreground">{s.analyses.totaal}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">Analyses</p>
-                <p className="text-xs text-muted-foreground/60 mt-0.5">+{s.analyses.dezeWeek} deze week</p>
-              </div>
-
-              <ArrowRight className="size-4 text-muted-foreground flex-shrink-0" />
-
-              {/* Stap 5: Risico breakdown */}
-              <div className="flex-1 min-w-[140px] rounded-lg bg-muted/50 border border-border/50 px-4 py-3">
-                <p className="text-xs text-muted-foreground mb-1.5">Risico-uitkomsten</p>
-                {Object.entries(RISICO_LABELS).map(([key, { label, kleur }]) => (
-                  <div key={key} className="flex justify-between text-xs">
-                    <span className={kleur}>{label}</span>
-                    <span className="font-medium text-foreground">{s.analyses.perRisico[key] ?? 0}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Plan breakdown */}
-            <div className="mt-4 pt-4 border-t border-border/30 grid grid-cols-4 gap-2">
-              {Object.entries(PLAN_LABELS).map(([key, label]) => (
-                <div key={key} className="text-center">
-                  <p className="text-lg font-bold text-foreground">{s.gebruikers.perPlan[key] ?? 0}</p>
-                  <p className="text-xs text-muted-foreground">{label}</p>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Navigatietegels */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {tiles.map((tile) => (
           <Link key={tile.href} href={tile.href}>
             <Card className="border-border/50 hover:border-border transition-colors cursor-pointer h-full">
