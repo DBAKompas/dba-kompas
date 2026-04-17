@@ -12,6 +12,7 @@ interface AuthContextValue {
   loading: boolean
   plan: Plan | null
   planLoading: boolean
+  roleLoading: boolean
   role: Role | null
   isAdmin: boolean
   refreshPlan: () => Promise<void>
@@ -22,6 +23,7 @@ const AuthContext = createContext<AuthContextValue>({
   loading: true,
   plan: null,
   planLoading: true,
+  roleLoading: true,
   role: null,
   isAdmin: false,
   refreshPlan: async () => {},
@@ -33,9 +35,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [plan, setPlan] = useState<Plan | null>(null)
   const [planLoading, setPlanLoading] = useState(true)
   const [role, setRole] = useState<Role | null>(null)
+  const [roleLoading, setRoleLoading] = useState(true)
   const supabase = createClient()
 
   const fetchRole = useCallback(async () => {
+    setRoleLoading(true)
     try {
       const res = await fetch('/api/user/role')
       if (res.ok) {
@@ -46,6 +50,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     } catch {
       setRole('user')
+    } finally {
+      setRoleLoading(false)
     }
   }, [])
 
@@ -87,6 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setPlan(null)
         setPlanLoading(false)
         setRole(null)
+        setRoleLoading(false)
       }
     })
 
@@ -100,6 +107,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setPlan(null)
         setPlanLoading(false)
         setRole(null)
+        setRoleLoading(false)
         // PostHog: reset na uitloggen zodat de volgende sessie anoniem start
         if (event === 'SIGNED_OUT') {
           posthog.reset()
@@ -116,6 +124,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       loading,
       plan,
       planLoading,
+      roleLoading,
       role,
       isAdmin: role === 'admin',
       refreshPlan: () => fetchPlan(user?.id, user?.email),

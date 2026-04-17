@@ -34,7 +34,7 @@ const navItems = [
 const PAYWALL_EXEMPT = ['/profiel', '/admin']
 
 function AppShell({ children }: { children: React.ReactNode }) {
-  const { user, loading, plan, planLoading, isAdmin } = useAuth()
+  const { user, loading, plan, planLoading, roleLoading, isAdmin } = useAuth()
   const pathname = usePathname()
   const router = useRouter()
 
@@ -47,18 +47,18 @@ function AppShell({ children }: { children: React.ReactNode }) {
   }, [loading, user, router, pathname])
 
   // Paywall: redirect naar /upgrade als ingelogd maar geen betaald plan
-  // Admins omzeilen de paywall altijd
+  // Admins omzeilen de paywall altijd — wacht ook op roleLoading zodat isAdmin correct is
   useEffect(() => {
-    if (!loading && !planLoading && user && plan === 'free' && !isAdmin) {
+    if (!loading && !planLoading && !roleLoading && user && plan === 'free' && !isAdmin) {
       const exempt = PAYWALL_EXEMPT.some(p => pathname === p || pathname.startsWith(p + '/'))
       if (!exempt) {
         router.push('/upgrade')
       }
     }
-  }, [loading, planLoading, user, plan, isAdmin, pathname, router])
+  }, [loading, planLoading, roleLoading, user, plan, isAdmin, pathname, router])
 
-  // Toon spinner zolang auth of plan nog laden
-  if (loading || planLoading) {
+  // Toon spinner zolang auth, plan of rol nog laden
+  if (loading || planLoading || roleLoading) {
     return (
       <div className="flex h-screen items-center justify-center bg-background">
         <Loader2 className="size-7 animate-spin text-primary/40" />
@@ -75,6 +75,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   // Toon spinner als plan 'free' is en we gaan redirecten (niet op vrijgestelde routes, niet voor admins)
+  // roleLoading is hier al false door bovenstaande check
   if (plan === 'free' && !isAdmin) {
     const exempt = PAYWALL_EXEMPT.some(p => pathname === p || pathname.startsWith(p + '/'))
     if (!exempt) {
