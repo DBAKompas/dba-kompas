@@ -6,6 +6,12 @@
 
 ## IN PROGRESS
 
+### CT-001 — Statistieken en funnel zichtbaar maken in Control Tower
+- [ ] Controleer of laatste commits zijn gepusht (`feat(admin): volledige funnel...` + `feat(admin): Control Tower fase 3...`)
+- [ ] Na deploy: verifieer dat statcards en funnelrij zichtbaar zijn op `/admin`
+- [ ] Quick scan data verschijnt pas na de eerste nieuwe quick scan (tabel `quick_scan_leads` is leeg bij aanvang)
+- [ ] Eventueel: historische quick scan data backfillen vanuit Loops contacts API
+
 ### TEST-006 — Welkomstmail end-to-end testen via Postmark
 - [ ] Wacht op Postmark account goedkeuring (aangevraagd)
 - [ ] Na goedkeuring: test-betaling uitvoeren op dbakompas.nl (Stripe test card)
@@ -29,10 +35,7 @@
 
 ### MIDDEL
 
-**LOOPS-002: Oude journeys verwijderen**
-- [ ] In Loops: verwijder `quick_scan_completed - high`
-- [ ] In Loops: verwijder `quick_scan_completed - medium`
-- [ ] In Loops: verwijder `quick_scan_completed - low`
+~~**LOOPS-002: Oude journeys verwijderen** — AFGEROND ✅~~
 
 **MAIL-001: info@dbakompas.nl in Apple Mail**
 - [ ] IMAP: `imap.strato.de`, poort 993, SSL/TLS
