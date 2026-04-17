@@ -5,7 +5,7 @@ import {
   ArrowRight, LogOut, CheckCircle, Zap, Target, MessageSquare,
   AlertTriangle, FileText, Edit3, Newspaper, Users, Building2, Network,
   Clock, Shield, PenTool, Bell, Lock, ChevronDown, Check,
-  ClipboardList, TrendingUp, BarChart3,
+  ClipboardList, TrendingUp, BarChart3, Menu, X,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import BrandLogo from "@/components/marketing/BrandLogo";
@@ -86,6 +86,7 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
 
 export default function Home() {
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [authModal, setAuthModal] = useState<"login" | null>(null);
   const [emailCheckoutPlan, setEmailCheckoutPlan] = useState<"monthly" | "yearly" | "one_time_dba" | null>(null);
   const [quickScanOpen, setQuickScanOpen] = useState(false);
@@ -97,7 +98,10 @@ export default function Home() {
   const { user } = useAuth();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 20);
+      if (window.scrollY > 20) setMenuOpen(false);
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -132,6 +136,40 @@ export default function Home() {
             <BrandLogo variant="dark" className="h-9 w-auto" />
           </Link>
 
+          {/* Hamburger — alleen mobiel */}
+          <button
+            className="md:hidden flex items-center justify-center w-9 h-9 rounded-lg text-foreground hover:bg-primary/8 transition-colors"
+            onClick={() => setMenuOpen(o => !o)}
+            aria-label={menuOpen ? "Menu sluiten" : "Menu openen"}
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              {menuOpen ? (
+                <motion.span
+                  key="x"
+                  initial={{ rotate: -90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: 90, opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className="flex"
+                >
+                  <X className="w-5 h-5" />
+                </motion.span>
+              ) : (
+                <motion.span
+                  key="menu"
+                  initial={{ rotate: 90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: -90, opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className="flex"
+                >
+                  <Menu className="w-5 h-5" />
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </button>
+
+          {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-6">
             <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">
               {LANDING.nav.features}
@@ -179,6 +217,94 @@ export default function Home() {
           </div>
         </div>
       </header>
+
+      {/* ── MOBIEL MENU ────────────────────────── */}
+      <AnimatePresence>
+        {menuOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              key="backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-30 bg-black/30 backdrop-blur-sm md:hidden"
+              onClick={() => setMenuOpen(false)}
+            />
+
+            {/* Menu paneel */}
+            <motion.div
+              key="panel"
+              initial={{ opacity: 0, y: -12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.22, ease: [0.25, 0.46, 0.45, 0.94] }}
+              className="fixed top-[57px] inset-x-0 z-40 md:hidden bg-background/98 backdrop-blur-xl border-b border-border/50 shadow-xl"
+            >
+              <nav className="max-w-7xl mx-auto px-5 py-5 flex flex-col gap-1">
+
+                {/* Nav-links */}
+                {[
+                  { href: "#features", label: LANDING.nav.features },
+                  { href: "#prijzen",  label: LANDING.nav.pricing },
+                  { href: "#faq",      label: LANDING.nav.faq },
+                ].map(({ href, label }) => (
+                  <a
+                    key={href}
+                    href={href}
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center px-3 py-3 rounded-lg text-base font-medium text-foreground hover:bg-primary/6 transition-colors"
+                  >
+                    {label}
+                  </a>
+                ))}
+
+                {/* Scheidingslijn */}
+                <div className="my-2 border-t border-border/40" />
+
+                {/* CTA knoppen */}
+                {user ? (
+                  <>
+                    <Button
+                      className="w-full justify-center text-base py-5"
+                      onClick={() => { setMenuOpen(false); window.location.href = `${APP_URL}/dashboard`; }}
+                    >
+                      Ga naar de app
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-center mt-1"
+                      onClick={() => { setMenuOpen(false); handleLogout(); }}
+                    >
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Uitloggen
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      className="w-full justify-center text-base py-5 btn-magnetic"
+                      onClick={() => { setMenuOpen(false); setEmailCheckoutPlan("yearly"); }}
+                    >
+                      {LANDING.nav.tryNow}
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-center mt-2"
+                      onClick={() => { setMenuOpen(false); window.location.href = `${APP_URL}/login`; }}
+                    >
+                      {LANDING.nav.login}
+                    </Button>
+                  </>
+                )}
+              </nav>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* ── HERO ───────────────────────────────── */}
       <section className="hero-gradient hero-shimmer px-4 sm:px-6 pt-20 pb-16 md:pt-28 md:pb-24 max-w-7xl mx-auto w-full">
