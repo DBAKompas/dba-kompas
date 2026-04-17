@@ -1,6 +1,6 @@
 # TASKS.md
 
-**Laatste update:** 2026-04-17 (sessie 14 — afsluiting)
+**Laatste update:** 2026-04-17 (sessie 15 — afsluiting)
 
 ---
 
@@ -71,13 +71,7 @@
 - [ ] Testen via bimigroup.org/bimi-generator/
 - [ ] DNS-acties: Marvin voert uit bij Cloudflare
 
-**INFRA-004: Mobiele navigatie marketing site**
-- [ ] Hamburger-icoon in header (alleen `md:hidden`)
-- [ ] Slide-in / dropdown menu met alle navigatiepunten
-- [ ] "Ga naar de app"-knop zichtbaar in mobiel menu
-- [ ] Sluiten via kruisje of klik buiten menu
-- [ ] Desktop volledig ongewijzigd (`hidden md:flex`)
-- [ ] Bestanden: `components/marketing/Header.tsx` of `app/(marketing)/layout.tsx`
+~~**INFRA-004: Mobiele navigatie marketing site** — AFGEROND ✅~~
 
 ### HOOG — Product klaarstomen (vóór marktlancering)
 
@@ -89,12 +83,13 @@
 - [ ] Handmatig 15-20 berichten invoeren (initieel vullen)
 - [ ] Make-scenario: RSS/scraper → AI samenvatting → Supabase insert (wekelijks)
 
-**PROD-002: Gidsen — diepe content + DB-backed**
-- [ ] Supabase migratie 005: `guides` tabel (slug, title, sections jsonb, category, difficulty, is_published)
-- [ ] Gids-detail pagina refactoren: DB query i.p.v. hardcoded object
-- [ ] Admin gids-editor `/admin/gidsen` (Markdown of WYSIWYG)
-- [ ] 15 diepgaande gidsen schrijven (DBA, fiscaal, administratief, contracten, ondernemen)
-- [ ] Publicatievlag per gids
+**PROD-002: Gidsen — content fase 1 AFGEROND ✅, admin editor pending**
+- [x] Type-systeem (`GuideBlock`, `GuideEntry`) in `lib/guides/content.ts` ✅
+- [x] 10 diepgaande gidsen geschreven (DBA, fiscaal, administratief, contracten, pensioen) ✅
+- [x] Overzichtspagina herschreven: categorie-secties, moeilijkheidsgraad-badges, leestijd ✅
+- [x] Detailpagina herschreven: gestijlde callouts (4 varianten), tabellen, genummerde lijsten, tag-cloud ✅
+- [ ] Admin gids-editor `/admin/gidsen` (toekomstig — optioneel als content stabiel blijft in code)
+- [ ] Supabase DB-migratie (optioneel — pas zinvol bij >25 gidsen of meerdere redacteuren)
 
 **PROD-003: Notificaties als levend systeem**
 - [ ] Trigger bij analyse: "Je analyse is klaar"
@@ -116,6 +111,8 @@
 ### MIDDEL
 
 ~~**LOOPS-002: Oude journeys verwijderen** — AFGEROND ✅~~
+
+~~**INFRA-004: Mobiele navigatie marketing site** — zie hierboven~~
 
 **MAIL-001: info@dbakompas.nl in Apple Mail**
 - [ ] IMAP: `imap.strato.de`, poort 993, SSL/TLS
@@ -153,6 +150,18 @@
 ---
 
 ## DONE
+
+### Sessie 2026-04-17 (sessie 15) — Gidsen volledig geïmplementeerd
+
+- [x] **PROD-002 fase 1: Gidsen content + rendering** ✅
+  - `lib/guides/content.ts`: volledig type-systeem (`GuideBlock` met 6 types, `GuideEntry`, `GuideDifficulty`)
+  - 10 diepgaande gidsen: Wet DBA, gezagsverhouding, zelfstandigheid, opdrachtomschrijving, handhaving, BTW, aftrekposten, administratie, opdrachtovereenkomst, pensioen
+  - `app/(app)/gidsen/page.tsx`: herschreven met categorie-secties, moeilijkheidsgraad-badges (basis/gevorderd/expert), leestijd, subtitel en hover-animaties
+  - `app/(app)/gidsen/[slug]/page.tsx`: rijke rendering — callouts (tip/warning/example/important), tabellen, genummerde lijsten met badges, h2/h3 hiërarchie, tag-cloud in header
+- [x] **INFRA-004: Hamburger menu marketing site** ✅
+  - `app/(marketing)/page.tsx`: hamburger Menu↔X met framer-motion AnimatePresence
+  - Mobile panel: backdrop, nav-links (Features/Prijzen/FAQ), CTAs contextgevoelig (ingelogd of niet)
+  - Desktop navigatie volledig ongewijzigd
 
 ### Sessie 2026-04-17 (sessie 14) — Sales Funnel tegel + paywall race condition fix
 - [x] **CT-002: Sales Funnel als aparte pagina** ✅

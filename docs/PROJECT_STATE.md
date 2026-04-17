@@ -1,6 +1,6 @@
 # PROJECT_STATE.md
 
-**Laatste update:** 2026-04-17 (sessie 14 — afsluiting)
+**Laatste update:** 2026-04-17 (sessie 15 — afsluiting)
 **Maturity:** ~99% (live op dbakompas.nl, Stripe in test mode, Postmark volledig actief)
 
 ---
@@ -24,8 +24,10 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
 - Masterplan SaaS professioneel opgesteld (`docs/MASTERPLAN_SAAS_PROFESSIONAL.md`)
 - Growthplan opgeslagen + technisch uitvoeringsplan (`docs/GROWTHPLAN_UITVOERING.md`)
 - INFRA-001 t/m -004 gepland: CT meegroeien, admin alerts + e-mailalerts, BIMI e-maillogo, mobiel menu
+- **INFRA-004 AFGEROND**: hamburger menu marketing site (framer-motion, backdrop, contextgevoelige CTAs)
 - Vercel Cron Jobs (weekly/monthly digest triggers)
 - Quick scan funnel volledig meetbaar (Supabase + Loops)
+- **Gidsen volledig geïmplementeerd**: 10 diepgaande gidsen, rijk type-systeem, gestijlde callouts + tabellen
 
 **Status e-mailinfrastructuur:** Postmark volledig operationeel. DKIM + Return-Path geverifieerd, `POSTMARK_SERVER_TOKEN` in Vercel, Supabase SMTP bijgewerkt. Resend volledig verwijderd.
 
@@ -77,6 +79,8 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
 - 80 unit + integratietests
 - NEXT_PUBLIC_APP_URL correct ingesteld in Vercel ✅
 - Loops `subscription_started` event endpoint gecorrigeerd ✅
+- **Gidsen** (`/gidsen` + `/gidsen/[slug]`): 10 diepgaande gidsen, categorie-secties, moeilijkheidsgraad-badges, callouts, tabellen ✅
+- **Mobiel hamburger menu** op marketing site (`app/(marketing)/page.tsx`) ✅
 
 ## WAT NIET WERKT / PENDING
 
@@ -89,6 +93,18 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
 ---
 
 ## SESSIEHISTORIE
+
+### Sessie 2026-04-17 (sessies 14+15) — Mobiel menu + gidsen
+
+- **INFRA-004 AFGEROND**: hamburger menu marketing site ✅
+  - `app/(marketing)/page.tsx`: Menu↔X framer-motion AnimatePresence, backdrop, nav-links, CTAs
+- **Sales Funnel tegel + paywall race condition fix** ✅
+  - `/admin/funnel/page.tsx`: conversie per stap, plan-breakdown, risico-uitkomsten
+  - `AuthContext.tsx` + `layout.tsx`: `roleLoading` state, race condition opgelost
+- **PROD-002 fase 1: Gidsen volledig geïmplementeerd** ✅
+  - `lib/guides/content.ts`: GuideBlock type-systeem + 10 diepgaande gidsen
+  - `app/(app)/gidsen/page.tsx`: categorie-secties, moeilijkheidsgraad + leestijdbadges
+  - `app/(app)/gidsen/[slug]/page.tsx`: callouts (4 varianten), tabellen, genummerde lijsten, tags
 
 ### Sessie 2026-04-16 (sessie 13) — Control Tower fase 2 + 3
 - **Control Tower fase 2**: gebruikersbeheer (`/admin/gebruikers` + API), admin root page `/admin` (fix 404) ✅
@@ -138,15 +154,22 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
 
 ## LAATSTE ACTIE
 
-**Sessie:** 2026-04-16 (sessie 13)
+**Sessie:** 2026-04-17 (sessie 15)
 **Laatste commits:**
-- `feat(admin): volledige funnel — quick scan → registratie → betaald → analyses`
-- `feat(admin): Control Tower fase 3 — statistieken, funnel en analyses-overzicht`
-- `fix(auth): admin omzeilt paywall, sidebar link naar /admin`
-- `feat(admin): Control Tower fase 2 — gebruikersbeheer + admin root page`
+- `feat(gidsen): rijke GuideBlock rendering + 10 diepgaande gidsen`
+- `feat(marketing): hamburger menu met framer-motion animaties (INFRA-004)`
+- `feat(admin): Sales Funnel als aparte tegel + paywall race condition fix`
 
 ## VOLGENDE GEPLANDE STAP
 
-1. **TEST-006**: Welkomstmail end-to-end testen (wacht op Postmark account goedkeuring)
-2. **STRIPE-LIVE**: Stripe omzetten naar live mode (vereist voor echte betalingen)
-3. **LOOPS-002**: 3 oude Loops journeys verwijderen
+**Prioriteit 1 — Vereist voor livegang:**
+1. **STRIPE-LIVE**: live keys, webhook, price IDs en coupon instellen in Vercel + Stripe Dashboard
+2. **TEST-006**: Welkomstmail end-to-end testen (na Postmark account goedkeuring)
+
+**Prioriteit 2 — Product kwaliteit:**
+3. **PROD-001**: Admin nieuws-UI + Make-automatie + initieel vullen van `news_items`
+4. **INFRA-002**: Admin alerts systeem (`admin_alerts` tabel + e-mail naar Marvin)
+5. **QUAL-001**: Follow-up vragen flow verdiepen (heranalyse met diff)
+
+**Prioriteit 3 — Groei (na STRIPE-LIVE):**
+6. **GROWTH-001**: Referral-engine bouwen (volledig plan in `docs/GROWTHPLAN_UITVOERING.md`)
