@@ -7,7 +7,7 @@ async function requireAdmin() {
   const { data: { user }, error } = await supabase.auth.getUser()
   if (error || !user) return { error: NextResponse.json({ error: 'Niet ingelogd' }, { status: 401 }) }
 
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+  const { data: profile } = await supabase.from('profiles').select('role').eq('user_id', user.id).single()
   if (!profile || profile.role !== 'admin') return { error: NextResponse.json({ error: 'Geen toegang' }, { status: 403 }) }
 
   return { userId: user.id }
