@@ -6,7 +6,6 @@ import { useAuth } from '@/components/auth/AuthContext'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
 import {
   ArrowLeft,
   Plus,
@@ -63,6 +62,9 @@ const IMPACTS = [
   { value: 'laag', label: 'Laag', color: 'bg-green-100 text-green-700' },
 ]
 
+const TEXTAREA_CLASS =
+  'w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none'
+
 function impactColor(impact: string) {
   return IMPACTS.find(i => i.value === impact)?.color ?? 'bg-muted text-muted-foreground'
 }
@@ -82,18 +84,14 @@ export default function AdminNieuwsPage() {
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState<string | null>(null)
 
-  // Formulier state
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState<FormState>(EMPTY_FORM)
   const [formContent, setFormContent] = useState('')
   const [error, setError] = useState<string | null>(null)
 
-  // Auth guard
   useEffect(() => {
-    if (!loading && (!user || !isAdmin)) {
-      router.push('/dashboard')
-    }
+    if (!loading && (!user || !isAdmin)) router.push('/dashboard')
   }, [loading, user, isAdmin, router])
 
   const fetchItems = useCallback(async () => {
@@ -108,11 +106,9 @@ export default function AdminNieuwsPage() {
     if (user && isAdmin) fetchItems()
   }, [user, isAdmin, fetchItems])
 
-  // ─── Formulier handlers ──────────────────────────────────
-
   function openNew() {
     setEditingId(null)
-    setForm(EMPTY_FORM)
+    setForm({ ...EMPTY_FORM, published_at: new Date().toISOString().slice(0, 10) })
     setFormContent('')
     setError(null)
     setShowForm(true)
@@ -130,7 +126,7 @@ export default function AdminNieuwsPage() {
       source_url: item.source_url ?? '',
       published_at: item.published_at.slice(0, 10),
     })
-    // Haal volledige content op
+    setFormContent('')
     fetch(`/api/admin/nieuws?id=${item.id}`)
       .then(r => r.json())
       .then(d => setFormContent(d.content ?? ''))
@@ -155,10 +151,22 @@ export default function AdminNieuwsPage() {
     setSaving(true)
     setError(null)
     try {
-      const payload = { ...form, content: formContent, published_at: new Date(form.published_at).toISOString() }
+      const payload = {
+        ...form,
+        content: formContent,
+        published_at: new Date(form.published_at).toISOString(),
+      }
       const res = editingId
-        ? await fetch('/api/admin/nieuws', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: editingId, ...payload }) })
-        : await fetch('/api/admin/nieuws', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+        ? await fetch('/api/admin/nieuws', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: editingId, ...payload }),
+          })
+        : await fetch('/api/admin/nieuws', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          })
 
       if (!res.ok) {
         const d = await res.json()
@@ -175,12 +183,14 @@ export default function AdminNieuwsPage() {
   async function handleDelete(id: string) {
     if (!confirm('Weet je zeker dat je dit bericht wilt verwijderen?')) return
     setDeleting(id)
-    await fetch('/api/admin/nieuws', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) })
+    await fetch('/api/admin/nieuws', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    })
     setDeleting(null)
     await fetchItems()
   }
-
-  // ─── Render ──────────────────────────────────────────────
 
   if (loading || fetching) {
     return (
@@ -193,14 +203,10 @@ export default function AdminNieuwsPage() {
   return (
     <div className="space-y-6 max-w-4xl">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="sm" onClick={() => router.push('/admin')} className="-ml-2">
-            <ArrowLeft className="size-4 mr-1.5" />
-            Control Tower
-          </Button>
-        </div>
-      </div>
+      <Button variant="ghost" size="sm" onClick={() => router.push('/admin')} className="-ml-2">
+        <ArrowLeft className="size-4 mr-1.5" />
+        Control Tower
+      </Button>
 
       <div className="flex items-start justify-between gap-4">
         <div>
@@ -232,6 +238,7 @@ export default function AdminNieuwsPage() {
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
+
             {/* Titel */}
             <div className="space-y-1.5">
               <label className="text-sm font-medium">Titel *</label>
@@ -244,23 +251,31 @@ export default function AdminNieuwsPage() {
 
             {/* Samenvatting */}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium">Samenvatting * <span className="text-muted-foreground font-normal">(zichtbaar in overzicht)</span></label>
-              <Textarea
+              <label className="text-sm font-medium">
+                Samenvatting *{' '}
+                <span className="text-muted-foreground font-normal">(zichtbaar in overzicht)</span>
+              </label>
+              <textarea
                 value={form.summary}
                 onChange={e => setForm(f => ({ ...f, summary: e.target.value }))}
                 placeholder="Korte samenvatting die in de nieuwslijst wordt getoond..."
                 rows={2}
+                className={TEXTAREA_CLASS}
               />
             </div>
 
             {/* Inhoud */}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium">Volledige inhoud * <span className="text-muted-foreground font-normal">(zichtbaar na uitklappen)</span></label>
-              <Textarea
+              <label className="text-sm font-medium">
+                Volledige inhoud *{' '}
+                <span className="text-muted-foreground font-normal">(zichtbaar na uitklappen)</span>
+              </label>
+              <textarea
                 value={formContent}
                 onChange={e => setFormContent(e.target.value)}
                 placeholder="Uitgebreide toelichting op het nieuws en wat het betekent voor zzp'ers..."
                 rows={5}
+                className={TEXTAREA_CLASS}
               />
             </div>
 
@@ -271,7 +286,7 @@ export default function AdminNieuwsPage() {
                 <select
                   value={form.category}
                   onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                 >
                   {CATEGORIES.map(c => (
                     <option key={c} value={c}>{c}</option>
@@ -329,13 +344,17 @@ export default function AdminNieuwsPage() {
 
             {/* Foutmelding */}
             {error && (
-              <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-md">{error}</p>
+              <p className="text-sm text-red-600 bg-red-50 dark:bg-red-950/20 px-3 py-2 rounded-md">
+                {error}
+              </p>
             )}
 
             {/* Actieknoppen */}
             <div className="flex items-center gap-3 pt-1">
               <Button onClick={handleSave} disabled={saving}>
-                {saving ? <Loader2 className="size-4 mr-2 animate-spin" /> : <Save className="size-4 mr-2" />}
+                {saving
+                  ? <Loader2 className="size-4 mr-2 animate-spin" />
+                  : <Save className="size-4 mr-2" />}
                 {editingId ? 'Wijzigingen opslaan' : 'Bericht publiceren'}
               </Button>
               <Button variant="outline" onClick={closeForm} disabled={saving}>
@@ -351,7 +370,9 @@ export default function AdminNieuwsPage() {
         <Card>
           <CardContent className="py-12 text-center">
             <Newspaper className="mx-auto size-10 text-muted-foreground mb-3" />
-            <p className="text-muted-foreground text-sm">Nog geen nieuwsberichten. Klik op "Nieuw bericht" om te beginnen.</p>
+            <p className="text-muted-foreground text-sm">
+              Nog geen nieuwsberichten. Klik op &ldquo;Nieuw bericht&rdquo; om te beginnen.
+            </p>
           </CardContent>
         </Card>
       ) : (
@@ -383,7 +404,12 @@ export default function AdminNieuwsPage() {
                       <div className="flex items-center gap-1 mt-1">
                         <span className="text-[11px] text-muted-foreground">Bron: {item.source}</span>
                         {item.source_url && (
-                          <a href={item.source_url} target="_blank" rel="noopener noreferrer" className="text-primary">
+                          <a
+                            href={item.source_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary"
+                          >
                             <ExternalLink className="size-3" />
                           </a>
                         )}
@@ -391,7 +417,12 @@ export default function AdminNieuwsPage() {
                     )}
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
-                    <Button variant="ghost" size="sm" onClick={() => openEdit(item)} className="h-8 w-8 p-0">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => openEdit(item)}
+                      className="h-8 w-8 p-0"
+                    >
                       <Pencil className="size-3.5" />
                     </Button>
                     <Button
@@ -403,8 +434,7 @@ export default function AdminNieuwsPage() {
                     >
                       {deleting === item.id
                         ? <Loader2 className="size-3.5 animate-spin" />
-                        : <Trash2 className="size-3.5" />
-                      }
+                        : <Trash2 className="size-3.5" />}
                     </Button>
                   </div>
                 </div>
