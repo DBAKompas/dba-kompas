@@ -1,6 +1,6 @@
 # TASKS.md
 
-**Laatste update:** 2026-04-17 (sessie 15 — afsluiting)
+**Laatste update:** 2026-04-18 (sessie 16 — nieuws systeem)
 
 ---
 
@@ -71,11 +71,17 @@
 
 > Volledig plan in `docs/MASTERPLAN_SAAS_PROFESSIONAL.md`
 
-**PROD-001: Nieuws vullen**
-- [ ] Admin pagina `/admin/nieuws`: toevoegen/bewerken nieuwsberichten
-- [ ] `/api/admin/nieuws/route.ts` (GET + POST)
-- [ ] Handmatig 15-20 berichten invoeren (initieel vullen)
-- [ ] Make-scenario: RSS/scraper → AI samenvatting → Supabase insert (wekelijks)
+~~**PROD-001: Nieuws vullen** — BACKEND + ADMIN AFGEROND ✅ (sessie 16, 2026-04-18)~~
+- [x] Admin pagina `/admin/nieuws`: toevoegen/bewerken nieuwsberichten ✅
+- [x] `/api/admin/nieuws/route.ts` (GET + POST + PATCH + DELETE) ✅
+- [x] `lib/news/sources.ts`: 5 RSS bronnen, trusted domains, DBA/ZZP keywords ✅
+- [x] `lib/news/fetch.ts`: RSS fetch, AI herschrijf (Claude Haiku), dedup, cooldown, cleanup ✅
+- [x] `/api/news/refresh/route.ts`: POST (auth+cooldown) + GET (Vercel cron) ✅
+- [x] `/api/news/read/route.ts`: DB-persistente leesmarkering ✅
+- [x] `app/(app)/nieuws/page.tsx`: impact/thema/bron-filters, ongelezen-tracking, feedback, bronvermelding ✅
+- [x] `vercel.json`: cron elk uur voor automatische RSS refresh ✅
+- [ ] SQL-migratie uitvoeren: `user_news_read` tabel aanmaken in Supabase Studio (zie onderaan DONE)
+- [ ] Handmatig 15-20 berichten invoeren via admin (initieel vullen) of eerste RSS refresh triggeren
 
 **PROD-002: Gidsen — content fase 1 AFGEROND ✅, admin editor pending**
 - [x] Type-systeem (`GuideBlock`, `GuideEntry`) in `lib/guides/content.ts` ✅
@@ -144,6 +150,37 @@
 ---
 
 ## DONE
+
+### Sessie 2026-04-18 (sessie 16) — Nieuws systeem volledig gebouwd + STRIPE-LIVE
+
+- [x] **STRIPE-LIVE** ✅ — live Stripe keys + webhook al actief op Vercel/dbakompas.nl
+- [x] **PROD-001 volledig** ✅
+  - `lib/news/sources.ts`: RSS bronnen (ZipConomy, Min. SZW, Rijksoverheid, Min. Fin., Min. EZ), trusted domains, DBA/ZZP keywords
+  - `lib/news/fetch.ts`: RSS fetch (native, geen externe lib), AI herschrijf via Claude Haiku, SHA-256 dedup, 12-maanden filter, 5-min cooldown, cleanup oude items
+  - `app/api/news/refresh/route.ts`: POST (auth+cooldown) + GET (Vercel cron via CRON_SECRET)
+  - `app/api/news/read/route.ts`: DB-persistente leesmarkering (vervangt localStorage)
+  - `app/(app)/nieuws/page.tsx`: volledig herschreven — impact/thema/bron/ongelezen filters, uitklap-kaarten, feedbackknoppen, bronbetrouwbaarheid-indicator, vernieuwen-knop
+  - `app/(app)/admin/nieuws/page.tsx`: admin nieuws-beheerpagina (CRUD)
+  - `app/api/admin/nieuws/route.ts`: GET/POST/PATCH/DELETE met admin-check
+  - `vercel.json`: cron elk uur voor automatische RSS refresh
+  - Admin dashboard: Nieuws-tegel toegevoegd
+
+> **Openstaande acties voor Marvin:**
+> 1. SQL uitvoeren in Supabase Studio (New query):
+>    ```sql
+>    CREATE TABLE public.user_news_read (
+>      id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+>      user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+>      news_item_id uuid NOT NULL REFERENCES public.news_items(id) ON DELETE CASCADE,
+>      read_at timestamptz DEFAULT now(),
+>      UNIQUE (user_id, news_item_id)
+>    );
+>    ALTER TABLE public.user_news_read ENABLE ROW LEVEL SECURITY;
+>    CREATE POLICY "Users can manage own read status"
+>      ON public.user_news_read FOR ALL USING (auth.uid() = user_id);
+>    ```
+> 2. Eerste RSS refresh handmatig triggeren via admin of /api/news/refresh POST
+> 3. `CRON_SECRET` environment variable aanmaken in Vercel (willekeurige string, bijv. `openssl rand -hex 32`)
 
 ### Sessie 2026-04-17 (sessie 15) — Gidsen volledig geïmplementeerd
 

@@ -1,7 +1,7 @@
 # PROJECT_STATE.md
 
-**Laatste update:** 2026-04-17 (sessie 15 — afsluiting)
-**Maturity:** ~99% (live op dbakompas.nl, Stripe in test mode, Postmark volledig actief)
+**Laatste update:** 2026-04-18 (sessie 16 — nieuws systeem + STRIPE-LIVE)
+**Maturity:** ~100% MVP (live op dbakompas.nl, Stripe in LIVE mode, nieuws systeem volledig)
 
 ---
 
@@ -81,10 +81,21 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
 - Loops `subscription_started` event endpoint gecorrigeerd ✅
 - **Gidsen** (`/gidsen` + `/gidsen/[slug]`): 10 diepgaande gidsen, categorie-secties, moeilijkheidsgraad-badges, callouts, tabellen ✅
 - **Mobiel hamburger menu** op marketing site (`app/(marketing)/page.tsx`) ✅
+- **Stripe LIVE mode**: live keys + webhook actief op Vercel + dbakompas.nl ✅
+- **Nieuws systeem volledig** ✅
+  - RSS feed fetcher (5 bronnen, native XML parser, geen externe lib)
+  - Claude Haiku AI herschrijf per artikel
+  - SHA-256 deduplicatie, 12-maanden filter, 5-minuten cooldown
+  - Vercel cron elk uur
+  - Admin CRUD UI (`/admin/nieuws`)
+  - Gebruikerspagina met impact/thema/bron-filters, ongelezen-tracking, feedback
+  - DB-persistente leesmarkering (`user_news_read` tabel — migratie pending)
 
 ## WAT NIET WERKT / PENDING
 
-- **STRIPE LIVE MODE**: niet geconfigureerd — VEREIST VOOR ECHTE BETALINGEN
+- **SQL migratie**: `user_news_read` tabel aanmaken in Supabase Studio (zie TASKS.md)
+- **CRON_SECRET**: env var aanmaken in Vercel (`openssl rand -hex 32`)
+- **Eerste RSS refresh**: handmatig triggeren na SQL migratie
 - **Loops**: 3 oude journeys nog te verwijderen (laag risico)
 - **TEST-005**: maximale invoerlengte (3000+ tekens) nog niet handmatig getest
 - **MAIL-001**: info@dbakompas.nl nog niet in Apple Mail
@@ -93,6 +104,19 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
 ---
 
 ## SESSIEHISTORIE
+
+### Sessie 2026-04-18 (sessie 16) — Nieuws systeem + STRIPE-LIVE
+
+- **STRIPE-LIVE bevestigd**: live keys + webhook al actief in Vercel/dbakompas.nl ✅
+- **PROD-001 nieuws systeem volledig gebouwd**:
+  - `lib/news/sources.ts`: 5 RSS bronnen, trusted domains whitelist, DBA/ZZP keywords
+  - `lib/news/fetch.ts`: RSS fetch (native), AI herschrijf (Claude Haiku), dedup, cooldown, cleanup
+  - `app/api/news/refresh/route.ts`: POST (auth+cooldown) + GET (Vercel cron via CRON_SECRET)
+  - `app/api/news/read/route.ts`: DB-persistente leesmarkering
+  - `app/api/admin/nieuws/route.ts`: admin CRUD (GET/POST/PATCH/DELETE)
+  - `app/(app)/admin/nieuws/page.tsx`: admin nieuws-beheerpagina
+  - `app/(app)/nieuws/page.tsx`: volledig herschreven met thema/impact/bron-filters
+  - `vercel.json`: cron elk uur toegevoegd
 
 ### Sessie 2026-04-17 (sessies 14+15) — Mobiel menu + gidsen
 
