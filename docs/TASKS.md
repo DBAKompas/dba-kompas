@@ -33,13 +33,7 @@
 - [ ] GROWTH-003: `?ref=CODE` tracking door funnel (cookie → registratie → checkout)
 - [ ] Loops: referral milestone e-mails aanmaken (events: `referral_milestone_1/3/5`)
 
-**STRIPE-LIVE: Stripe omzetten naar live mode**
-- [ ] Live Stripe keys instellen in Vercel: `STRIPE_SECRET_KEY` (sk_live_...) + `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` (pk_live_...)
-- [ ] Live webhook aanmaken in Stripe Dashboard: `https://dbakompas.nl/api/billing/webhook` (5 events)
-- [ ] Nieuw `STRIPE_WEBHOOK_SECRET` uit live webhook → Vercel
-- [ ] Live price IDs: `STRIPE_PRICE_ID_MONTHLY`, `STRIPE_PRICE_ID_YEARLY`, `STRIPE_PRICE_ID_ONE_TIME`
-- [ ] Coupon `ONETIMECREDIT` aanmaken in Stripe live mode + env var
-- [ ] End-to-end live betaling testen
+~~**STRIPE-LIVE** — AFGEROND ✅ (sessie 16, 2026-04-18)~~
 
 ### HOOG — Infrastructuur & Operationeel (parallel aan product)
 
