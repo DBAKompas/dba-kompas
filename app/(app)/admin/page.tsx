@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/components/auth/AuthContext'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Loader2, Users, Mail, FileSearch, TrendingUp } from 'lucide-react'
+import { Loader2, Users, Mail, FileSearch, TrendingUp, Newspaper } from 'lucide-react'
 
 type Stats = {
   gebruikers: {
@@ -38,6 +38,12 @@ const tiles = [
     title: 'Sales Funnel',
     description: 'Conversie van quick scan naar registratie, betaling en analyse.',
     icon: <TrendingUp className="size-5" />,
+  },
+  {
+    href: '/admin/nieuws',
+    title: 'Nieuws',
+    description: 'Voeg nieuwsberichten toe en beheer gepubliceerde items.',
+    icon: <Newspaper className="size-5" />,
   },
   {
     href: '/admin/emails',
@@ -126,7 +132,7 @@ export default function AdminPage() {
       ) : null}
 
       {/* Navigatietegels */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {tiles.map((tile) => (
           <Link key={tile.href} href={tile.href}>
             <Card className="border-border/50 hover:border-border transition-colors cursor-pointer h-full">
