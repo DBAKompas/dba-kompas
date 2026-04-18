@@ -45,17 +45,17 @@ export default function GidsenPage() {
                   href={`/gidsen/${guide.slug}`}
                   className="group flex items-center justify-between gap-4 px-5 py-3.5 hover:bg-muted/40 transition-colors"
                 >
-                  <div className="flex items-center gap-3 min-w-0">
+                  <span className="text-sm font-medium truncate group-hover:text-primary transition-colors">
+                    {guide.title}
+                  </span>
+                  <div className="flex items-center gap-3 shrink-0">
                     <span
-                      className={`shrink-0 inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${DIFFICULTY_CLASS[guide.difficulty]}`}
+                      className={`w-20 text-center inline-flex items-center justify-center rounded-full px-2 py-0.5 text-[11px] font-medium ${DIFFICULTY_CLASS[guide.difficulty]}`}
                     >
                       {DIFFICULTY_LABEL[guide.difficulty]}
                     </span>
-                    <span className="text-sm font-medium truncate group-hover:text-primary transition-colors">
-                      {guide.title}
-                    </span>
+                    <ChevronRight className="size-4 text-muted-foreground/50 transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
                   </div>
-                  <ChevronRight className="size-4 shrink-0 text-muted-foreground/50 transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
                 </Link>
               ))}
             </div>
