@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import BrandLogo from '@/components/marketing/BrandLogo'
 import {
   Upload,
   FileText,
@@ -62,18 +63,20 @@ interface AnalyseSummary {
 // ── Laadscherm component ─────────────────────────────────────────────────────
 function LoadingScreen({ stepIdx }: { stepIdx: number }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-sm">
-      <div className="max-w-sm w-full mx-4 space-y-8">
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background/95 backdrop-blur-sm">
+      <div className="flex flex-col items-center gap-8">
+
+        {/* Logo */}
+        <BrandLogo variant="dark" className="h-8 w-auto opacity-70" />
+
         {/* Spinner */}
-        <div className="flex justify-center">
-          <div className="relative size-16">
-            <div className="absolute inset-0 rounded-full border-4 border-primary/20" />
-            <div className="absolute inset-0 rounded-full border-4 border-primary border-t-transparent animate-spin" />
-          </div>
+        <div className="relative size-16">
+          <div className="absolute inset-0 rounded-full border-4 border-primary/20" />
+          <div className="absolute inset-0 rounded-full border-4 border-primary border-t-transparent animate-spin" />
         </div>
 
-        {/* Steps */}
-        <div className="space-y-3">
+        {/* Steps — gecentreerd blok */}
+        <div className="flex flex-col items-start gap-3">
           {LOADING_STEPS.map((step, i) => (
             <div key={i} className="flex items-center gap-3">
               <div
@@ -106,7 +109,7 @@ function LoadingScreen({ stepIdx }: { stepIdx: number }) {
           ))}
         </div>
 
-        <p className="text-center text-xs text-muted-foreground">
+        <p className="text-xs text-muted-foreground">
           Gemiddeld 15–30 seconden
         </p>
       </div>
