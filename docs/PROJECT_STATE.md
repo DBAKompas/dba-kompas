@@ -1,7 +1,7 @@
 # PROJECT_STATE.md
 
-**Laatste update:** 2026-04-18 (sessie 16 — nieuws systeem + STRIPE-LIVE)
-**Maturity:** ~100% MVP (live op dbakompas.nl, Stripe in LIVE mode, nieuws systeem volledig)
+**Laatste update:** 2026-04-18 (sessie 17 — app-wide redesign)
+**Maturity:** ~100% MVP (live op dbakompas.nl, Stripe in LIVE mode, nieuws systeem + volledig redesign)
 
 ---
 
@@ -90,6 +90,12 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
   - Admin CRUD UI (`/admin/nieuws`)
   - Gebruikerspagina met impact/thema/bron-filters, ongelezen-tracking, feedback
   - DB-persistente leesmarkering (`user_news_read` tabel — migratie pending)
+- **App-wide redesign volledig** ✅ (sessie 17)
+  - 15 app-pagina's herschreven: `dashboard`, `analyse`, `documenten`, `notificaties`, `profiel`, `nieuws`, `gidsen`, `gidsen/[slug]`, `admin` + 5 admin sub-pagina's
+  - Design system: `rounded-xl border border-border bg-card`, `text-3xl font-bold tracking-tight`, `space-y-8`
+  - Geen shadcn Card components meer in app-pagina's
+  - Gidsen: compacte lijstweergave (alleen titel + gradatiebadge, alles in één oogopslag)
+  - Commit `fcdebe7` aangemaakt — push pending (zie openstaande actie TASKS.md)
 
 ## WAT NIET WERKT / PENDING
 
@@ -104,6 +110,16 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
 ---
 
 ## SESSIEHISTORIE
+
+### Sessie 2026-04-18 (sessie 17) — App-wide redesign
+
+- **App-wide redesign** ✅: 15 pagina's volledig herschreven met consistent design system
+  - `app/(app)/dashboard/page.tsx`, `analyse/`, `documenten/`, `notificaties/`, `profiel/`
+  - `app/(app)/gidsen/page.tsx` + `gidsen/[slug]/page.tsx`
+  - `app/(app)/admin/page.tsx` + `admin/gebruikers/`, `admin/analyses/`, `admin/funnel/`, `admin/emails/`, `admin/nieuws/`
+  - Design regels: `rounded-xl border border-border bg-card p-5/p-6`, `text-3xl font-bold tracking-tight`, `space-y-8`, empty states `py-16 text-center`
+  - Admin tabellen: `rounded-xl border overflow-hidden` met padded header en `divide-y`
+- **Gidsen compacte lijstweergave** ✅: compacte rijen (titel + gradatiebadge), categorieheaders klein uppercase
 
 ### Sessie 2026-04-18 (sessie 16) — Nieuws systeem + STRIPE-LIVE
 
@@ -178,22 +194,32 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
 
 ## LAATSTE ACTIE
 
-**Sessie:** 2026-04-17 (sessie 15)
+**Sessie:** 2026-04-18 (sessie 17)
 **Laatste commits:**
-- `feat(gidsen): rijke GuideBlock rendering + 10 diepgaande gidsen`
-- `feat(marketing): hamburger menu met framer-motion animaties (INFRA-004)`
-- `feat(admin): Sales Funnel als aparte tegel + paywall race condition fix`
+- `fcdebe7` — `feat(design): app-wide redesign — consistent spacing, typography en card-stijl` (gepusht via Mac terminal vereist)
+- Gidsen refactor (compacte lijstweergave) — commit nog aanmaken via Mac terminal
+
+**Openstaande actie voor Marvin:**
+```bash
+rm -f ~/dba-kompas/.git/HEAD.lock
+cd ~/dba-kompas
+git add "app/(app)/gidsen/page.tsx"
+git commit -m "refactor(gidsen): compacte lijstweergave — alleen titel en gradatie"
+git push origin main
+```
 
 ## VOLGENDE GEPLANDE STAP
 
-**Prioriteit 1 — Vereist voor livegang:**
-1. **STRIPE-LIVE**: live keys, webhook, price IDs en coupon instellen in Vercel + Stripe Dashboard
-2. **TEST-006**: Welkomstmail end-to-end testen (na Postmark account goedkeuring)
+**Prioriteit 1 — Operationeel:**
+1. **Push commits** via Mac terminal (zie openstaande actie hierboven)
+2. **SQL migratie** `user_news_read` uitvoeren in Supabase Studio (staat al klaar in TASKS.md)
+3. **CRON_SECRET** env var aanmaken in Vercel (`openssl rand -hex 32`)
+4. **Eerste RSS refresh** handmatig triggeren na SQL migratie
 
-**Prioriteit 2 — Product kwaliteit:**
-3. **PROD-001**: Admin nieuws-UI + Make-automatie + initieel vullen van `news_items`
-4. **INFRA-002**: Admin alerts systeem (`admin_alerts` tabel + e-mail naar Marvin)
-5. **QUAL-001**: Follow-up vragen flow verdiepen (heranalyse met diff)
+**Prioriteit 2 — Groei:**
+5. **GROWTH-001**: Referral-engine bouwen (volledig plan in `docs/GROWTHPLAN_UITVOERING.md`)
 
-**Prioriteit 3 — Groei (na STRIPE-LIVE):**
-6. **GROWTH-001**: Referral-engine bouwen (volledig plan in `docs/GROWTHPLAN_UITVOERING.md`)
+**Prioriteit 3 — Product kwaliteit:**
+6. **INFRA-002**: Admin alerts systeem (`admin_alerts` tabel + e-mail naar Marvin bij events)
+7. **PROD-003**: Notificaties als levend systeem (triggers bij analyse, hoog-impact nieuws, betalingsfout)
+8. **QUAL-001**: Analyse-ervaring verdiepen (heranalyse met diff, Word-download)

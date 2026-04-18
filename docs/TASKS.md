@@ -1,6 +1,6 @@
 # TASKS.md
 
-**Laatste update:** 2026-04-18 (sessie 16 — nieuws systeem)
+**Laatste update:** 2026-04-18 (sessie 17 — app-wide redesign)
 
 ---
 
@@ -150,6 +150,22 @@
 ---
 
 ## DONE
+
+### Sessie 2026-04-18 (sessie 17) — App-wide redesign
+
+- [x] **App-wide redesign volledig** ✅ — alle app-pagina's (15 bestanden) herschreven met nieuw design system:
+  - Design regels: `rounded-xl border border-border bg-card`, `text-3xl font-bold tracking-tight`, `space-y-8`, empty states `py-16 text-center`
+  - Geen shadcn Card, CardHeader, CardTitle, CardDescription, CardContent meer in app-pagina's
+  - Bijgewerkt: `dashboard`, `analyse`, `documenten`, `notificaties`, `profiel`, `gidsen`, `gidsen/[slug]`
+  - Admin: `admin/page.tsx` + alle sub-pagina's (`gebruikers`, `analyses`, `funnel`, `emails`, `nieuws`)
+  - `layout.tsx` + `nieuws/page.tsx` al bijgewerkt in sessie 16
+  - Commit: `fcdebe7`
+- [x] **Gidsen compacte lijstweergave** ✅ — alleen titel + gradatiebadge per rij, alle categorie-gidsen in één oogopslag zichtbaar
+
+> **Openstaande actie voor Marvin (sessie 17):**
+> 1. `rm -f ~/dba-kompas/.git/HEAD.lock` in Mac terminal
+> 2. Dan: `cd ~/dba-kompas && git add "app/(app)/gidsen/page.tsx" && git commit -m "refactor(gidsen): compacte lijstweergave" && git push origin main`
+> 3. Dit pusht zowel de redesign commit (`fcdebe7`) als de gidsen-fix mee naar Vercel
 
 ### Sessie 2026-04-18 (sessie 16) — Nieuws systeem volledig gebouwd + STRIPE-LIVE
 
