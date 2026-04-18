@@ -1,7 +1,7 @@
 # PROJECT_STATE.md
 
-**Laatste update:** 2026-04-18 (sessie 18 — analyse flow redesign)
-**Maturity:** ~100% MVP (live op dbakompas.nl, Stripe LIVE, nieuws systeem, volledig redesign + verbeterde analyse UX)
+**Laatste update:** 2026-04-18 (sessie 18 afgerond — analyse flow + loading screen fix)
+**Maturity:** ~100% MVP + verbeterde analyse UX (live op dbakompas.nl, Stripe LIVE, nieuws systeem, volledig redesign)
 
 ---
 

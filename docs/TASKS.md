@@ -1,6 +1,6 @@
 # TASKS.md
 
-**Laatste update:** 2026-04-18 (sessie 18 — analyse flow redesign)
+**Laatste update:** 2026-04-18 (sessie 18 afgerond — analyse flow + loading screen fix)
 
 ---
 
@@ -173,13 +173,15 @@
 - [x] **Dashboard hero banner** ✅ — grote visuele CTA tegel met gradient, logo-icoon, animatie
 - [x] **Layout uitloggen** ✅ — rood hover-state (`hover:bg-destructive/10 hover:text-destructive`)
 
-> **Openstaande actie voor Marvin (sessie 18):**
+> **Openstaande acties voor Marvin (sessie 18 — push indien nog niet gedaan):**
 > ```bash
+> rm -f ~/dba-kompas/.git/index.lock ~/dba-kompas/.git/HEAD.lock
 > cd ~/dba-kompas
 > git add "app/(app)/analyse/page.tsx" "app/(app)/analyse/[id]/page.tsx" "app/(app)/dashboard/page.tsx" "app/(app)/layout.tsx" "docs/TASKS.md" "docs/PROJECT_STATE.md"
 > git commit -m "feat(analyse): wizard, realtime detectie, score circles, scenario's en disclaimer"
 > git push origin main
 > ```
+> (Bevat ook de loading screen fix: BrandLogo boven spinner, gecentreerd layout)
 
 ### Sessie 2026-04-18 (sessie 17) — App-wide redesign
 
