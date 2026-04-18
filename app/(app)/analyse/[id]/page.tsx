@@ -20,8 +20,13 @@ import {
   Circle,
   HelpCircle,
   RefreshCw,
+  Copy,
+  Check,
+  Layers,
+  Zap,
 } from 'lucide-react'
 
+// ── Types ────────────────────────────────────────────────────────────────────
 interface Domain {
   key: string
   title: string
@@ -72,6 +77,7 @@ interface Assessment {
   created_at: string
 }
 
+// ── Helpers ──────────────────────────────────────────────────────────────────
 function parseJson<T>(value: string | object | null | undefined): T | null {
   if (!value) return null
   if (typeof value === 'object') return value as T
@@ -87,8 +93,10 @@ function riskConfig(level: string) {
         border: 'border-emerald-400',
         text: 'text-emerald-700',
         badge: 'bg-emerald-100 text-emerald-800',
+        circle: '#10b981',
         icon: ShieldCheck,
         label: 'Laag risico',
+        score: 88,
       }
     case 'hoog':
       return {
@@ -97,8 +105,10 @@ function riskConfig(level: string) {
         border: 'border-red-400',
         text: 'text-red-700',
         badge: 'bg-red-100 text-red-800',
+        circle: '#ef4444',
         icon: ShieldAlert,
         label: 'Hoog risico',
+        score: 25,
       }
     default:
       return {
@@ -107,12 +117,148 @@ function riskConfig(level: string) {
         border: 'border-amber-400',
         text: 'text-amber-700',
         badge: 'bg-amber-100 text-amber-800',
+        circle: '#f59e0b',
         icon: Shield,
         label: 'Gemiddeld risico',
+        score: 55,
       }
   }
 }
 
+function domainScore(label: string): number {
+  switch (label?.toLowerCase()) {
+    case 'laag': return 88
+    case 'hoog': return 22
+    default: return 54
+  }
+}
+
+function scenarioLabel(riskLabel: string): { text: string; color: string } {
+  switch (riskLabel?.toLowerCase()) {
+    case 'hoog':
+      return { text: 'Sterk aanbevolen', color: 'bg-red-100 text-red-700 border-red-200' }
+    case 'laag':
+      return { text: 'Optioneel', color: 'bg-emerald-100 text-emerald-700 border-emerald-200' }
+    default:
+      return { text: 'Aanbevolen', color: 'bg-amber-100 text-amber-700 border-amber-200' }
+  }
+}
+
+// ── Score cirkel met animatie ─────────────────────────────────────────────────
+function ScoreCircle({
+  score,
+  color,
+  size = 80,
+  strokeWidth = 8,
+}: {
+  score: number
+  color: string
+  size?: number
+  strokeWidth?: number
+}) {
+  const [displayed, setDisplayed] = useState(0)
+  const radius = (size - strokeWidth) / 2
+  const circumference = 2 * Math.PI * radius
+
+  useEffect(() => {
+    let frame: number
+    const duration = 1100
+    const start = performance.now()
+
+    const animate = (now: number) => {
+      const elapsed = now - start
+      const progress = Math.min(elapsed / duration, 1)
+      // ease-out cubic
+      const eased = 1 - Math.pow(1 - progress, 3)
+      setDisplayed(Math.round(score * eased))
+      if (progress < 1) frame = requestAnimationFrame(animate)
+    }
+
+    frame = requestAnimationFrame(animate)
+    return () => cancelAnimationFrame(frame)
+  }, [score])
+
+  const dashOffset = circumference - (displayed / 100) * circumference
+
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      {/* Track */}
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={strokeWidth}
+        className="text-muted/20"
+      />
+      {/* Progress */}
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        fill="none"
+        stroke={color}
+        strokeWidth={strokeWidth}
+        strokeDasharray={circumference}
+        strokeDashoffset={dashOffset}
+        strokeLinecap="round"
+        style={{
+          transform: 'rotate(-90deg)',
+          transformOrigin: `${size / 2}px ${size / 2}px`,
+        }}
+      />
+      {/* Percentage tekst */}
+      <text
+        x={size / 2}
+        y={size / 2 + 5}
+        textAnchor="middle"
+        fontSize="13"
+        fontWeight="700"
+        fill="currentColor"
+        className="text-foreground"
+      >
+        {displayed}%
+      </text>
+    </svg>
+  )
+}
+
+// ── Copy to clipboard knop ────────────────────────────────────────────────────
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false)
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(text)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+  return (
+    <button
+      onClick={handleCopy}
+      className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+    >
+      {copied ? <Check className="size-3.5 text-emerald-500" /> : <Copy className="size-3.5" />}
+      {copied ? 'Gekopieerd!' : 'Kopiëren'}
+    </button>
+  )
+}
+
+// ── Bouwstenen weergave helper ────────────────────────────────────────────────
+function draftToPlainText(draft: CompactDraft | LongDraft | null): string {
+  if (!draft) return ''
+  const lines: string[] = []
+  if (draft.title) lines.push(`TITEL\n${draft.title}`, '')
+  if (draft.assignmentDescription) lines.push(`OPDRACHTOMSCHRIJVING\n${draft.assignmentDescription}`, '')
+  if (draft.deliverables?.length) lines.push(`OPLEVERINGEN\n${draft.deliverables.map((d) => `• ${d}`).join('\n')}`, '')
+  if ('executionAndSteering' in draft && draft.executionAndSteering) lines.push(`UITVOERING & AANSTURING\n${draft.executionAndSteering}`, '')
+  if ('acceptanceCriteria' in draft && (draft as LongDraft).acceptanceCriteria?.length) {
+    lines.push(`ACCEPTATIECRITERIA\n${(draft as LongDraft).acceptanceCriteria!.map((c) => `• ${c}`).join('\n')}`, '')
+  }
+  if (draft.structuralNote) lines.push(`NOOT\n${draft.structuralNote}`)
+  return lines.join('\n')
+}
+
+// ── Hoofd component ───────────────────────────────────────────────────────────
 export default function AssessmentDetailPage() {
   const params = useParams<{ id: string }>()
   const router = useRouter()
@@ -123,8 +269,10 @@ export default function AssessmentDetailPage() {
   const [reanalyseLoading, setReanalyseLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [expandedDomains, setExpandedDomains] = useState<Set<number>>(new Set([0, 1, 2]))
-  const [activeTab, setActiveTab] = useState<'compact' | 'long'>('compact')
+  const [draftTab, setDraftTab] = useState<'compact' | 'uitgebreid' | 'bouwstenen'>('compact')
   const [answers, setAnswers] = useState<Record<string, string>>({})
+  const [activeScenario, setActiveScenario] = useState<number | null>(null)
+  const [heranalyseText, setHeranalyseText] = useState('')
 
   useEffect(() => {
     if (!params.id) return
@@ -138,7 +286,11 @@ export default function AssessmentDetailPage() {
   }, [params.id])
 
   const toggleDomain = (i: number) =>
-    setExpandedDomains((prev) => { const n = new Set(prev); n.has(i) ? n.delete(i) : n.add(i); return n })
+    setExpandedDomains((prev) => {
+      const n = new Set(prev)
+      n.has(i) ? n.delete(i) : n.add(i)
+      return n
+    })
 
   const handleGenerateDraft = () => {
     if (!assessment || draftLoading) return
@@ -158,10 +310,14 @@ export default function AssessmentDetailPage() {
       .catch(() => setFullDraftLoading(false))
   }
 
-  const handleTabChange = (tab: 'compact' | 'long') => {
-    setActiveTab(tab)
-    // Lazy-load full draft when user switches to the Uitgebreid tab for the first time
-    if (tab === 'long' && assessment && !parseJson<LongDraft>(assessment.optimized_brief) && !fullDraftLoading) {
+  const handleDraftTabChange = (tab: 'compact' | 'uitgebreid' | 'bouwstenen') => {
+    setDraftTab(tab)
+    if (
+      (tab === 'uitgebreid' || tab === 'bouwstenen') &&
+      assessment &&
+      !parseJson<LongDraft>(assessment.optimized_brief) &&
+      !fullDraftLoading
+    ) {
       handleGenerateFullDraft()
     }
   }
@@ -171,28 +327,27 @@ export default function AssessmentDetailPage() {
     const aanvullingen = Object.entries(answers)
       .filter(([, v]) => v.trim())
       .map(([k, v]) => {
-        const q = followUpQuestions.find(q => q.key === k)
+        const q = followUpQuestions.find((q) => q.key === k)
         return q ? `${q.label}: ${v.trim()}` : v.trim()
       })
       .join('\n')
-    if (!aanvullingen) return
-    const combinedText = `${assessment.input_text}\n\nAanvullende informatie:\n${aanvullingen}`
+    const extra = heranalyseText.trim()
+    const combined = [assessment.input_text, aanvullingen, extra].filter(Boolean).join('\n\nAanvullende informatie:\n')
     setReanalyseLoading(true)
     try {
       const res = await fetch('/api/dba/analyse', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ inputText: combinedText }),
+        body: JSON.stringify({ inputText: combined }),
       })
       const data = await res.json()
-      if (data.id) {
-        router.push(`/analyse/${data.id}`)
-      }
+      if (data.id) router.push(`/analyse/${data.id}`)
     } finally {
       setReanalyseLoading(false)
     }
   }
 
+  // ── Loading / error states ─────────────────────────────────────────────────
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -212,7 +367,7 @@ export default function AssessmentDetailPage() {
           {error || 'Analyse niet gevonden'}
         </div>
         <Link href="/analyse" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="size-4" /> Terug naar analyses
+          <ArrowLeft className="size-4" /> Terug naar analyse
         </Link>
       </div>
     )
@@ -224,25 +379,24 @@ export default function AssessmentDetailPage() {
   const compactDraft = parseJson<CompactDraft>(assessment.compact_assignment_draft)
   const longDraft = parseJson<LongDraft>(assessment.optimized_brief)
   const domains = (assessment.domains as Domain[]) ?? []
-
-  // Follow-up vragen: kunnen objecten zijn (nieuw) of strings (oud)
   const rawFollowUp = assessment.follow_up_questions
   const followUpQuestions: FollowUpQuestion[] = Array.isArray(rawFollowUp)
     ? rawFollowUp.filter((q): q is FollowUpQuestion => typeof q === 'object' && q !== null && 'key' in q)
     : []
-
-  const hasAnswers = Object.values(answers).some(v => v.trim())
+  const improvements = (assessment.top_improvements as string[]) ?? []
+  const hasAnswers = Object.values(answers).some((v) => v.trim()) || heranalyseText.trim().length > 0
+  const scenarioRec = scenarioLabel(assessment.overall_risk_label)
 
   if (isFallback) {
     return (
       <div className="mx-auto max-w-2xl p-8 space-y-6">
         <Link href="/analyse" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="size-4" /> Terug naar analyses
+          <ArrowLeft className="size-4" /> Terug
         </Link>
         <div className="rounded-2xl border border-amber-200 bg-amber-50 p-8 text-center space-y-4">
           <AlertTriangle className="size-12 text-amber-500 mx-auto" />
           <h2 className="text-xl font-semibold">Analyse kon niet worden voltooid</h2>
-          <p className="text-muted-foreground">Er is een technisch probleem opgetreden bij het verwerken van uw opdracht. Ga terug en probeer het opnieuw.</p>
+          <p className="text-muted-foreground">Er is een technisch probleem opgetreden. Ga terug en probeer het opnieuw.</p>
           <Link href="/analyse" className="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600">
             Opnieuw proberen
           </Link>
@@ -251,43 +405,56 @@ export default function AssessmentDetailPage() {
     )
   }
 
+  // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen">
-      {/* Hero risk banner */}
+
+      {/* ── Hero risico-banner ─────────────────────────────────────────────── */}
       <div className={`${risk.bg} px-6 py-8`}>
         <div className="mx-auto max-w-5xl">
           <div className="flex items-start justify-between gap-4">
             <Link href="/analyse" className="inline-flex items-center gap-1.5 text-sm text-white/80 hover:text-white transition-colors">
               <ArrowLeft className="size-4" /> Terug
             </Link>
-            <a href={`/api/dba/assessments/${params.id}/pdf`} download
-              className="inline-flex items-center gap-1.5 rounded-lg border border-white/30 bg-white/10 px-3 py-1.5 text-sm text-white hover:bg-white/20 transition-colors">
+            <a
+              href={`/api/dba/assessments/${params.id}/pdf`}
+              download
+              className="inline-flex items-center gap-1.5 rounded-lg border border-white/30 bg-white/10 px-3 py-1.5 text-sm text-white hover:bg-white/20 transition-colors"
+            >
               <Download className="size-4" /> PDF
             </a>
           </div>
-          <div className="mt-6 flex items-center gap-4">
-            <div className="rounded-2xl bg-white/20 p-4">
-              <RiskIcon className="size-10 text-white" />
+
+          <div className="mt-6 flex items-center gap-6">
+            {/* Score cirkel */}
+            <div className="shrink-0">
+              <ScoreCircle score={risk.score} color="rgba(255,255,255,0.9)" size={88} strokeWidth={9} />
             </div>
             <div>
               <p className="text-white/70 text-sm font-medium uppercase tracking-wide">DBA Risico-analyse</p>
               <h1 className="text-3xl font-bold text-white mt-1">{risk.label}</h1>
-              <p className="text-white/80 text-sm mt-1">
+              <p className="text-white/70 text-sm mt-1">
                 {assessment.created_at
-                  ? new Date(assessment.created_at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })
+                  ? new Date(assessment.created_at).toLocaleDateString('nl-NL', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                    })
                   : ''}
               </p>
             </div>
           </div>
+
           <p className="mt-4 text-white/90 text-base leading-relaxed max-w-2xl">
             {assessment.overall_summary}
           </p>
         </div>
       </div>
 
-      <div className="mx-auto max-w-5xl px-6 py-8 space-y-8">
+      {/* ── Pagina-inhoud ──────────────────────────────────────────────────── */}
+      <div className="mx-auto max-w-5xl px-6 py-8 space-y-10">
 
-        {/* Domain grid */}
+        {/* ── Beoordeling per domein ────────────────────────────────────────── */}
         <section>
           <h2 className="text-lg font-semibold mb-4">Beoordeling per domein</h2>
           <div className="grid gap-4 md:grid-cols-3">
@@ -295,27 +462,29 @@ export default function AssessmentDetailPage() {
               const dr = riskConfig(domain.scoreLabel)
               const DomainIcon = dr.icon
               const expanded = expandedDomains.has(index)
+              const dScore = domainScore(domain.scoreLabel)
+
               return (
-                <div key={domain.key ?? index}
-                  className={`rounded-xl border-2 ${dr.border} ${dr.bgLight} overflow-hidden`}>
-                  <button
-                    className="w-full text-left p-4"
-                    onClick={() => toggleDomain(index)}
-                  >
+                <div
+                  key={domain.key ?? index}
+                  className={`rounded-xl border-2 ${dr.border} ${dr.bgLight} overflow-hidden`}
+                >
+                  <button className="w-full text-left p-4" onClick={() => toggleDomain(index)}>
                     <div className="flex items-start justify-between gap-2">
-                      <div className="flex items-center gap-2">
-                        <DomainIcon className={`size-5 shrink-0 ${dr.text}`} />
-                        <span className="font-semibold text-sm leading-tight">{domain.title}</span>
+                      <div className="flex items-start gap-2.5">
+                        {/* Mini score cirkel */}
+                        <ScoreCircle score={dScore} color={dr.circle} size={48} strokeWidth={5} />
+                        <div className="min-w-0 pt-1">
+                          <span className="font-semibold text-sm leading-tight block">{domain.title}</span>
+                          <span className={`inline-flex mt-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${dr.badge}`}>
+                            {domain.scoreLabel}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${dr.badge}`}>
-                          {domain.scoreLabel}
-                        </span>
-                        {expanded
-                          ? <ChevronUp className="size-4 text-muted-foreground" />
-                          : <ChevronDown className="size-4 text-muted-foreground" />
-                        }
-                      </div>
+                      {expanded
+                        ? <ChevronUp className="size-4 text-muted-foreground shrink-0 mt-1" />
+                        : <ChevronDown className="size-4 text-muted-foreground shrink-0 mt-1" />
+                      }
                     </div>
                     {domain.summary && (
                       <p className="mt-2 text-sm text-muted-foreground leading-snug">{domain.summary}</p>
@@ -326,7 +495,9 @@ export default function AssessmentDetailPage() {
                     <div className="px-4 pb-4 space-y-3 border-t border-white/50 pt-3">
                       {domain.indicatorsForRisk?.length > 0 && (
                         <div>
-                          <p className="text-xs font-semibold text-red-600 uppercase tracking-wide mb-1.5">Risico-indicatoren</p>
+                          <p className="text-xs font-semibold text-red-600 uppercase tracking-wide mb-1.5">
+                            Risico-indicatoren
+                          </p>
                           <ul className="space-y-1">
                             {domain.indicatorsForRisk.map((ind, i) => (
                               <li key={i} className="flex items-start gap-1.5 text-sm text-muted-foreground">
@@ -339,7 +510,9 @@ export default function AssessmentDetailPage() {
                       )}
                       {domain.indicatorsForIndependence?.length > 0 && (
                         <div>
-                          <p className="text-xs font-semibold text-emerald-600 uppercase tracking-wide mb-1.5">Onafhankelijkheid</p>
+                          <p className="text-xs font-semibold text-emerald-600 uppercase tracking-wide mb-1.5">
+                            Onafhankelijkheid
+                          </p>
                           <ul className="space-y-1">
                             {domain.indicatorsForIndependence.map((ind, i) => (
                               <li key={i} className="flex items-start gap-1.5 text-sm text-muted-foreground">
@@ -352,7 +525,9 @@ export default function AssessmentDetailPage() {
                       )}
                       {domain.suggestedImprovements?.length > 0 && (
                         <div>
-                          <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1.5">Aanbeveling</p>
+                          <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1.5">
+                            Aanbeveling
+                          </p>
                           <ul className="space-y-1">
                             {domain.suggestedImprovements.map((imp, i) => (
                               <li key={i} className="flex items-start gap-1.5 text-sm text-muted-foreground">
@@ -371,15 +546,15 @@ export default function AssessmentDetailPage() {
           </div>
         </section>
 
-        {/* Top improvements */}
-        {(assessment.top_improvements as string[])?.length > 0 && (
+        {/* ── Actiepunten ──────────────────────────────────────────────────── */}
+        {improvements.length > 0 && (
           <section>
             <div className="flex items-center gap-2 mb-4">
               <TrendingUp className="size-5 text-blue-500" />
               <h2 className="text-lg font-semibold">Actiepunten</h2>
             </div>
-            <div className="rounded-xl border bg-card divide-y">
-              {(assessment.top_improvements as string[]).map((imp, i) => (
+            <div className="rounded-xl border border-border bg-card divide-y divide-border">
+              {improvements.map((imp, i) => (
                 <div key={i} className="flex items-start gap-3 px-5 py-4">
                   <div className="flex size-6 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-700 text-xs font-bold mt-0.5">
                     {i + 1}
@@ -391,31 +566,104 @@ export default function AssessmentDetailPage() {
           </section>
         )}
 
-        {/* Follow-up vragen — aanvullende informatie */}
-        {followUpQuestions.length > 0 && (
+        {/* ── Beschikbare scenario's ───────────────────────────────────────── */}
+        {improvements.length > 0 && (
+          <section>
+            <div className="flex items-center gap-2 mb-4">
+              <Zap className="size-5 text-violet-500" />
+              <h2 className="text-lg font-semibold">Beschikbare scenario&apos;s</h2>
+              <span className={`ml-auto inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold ${scenarioRec.color}`}>
+                {scenarioRec.text}
+              </span>
+            </div>
+            <p className="text-sm text-muted-foreground mb-4">
+              Klik op een scenario om een voorbeeldtekst te laden in het heranalyse-veld.
+            </p>
+            <div className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden">
+              {improvements.map((imp, i) => (
+                <button
+                  key={i}
+                  onClick={() => {
+                    setActiveScenario(i === activeScenario ? null : i)
+                    setHeranalyseText(
+                      i === activeScenario
+                        ? ''
+                        : `Ik heb de volgende aanpassing doorgevoerd: ${imp}`
+                    )
+                  }}
+                  className={`w-full flex items-start gap-3 px-5 py-4 text-left transition-colors ${
+                    activeScenario === i ? 'bg-violet-50' : 'hover:bg-muted/40'
+                  }`}
+                >
+                  <div className={`flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold mt-0.5 transition-colors ${
+                    activeScenario === i ? 'bg-violet-600 text-white' : 'bg-muted text-muted-foreground'
+                  }`}>
+                    {activeScenario === i ? <Check className="size-3" /> : i + 1}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-foreground leading-relaxed">{imp}</p>
+                    {activeScenario === i && (
+                      <p className="text-xs text-violet-600 font-medium mt-1">
+                        ✓ Voorbeeldtekst geladen in heranalyse-veld
+                      </p>
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ── Follow-up vragen ─────────────────────────────────────────────── */}
+        {(followUpQuestions.length > 0 || improvements.length > 0) && (
           <section>
             <div className="flex items-center gap-2 mb-3">
               <HelpCircle className="size-5 text-slate-400" />
               <h2 className="text-lg font-semibold">Analyse verfijnen</h2>
             </div>
             <p className="text-sm text-muted-foreground mb-4">
-              Beantwoord de vragen hieronder om de analyse nauwkeuriger te maken. Vul in wat van toepassing is en klik op heranalyseer.
+              Voeg aanvullende informatie toe of beschrijf een scenario om de analyse te heruitvoeren.
             </p>
-            <div className="rounded-xl border bg-card divide-y">
-              {followUpQuestions.map((q) => (
-                <div key={q.key} className="px-5 py-4 space-y-2">
-                  <label className="text-sm font-medium text-foreground">{q.question}</label>
-                  <p className="text-xs text-muted-foreground">{q.hint}</p>
-                  <textarea
-                    className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none"
-                    rows={2}
-                    placeholder="Uw antwoord..."
-                    value={answers[q.key] ?? ''}
-                    onChange={(e) => setAnswers(prev => ({ ...prev, [q.key]: e.target.value }))}
-                  />
-                </div>
-              ))}
+
+            {followUpQuestions.length > 0 && (
+              <div className="rounded-xl border border-border bg-card divide-y divide-border mb-4">
+                {followUpQuestions.map((q) => (
+                  <div key={q.key} className="px-5 py-4 space-y-2">
+                    <label className="text-sm font-medium text-foreground">{q.question}</label>
+                    <p className="text-xs text-muted-foreground">{q.hint}</p>
+                    <textarea
+                      className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+                      rows={2}
+                      placeholder="Uw antwoord..."
+                      value={answers[q.key] ?? ''}
+                      onChange={(e) => setAnswers((prev) => ({ ...prev, [q.key]: e.target.value }))}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Scenario heranalyse tekstveld */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">
+                {activeScenario !== null ? 'Scenario-tekst (bewerken indien gewenst)' : 'Aanvullende opmerkingen'}
+              </label>
+              <textarea
+                className={`w-full rounded-xl border-2 bg-card px-4 py-3 text-sm outline-none resize-none leading-relaxed transition-colors min-h-[100px] ${
+                  heranalyseText.trim()
+                    ? 'border-violet-400 focus:ring-2 focus:ring-violet-400/20'
+                    : 'border-border focus:border-ring focus:ring-2 focus:ring-ring/20'
+                }`}
+                placeholder="Beschrijf hier aanpassingen of geselecteerd scenario..."
+                value={heranalyseText}
+                onChange={(e) => {
+                  setHeranalyseText(e.target.value)
+                  if (activeScenario !== null && e.target.value === '') setActiveScenario(null)
+                }}
+                rows={3}
+              />
             </div>
+
             <div className="mt-3">
               <button
                 onClick={handleReanalyse}
@@ -431,7 +679,7 @@ export default function AssessmentDetailPage() {
           </section>
         )}
 
-        {/* Assignment draft — op aanvraag */}
+        {/* ── Opdrachtformulering ───────────────────────────────────────────── */}
         <section>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
@@ -444,39 +692,52 @@ export default function AssessmentDetailPage() {
                 className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700 transition-colors"
               >
                 <FileText className="size-4" />
-                Genereer opdrachtomschrijving
+                Genereer
               </button>
             )}
           </div>
 
-          <div className="rounded-xl border bg-card overflow-hidden">
+          <div className="rounded-xl border border-border bg-card overflow-hidden">
             {draftLoading ? (
               <div className="flex items-center gap-3 p-8 text-sm text-muted-foreground">
                 <Loader2 className="size-5 animate-spin shrink-0" />
                 <div>
                   <p className="font-medium">Opdrachtteksten worden gegenereerd...</p>
-                  <p className="text-xs mt-0.5 text-muted-foreground/70">Dit duurt circa 3-5 seconden</p>
+                  <p className="text-xs mt-0.5 text-muted-foreground/70">Dit duurt circa 3–5 seconden</p>
                 </div>
               </div>
             ) : (compactDraft || longDraft) ? (
               <div>
-                <div className="flex border-b">
-                  <button
-                    className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${activeTab === 'compact' ? 'bg-violet-50 text-violet-700 border-b-2 border-violet-500' : 'text-muted-foreground hover:text-foreground'}`}
-                    onClick={() => handleTabChange('compact')}
-                  >
-                    Compact (modelovereenkomst)
-                  </button>
-                  <button
-                    className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${activeTab === 'long' ? 'bg-violet-50 text-violet-700 border-b-2 border-violet-500' : 'text-muted-foreground hover:text-foreground'}`}
-                    onClick={() => handleTabChange('long')}
-                  >
-                    Uitgebreid (intern gebruik)
-                  </button>
+                {/* Tab bar: compact / uitgebreid / bouwstenen */}
+                <div className="flex border-b border-border">
+                  {(
+                    [
+                      { key: 'compact', label: 'Compact', icon: FileText },
+                      { key: 'uitgebreid', label: 'Uitgebreid', icon: TrendingUp },
+                      { key: 'bouwstenen', label: 'Bouwstenen', icon: Layers },
+                    ] as const
+                  ).map(({ key, label, icon: Icon }) => (
+                    <button
+                      key={key}
+                      className={`flex items-center gap-1.5 flex-1 px-3 py-3 text-sm font-medium transition-colors ${
+                        draftTab === key
+                          ? 'bg-violet-50 text-violet-700 border-b-2 border-violet-500'
+                          : 'text-muted-foreground hover:text-foreground'
+                      }`}
+                      onClick={() => handleDraftTabChange(key)}
+                    >
+                      <Icon className="size-3.5 shrink-0" />
+                      {label}
+                    </button>
+                  ))}
                 </div>
 
-                {activeTab === 'compact' && compactDraft && (
+                {/* Compact tab */}
+                {draftTab === 'compact' && compactDraft && (
                   <div className="p-6 space-y-5">
+                    <div className="flex justify-end">
+                      <CopyButton text={draftToPlainText(compactDraft)} />
+                    </div>
                     {compactDraft.title && (
                       <div>
                         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Titel</p>
@@ -517,17 +778,17 @@ export default function AssessmentDetailPage() {
                   </div>
                 )}
 
-                {activeTab === 'long' && fullDraftLoading && (
+                {/* Uitgebreid tab */}
+                {draftTab === 'uitgebreid' && fullDraftLoading && (
                   <div className="flex items-center gap-3 p-8 text-sm text-muted-foreground">
                     <Loader2 className="size-5 animate-spin shrink-0" />
                     <div>
                       <p className="font-medium">Uitgebreide versie wordt opgesteld...</p>
-                      <p className="text-xs mt-0.5 text-muted-foreground/70">Dit duurt circa 8-12 seconden</p>
+                      <p className="text-xs mt-0.5 text-muted-foreground/70">Dit duurt circa 8–12 seconden</p>
                     </div>
                   </div>
                 )}
-
-                {activeTab === 'long' && !fullDraftLoading && !longDraft && (
+                {draftTab === 'uitgebreid' && !fullDraftLoading && !longDraft && (
                   <div className="p-6 text-center space-y-3">
                     <p className="text-sm text-muted-foreground">De uitgebreide versie kon niet worden geladen.</p>
                     <button
@@ -538,9 +799,11 @@ export default function AssessmentDetailPage() {
                     </button>
                   </div>
                 )}
-
-                {activeTab === 'long' && !fullDraftLoading && longDraft && (
+                {draftTab === 'uitgebreid' && !fullDraftLoading && longDraft && (
                   <div className="p-6 space-y-5">
+                    <div className="flex justify-end">
+                      <CopyButton text={draftToPlainText(longDraft)} />
+                    </div>
                     {longDraft.title && (
                       <div>
                         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Titel</p>
@@ -606,18 +869,59 @@ export default function AssessmentDetailPage() {
                     )}
                   </div>
                 )}
+
+                {/* Bouwstenen tab */}
+                {draftTab === 'bouwstenen' && fullDraftLoading && (
+                  <div className="flex items-center gap-3 p-8 text-sm text-muted-foreground">
+                    <Loader2 className="size-5 animate-spin shrink-0" />
+                    <p className="font-medium">Bouwstenen worden voorbereid...</p>
+                  </div>
+                )}
+                {draftTab === 'bouwstenen' && !fullDraftLoading && (() => {
+                  const draft = longDraft ?? compactDraft
+                  if (!draft) return (
+                    <div className="p-6 text-center">
+                      <p className="text-sm text-muted-foreground">Bouwstenen niet beschikbaar.</p>
+                    </div>
+                  )
+                  const blocks: { label: string; content: string }[] = []
+                  if (draft.title) blocks.push({ label: 'Titel', content: draft.title })
+                  if (draft.assignmentDescription) blocks.push({ label: 'Opdrachtomschrijving', content: draft.assignmentDescription })
+                  if (draft.deliverables?.length) blocks.push({ label: 'Opleveringen', content: draft.deliverables.map((d) => `• ${d}`).join('\n') })
+                  if ('acceptanceCriteria' in draft && (draft as LongDraft).acceptanceCriteria?.length) {
+                    blocks.push({ label: 'Acceptatiecriteria', content: (draft as LongDraft).acceptanceCriteria!.map((c) => `• ${c}`).join('\n') })
+                  }
+                  if ('executionAndSteering' in draft && draft.executionAndSteering) {
+                    blocks.push({ label: 'Uitvoering & aansturing', content: draft.executionAndSteering! })
+                  }
+                  if (draft.structuralNote) blocks.push({ label: 'Structurele noot', content: draft.structuralNote })
+                  return (
+                    <div className="divide-y divide-border">
+                      {blocks.map((block) => (
+                        <div key={block.label} className="px-5 py-4 space-y-2">
+                          <div className="flex items-center justify-between">
+                            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{block.label}</p>
+                            <CopyButton text={block.content} />
+                          </div>
+                          <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">{block.content}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )
+                })()}
+
               </div>
             ) : (
               <div className="p-6 text-sm text-muted-foreground">
-                Klik op &quot;Genereer opdrachtomschrijving&quot; om een professionele opdrachttekst te laten opstellen op basis van deze analyse.
+                Klik op &quot;Genereer&quot; om een professionele opdrachttekst te laten opstellen op basis van deze analyse.
               </div>
             )}
           </div>
         </section>
 
-        {/* Disclaimer */}
+        {/* ── Disclaimer ───────────────────────────────────────────────────── */}
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 text-xs text-amber-800">
-          <strong>Disclaimer:</strong> Deze analyse is een hulpmiddel en vervangt geen juridisch advies. De resultaten zijn indicatief. Raadpleeg altijd een juridisch specialist voor definitieve beoordeling.
+          <strong>Disclaimer:</strong> Deze analyse is een hulpmiddel en vervangt geen juridisch advies. De resultaten zijn indicatief. Raadpleeg altijd een specialist voor definitieve beoordeling.
         </div>
 
       </div>

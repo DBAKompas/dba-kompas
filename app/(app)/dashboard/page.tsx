@@ -138,34 +138,45 @@ export default function DashboardPage() {
         })}
       </div>
 
-      {/* CTA */}
-      <div className="rounded-xl border border-border bg-card p-6">
-        <h2 className="text-lg font-semibold">Start nieuwe analyse</h2>
-        <p className="text-sm text-muted-foreground mt-1">
-          Upload een overeenkomst of plak tekst om te controleren op DBA-compliance
-        </p>
-        <div className="mt-4">
-          <Button asChild>
-            <Link href="/analyse">
-              <FileSearch className="size-4" />
+      {/* Hero analyse banner */}
+      <Link
+        href="/analyse"
+        className="group block rounded-xl overflow-hidden bg-gradient-to-br from-primary to-primary/80 p-6 hover:from-primary/95 hover:to-primary/75 transition-all"
+      >
+        <div className="flex items-center justify-between gap-4">
+          <div className="space-y-1.5">
+            <p className="text-xs font-semibold uppercase tracking-widest text-primary-foreground/70">
+              DBA compliance
+            </p>
+            <h2 className="text-2xl font-bold text-primary-foreground leading-tight">
               Nieuwe analyse starten
-              <ArrowRight className="size-4" />
-            </Link>
-          </Button>
+            </h2>
+            <p className="text-sm text-primary-foreground/80 max-w-sm">
+              Upload een overeenkomst of plak tekst — resultaat binnen 30 seconden.
+            </p>
+          </div>
+          <div className="flex items-center gap-3 shrink-0">
+            <div className="rounded-xl bg-white/15 p-4 group-hover:bg-white/20 transition-colors">
+              <FileSearch className="size-8 text-white" />
+            </div>
+            <ArrowRight className="size-5 text-white/70 group-hover:translate-x-0.5 transition-transform" />
+          </div>
         </div>
-      </div>
+      </Link>
 
       {/* Eerdere analyses */}
       <div className="rounded-xl border border-border bg-card p-6">
-        <h2 className="text-lg font-semibold">Eerdere analyses</h2>
-        <p className="text-sm text-muted-foreground mt-1">
-          Bekijk uw eerder uitgevoerde analyses en resultaten
-        </p>
-        <div className="mt-4">
-          <Button variant="outline" asChild>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold">Eerdere analyses</h2>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Bekijk uw eerder uitgevoerde analyses en resultaten
+            </p>
+          </div>
+          <Button variant="outline" size="sm" asChild>
             <Link href="/analyse">
-              Bekijk alle analyses
-              <ArrowRight className="size-4" />
+              Bekijk alles
+              <ArrowRight className="size-3.5" />
             </Link>
           </Button>
         </div>

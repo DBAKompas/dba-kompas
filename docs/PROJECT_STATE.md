@@ -1,7 +1,7 @@
 # PROJECT_STATE.md
 
-**Laatste update:** 2026-04-18 (sessie 17 — app-wide redesign)
-**Maturity:** ~100% MVP (live op dbakompas.nl, Stripe in LIVE mode, nieuws systeem + volledig redesign)
+**Laatste update:** 2026-04-18 (sessie 18 — analyse flow redesign)
+**Maturity:** ~100% MVP (live op dbakompas.nl, Stripe LIVE, nieuws systeem, volledig redesign + verbeterde analyse UX)
 
 ---
 
@@ -110,6 +110,27 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
 ---
 
 ## SESSIEHISTORIE
+
+### Sessie 2026-04-18 (sessie 18) — Analyse flow redesign (kern van de app)
+
+- **Analyse wizard volledig herbouwd** ✅
+  - Tab-navigatie: Nieuwe analyse / Eerdere analyses
+  - Twee invoertegels (Plak tekst / Upload bestand) met hover-states
+  - Stap 1 / Stap 2 indicator
+  - Textarea met **oranje border** bij actief typen
+  - **Realtime DBA-element detectie**: 10 kernsignalen, kleurgecodeerde progress bar, herkende/onherkende tags
+  - Privacy block: 14-dagen dataretentie vermeld
+  - Bevestigingsscherm: overzicht van wat gebruiker krijgt
+  - **Disclaimer met verplichte checkboxen** (alleen eerste analyse, localStorage-vlag)
+  - Laadscherm: sequentiële stappen met groene vinkjes
+- **Resultaten pagina uitgebreid** ✅
+  - SVG score-cirkels met ease-out animatie in hero + per domein
+  - Derde tab "Bouwstenen": individuele secties met eigen kopieer-knop
+  - Copy-knop voor volledige draft
+  - Scenario-aanbevelingen sectie met drempelwaarde-labels (Sterk aanbevolen / Aanbevolen / Optioneel)
+  - Scenario klikken → voorbeeldtekst in heranalyse-veld
+- **Dashboard hero banner** ✅ — grote gradient CTA tegel
+- **Layout uitloggen** ✅ — rood hover-state
 
 ### Sessie 2026-04-18 (sessie 17) — App-wide redesign
 

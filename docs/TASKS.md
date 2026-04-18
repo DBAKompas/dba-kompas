@@ -1,6 +1,6 @@
 # TASKS.md
 
-**Laatste update:** 2026-04-18 (sessie 17 — app-wide redesign)
+**Laatste update:** 2026-04-18 (sessie 18 — analyse flow redesign)
 
 ---
 
@@ -150,6 +150,36 @@
 ---
 
 ## DONE
+
+### Sessie 2026-04-18 (sessie 18) — Analyse flow volledig redesigned
+
+- [x] **Analyse wizard (Stap 1 / Stap 2)** ✅ — `app/(app)/analyse/page.tsx` volledig herschreven:
+  - Tab-navigatie: "Nieuwe analyse" + "Eerdere analyses" (haalt assessments op via API)
+  - Stap-indicator: visuele Stap 1 → 2 progress
+  - Twee grote invoertegels: "Plak tekst" + "Upload bestand" met hover-states
+  - Textarea met **oranje border** bij actief typen
+  - **Realtime DBA-element detectie**: 10 kernsignalen, kleurcode progress bar, herkend/niet-herkend tags
+  - Privacy blok: "Bescherm je privacy" + vermelding 14-dagen dataretentie
+  - Bevestigingsscherm (Stap 2): samenvatting van wat gebruiker krijgt, invoer preview
+  - **Disclaimer met verplichte checkboxen** (alleen eerste analyse via `localStorage`), daarna overgeslagen
+  - Laadscherm: sequentiële stappen met groene vinkjes en spinner
+- [x] **Resultaten pagina** ✅ — `app/(app)/analyse/[id]/page.tsx` uitgebreid:
+  - **SVG score-cirkels met animatie** (ease-out cubic, 1.1s) in hero + per domein
+  - Derde tab "Bouwstenen" naast Compact + Uitgebreid — afzonderlijke kopieer-knop per bouwsteen
+  - **Copy-knop** voor volledige draft tekst (Compact + Uitgebreid)
+  - **Scenario-aanbevelingen sectie** met drempelwaarde-label (Sterk aanbevolen / Aanbevolen / Optioneel) gebaseerd op risico-niveau
+  - Scenario klikken laadt voorbeeldtekst in heranalyse-veld
+  - Heranalyse-veld gecombineerd met follow-up vragen en scenario-tekst
+- [x] **Dashboard hero banner** ✅ — grote visuele CTA tegel met gradient, logo-icoon, animatie
+- [x] **Layout uitloggen** ✅ — rood hover-state (`hover:bg-destructive/10 hover:text-destructive`)
+
+> **Openstaande actie voor Marvin (sessie 18):**
+> ```bash
+> cd ~/dba-kompas
+> git add "app/(app)/analyse/page.tsx" "app/(app)/analyse/[id]/page.tsx" "app/(app)/dashboard/page.tsx" "app/(app)/layout.tsx" "docs/TASKS.md" "docs/PROJECT_STATE.md"
+> git commit -m "feat(analyse): wizard, realtime detectie, score circles, scenario's en disclaimer"
+> git push origin main
+> ```
 
 ### Sessie 2026-04-18 (sessie 17) — App-wide redesign
 
