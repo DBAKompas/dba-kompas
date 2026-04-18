@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -57,6 +56,32 @@ const specialisatieOpties = [
   'Financiën / Administratie',
   'Anders',
 ]
+
+function Toggle({
+  checked,
+  onChange,
+}: {
+  checked: boolean
+  onChange: () => void
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      onClick={onChange}
+      className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full transition-colors ${
+        checked ? 'bg-primary' : 'bg-muted-foreground/25'
+      }`}
+    >
+      <span
+        className={`pointer-events-none inline-block size-4 transform rounded-full bg-white shadow-sm transition-transform mt-0.5 ${
+          checked ? 'translate-x-4' : 'translate-x-0.5'
+        }`}
+      />
+    </button>
+  )
+}
 
 export default function ProfielPage() {
   const [profile, setProfile] = useState<Profile | null>(null)
@@ -163,21 +188,19 @@ export default function ProfielPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div className="mx-auto max-w-2xl space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold">Profiel</h1>
-        <p className="text-muted-foreground">Beheer uw accountinstellingen</p>
+        <h1 className="text-3xl font-bold tracking-tight">Profiel</h1>
+        <p className="text-sm text-muted-foreground mt-1">Beheer uw accountinstellingen</p>
       </div>
 
-      {/* Personal info */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <User className="size-5" />
-            Persoonlijke gegevens
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      {/* Persoonlijke gegevens */}
+      <div className="rounded-xl border border-border bg-card p-6 space-y-5">
+        <div className="flex items-center gap-2">
+          <User className="size-5 text-muted-foreground" />
+          <h2 className="text-lg font-semibold">Persoonlijke gegevens</h2>
+        </div>
+        <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Naam</Label>
             <Input
@@ -199,15 +222,13 @@ export default function ProfielPage() {
             <Label htmlFor="bedrijfstak">Bedrijfstak</Label>
             <select
               id="bedrijfstak"
-              className="h-8 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+              className="h-9 w-full rounded-lg border border-input bg-transparent px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
               value={profile.bedrijfstak || ''}
               onChange={(e) => updateField('bedrijfstak', e.target.value)}
             >
               <option value="">Selecteer bedrijfstak</option>
               {bedrijfstakOpties.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
+                <option key={opt} value={opt}>{opt}</option>
               ))}
             </select>
           </div>
@@ -215,149 +236,115 @@ export default function ProfielPage() {
             <Label htmlFor="specialisatie">Specialisatie</Label>
             <select
               id="specialisatie"
-              className="h-8 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+              className="h-9 w-full rounded-lg border border-input bg-transparent px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
               value={profile.specialisatie || ''}
               onChange={(e) => updateField('specialisatie', e.target.value)}
             >
               <option value="">Selecteer specialisatie</option>
               {specialisatieOpties.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
+                <option key={opt} value={opt}>{opt}</option>
               ))}
             </select>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      {/* News preferences */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Nieuws voorkeuren</CardTitle>
-          <CardDescription>
+      {/* Nieuws voorkeuren */}
+      <div className="rounded-xl border border-border bg-card p-6 space-y-4">
+        <div>
+          <h2 className="text-lg font-semibold">Nieuws voorkeuren</h2>
+          <p className="text-sm text-muted-foreground mt-1">
             Kies welke nieuwscategorieën u wilt ontvangen
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3">
+          </p>
+        </div>
+        <div className="space-y-2">
           {[
             { key: 'wetgeving' as const, label: 'Wetgeving' },
             { key: 'jurisprudentie' as const, label: 'Jurisprudentie' },
             { key: 'beleid' as const, label: 'Beleid' },
           ].map((item) => (
-            <label
+            <div
               key={item.key}
-              className="flex items-center justify-between rounded-lg border px-4 py-3 cursor-pointer hover:bg-muted/50"
+              className="flex items-center justify-between rounded-lg border border-border px-4 py-3 cursor-pointer hover:bg-muted/40 transition-colors"
+              onClick={() => toggleNieuwsVoorkeur(item.key)}
             >
               <span className="text-sm font-medium">{item.label}</span>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={profile.nieuws_voorkeuren?.[item.key] ?? false}
-                className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full transition-colors ${
-                  profile.nieuws_voorkeuren?.[item.key]
-                    ? 'bg-primary'
-                    : 'bg-muted-foreground/25'
-                }`}
-                onClick={() => toggleNieuwsVoorkeur(item.key)}
-              >
-                <span
-                  className={`pointer-events-none inline-block size-4 transform rounded-full bg-white shadow-sm transition-transform ${
-                    profile.nieuws_voorkeuren?.[item.key]
-                      ? 'translate-x-4'
-                      : 'translate-x-0.5'
-                  } mt-0.5`}
-                />
-              </button>
-            </label>
+              <Toggle
+                checked={profile.nieuws_voorkeuren?.[item.key] ?? false}
+                onChange={() => toggleNieuwsVoorkeur(item.key)}
+              />
+            </div>
           ))}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      {/* Notification settings */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Notificatie instellingen</CardTitle>
-          <CardDescription>
+      {/* Notificatie instellingen */}
+      <div className="rounded-xl border border-border bg-card p-6 space-y-4">
+        <div>
+          <h2 className="text-lg font-semibold">Notificatie instellingen</h2>
+          <p className="text-sm text-muted-foreground mt-1">
             Beheer hoe u notificaties ontvangt
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3">
+          </p>
+        </div>
+        <div className="space-y-2">
           {[
             { key: 'email' as const, label: 'E-mail notificaties' },
             { key: 'push' as const, label: 'Push notificaties' },
             { key: 'nieuwsUpdates' as const, label: 'Nieuws updates' },
             { key: 'analyseResultaten' as const, label: 'Analyse resultaten' },
           ].map((item) => (
-            <label
+            <div
               key={item.key}
-              className="flex items-center justify-between rounded-lg border px-4 py-3 cursor-pointer hover:bg-muted/50"
+              className="flex items-center justify-between rounded-lg border border-border px-4 py-3 cursor-pointer hover:bg-muted/40 transition-colors"
+              onClick={() => toggleNotificatie(item.key)}
             >
               <span className="text-sm font-medium">{item.label}</span>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={profile.notificatie_instellingen?.[item.key] ?? false}
-                className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full transition-colors ${
-                  profile.notificatie_instellingen?.[item.key]
-                    ? 'bg-primary'
-                    : 'bg-muted-foreground/25'
-                }`}
-                onClick={() => toggleNotificatie(item.key)}
-              >
-                <span
-                  className={`pointer-events-none inline-block size-4 transform rounded-full bg-white shadow-sm transition-transform ${
-                    profile.notificatie_instellingen?.[item.key]
-                      ? 'translate-x-4'
-                      : 'translate-x-0.5'
-                  } mt-0.5`}
-                />
-              </button>
-            </label>
-          ))}
-        </CardContent>
-      </Card>
-
-      {/* Subscription */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CreditCard className="size-5" />
-            Abonnement
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between rounded-lg bg-muted p-4">
-            <div>
-              <p className="text-sm font-medium">
-                {profile.subscription?.plan || 'Geen actief abonnement'}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Status:{' '}
-                <span className="font-medium">
-                  {profile.subscription?.status || 'Inactief'}
-                </span>
-              </p>
+              <Toggle
+                checked={profile.notificatie_instellingen?.[item.key] ?? false}
+                onChange={() => toggleNotificatie(item.key)}
+              />
             </div>
-            {profile.subscription?.status === 'active' && (
-              <CheckCircle className="size-5 text-green-600" />
-            )}
-          </div>
-          <Button
-            variant="outline"
-            onClick={handleManageSubscription}
-            disabled={portalLoading}
-          >
-            {portalLoading ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              <ExternalLink className="size-4" />
-            )}
-            Abonnement beheren
-          </Button>
-        </CardContent>
-      </Card>
+          ))}
+        </div>
+      </div>
 
-      {/* Save button */}
+      {/* Abonnement */}
+      <div className="rounded-xl border border-border bg-card p-6 space-y-4">
+        <div className="flex items-center gap-2">
+          <CreditCard className="size-5 text-muted-foreground" />
+          <h2 className="text-lg font-semibold">Abonnement</h2>
+        </div>
+        <div className="flex items-center justify-between rounded-lg bg-muted/50 px-4 py-3">
+          <div>
+            <p className="text-sm font-medium">
+              {profile.subscription?.plan || 'Geen actief abonnement'}
+            </p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Status:{' '}
+              <span className="font-medium">
+                {profile.subscription?.status || 'Inactief'}
+              </span>
+            </p>
+          </div>
+          {profile.subscription?.status === 'active' && (
+            <CheckCircle className="size-5 text-emerald-500" />
+          )}
+        </div>
+        <Button
+          variant="outline"
+          onClick={handleManageSubscription}
+          disabled={portalLoading}
+        >
+          {portalLoading ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <ExternalLink className="size-4" />
+          )}
+          Abonnement beheren
+        </Button>
+      </div>
+
+      {/* Opslaan */}
       <div className="flex items-center gap-3">
         <Button onClick={handleSave} disabled={saving}>
           {saving ? (
@@ -368,7 +355,7 @@ export default function ProfielPage() {
           Opslaan
         </Button>
         {saved && (
-          <span className="flex items-center gap-1 text-sm text-green-600">
+          <span className="flex items-center gap-1 text-sm text-emerald-600">
             <CheckCircle className="size-4" />
             Opgeslagen
           </span>

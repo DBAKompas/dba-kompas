@@ -12,8 +12,6 @@ import {
 import { Button } from '@/components/ui/button'
 import { getGuide, type GuideBlock, type GuideDifficulty } from '@/lib/guides/content'
 
-// ─── Difficulty badge ─────────────────────────────────────────
-
 const DIFFICULTY_LABEL: Record<GuideDifficulty, string> = {
   basis: 'Basis',
   gevorderd: 'Gevorderd',
@@ -26,8 +24,6 @@ const DIFFICULTY_CLASS: Record<GuideDifficulty, string> = {
     'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
   expert: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
 }
-
-// ─── Callout config ───────────────────────────────────────────
 
 const CALLOUT_CONFIG = {
   tip: {
@@ -68,8 +64,6 @@ const CALLOUT_CONFIG = {
   },
 }
 
-// ─── Block renderer ───────────────────────────────────────────
-
 function RenderBlock({ block }: { block: GuideBlock }) {
   switch (block.type) {
     case 'paragraph':
@@ -88,7 +82,7 @@ function RenderBlock({ block }: { block: GuideBlock }) {
         )
       }
       return (
-        <h2 className="text-lg font-bold mt-8 mb-3 text-foreground border-b pb-1.5">
+        <h2 className="text-lg font-bold mt-8 mb-3 text-foreground border-b border-border pb-1.5">
           {block.text}
         </h2>
       )
@@ -124,9 +118,7 @@ function RenderBlock({ block }: { block: GuideBlock }) {
       const Icon = cfg.icon
       const title = block.title ?? cfg.default_title
       return (
-        <div
-          className={`rounded-lg border-l-4 px-4 py-3.5 ${cfg.border} ${cfg.bg}`}
-        >
+        <div className={`rounded-xl border-l-4 px-4 py-3.5 ${cfg.border} ${cfg.bg}`}>
           <div className="flex items-start gap-2.5">
             <Icon className={`size-4 shrink-0 mt-0.5 ${cfg.icon_class}`} />
             <div className="space-y-1">
@@ -144,10 +136,10 @@ function RenderBlock({ block }: { block: GuideBlock }) {
 
     case 'table':
       return (
-        <div className="overflow-x-auto rounded-lg border">
+        <div className="overflow-x-auto rounded-xl border border-border">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b bg-muted/50">
+              <tr className="border-b border-border bg-muted/50">
                 {block.headers.map((h, i) => (
                   <th
                     key={i}
@@ -162,7 +154,7 @@ function RenderBlock({ block }: { block: GuideBlock }) {
               {block.rows.map((row, ri) => (
                 <tr
                   key={ri}
-                  className="border-b last:border-0 hover:bg-muted/30 transition-colors"
+                  className="border-b border-border/50 last:border-0 hover:bg-muted/30 transition-colors"
                 >
                   {row.map((cell, ci) => (
                     <td
@@ -187,8 +179,6 @@ function RenderBlock({ block }: { block: GuideBlock }) {
   }
 }
 
-// ─── Page ─────────────────────────────────────────────────────
-
 export default function GuideDetailPage() {
   const params = useParams()
   const router = useRouter()
@@ -209,7 +199,6 @@ export default function GuideDetailPage() {
 
   return (
     <div className="max-w-2xl">
-      {/* Terug */}
       <Button
         variant="ghost"
         size="sm"
@@ -220,8 +209,7 @@ export default function GuideDetailPage() {
         Terug naar gidsen
       </Button>
 
-      {/* Header */}
-      <div className="mb-8 pb-6 border-b">
+      <div className="mb-8 pb-6 border-b border-border">
         <div className="flex flex-wrap items-center gap-2 mb-3">
           <span className="text-xs text-muted-foreground bg-muted px-2.5 py-0.5 rounded-full">
             {guide.category}
@@ -237,7 +225,7 @@ export default function GuideDetailPage() {
           </span>
         </div>
 
-        <h1 className="text-2xl font-bold leading-tight mb-2">{guide.title}</h1>
+        <h1 className="text-3xl font-bold tracking-tight leading-tight mb-2">{guide.title}</h1>
         <p className="text-muted-foreground text-[15px]">{guide.subtitle}</p>
 
         {guide.tags.length > 0 && (
@@ -254,15 +242,13 @@ export default function GuideDetailPage() {
         )}
       </div>
 
-      {/* Content */}
       <div className="space-y-5">
         {guide.blocks.map((block, i) => (
           <RenderBlock key={i} block={block} />
         ))}
       </div>
 
-      {/* Footer CTA */}
-      <div className="mt-10 pt-6 border-t">
+      <div className="mt-10 pt-6 border-t border-border">
         <Button
           variant="ghost"
           size="sm"

@@ -3,7 +3,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/components/auth/AuthContext'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -17,8 +16,6 @@ import {
   Newspaper,
   ExternalLink,
 } from 'lucide-react'
-
-// ─── Types ────────────────────────────────────────────────────
 
 interface NewsItem {
   id: string
@@ -59,11 +56,11 @@ const CATEGORIES = ['Wet DBA', 'Handhaving', 'Rechtspraak', 'Fiscaal', 'Ondernem
 const IMPACTS = [
   { value: 'hoog', label: 'Hoog', color: 'bg-red-100 text-red-700' },
   { value: 'medium', label: 'Medium', color: 'bg-amber-100 text-amber-700' },
-  { value: 'laag', label: 'Laag', color: 'bg-green-100 text-green-700' },
+  { value: 'laag', label: 'Laag', color: 'bg-emerald-100 text-emerald-700' },
 ]
 
 const TEXTAREA_CLASS =
-  'w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none'
+  'w-full rounded-lg border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none'
 
 function impactColor(impact: string) {
   return IMPACTS.find(i => i.value === impact)?.color ?? 'bg-muted text-muted-foreground'
@@ -72,8 +69,6 @@ function impactColor(impact: string) {
 function formatDatum(iso: string) {
   return new Date(iso).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' })
 }
-
-// ─── Page ─────────────────────────────────────────────────────
 
 export default function AdminNieuwsPage() {
   const { user, loading, isAdmin } = useAuth()
@@ -201,8 +196,8 @@ export default function AdminNieuwsPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-4xl">
-      {/* Header */}
+    <div className="space-y-8 max-w-4xl">
+
       <Button variant="ghost" size="sm" onClick={() => router.push('/admin')} className="-ml-2">
         <ArrowLeft className="size-4 mr-1.5" />
         Control Tower
@@ -210,11 +205,11 @@ export default function AdminNieuwsPage() {
 
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
+          <div className="flex items-center gap-2">
             <Newspaper className="size-6 text-primary" />
-            Nieuwsbeheer
-          </h1>
-          <p className="text-muted-foreground mt-0.5 text-sm">
+            <h1 className="text-3xl font-bold tracking-tight">Nieuwsbeheer</h1>
+          </div>
+          <p className="text-sm text-muted-foreground mt-1">
             {items.length} {items.length === 1 ? 'bericht' : 'berichten'} gepubliceerd
           </p>
         </div>
@@ -226,220 +221,200 @@ export default function AdminNieuwsPage() {
 
       {/* Formulier */}
       {showForm && (
-        <Card className="border-primary/30 shadow-sm">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-base">
-                {editingId ? 'Bericht bewerken' : 'Nieuw nieuwsbericht'}
-              </CardTitle>
-              <Button variant="ghost" size="sm" onClick={closeForm}>
-                <X className="size-4" />
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <div className="rounded-xl border border-primary/30 bg-card p-6 shadow-sm space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold">
+              {editingId ? 'Bericht bewerken' : 'Nieuw nieuwsbericht'}
+            </h2>
+            <Button variant="ghost" size="sm" onClick={closeForm}>
+              <X className="size-4" />
+            </Button>
+          </div>
 
-            {/* Titel */}
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium">Titel *</label>
+            <Input
+              value={form.title}
+              onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
+              placeholder="Belastingdienst start controles op schijnzelfstandigheid"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium">
+              Samenvatting *{' '}
+              <span className="text-muted-foreground font-normal">(zichtbaar in overzicht)</span>
+            </label>
+            <textarea
+              value={form.summary}
+              onChange={e => setForm(f => ({ ...f, summary: e.target.value }))}
+              placeholder="Korte samenvatting die in de nieuwslijst wordt getoond..."
+              rows={2}
+              className={TEXTAREA_CLASS}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium">
+              Volledige inhoud *{' '}
+              <span className="text-muted-foreground font-normal">(zichtbaar na uitklappen)</span>
+            </label>
+            <textarea
+              value={formContent}
+              onChange={e => setFormContent(e.target.value)}
+              placeholder="Uitgebreide toelichting op het nieuws en wat het betekent voor zzp'ers..."
+              rows={5}
+              className={TEXTAREA_CLASS}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium">Titel *</label>
+              <label className="text-sm font-medium">Categorie *</label>
+              <select
+                value={form.category}
+                onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
+                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              >
+                {CATEGORIES.map(c => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium">Impact *</label>
+              <div className="flex gap-2">
+                {IMPACTS.map(opt => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setForm(f => ({ ...f, impact: opt.value }))}
+                    className={`flex-1 rounded-lg px-3 py-2 text-sm font-medium border transition-all ${
+                      form.impact === opt.value
+                        ? `${opt.color} border-transparent ring-2 ring-offset-1 ring-primary/40`
+                        : 'border-input bg-background hover:bg-muted'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium">Bron</label>
               <Input
-                value={form.title}
-                onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-                placeholder="Belastingdienst start controles op schijnzelfstandigheid"
+                value={form.source}
+                onChange={e => setForm(f => ({ ...f, source: e.target.value }))}
+                placeholder="Belastingdienst"
               />
             </div>
-
-            {/* Samenvatting */}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium">
-                Samenvatting *{' '}
-                <span className="text-muted-foreground font-normal">(zichtbaar in overzicht)</span>
-              </label>
-              <textarea
-                value={form.summary}
-                onChange={e => setForm(f => ({ ...f, summary: e.target.value }))}
-                placeholder="Korte samenvatting die in de nieuwslijst wordt getoond..."
-                rows={2}
-                className={TEXTAREA_CLASS}
+              <label className="text-sm font-medium">Bron URL</label>
+              <Input
+                value={form.source_url}
+                onChange={e => setForm(f => ({ ...f, source_url: e.target.value }))}
+                placeholder="https://..."
               />
             </div>
-
-            {/* Inhoud */}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium">
-                Volledige inhoud *{' '}
-                <span className="text-muted-foreground font-normal">(zichtbaar na uitklappen)</span>
-              </label>
-              <textarea
-                value={formContent}
-                onChange={e => setFormContent(e.target.value)}
-                placeholder="Uitgebreide toelichting op het nieuws en wat het betekent voor zzp'ers..."
-                rows={5}
-                className={TEXTAREA_CLASS}
+              <label className="text-sm font-medium">Publicatiedatum</label>
+              <Input
+                type="date"
+                value={form.published_at}
+                onChange={e => setForm(f => ({ ...f, published_at: e.target.value }))}
               />
             </div>
+          </div>
 
-            {/* Categorie + Impact */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium">Categorie *</label>
-                <select
-                  value={form.category}
-                  onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                >
-                  {CATEGORIES.map(c => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium">Impact *</label>
-                <div className="flex gap-2">
-                  {IMPACTS.map(opt => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => setForm(f => ({ ...f, impact: opt.value }))}
-                      className={`flex-1 rounded-md px-3 py-2 text-sm font-medium border transition-all ${
-                        form.impact === opt.value
-                          ? `${opt.color} border-transparent ring-2 ring-offset-1 ring-primary/40`
-                          : 'border-input bg-background hover:bg-muted'
-                      }`}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
+          {error && (
+            <p className="text-sm text-red-600 bg-red-50 dark:bg-red-950/20 px-3 py-2 rounded-lg">
+              {error}
+            </p>
+          )}
 
-            {/* Bron + URL + Datum */}
-            <div className="grid grid-cols-3 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium">Bron</label>
-                <Input
-                  value={form.source}
-                  onChange={e => setForm(f => ({ ...f, source: e.target.value }))}
-                  placeholder="Belastingdienst"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium">Bron URL</label>
-                <Input
-                  value={form.source_url}
-                  onChange={e => setForm(f => ({ ...f, source_url: e.target.value }))}
-                  placeholder="https://..."
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium">Publicatiedatum</label>
-                <Input
-                  type="date"
-                  value={form.published_at}
-                  onChange={e => setForm(f => ({ ...f, published_at: e.target.value }))}
-                />
-              </div>
-            </div>
-
-            {/* Foutmelding */}
-            {error && (
-              <p className="text-sm text-red-600 bg-red-50 dark:bg-red-950/20 px-3 py-2 rounded-md">
-                {error}
-              </p>
-            )}
-
-            {/* Actieknoppen */}
-            <div className="flex items-center gap-3 pt-1">
-              <Button onClick={handleSave} disabled={saving}>
-                {saving
-                  ? <Loader2 className="size-4 mr-2 animate-spin" />
-                  : <Save className="size-4 mr-2" />}
-                {editingId ? 'Wijzigingen opslaan' : 'Bericht publiceren'}
-              </Button>
-              <Button variant="outline" onClick={closeForm} disabled={saving}>
-                Annuleren
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+          <div className="flex items-center gap-3 pt-1">
+            <Button onClick={handleSave} disabled={saving}>
+              {saving
+                ? <Loader2 className="size-4 mr-2 animate-spin" />
+                : <Save className="size-4 mr-2" />}
+              {editingId ? 'Wijzigingen opslaan' : 'Bericht publiceren'}
+            </Button>
+            <Button variant="outline" onClick={closeForm} disabled={saving}>
+              Annuleren
+            </Button>
+          </div>
+        </div>
       )}
 
       {/* Berichtenlijst */}
       {items.length === 0 ? (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <Newspaper className="mx-auto size-10 text-muted-foreground mb-3" />
-            <p className="text-muted-foreground text-sm">
-              Nog geen nieuwsberichten. Klik op &ldquo;Nieuw bericht&rdquo; om te beginnen.
-            </p>
-          </CardContent>
-        </Card>
+        <div className="rounded-xl border border-border bg-card py-16 text-center">
+          <Newspaper className="mx-auto size-10 text-muted-foreground mb-3" />
+          <p className="text-muted-foreground text-sm">
+            Nog geen nieuwsberichten. Klik op &ldquo;Nieuw bericht&rdquo; om te beginnen.
+          </p>
+        </div>
       ) : (
         <div className="space-y-2">
           {items.map(item => (
-            <Card key={item.id} className="hover:border-border/80 transition-colors">
-              <CardContent className="py-4 px-5">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap items-center gap-2 mb-1">
-                      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${impactColor(item.impact)}`}>
-                        {item.impact}
+            <div key={item.id} className="rounded-xl border border-border bg-card px-5 py-4 hover:border-border/80 transition-colors">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
+                    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${impactColor(item.impact)}`}>
+                      {item.impact}
+                    </span>
+                    <span className="text-[11px] bg-muted text-muted-foreground px-2 py-0.5 rounded-full">
+                      {item.category}
+                    </span>
+                    <span className="text-[11px] text-muted-foreground">
+                      {formatDatum(item.published_at)}
+                    </span>
+                    {item.is_new && (
+                      <span className="text-[11px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">
+                        Nieuw
                       </span>
-                      <span className="text-[11px] bg-muted text-muted-foreground px-2 py-0.5 rounded-full">
-                        {item.category}
-                      </span>
-                      <span className="text-[11px] text-muted-foreground">
-                        {formatDatum(item.published_at)}
-                      </span>
-                      {item.is_new && (
-                        <span className="text-[11px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">
-                          Nieuw
-                        </span>
-                      )}
-                    </div>
-                    <p className="font-medium text-sm leading-snug">{item.title}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{item.summary}</p>
-                    {item.source && (
-                      <div className="flex items-center gap-1 mt-1">
-                        <span className="text-[11px] text-muted-foreground">Bron: {item.source}</span>
-                        {item.source_url && (
-                          <a
-                            href={item.source_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-primary"
-                          >
-                            <ExternalLink className="size-3" />
-                          </a>
-                        )}
-                      </div>
                     )}
                   </div>
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => openEdit(item)}
-                      className="h-8 w-8 p-0"
-                    >
-                      <Pencil className="size-3.5" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDelete(item.id)}
-                      disabled={deleting === item.id}
-                      className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                    >
-                      {deleting === item.id
-                        ? <Loader2 className="size-3.5 animate-spin" />
-                        : <Trash2 className="size-3.5" />}
-                    </Button>
-                  </div>
+                  <p className="font-medium text-sm leading-snug">{item.title}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{item.summary}</p>
+                  {item.source && (
+                    <div className="flex items-center gap-1 mt-1">
+                      <span className="text-[11px] text-muted-foreground">Bron: {item.source}</span>
+                      {item.source_url && (
+                        <a href={item.source_url} target="_blank" rel="noopener noreferrer" className="text-primary">
+                          <ExternalLink className="size-3" />
+                        </a>
+                      )}
+                    </div>
+                  )}
                 </div>
-              </CardContent>
-            </Card>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => openEdit(item)}
+                    className="h-8 w-8 p-0"
+                  >
+                    <Pencil className="size-3.5" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDelete(item.id)}
+                    disabled={deleting === item.id}
+                    className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                  >
+                    {deleting === item.id
+                      ? <Loader2 className="size-3.5 animate-spin" />
+                      : <Trash2 className="size-3.5" />}
+                  </Button>
+                </div>
+              </div>
+            </div>
           ))}
         </div>
       )}

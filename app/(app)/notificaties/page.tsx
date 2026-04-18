@@ -1,10 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import {
-  Bell,
   BellOff,
   Check,
   Loader2,
@@ -77,87 +75,82 @@ export default function NotificatiesPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">
-            Notificaties
-            {unreadCount > 0 && (
-              <span className="ml-2 inline-flex size-6 items-center justify-center rounded-full bg-red-500 text-xs font-medium text-white">
-                {unreadCount}
-              </span>
-            )}
-          </h1>
-          <p className="text-muted-foreground">
-            Meldingen over uw analyses en DBA-updates
-          </p>
+    <div className="space-y-8">
+      <div>
+        <div className="flex items-center gap-3">
+          <h1 className="text-3xl font-bold tracking-tight">Notificaties</h1>
+          {unreadCount > 0 && (
+            <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-red-500 px-1.5 text-xs font-medium text-white">
+              {unreadCount}
+            </span>
+          )}
         </div>
+        <p className="text-sm text-muted-foreground mt-1">
+          Meldingen over uw analyses en DBA-updates
+        </p>
       </div>
 
       {notifications.length === 0 ? (
-        <Card>
-          <CardContent className="py-12 text-center text-muted-foreground">
-            <BellOff className="mx-auto size-12 mb-3" />
-            <p className="text-lg font-medium">Geen notificaties</p>
-            <p className="mt-1 text-sm">
-              U ontvangt hier meldingen over uw analyses en belangrijke updates
-            </p>
-          </CardContent>
-        </Card>
+        <div className="rounded-xl border border-border bg-card py-16 text-center">
+          <BellOff className="mx-auto size-12 text-muted-foreground mb-3" />
+          <p className="text-lg font-semibold">Geen notificaties</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            U ontvangt hier meldingen over uw analyses en belangrijke updates
+          </p>
+        </div>
       ) : (
         <div className="space-y-3">
           {notifications.map((notification) => {
             const Icon = getNotificationIcon(notification.type)
             return (
-              <Card
+              <div
                 key={notification.id}
-                className={notification.is_read ? 'opacity-60' : ''}
+                className={`rounded-xl border border-border bg-card px-5 py-4 transition-opacity ${notification.is_read ? 'opacity-55' : ''}`}
               >
-                <CardHeader>
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-start gap-3">
-                      <Icon className="mt-0.5 size-5 shrink-0 text-muted-foreground" />
-                      <div>
-                        <CardTitle className="flex items-center gap-2">
-                          {notification.title}
-                          {!notification.is_read && (
-                            <span className="size-2 rounded-full bg-blue-500" />
-                          )}
-                        </CardTitle>
-                        <CardDescription className="mt-1">
-                          {notification.message}
-                        </CardDescription>
-                        {notification.created_at && (
-                          <p className="mt-1 text-xs text-muted-foreground">
-                            {new Date(notification.created_at).toLocaleDateString('nl-NL', {
-                              day: 'numeric',
-                              month: 'long',
-                              year: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })}
-                          </p>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-3">
+                    <Icon className="mt-0.5 size-5 shrink-0 text-muted-foreground" />
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium text-sm">{notification.title}</p>
+                        {!notification.is_read && (
+                          <span className="size-2 rounded-full bg-blue-500 shrink-0" />
                         )}
                       </div>
+                      <p className="text-sm text-muted-foreground mt-0.5">
+                        {notification.message}
+                      </p>
+                      {notification.created_at && (
+                        <p className="mt-1 text-xs text-muted-foreground/60">
+                          {new Date(notification.created_at).toLocaleDateString('nl-NL', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </p>
+                      )}
                     </div>
-                    {!notification.is_read && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        disabled={markingRead.has(notification.id)}
-                        onClick={() => markAsRead(notification.id)}
-                      >
-                        {markingRead.has(notification.id) ? (
-                          <Loader2 className="size-4 animate-spin" />
-                        ) : (
-                          <Check className="size-4" />
-                        )}
-                        Gelezen
-                      </Button>
-                    )}
                   </div>
-                </CardHeader>
-              </Card>
+                  {!notification.is_read && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      disabled={markingRead.has(notification.id)}
+                      onClick={() => markAsRead(notification.id)}
+                      className="shrink-0"
+                    >
+                      {markingRead.has(notification.id) ? (
+                        <Loader2 className="size-4 animate-spin" />
+                      ) : (
+                        <Check className="size-4" />
+                      )}
+                      Gelezen
+                    </Button>
+                  )}
+                </div>
+              </div>
             )
           })}
         </div>

@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/components/auth/AuthContext'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Loader2, ArrowRight, TrendingUp } from 'lucide-react'
 
 type Stats = {
@@ -51,7 +50,7 @@ function ConvStap({
   rate?: string
 }) {
   return (
-    <div className="flex-1 min-w-[110px] rounded-lg bg-muted/50 border border-border/50 px-4 py-4 text-center">
+    <div className="flex-1 min-w-[110px] rounded-xl bg-muted/50 border border-border px-4 py-4 text-center">
       <p className="text-3xl font-bold text-foreground">{waarde}</p>
       <p className="text-xs text-muted-foreground mt-1">{label}</p>
       {sub && <p className="text-xs text-muted-foreground/60 mt-0.5">{sub}</p>}
@@ -97,12 +96,11 @@ export default function FunnelPage() {
   const s = stats
 
   return (
-    <div className="p-8 max-w-5xl">
+    <div className="space-y-8">
 
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-foreground">Sales Funnel</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Sales Funnel</h1>
+        <p className="text-sm text-muted-foreground mt-1">
           Van quick scan tot betaalde analyse — conversie per stap
         </p>
       </div>
@@ -114,60 +112,45 @@ export default function FunnelPage() {
       ) : s ? (
         <>
           {/* Hoofd funnel */}
-          <Card className="border-border/50 mb-6">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                <TrendingUp className="size-4 text-muted-foreground" />
-                Conversie per stap
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-2 flex-wrap">
+          <div className="rounded-xl border border-border bg-card p-6">
+            <div className="flex items-center gap-2 mb-5">
+              <TrendingUp className="size-4 text-muted-foreground" />
+              <h2 className="text-base font-semibold">Conversie per stap</h2>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <ConvStap
+                waarde={s.quickScans.totaal}
+                label="Quick scans"
+                sub={`+${s.quickScans.dezeWeek} deze week`}
+              />
+              <ArrowRight className="size-4 text-muted-foreground flex-shrink-0" />
+              <ConvStap
+                waarde={s.gebruikers.totaal}
+                label="Registraties"
+                sub={`+${s.gebruikers.nieuwDezeWeek} deze week`}
+                rate={s.quickScans.totaal > 0 ? `${s.quickScans.naarRegistratieRate}% conv.` : undefined}
+              />
+              <ArrowRight className="size-4 text-muted-foreground flex-shrink-0" />
+              <ConvStap
+                waarde={s.gebruikers.betaald}
+                label="Betaald"
+                rate={`${s.gebruikers.conversieRate}% conv.`}
+              />
+              <ArrowRight className="size-4 text-muted-foreground flex-shrink-0" />
+              <ConvStap
+                waarde={s.analyses.totaal}
+                label="Analyses"
+                sub={`+${s.analyses.dezeWeek} deze week`}
+              />
+            </div>
+          </div>
 
-                <ConvStap
-                  waarde={s.quickScans.totaal}
-                  label="Quick scans"
-                  sub={`+${s.quickScans.dezeWeek} deze week`}
-                />
+          {/* Plan + Risico breakdown */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
 
-                <ArrowRight className="size-4 text-muted-foreground flex-shrink-0" />
-
-                <ConvStap
-                  waarde={s.gebruikers.totaal}
-                  label="Registraties"
-                  sub={`+${s.gebruikers.nieuwDezeWeek} deze week`}
-                  rate={s.quickScans.totaal > 0 ? `${s.quickScans.naarRegistratieRate}% conv.` : undefined}
-                />
-
-                <ArrowRight className="size-4 text-muted-foreground flex-shrink-0" />
-
-                <ConvStap
-                  waarde={s.gebruikers.betaald}
-                  label="Betaald"
-                  rate={`${s.gebruikers.conversieRate}% conv.`}
-                />
-
-                <ArrowRight className="size-4 text-muted-foreground flex-shrink-0" />
-
-                <ConvStap
-                  waarde={s.analyses.totaal}
-                  label="Analyses"
-                  sub={`+${s.analyses.dezeWeek} deze week`}
-                />
-
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Twee kolommen: plan breakdown + risico breakdown */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
-
-            {/* Plan verdeling */}
-            <Card className="border-border/50">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-semibold">Abonnementen</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
+            <div className="rounded-xl border border-border bg-card p-6">
+              <h2 className="text-base font-semibold mb-4">Abonnementen</h2>
+              <div className="space-y-3">
                 {Object.entries(PLAN_LABELS).map(([key, label]) => {
                   const aantal = s.gebruikers.perPlan[key] ?? 0
                   const totaal = s.gebruikers.totaal
@@ -176,7 +159,9 @@ export default function FunnelPage() {
                     <div key={key}>
                       <div className="flex justify-between text-sm mb-1">
                         <span className="text-muted-foreground">{label}</span>
-                        <span className="font-medium text-foreground">{aantal} <span className="text-muted-foreground/60 text-xs">({pct}%)</span></span>
+                        <span className="font-medium text-foreground">
+                          {aantal} <span className="text-muted-foreground/60 text-xs">({pct}%)</span>
+                        </span>
                       </div>
                       <div className="h-1.5 rounded-full bg-muted overflow-hidden">
                         <div
@@ -187,15 +172,12 @@ export default function FunnelPage() {
                     </div>
                   )
                 })}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            {/* Risico verdeling */}
-            <Card className="border-border/50">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-semibold">Risico-uitkomsten analyses</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
+            <div className="rounded-xl border border-border bg-card p-6">
+              <h2 className="text-base font-semibold mb-4">Risico-uitkomsten analyses</h2>
+              <div className="space-y-3">
                 {Object.entries(RISICO_LABELS).map(([key, { label, kleur }]) => {
                   const aantal = s.analyses.perRisico[key] ?? 0
                   const totaal = s.analyses.totaal
@@ -204,7 +186,9 @@ export default function FunnelPage() {
                     <div key={key}>
                       <div className="flex justify-between text-sm mb-1">
                         <span className={kleur}>{label}</span>
-                        <span className="font-medium text-foreground">{aantal} <span className="text-muted-foreground/60 text-xs">({pct}%)</span></span>
+                        <span className="font-medium text-foreground">
+                          {aantal} <span className="text-muted-foreground/60 text-xs">({pct}%)</span>
+                        </span>
                       </div>
                       <div className="h-1.5 rounded-full bg-muted overflow-hidden">
                         <div
@@ -219,48 +203,44 @@ export default function FunnelPage() {
                     </div>
                   )
                 })}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
           </div>
 
           {/* Conversie samenvatting */}
-          <Card className="border-border/50">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-semibold">Conversie samenvatting</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
-                <div className="rounded-lg bg-muted/40 px-4 py-3">
-                  <p className="text-muted-foreground text-xs mb-1">Quick scan → Registratie</p>
-                  <p className="text-2xl font-bold text-foreground">
-                    {s.quickScans.totaal > 0 ? `${s.quickScans.naarRegistratieRate}%` : '—'}
-                  </p>
-                  <p className="text-xs text-muted-foreground/60 mt-0.5">
-                    {s.gebruikers.totaal} van {s.quickScans.totaal}
-                  </p>
-                </div>
-                <div className="rounded-lg bg-muted/40 px-4 py-3">
-                  <p className="text-muted-foreground text-xs mb-1">Registratie → Betaald</p>
-                  <p className="text-2xl font-bold text-foreground">{s.gebruikers.conversieRate}%</p>
-                  <p className="text-xs text-muted-foreground/60 mt-0.5">
-                    {s.gebruikers.betaald} van {s.gebruikers.totaal}
-                  </p>
-                </div>
-                <div className="rounded-lg bg-muted/40 px-4 py-3">
-                  <p className="text-muted-foreground text-xs mb-1">Betaald → Analyse gedaan</p>
-                  <p className="text-2xl font-bold text-foreground">
-                    {s.gebruikers.betaald > 0
-                      ? `${Math.round((s.analyses.totaal / s.gebruikers.betaald) * 100)}%`
-                      : '—'}
-                  </p>
-                  <p className="text-xs text-muted-foreground/60 mt-0.5">
-                    {s.analyses.totaal} analyses door {s.gebruikers.betaald} betaald
-                  </p>
-                </div>
+          <div className="rounded-xl border border-border bg-card p-6">
+            <h2 className="text-base font-semibold mb-4">Conversie samenvatting</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+              <div className="rounded-xl bg-muted/40 px-4 py-3">
+                <p className="text-muted-foreground text-xs mb-1">Quick scan → Registratie</p>
+                <p className="text-2xl font-bold text-foreground">
+                  {s.quickScans.totaal > 0 ? `${s.quickScans.naarRegistratieRate}%` : '—'}
+                </p>
+                <p className="text-xs text-muted-foreground/60 mt-0.5">
+                  {s.gebruikers.totaal} van {s.quickScans.totaal}
+                </p>
               </div>
-            </CardContent>
-          </Card>
+              <div className="rounded-xl bg-muted/40 px-4 py-3">
+                <p className="text-muted-foreground text-xs mb-1">Registratie → Betaald</p>
+                <p className="text-2xl font-bold text-foreground">{s.gebruikers.conversieRate}%</p>
+                <p className="text-xs text-muted-foreground/60 mt-0.5">
+                  {s.gebruikers.betaald} van {s.gebruikers.totaal}
+                </p>
+              </div>
+              <div className="rounded-xl bg-muted/40 px-4 py-3">
+                <p className="text-muted-foreground text-xs mb-1">Betaald → Analyse gedaan</p>
+                <p className="text-2xl font-bold text-foreground">
+                  {s.gebruikers.betaald > 0
+                    ? `${Math.round((s.analyses.totaal / s.gebruikers.betaald) * 100)}%`
+                    : '—'}
+                </p>
+                <p className="text-xs text-muted-foreground/60 mt-0.5">
+                  {s.analyses.totaal} analyses door {s.gebruikers.betaald} betaald
+                </p>
+              </div>
+            </div>
+          </div>
         </>
       ) : (
         <p className="text-sm text-muted-foreground">Kon statistieken niet laden.</p>

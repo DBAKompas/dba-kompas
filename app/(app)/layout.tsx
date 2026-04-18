@@ -30,7 +30,6 @@ const navItems = [
   { href: '/profiel',      label: 'Profiel',       icon: User },
 ]
 
-// Routes die altijd toegankelijk zijn, ook zonder betaald plan
 const PAYWALL_EXEMPT = ['/profiel', '/admin']
 
 function AppShell({ children }: { children: React.ReactNode }) {
@@ -38,7 +37,6 @@ function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
 
-  // Redirect naar login als niet ingelogd, met ?next= voor redirect na inloggen
   useEffect(() => {
     if (!loading && !user) {
       const next = encodeURIComponent(pathname)
@@ -46,22 +44,17 @@ function AppShell({ children }: { children: React.ReactNode }) {
     }
   }, [loading, user, router, pathname])
 
-  // Paywall: redirect naar /upgrade als ingelogd maar geen betaald plan
-  // Admins omzeilen de paywall altijd — wacht ook op roleLoading zodat isAdmin correct is
   useEffect(() => {
     if (!loading && !planLoading && !roleLoading && user && plan === 'free' && !isAdmin) {
       const exempt = PAYWALL_EXEMPT.some(p => pathname === p || pathname.startsWith(p + '/'))
-      if (!exempt) {
-        router.push('/upgrade')
-      }
+      if (!exempt) router.push('/upgrade')
     }
   }, [loading, planLoading, roleLoading, user, plan, isAdmin, pathname, router])
 
-  // Toon spinner zolang auth, plan of rol nog laden
   if (loading || planLoading || roleLoading) {
     return (
       <div className="flex h-screen items-center justify-center bg-background">
-        <Loader2 className="size-7 animate-spin text-primary/40" />
+        <Loader2 className="size-6 animate-spin text-primary/30" />
       </div>
     )
   }
@@ -69,19 +62,17 @@ function AppShell({ children }: { children: React.ReactNode }) {
   if (!user) {
     return (
       <div className="flex h-screen items-center justify-center bg-background">
-        <Loader2 className="size-7 animate-spin text-primary/40" />
+        <Loader2 className="size-6 animate-spin text-primary/30" />
       </div>
     )
   }
 
-  // Toon spinner als plan 'free' is en we gaan redirecten (niet op vrijgestelde routes, niet voor admins)
-  // roleLoading is hier al false door bovenstaande check
   if (plan === 'free' && !isAdmin) {
     const exempt = PAYWALL_EXEMPT.some(p => pathname === p || pathname.startsWith(p + '/'))
     if (!exempt) {
       return (
         <div className="flex h-screen items-center justify-center bg-background">
-          <Loader2 className="size-7 animate-spin text-primary/40" />
+          <Loader2 className="size-6 animate-spin text-primary/30" />
         </div>
       )
     }
@@ -96,18 +87,18 @@ function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen bg-background">
 
-      {/* ── Sidebar ─────────────────────────── */}
-      <aside className="fixed inset-y-0 left-0 z-30 flex w-60 flex-col border-r border-border/50 bg-card">
+      {/* ── Sidebar ───────────────────────────── */}
+      <aside className="fixed inset-y-0 left-0 z-30 flex w-56 flex-col bg-card border-r border-border/50">
 
         {/* Logo */}
-        <div className="flex h-14 items-center px-4 border-b border-border/40">
-          <Link href="/dashboard" className="flex items-center">
-            <BrandLogo variant="dark" className="h-8 w-auto" />
+        <div className="flex h-16 shrink-0 items-center px-5 border-b border-border/40">
+          <Link href="/dashboard">
+            <BrandLogo variant="dark" className="h-7 w-auto" />
           </Link>
         </div>
 
         {/* Nav */}
-        <nav className="flex flex-1 flex-col gap-0.5 p-3 pt-4">
+        <nav className="flex flex-1 flex-col gap-0.5 px-3 py-4 overflow-y-auto">
           {navItems.map((item) => {
             const Icon = item.icon
             const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
@@ -115,31 +106,30 @@ function AppShell({ children }: { children: React.ReactNode }) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
                   isActive
                     ? 'bg-primary text-primary-foreground shadow-sm'
                     : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                 }`}
               >
-                <Icon className="size-4 flex-shrink-0" />
+                <Icon className="size-4 shrink-0" />
                 {item.label}
               </Link>
             )
           })}
 
-          {/* Admin nav — alleen zichtbaar voor beheerder */}
           {isAdmin && (
             <>
-              <div className="mx-3 my-2 border-t border-border/40" />
+              <div className="mx-2 my-3 border-t border-border/40" />
               <Link
                 href="/admin"
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
                   pathname.startsWith('/admin')
                     ? 'bg-primary text-primary-foreground shadow-sm'
                     : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                 }`}
               >
-                <Settings2 className="size-4 flex-shrink-0" />
+                <Settings2 className="size-4 shrink-0" />
                 Control Tower
               </Link>
             </>
@@ -147,32 +137,34 @@ function AppShell({ children }: { children: React.ReactNode }) {
         </nav>
 
         {/* Footer */}
-        <div className="border-t border-border/40 p-3 space-y-1">
+        <div className="shrink-0 border-t border-border/40 px-3 py-3 space-y-0.5">
           <a
             href="https://dbakompas.nl"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 rounded-lg px-3 py-2 text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+            className="flex items-center gap-3 rounded-lg px-3 py-2 text-xs text-muted-foreground/50 hover:text-muted-foreground transition-colors"
           >
-            <ExternalLink className="size-3.5 flex-shrink-0" />
+            <ExternalLink className="size-3.5 shrink-0" />
             Terug naar website
           </a>
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
           >
-            <LogOut className="size-4 flex-shrink-0" />
+            <LogOut className="size-4 shrink-0" />
             Uitloggen
           </button>
           {user.email && (
-            <p className="px-3 pt-1 text-[11px] text-muted-foreground/40 truncate">{user.email}</p>
+            <p className="px-3 pt-1 pb-0.5 text-[11px] text-muted-foreground/40 truncate">{user.email}</p>
           )}
         </div>
       </aside>
 
-      {/* ── Main ────────────────────────────── */}
-      <main className="ml-60 flex-1 min-h-screen">
-        {children}
+      {/* ── Main ──────────────────────────────── */}
+      <main className="ml-56 flex-1 min-h-screen">
+        <div className="px-8 py-8 max-w-5xl">
+          {children}
+        </div>
       </main>
     </div>
   )

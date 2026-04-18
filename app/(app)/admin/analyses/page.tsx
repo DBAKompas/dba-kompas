@@ -3,7 +3,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/components/auth/AuthContext'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Loader2, RefreshCw } from 'lucide-react'
 
@@ -79,11 +78,11 @@ export default function AnalysesPage() {
   if (!isAdmin) return null
 
   return (
-    <div className="p-8 max-w-6xl">
-      <div className="mb-8 flex items-center justify-between">
+    <div className="space-y-8">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Analyses</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <h1 className="text-3xl font-bold tracking-tight">Analyses</h1>
+          <p className="text-sm text-muted-foreground mt-1">
             {fetching ? 'Laden...' : `${totaalAnalyses} analyses door ${actieveGebruikers} gebruikers`}
           </p>
         </div>
@@ -100,64 +99,62 @@ export default function AnalysesPage() {
       </div>
 
       {fout && (
-        <div className="mb-6 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+        <div className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
           {fout}
         </div>
       )}
 
-      <Card className="border-border/50">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base">Per gebruiker</CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          {fetching ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="size-5 animate-spin text-muted-foreground" />
-            </div>
-          ) : data.length === 0 ? (
-            <div className="py-12 text-center text-sm text-muted-foreground">
-              Nog geen analyses gevonden.
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border/50">
-                    <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wide">Gebruiker</th>
-                    <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wide">Plan</th>
-                    <th className="text-right px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wide">Totaal</th>
-                    <th className="text-right px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                      <span className="text-emerald-600">Laag</span>
-                    </th>
-                    <th className="text-right px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                      <span className="text-amber-600">Gemiddeld</span>
-                    </th>
-                    <th className="text-right px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                      <span className="text-red-600">Hoog</span>
-                    </th>
-                    <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wide">Laatste analyse</th>
+      <div className="rounded-xl border border-border bg-card overflow-hidden">
+        <div className="px-5 py-4 border-b border-border">
+          <h2 className="text-base font-semibold">Per gebruiker</h2>
+        </div>
+        {fetching ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="size-5 animate-spin text-muted-foreground" />
+          </div>
+        ) : data.length === 0 ? (
+          <div className="py-12 text-center text-sm text-muted-foreground">
+            Nog geen analyses gevonden.
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border/50">
+                  <th className="text-left px-5 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wide">Gebruiker</th>
+                  <th className="text-left px-5 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wide">Plan</th>
+                  <th className="text-right px-5 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wide">Totaal</th>
+                  <th className="text-right px-5 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                    <span className="text-emerald-600">Laag</span>
+                  </th>
+                  <th className="text-right px-5 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                    <span className="text-amber-600">Gemiddeld</span>
+                  </th>
+                  <th className="text-right px-5 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                    <span className="text-red-600">Hoog</span>
+                  </th>
+                  <th className="text-left px-5 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wide">Laatste analyse</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.map((r) => (
+                  <tr key={r.user_id} className="border-b border-border/30 hover:bg-muted/30 transition-colors">
+                    <td className="px-5 py-4 font-medium text-foreground">{r.email}</td>
+                    <td className="px-5 py-4 text-muted-foreground">
+                      {r.plan ? (PLAN_LABELS[r.plan] ?? r.plan) : 'Onbekend'}
+                    </td>
+                    <td className="px-5 py-4 text-right font-bold text-foreground">{r.totaal}</td>
+                    <td className="px-5 py-4 text-right text-emerald-600 font-medium">{r.laag}</td>
+                    <td className="px-5 py-4 text-right text-amber-600 font-medium">{r.gemiddeld}</td>
+                    <td className="px-5 py-4 text-right text-red-600 font-medium">{r.hoog}</td>
+                    <td className="px-5 py-4 text-muted-foreground">{formatDatum(r.laatste)}</td>
                   </tr>
-                </thead>
-                <tbody>
-                  {data.map((r) => (
-                    <tr key={r.user_id} className="border-b border-border/30 hover:bg-muted/30 transition-colors">
-                      <td className="px-6 py-4 font-medium text-foreground">{r.email}</td>
-                      <td className="px-6 py-4 text-muted-foreground">
-                        {r.plan ? (PLAN_LABELS[r.plan] ?? r.plan) : 'Onbekend'}
-                      </td>
-                      <td className="px-6 py-4 text-right font-bold text-foreground">{r.totaal}</td>
-                      <td className="px-6 py-4 text-right text-emerald-600 font-medium">{r.laag}</td>
-                      <td className="px-6 py-4 text-right text-amber-600 font-medium">{r.gemiddeld}</td>
-                      <td className="px-6 py-4 text-right text-red-600 font-medium">{r.hoog}</td>
-                      <td className="px-6 py-4 text-muted-foreground">{formatDatum(r.laatste)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

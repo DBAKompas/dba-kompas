@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/components/auth/AuthContext'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Loader2, Users, Mail, FileSearch, TrendingUp, Newspaper } from 'lucide-react'
 
 type Stats = {
@@ -55,13 +54,11 @@ const tiles = [
 
 function StatCard({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
   return (
-    <Card className="border-border/50">
-      <CardContent className="pt-5 pb-4">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">{label}</p>
-        <p className="text-3xl font-bold text-foreground">{value}</p>
-        {sub && <p className="text-xs text-muted-foreground mt-1">{sub}</p>}
-      </CardContent>
-    </Card>
+    <div className="rounded-xl border border-border bg-card p-5">
+      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-1">{label}</p>
+      <p className="text-3xl font-bold text-foreground">{value}</p>
+      {sub && <p className="text-xs text-muted-foreground mt-1">{sub}</p>}
+    </div>
   )
 }
 
@@ -102,28 +99,25 @@ export default function AdminPage() {
   const s = stats
 
   return (
-    <div className="p-8 max-w-5xl">
+    <div className="space-y-8">
 
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-foreground">Control Tower</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Overzicht van DBA Kompas</p>
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Control Tower</h1>
+        <p className="text-sm text-muted-foreground mt-1">Overzicht van DBA Kompas</p>
       </div>
 
-      {/* Statcards */}
+      {/* Stat cards */}
       {statsLoading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
-            <Card key={i} className="border-border/50">
-              <CardContent className="pt-5 pb-4">
-                <div className="h-3 w-20 bg-muted rounded animate-pulse mb-2" />
-                <div className="h-8 w-12 bg-muted rounded animate-pulse" />
-              </CardContent>
-            </Card>
+            <div key={i} className="rounded-xl border border-border bg-card p-5">
+              <div className="h-3 w-20 bg-muted rounded animate-pulse mb-3" />
+              <div className="h-8 w-12 bg-muted rounded animate-pulse" />
+            </div>
           ))}
         </div>
       ) : s ? (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <StatCard label="Gebruikers totaal" value={s.gebruikers.totaal} sub={`+${s.gebruikers.nieuwDezeWeek} deze week`} />
           <StatCard label="Betaald" value={s.gebruikers.betaald} sub={`${s.gebruikers.conversieRate}% conversie`} />
           <StatCard label="Analyses totaal" value={s.analyses.totaal} sub={`+${s.analyses.dezeWeek} deze week`} />
@@ -135,17 +129,13 @@ export default function AdminPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {tiles.map((tile) => (
           <Link key={tile.href} href={tile.href}>
-            <Card className="border-border/50 hover:border-border transition-colors cursor-pointer h-full">
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center gap-3 text-base">
-                  <span className="text-muted-foreground">{tile.icon}</span>
-                  {tile.title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground leading-relaxed">{tile.description}</p>
-              </CardContent>
-            </Card>
+            <div className="rounded-xl border border-border bg-card p-5 hover:border-border/80 hover:bg-muted/20 transition-all cursor-pointer h-full">
+              <div className="flex items-center gap-3 mb-2">
+                <span className="text-muted-foreground">{tile.icon}</span>
+                <h2 className="text-base font-semibold">{tile.title}</h2>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">{tile.description}</p>
+            </div>
           </Link>
         ))}
       </div>
