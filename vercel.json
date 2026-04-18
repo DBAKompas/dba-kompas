@@ -19,7 +19,7 @@
     },
     {
       "path": "/api/news/refresh",
-      "schedule": "0 * * * *"
+      "schedule": "0 7 * * *"
     }
   ]
 }
