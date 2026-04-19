@@ -4,6 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
 import { sendLoopsEvent, updateLoopsContact } from '@/lib/loops'
 import { captureServerEvent } from '@/lib/posthog'
 import { sendPurchaseWelcomeEmail } from '@/modules/email/send'
+import { trackReferral, qualifyReferral } from '@/lib/referral/engine'
 import type Stripe from 'stripe'
 
 export async function POST(request: Request) {
@@ -72,6 +73,20 @@ export async function POST(request: Request) {
 
 // ---------- Helpers ----------
 
+/**
+ * Zoekt het e-mailadres van de referrer van een given referred_user_id.
+ * Gebruikt voor het sturen van de Loops reward-mail.
+ */
+async function getReferrerEmail(referredUserId: string): Promise<string | null> {
+  const { data: tracking } = await supabaseAdmin
+    .from('referral_tracking')
+    .select('referrer_id')
+    .eq('referred_user_id', referredUserId)
+    .single()
+  if (!tracking?.referrer_id) return null
+  return getUserEmailById(tracking.referrer_id)
+}
+
 async function getUserEmailById(userId: string): Promise<string | null> {
   const { data } = await supabaseAdmin
     .from('profiles')
@@ -93,6 +108,22 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   if (!userId) return
 
   const customerId = session.customer as string
+  const referralCode = session.metadata?.referral_code ?? null
+
+  // ── Referral tracking + kwalificatie (GROWTH-001) ──────────────────────────
+  // Stap 1: koppel de referral code aan deze user als die er nog niet was
+  if (referralCode) {
+    await trackReferral({ referredUserId: userId, referralCode }).catch((err) =>
+      console.error('[webhook] trackReferral fout:', err)
+    )
+  }
+  // Stap 2: kwalificeer de referral (zoekt ook zonder code via bestaande tracking)
+  const referrerEmail = await getReferrerEmail(userId)
+  await qualifyReferral({
+    referredUserId: userId,
+    checkoutSessionId: session.id,
+    referrerEmail,
+  }).catch((err) => console.error('[webhook] qualifyReferral fout:', err))
 
   // Handle one-time purchase
   if (session.mode === 'payment') {

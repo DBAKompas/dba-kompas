@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import ReferralWidget from '@/components/referral/ReferralWidget'
 import {
   ArrowLeft,
   Download,
@@ -565,6 +566,9 @@ export default function AssessmentDetailPage() {
             </div>
           </section>
         )}
+
+        {/* ── Referral widget (GROWTH-002) ──────────────────────────────────── */}
+        <ReferralWidget />
 
         {/* ── Beschikbare scenario's ───────────────────────────────────────── */}
         {improvements.length > 0 && (

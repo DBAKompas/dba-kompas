@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { stripe } from '@/lib/stripe/client'
 import { captureServerEvent } from '@/lib/posthog'
+import { cookies } from 'next/headers'
 
 export async function POST(request: Request) {
   try {
@@ -28,6 +29,10 @@ export async function POST(request: Request) {
     // Support both subscription and one-time payment modes
     const checkoutMode = mode === 'payment' ? 'payment' : 'subscription'
 
+    // Referral code uit cookie lezen (GROWTH-001)
+    const cookieStore = await cookies()
+    const referralCode = cookieStore.get('dba_ref')?.value ?? null
+
     const sessionParams: Record<string, unknown> = {
       mode: checkoutMode,
       // payment_method_types bewust weggelaten: Stripe beheert dit automatisch op basis van mode.
@@ -35,7 +40,10 @@ export async function POST(request: Request) {
       line_items: [{ price: effectivePriceId, quantity: 1 }],
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
-      metadata: { user_id: user.id },
+      metadata: {
+        user_id: user.id,
+        ...(referralCode ? { referral_code: referralCode } : {}),
+      },
     }
 
     // Look up existing Stripe customer

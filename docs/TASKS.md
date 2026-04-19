@@ -1,6 +1,6 @@
 # TASKS.md
 
-**Laatste update:** 2026-04-18 (sessie 18 afgerond — analyse flow + loading screen fix)
+**Laatste update:** 2026-04-18 (sessie 19 — GROWTH-001 referral engine)
 
 ---
 
@@ -21,17 +21,21 @@
 
 ### HOOG — Vereist voor productie-livegang
 
-**GROWTH-001: Referral-engine (na STRIPE-LIVE)**
-> Volledig plan in `docs/GROWTHPLAN_UITVOERING.md`. Nog niet beginnen tot STRIPE-LIVE klaar is.
-- [ ] Supabase migratie 004: `referral_codes`, `referral_rewards`, `referral_tracking` tabellen
-- [ ] `GET /api/referral/code` — eigen referralcode ophalen/aanmaken
-- [ ] `POST /api/referral/track` — `?ref=CODE` opslaan bij registratie
-- [ ] Webhook `checkout.session.completed` uitbreiden: referral qualificeren + reward schrijven
-- [ ] Anti-fraud guards (zelfverwijzing, bestaande users, dubbele webhook)
-- [ ] Stripe coupon `REFERRAL_MONTH_DISCOUNT` aanmaken
-- [ ] GROWTH-002: referral widget na analyse (ReferralWidget.tsx)
-- [ ] GROWTH-003: `?ref=CODE` tracking door funnel (cookie → registratie → checkout)
-- [ ] Loops: referral milestone e-mails aanmaken (events: `referral_milestone_1/3/5`)
+~~**GROWTH-001/002/003: Referral-engine** — AFGEROND ✅ (sessie 19, 2026-04-18)~~
+- [x] `supabase/migrations/004_referral_engine.sql` — 3 tabellen + RLS + indexes
+- [x] `lib/referral/engine.ts` — code generatie, tracking, kwalificatie, rewards, anti-fraud
+- [x] `GET /api/referral/code` — eigen code ophalen/aanmaken + stats
+- [x] `POST /api/referral/track` — referral koppelen aan gebruiker
+- [x] `middleware.ts` — `?ref=CODE` → `dba_ref` cookie (30 dagen, httpOnly)
+- [x] `auth/callback/route.ts` — cookie verwerken na registratie
+- [x] `checkout/route.ts` — referral_code in Stripe session metadata
+- [x] `webhook/route.ts` — referral kwalificeren + rewards bij mijlpalen 1/3/5
+- [x] `components/referral/ReferralWidget.tsx` — widget na analyse met voortgang
+
+**Openstaande handmatige acties voor Marvin:**
+- [ ] **SQL uitvoeren** in Supabase Studio: inhoud van `supabase/migrations/004_referral_engine.sql`
+- [ ] **Stripe coupon aanmaken:** Dashboard → Coupons → `REFERRAL_MONTH_DISCOUNT` (1 maand gratis)
+- [ ] **Loops journeys:** events `referral_milestone_1`, `referral_milestone_3`, `referral_milestone_5`
 
 ~~**STRIPE-LIVE** — AFGEROND ✅ (sessie 16, 2026-04-18)~~
 
@@ -150,6 +154,19 @@
 ---
 
 ## DONE
+
+### Sessie 2026-04-18 (sessie 19) — GROWTH-001/002/003 referral engine
+
+- [x] **`supabase/migrations/004_referral_engine.sql`** ✅ — 3 tabellen: `referral_codes`, `referral_rewards`, `referral_tracking` met RLS, indexes, idempotency constraints
+- [x] **`lib/referral/engine.ts`** ✅ — core engine: code generatie, tracking, kwalificatie, reward uitschrijving (mijlpalen 1/3/5), anti-fraud (zelfverwijzing, duplicaten), stats voor widget
+- [x] **`GET /api/referral/code`** ✅ — code ophalen/aanmaken + statistieken (qualified count, rewards)
+- [x] **`POST /api/referral/track`** ✅ — referral koppelen aan gebruiker (idempotent)
+- [x] **`middleware.ts`** ✅ — `?ref=CODE` opslaan als `dba_ref` cookie (30 dagen, httpOnly, lax)
+- [x] **`app/auth/callback/route.ts`** ✅ — cookie lezen bij registratie, trackReferral aanroepen
+- [x] **`app/api/billing/checkout/route.ts`** ✅ — referral_code uit cookie → Stripe session metadata
+- [x] **`app/api/billing/webhook/route.ts`** ✅ — na checkout: trackReferral + qualifyReferral, Loops events bij mijlpalen
+- [x] **`components/referral/ReferralWidget.tsx`** ✅ — widget na analyse: persoonlijke URL, kopieer-knop, mijlpaal-voortgang (1/3/5), rewards
+- [x] **`app/(app)/analyse/[id]/page.tsx`** ✅ — ReferralWidget toegevoegd na actiepunten
 
 ### Sessie 2026-04-18 (sessie 18) — Analyse flow volledig redesigned
 
