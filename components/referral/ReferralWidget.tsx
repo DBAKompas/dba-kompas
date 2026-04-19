@@ -13,7 +13,7 @@ interface ReferralStats {
 const MILESTONES = [
   { count: 1, label: '1 doorverwijzing', reward: '1 gratis analyse', icon: '🎁' },
   { count: 3, label: '3 doorverwijzingen', reward: '1 maand gratis', icon: '🏆' },
-  { count: 5, label: '5 doorverwijzingen', reward: '1 maand gratis', icon: '⭐' },
+  { count: 5, label: '5 doorverwijzingen', reward: '2 maanden gratis', icon: '⭐' },
 ]
 
 export default function ReferralWidget() {

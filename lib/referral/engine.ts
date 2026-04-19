@@ -17,7 +17,7 @@ import { sendLoopsEvent } from '@/lib/loops'
 const MILESTONES: Record<number, { reward_type: string; coupon?: string }> = {
   1: { reward_type: 'free_check' },
   3: { reward_type: 'month_discount', coupon: 'REFERRAL_MONTH_DISCOUNT' },
-  5: { reward_type: 'month_discount', coupon: 'REFERRAL_MONTH_DISCOUNT' },
+  5: { reward_type: 'two_month_discount', coupon: 'REFERRAL_TWO_MONTH_DISCOUNT' },
 }
 
 // ── Code generatie ────────────────────────────────────────────────────────────
