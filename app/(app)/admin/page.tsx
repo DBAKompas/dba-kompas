@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/components/auth/AuthContext'
 import { Loader2, Users, Mail, FileSearch, TrendingUp, Newspaper, Share2 } from 'lucide-react'
+import { AlertsWidget } from '@/components/admin/AlertsWidget'
 
 type Stats = {
   gebruikers: {
@@ -111,6 +112,9 @@ export default function AdminPage() {
         <h1 className="text-3xl font-bold tracking-tight">Control Tower</h1>
         <p className="text-sm text-muted-foreground mt-1">Overzicht van DBA Kompas</p>
       </div>
+
+      {/* Openstaande alerts */}
+      <AlertsWidget />
 
       {/* Stat cards */}
       {statsLoading ? (

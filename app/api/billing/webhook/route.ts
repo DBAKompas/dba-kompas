@@ -5,6 +5,7 @@ import { sendLoopsEvent, updateLoopsContact } from '@/lib/loops'
 import { captureServerEvent } from '@/lib/posthog'
 import { sendPurchaseWelcomeEmail } from '@/modules/email/send'
 import { trackReferral, qualifyReferral } from '@/lib/referral/engine'
+import { createAlert } from '@/lib/admin/alerts'
 import type Stripe from 'stripe'
 
 export async function POST(request: Request) {
@@ -374,6 +375,21 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
       dedupKey: `pf-${invoice.id}`,
     })
   }
+
+  // Admin alert: betaling mislukt
+  await createAlert({
+    type: 'payment_failed',
+    severity: 'critical',
+    title: 'Betaling mislukt',
+    message: `De automatische incasso voor een abonnement is mislukt. Controleer de status van het abonnement en neem indien nodig contact op met de gebruiker.`,
+    metadata: {
+      user_id: existingSub.user_id,
+      email: email ?? 'onbekend',
+      invoice_id: invoice.id,
+      subscription_id: subscriptionId,
+    },
+    sendMail: true,
+  }).catch(err => console.error('[webhook] alert aanmaken mislukt:', err))
 
   // PostHog: betaling mislukt
   captureServerEvent({
