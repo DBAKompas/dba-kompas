@@ -1,6 +1,6 @@
 # TASKS.md
 
-**Laatste update:** 2026-04-18 (sessie 19 — GROWTH-001 referral engine)
+**Laatste update:** 2026-04-18 (sessie 19 afgerond — referral engine live, mijlpaal 5 = 2 maanden)
 
 ---
 

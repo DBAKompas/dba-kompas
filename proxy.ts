@@ -15,12 +15,28 @@ const PUBLIC_ROUTES = [
   '/api/loops/',
 ]
 
+const REFERRAL_COOKIE = 'dba_ref'
+const REFERRAL_COOKIE_MAX_AGE = 60 * 60 * 24 * 30 // 30 dagen
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
+  // ── 1. Referral cookie opslaan (?ref=CODE in URL) ──────────────────────────
+  // Dit doen we altijd — ook voor niet-ingelogde bezoekers
+  const refCode = request.nextUrl.searchParams.get('ref')
+
   // Publieke routes altijd doorlaten
   if (PUBLIC_ROUTES.some((route) => pathname.startsWith(route))) {
-    return NextResponse.next({ request })
+    const response = NextResponse.next({ request })
+    if (refCode && /^[A-Z0-9]{6,12}$/i.test(refCode) && !request.cookies.get(REFERRAL_COOKIE)) {
+      response.cookies.set(REFERRAL_COOKIE, refCode.toUpperCase(), {
+        maxAge: REFERRAL_COOKIE_MAX_AGE,
+        path: '/',
+        httpOnly: true,
+        sameSite: 'lax',
+      })
+    }
+    return response
   }
 
   // Overige API routes doen hun eigen auth
@@ -56,6 +72,16 @@ export async function proxy(request: NextRequest) {
     const loginUrl = new URL('/login', request.url)
     if (pathname !== '/') loginUrl.searchParams.set('next', pathname)
     return NextResponse.redirect(loginUrl)
+  }
+
+  // Referral cookie ook instellen op beveiligde routes (ingelogde gebruiker)
+  if (refCode && /^[A-Z0-9]{6,12}$/i.test(refCode) && !request.cookies.get(REFERRAL_COOKIE)) {
+    supabaseResponse.cookies.set(REFERRAL_COOKIE, refCode.toUpperCase(), {
+      maxAge: REFERRAL_COOKIE_MAX_AGE,
+      path: '/',
+      httpOnly: true,
+      sameSite: 'lax',
+    })
   }
 
   // Ingelogde gebruikers die /login bezoeken naar /dashboard sturen
