@@ -6,12 +6,22 @@ type PurchasePlan = 'one_time' | 'monthly' | 'yearly'
 
 type SendPurchaseWelcomeOptions = {
   /**
-   * Magic link voor 1-klik login (KI-020 guest-flow).
-   * Wanneer aanwezig wordt deze in het template ingevuld via {{ login_link }}.
-   * Zo niet, dan valt de template terug op een gewone dashboard-link
-   * (zie Postmark template: `{{ login_link }}` met default naar {{ app_url }}/login).
+   * URL naar `/auth/activate/<token>` (KI-020-A).
+   * Klant stelt hier een eigen wachtwoord in, komt direct in dashboard.
+   * Wordt in Postmark ingevuld als `{{ activate_link }}`.
    */
-  magicLink?: string
+  activateLink?: string
+  /**
+   * URL naar `/auth/welcome/<token>` (KI-020-A).
+   * Klant wordt via verse magic-link direct ingelogd (geen wachtwoord).
+   * Wordt in Postmark ingevuld als `{{ login_link }}`.
+   *
+   * Fallback: als zowel `activateLink` als `loginLink` ontbreken (bv. bij
+   * een reeds bestaande user die nog inlogt via eigen wachtwoord) vullen
+   * we `login_link` met de generieke /login pagina zodat het template
+   * niet breekt.
+   */
+  loginLink?: string
 }
 
 const TEMPLATE_ALIASES: Record<PurchasePlan, string> = {
@@ -30,12 +40,15 @@ export async function sendPurchaseWelcomeEmail(
   plan: PurchasePlan,
   options: SendPurchaseWelcomeOptions = {},
 ) {
-  const loginLink = options.magicLink ?? defaultLoginLink()
+  const fallback = defaultLoginLink()
+  const activateLink = options.activateLink ?? fallback
+  const loginLink = options.loginLink ?? fallback
   return client.sendEmailWithTemplate({
     From: 'DBA Kompas <noreply@dbakompas.nl>',
     To: to,
     TemplateAlias: TEMPLATE_ALIASES[plan],
     TemplateModel: {
+      activate_link: activateLink,
       login_link: loginLink,
     },
     MessageStream: 'outbound',

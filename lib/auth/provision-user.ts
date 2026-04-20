@@ -1,20 +1,24 @@
 /**
- * provision-user.ts — post-payment user-provisioning voor guest-checkout flow (KI-020).
+ * provision-user.ts — post-payment user-provisioning voor guest-checkout flow
+ * (KI-020 + KI-020-A).
  *
  * Gebruikt door de Stripe webhook (`handleCheckoutCompleted`) wanneer een
- * checkout voltooid is zonder vooraf ingelogde user. De e-mail is dan bekend
+ * checkout voltooid is zonder vooraf ingelogde user. De e-mail is bekend
  * via `session.metadata.guest_email` (gezet door `/api/billing/checkout-guest`
  * en `/api/one-time/checkout-guest`).
  *
  * Gedrag:
  * - Lookup op `profiles.email` (lowercase genormaliseerd).
- * - Bestaande user -> gebruik bestaande userId, genereer verse magic link.
+ * - Bestaande user -> gebruik bestaande userId.
  * - Nieuwe user -> `admin.createUser` met `email_confirm: true` en een
  *   cryptografisch sterke random string als wachtwoord (wordt niet gebruikt).
  *   De `on_auth_user_created` trigger vult automatisch `public.profiles`.
- * - Magic link wordt gegenereerd via `auth.admin.generateLink({type: 'magiclink'})`
- *   met een `redirectTo` die via `/auth/callback?next=/dashboard` de klant
- *   ingelogd op het dashboard laat landen.
+ * - Voor de welkomstmail genereren we een eigen welcome-token en geven
+ *   twee URLs terug:
+ *     - `activateUrl` -> /auth/activate/<token>  (wachtwoord kiezen)
+ *     - `loginUrl`    -> /auth/welcome/<token>   (direct-inloggen via verse magic link)
+ *   Het token is HMAC-signed en persistent gelogd in `public.welcome_tokens`
+ *   voor auditability en revocation (KI-020-A).
  *
  * Beveiliging:
  * - Alleen aanroepen vanuit webhook na geverifieerde Stripe-signature.
@@ -24,10 +28,14 @@
 
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { randomBytes } from 'crypto'
+import { issueWelcomeToken } from '@/lib/auth/welcome-token-server'
 
 export type ProvisionUserResult = {
   userId: string
-  magicLink: string
+  /** URL naar /auth/activate/<token> (wachtwoord kiezen). */
+  activateUrl: string
+  /** URL naar /auth/welcome/<token> (direct inloggen met verse magic link). */
+  loginUrl: string
   isNew: boolean
 }
 
@@ -40,8 +48,8 @@ export function normalizeEmail(email: string): string {
 }
 
 /**
- * Provisioneer een user op basis van een e-mailadres en geef een magic link terug.
- * Gooit bij harde fouten (kon niet aanmaken, kon link niet genereren).
+ * Provisioneer een user op basis van een e-mailadres en geef de twee
+ * welkomst-URL's terug. Gooit bij harde fouten.
  */
 export async function provisionUserForCheckout({
   email,
@@ -70,7 +78,8 @@ export async function provisionUserForCheckout({
 
   // 2. Nieuwe user aanmaken indien niet bestaand
   if (!userId) {
-    // Lang random wachtwoord; wordt niet gedeeld met de klant. Klant logt via magic link.
+    // Lang random wachtwoord; wordt niet gedeeld met de klant. Klant kiest
+    // zelf via /auth/activate, of logt in via magic link.
     const randomPassword = `${randomBytes(24).toString('hex')}!Aa1`
     const { data, error } = await supabaseAdmin.auth.admin.createUser({
       email: normalizedEmail,
@@ -85,26 +94,18 @@ export async function provisionUserForCheckout({
     userId = data.user.id
   }
 
-  // 3. Magic link genereren voor 1-klik login vanuit de welkomstmail
+  // 3. Welcome-token uitgeven + beide URL's samenstellen (KI-020-A).
   const cleanAppUrl = appUrl.replace(/\/+$/, '')
-  const redirectTo = `${cleanAppUrl}/auth/callback?next=/dashboard`
-
-  const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
-    type: 'magiclink',
+  const token = await issueWelcomeToken({
+    userId: userId!,
     email: normalizedEmail,
-    options: { redirectTo },
   })
-
-  const actionLink = linkData?.properties?.action_link
-  if (linkError || !actionLink) {
-    throw new Error(
-      `provisionUserForCheckout: generateLink mislukt voor ${normalizedEmail}: ${linkError?.message ?? 'geen action_link'}`,
-    )
-  }
+  const encoded = encodeURIComponent(token)
 
   return {
     userId: userId!,
-    magicLink: actionLink,
+    activateUrl: `${cleanAppUrl}/auth/activate/${encoded}`,
+    loginUrl:    `${cleanAppUrl}/auth/welcome/${encoded}`,
     isNew,
   }
 }

@@ -18,7 +18,6 @@ const select = vi.fn(() => ({
 const from = vi.fn(() => ({ select }))
 
 const createUser = vi.fn()
-const generateLink = vi.fn()
 
 vi.mock('@/lib/supabase/admin', () => ({
   supabaseAdmin: {
@@ -26,10 +25,26 @@ vi.mock('@/lib/supabase/admin', () => ({
     auth: {
       admin: {
         createUser: (...args: unknown[]) => createUser(...args),
-        generateLink: (...args: unknown[]) => generateLink(...args),
       },
     },
   },
+}))
+
+// ─── Welcome-token server mock (KI-020-A) ─────────────────────────────────────
+// `provisionUserForCheckout` roept `issueWelcomeToken` aan i.p.v. Supabase's
+// `generateLink` (magic link wordt pas on-click gegenereerd in de server-action
+// van /auth/welcome/<token>).
+
+const issueWelcomeToken = vi.fn<
+  (args: { userId: string; email: string; ttlSeconds?: number }) => Promise<string>
+>()
+
+vi.mock('@/lib/auth/welcome-token-server', () => ({
+  issueWelcomeToken: (args: {
+    userId: string
+    email: string
+    ttlSeconds?: number
+  }) => issueWelcomeToken(args),
 }))
 
 describe('lib/auth/provision-user — normalizeEmail', () => {
@@ -48,14 +63,14 @@ describe('lib/auth/provision-user — normalizeEmail', () => {
   })
 })
 
-describe('lib/auth/provision-user — provisionUserForCheckout', () => {
+describe('lib/auth/provision-user — provisionUserForCheckout (KI-020-A)', () => {
   beforeEach(() => {
     vi.resetModules()
     from.mockClear()
     select.mockClear()
     lookup.maybeSingle.mockReset()
     createUser.mockReset()
-    generateLink.mockReset()
+    issueWelcomeToken.mockReset()
   })
 
   it('gebruikt bestaande user wanneer profile gevonden en maakt GEEN nieuwe user aan', async () => {
@@ -63,10 +78,7 @@ describe('lib/auth/provision-user — provisionUserForCheckout', () => {
       data: { user_id: 'user-existing-123' },
       error: null,
     })
-    generateLink.mockResolvedValueOnce({
-      data: { properties: { action_link: 'https://dbakompas.nl/auth/action?code=abc' } },
-      error: null,
-    })
+    issueWelcomeToken.mockResolvedValueOnce('signed.token.value')
 
     const { provisionUserForCheckout } = await import('@/lib/auth/provision-user')
     const result = await provisionUserForCheckout({
@@ -77,14 +89,14 @@ describe('lib/auth/provision-user — provisionUserForCheckout', () => {
     expect(createUser).not.toHaveBeenCalled()
     expect(result).toEqual({
       userId: 'user-existing-123',
-      magicLink: 'https://dbakompas.nl/auth/action?code=abc',
+      activateUrl: 'https://dbakompas.nl/auth/activate/signed.token.value',
+      loginUrl: 'https://dbakompas.nl/auth/welcome/signed.token.value',
       isNew: false,
     })
-    // Magic link moet gegenereerd zijn op genormaliseerde (lowercase) e-mail
-    expect(generateLink).toHaveBeenCalledWith({
-      type: 'magiclink',
+    // Token moet gegenereerd zijn op genormaliseerde (lowercase) e-mail
+    expect(issueWelcomeToken).toHaveBeenCalledWith({
+      userId: 'user-existing-123',
       email: 'bestaand@example.com',
-      options: { redirectTo: 'https://dbakompas.nl/auth/callback?next=/dashboard' },
     })
   })
 
@@ -94,10 +106,7 @@ describe('lib/auth/provision-user — provisionUserForCheckout', () => {
       data: { user: { id: 'user-new-456' } },
       error: null,
     })
-    generateLink.mockResolvedValueOnce({
-      data: { properties: { action_link: 'https://dbakompas.nl/auth/action?code=xyz' } },
-      error: null,
-    })
+    issueWelcomeToken.mockResolvedValueOnce('fresh.token.value')
 
     const { provisionUserForCheckout } = await import('@/lib/auth/provision-user')
     const result = await provisionUserForCheckout({
@@ -118,9 +127,36 @@ describe('lib/auth/provision-user — provisionUserForCheckout', () => {
 
     expect(result).toEqual({
       userId: 'user-new-456',
-      magicLink: 'https://dbakompas.nl/auth/action?code=xyz',
+      activateUrl: 'https://dbakompas.nl/auth/activate/fresh.token.value',
+      loginUrl: 'https://dbakompas.nl/auth/welcome/fresh.token.value',
       isNew: true,
     })
+    expect(issueWelcomeToken).toHaveBeenCalledWith({
+      userId: 'user-new-456',
+      email: 'nieuw@example.com',
+    })
+  })
+
+  it('url-encodet de token in de URLs', async () => {
+    lookup.maybeSingle.mockResolvedValueOnce({
+      data: { user_id: 'user-xyz' },
+      error: null,
+    })
+    // Token met specials die encoded moeten worden
+    issueWelcomeToken.mockResolvedValueOnce('abc.def+ghi/jkl=')
+
+    const { provisionUserForCheckout } = await import('@/lib/auth/provision-user')
+    const result = await provisionUserForCheckout({
+      email: 'x@example.com',
+      appUrl: 'https://dbakompas.nl',
+    })
+
+    expect(result.activateUrl).toBe(
+      'https://dbakompas.nl/auth/activate/abc.def%2Bghi%2Fjkl%3D',
+    )
+    expect(result.loginUrl).toBe(
+      'https://dbakompas.nl/auth/welcome/abc.def%2Bghi%2Fjkl%3D',
+    )
   })
 
   it('gooit een fout wanneer profile-lookup een niet-PGRST116 error teruggeeft', async () => {
@@ -134,7 +170,7 @@ describe('lib/auth/provision-user — provisionUserForCheckout', () => {
       provisionUserForCheckout({ email: 'x@example.com', appUrl: 'https://dbakompas.nl' }),
     ).rejects.toThrow(/profile lookup mislukt/)
     expect(createUser).not.toHaveBeenCalled()
-    expect(generateLink).not.toHaveBeenCalled()
+    expect(issueWelcomeToken).not.toHaveBeenCalled()
   })
 
   it('gooit een fout wanneer admin.createUser faalt', async () => {
@@ -148,45 +184,23 @@ describe('lib/auth/provision-user — provisionUserForCheckout', () => {
     await expect(
       provisionUserForCheckout({ email: 'x@example.com', appUrl: 'https://dbakompas.nl' }),
     ).rejects.toThrow(/admin.createUser mislukt/)
-    expect(generateLink).not.toHaveBeenCalled()
+    expect(issueWelcomeToken).not.toHaveBeenCalled()
   })
 
-  it('gooit een fout wanneer generateLink faalt', async () => {
-    lookup.maybeSingle.mockResolvedValueOnce({
-      data: { user_id: 'user-abc' },
-      error: null,
-    })
-    generateLink.mockResolvedValueOnce({
-      data: null,
-      error: { message: 'rate limited' },
-    })
-
-    const { provisionUserForCheckout } = await import('@/lib/auth/provision-user')
-    await expect(
-      provisionUserForCheckout({ email: 'x@example.com', appUrl: 'https://dbakompas.nl' }),
-    ).rejects.toThrow(/generateLink mislukt/)
-  })
-
-  it('strip trailing slashes van appUrl bij redirectTo', async () => {
+  it('strip trailing slashes van appUrl in beide URLs', async () => {
     lookup.maybeSingle.mockResolvedValueOnce({
       data: { user_id: 'user-123' },
       error: null,
     })
-    generateLink.mockResolvedValueOnce({
-      data: { properties: { action_link: 'https://dbakompas.nl/auth/action' } },
-      error: null,
-    })
+    issueWelcomeToken.mockResolvedValueOnce('tok')
 
     const { provisionUserForCheckout } = await import('@/lib/auth/provision-user')
-    await provisionUserForCheckout({
+    const result = await provisionUserForCheckout({
       email: 'x@example.com',
       appUrl: 'https://dbakompas.nl///',
     })
 
-    expect(generateLink).toHaveBeenCalledWith(
-      expect.objectContaining({
-        options: { redirectTo: 'https://dbakompas.nl/auth/callback?next=/dashboard' },
-      }),
-    )
+    expect(result.activateUrl).toBe('https://dbakompas.nl/auth/activate/tok')
+    expect(result.loginUrl).toBe('https://dbakompas.nl/auth/welcome/tok')
   })
 })

@@ -33,6 +33,59 @@ Elke beslissing bevat: datum, beslissing, reden, alternatieven overwogen.
 
 ---
 
+## 2026-04-20 — KI-020-A: Activate-flow + magic-link click-through pages
+
+**Status:** Amendement op KI-020. Het KI-020-principe (guest-email checkout, user-provisioning na betaling) blijft ongewijzigd. Wat verandert is hoe we de klant vanuit de welkomstmail naar het dashboard leiden.
+
+**Beslissing:** De welkomstmail stuurt de klant niet meer direct naar een rauwe Supabase-magic-link. In plaats daarvan bevat de mail twee CTA's naar eigen domein:
+- Primair: `/auth/activate/<token>` -> klant stelt zelf een wachtwoord in, wordt direct ingelogd, komt in dashboard.
+- Secundair: `/auth/welcome/<token>` -> klant klikt en wordt via een verse, server-gegenereerde Supabase-magic-link ingelogd zonder wachtwoord.
+
+Beide URL's delen hetzelfde welcome-token. Het token is stateful (DB-row in `public.welcome_tokens`) en daardoor volledig traceerbaar en herstelbaar vanuit Supabase.
+
+**Mechanisme:**
+- `lib/auth/welcome-token.ts`: stateless HMAC-SHA256 helper met `signWelcomeToken` / `verifyWelcomeToken`. Payload: `{jti, userId, email, exp}`. TTL 24 uur (langer dan Supabase-default 1u; ruimer venster voor klant). Env: `WELCOME_TOKEN_SECRET` (min 32 tekens, random).
+- `lib/auth/welcome-token-server.ts`: server-only wrapper met DB-state. Exports `issueWelcomeToken` (insert + sign), `validateWelcomeToken` (signature + expiry + used/revoked checks), `markWelcomeTokenUsed` (markeert + revokes andere openstaande tokens voor zelfde user).
+- Migration `006_welcome_tokens.sql` creëert `public.welcome_tokens` (jti PK, user_id, email, created_at, expires_at, used_at, used_ip, used_purpose, revoked_at, revoke_reason). RLS aan, geen policies: uitsluitend service-role toegang.
+- `app/auth/activate/[token]/page.tsx` + `ActivateForm.tsx` + `actions.ts`: wachtwoord-instel-scherm met policy "min 10 tekens + mix upper/lower/digit/special". Submit = server action die token valideert, `admin.updateUserById({password})` uitvoert, token als used markeert (purpose='activate'), server-side `signInWithPassword` doet, en `redirect('/dashboard')` buiten try/catch.
+- `app/auth/welcome/[token]/page.tsx` + `WelcomeForm.tsx` + `actions.ts`: "direct inloggen zonder wachtwoord"-scherm. Submit = server action die token valideert, `admin.generateLink({type:'magiclink'})` aanroept, token markeert (purpose='magiclink'), en `redirect(actionLink)` doet naar Supabase verify-URL.
+- `lib/auth/provision-user.ts` returnt nu `{userId, activateUrl, loginUrl, isNew}`. Beide URL's delen hetzelfde token.
+- `modules/email/send.ts` accepteert `{activateLink, loginLink}` en mappt naar Postmark `TemplateModel.activate_link` + `TemplateModel.login_link`.
+- `app/login/page.tsx` detecteert nu `?error=auth_callback_error` (querystring) én `#error_code=otp_expired` (hash) en toont een banner + schakelt direct naar magic-link-mode. Hash wordt opgeruimd via `history.replaceState`.
+
+**Reden:**
+- Gmail's SafeBrowsing-scanner prefetcht links in mail vóór de klant klikt. Bij een rauwe Supabase-magic-link verbruikt die prefetch het single-use token; de klant klikt vervolgens op een al-gebruikte link en krijgt `otp_expired` + redirect naar `/login`. Dit werd geobserveerd in sessie 18 (TEST-006).
+- Click-through pages op eigen domein zijn POST-only voor het token-verbruik: de GET (prefetch) toont alleen een vriendelijke pagina; pas de POST (formulier-submit) genereert de Supabase-magic-link of wijzigt het wachtwoord. Gmail prefetcht geen POSTs.
+- Gebruiker heeft expliciet aangegeven dat de conversie al verricht is bij de welkomstmail en dat een wachtwoord-instel-stap op dat moment logisch voelt. Activate-flow wordt primair, magic-link blijft als "geen-wachtwoord-nodig"-alternatief.
+- Stateful tokens via `welcome_tokens` maken de flow traceerbaar (audit) en herstelbaar (revocation). Bij misbruik kan de admin een token handmatig revoked markeren vanuit Supabase Studio.
+
+**Alternatieven overwogen:**
+- Alleen wachtwoord-flow (zonder magic-link fallback): onvriendelijk voor klanten die geen wachtwoord willen en gewoon snel willen inloggen.
+- Alleen magic-link met `ttl=0`-hack of wildcard-whitelist: geen stabiele oplossing tegen Gmail prefetch, en Supabase-defaults bieden hier geen grip op.
+- Stateless tokens zonder DB-row: eenvoudiger, maar niet traceerbaar/revocable zoals expliciet gewenst door gebruiker ("als het maar altijd te tracken en te herstellen is vanuit supabase").
+- Twee aparte tokens (één voor activate, één voor magic-link): onnodig complex; één token werkt omdat de klant sowieso maar één pad kiest, en `markWelcomeTokenUsed` revoked het token in beide takken.
+
+**Beveiliging:**
+- Token-signing via HMAC-SHA256 met server-only secret. `timingSafeEqual` voor signature-vergelijking. Base64URL encoding.
+- TTL 24 uur; na gebruik direct gemarkeerd in DB en andere openstaande tokens voor dezelfde user automatisch gerevokeerd.
+- RLS aan op `welcome_tokens` zonder policies: onbereikbaar voor anon/authenticated rollen, alleen service-role (webhook + server actions) mag lezen/schrijven.
+- Wachtwoord-policy: minimaal 10 tekens + hoofdletter + kleine letter + cijfer + speciaal teken. Gevalideerd server-side vóór `updateUserById`.
+- Magic-link-tak genereert pas een verse Supabase-magic-link op de POST-submit; de URL wordt nooit in e-mail of server-log gezet.
+- `'server-only'` import-guard op `welcome-token-server.ts` zodat admin-secret en DB-access niet per ongeluk bundle-shipped worden.
+
+**Observability:**
+- `welcome_tokens.used_purpose` (`'activate' | 'magiclink'`) maakt splitsing zichtbaar voor de eerste week. Verwachting: >60% kiest activate.
+- `welcome_tokens.used_ip` voor audit bij vermoedens van accountovername.
+- Webhook-failures blijven naar Sentry + `admin_alerts` gaan zoals in KI-020 vastgelegd.
+
+**Migratiestappen:**
+1. Env `WELCOME_TOKEN_SECRET` (min 32 random chars) toevoegen aan Vercel (alle environments).
+2. Migration `006_welcome_tokens.sql` draaien in Supabase Studio.
+3. Postmark templates `welkomstmail-eenmalig | -maand | -jaar` krijgen primaire CTA `{{ activate_link }}` ("Activeer je account") + secundaire tekst-link `{{ login_link }}` ("Liever direct inloggen zonder wachtwoord? Klik hier.").
+4. Deploy, hertest TEST-006 B1/B2/B3.
+
+---
+
 ## 2026-04-13 — Nederlandstalige foutmeldingen via centrale vertaalfunctie
 
 **Beslissing:** Supabase Auth geeft altijd Engelse foutmeldingen terug. Deze worden vertaald via een centrale `translateAuthError(message)` functie in `lib/auth-errors.ts`.

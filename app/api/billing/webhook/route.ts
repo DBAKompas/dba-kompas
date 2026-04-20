@@ -142,7 +142,8 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   // bestaat er nog geen Supabase user. We provisioneren 'm hier NA betaling en
   // genereren een magic link die de welkomstmail meestuurt voor 1-klik login.
   let userId = session.metadata?.user_id
-  let guestMagicLink: string | undefined
+  let guestActivateUrl: string | undefined
+  let guestLoginUrl: string | undefined
 
   const guestEmail = session.metadata?.guest_email
   const isGuestFlow = session.metadata?.guest_flow === 'true'
@@ -152,7 +153,8 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     try {
       const result = await provisionUserForCheckout({ email: guestEmail, appUrl })
       userId = result.userId
-      guestMagicLink = result.magicLink
+      guestActivateUrl = result.activateUrl
+      guestLoginUrl = result.loginUrl
     } catch (err) {
       console.error('[webhook] provisionUserForCheckout mislukt:', err)
       Sentry.captureException(err, {
@@ -224,9 +226,13 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           plan: 'one_time',
           subscription_status: 'active',
         }, `one-time-${userId}`),
-        // Welkomstmail: bevestiging aankoop + upsell aanbod + CTA naar dashboard
-        // (KI-020) magic link wordt meegestuurd bij guest-flow voor 1-klik login
-        sendPurchaseWelcomeEmail(email, 'one_time', { magicLink: guestMagicLink }).catch(err =>
+        // Welkomstmail: bevestiging aankoop + activatie-link (wachtwoord) +
+        // fallback magic-link (KI-020 / KI-020-A). Bij een bestaande user
+        // zijn beide undefined en valt de template terug op /login.
+        sendPurchaseWelcomeEmail(email, 'one_time', {
+          activateLink: guestActivateUrl,
+          loginLink: guestLoginUrl,
+        }).catch(err =>
           handleWelcomeMailFailure(err, 'one_time', userId!)
         ),
       ])
@@ -277,9 +283,13 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         subscription_status: 'active',
         plan: plan as 'monthly' | 'yearly',
       }, `sub-start-${userId}`),
-      // Welkomstmail: bevestiging abonnement + CTA naar dashboard
-      // (KI-020) magic link wordt meegestuurd bij guest-flow voor 1-klik login
-      sendPurchaseWelcomeEmail(email, plan as 'monthly' | 'yearly', { magicLink: guestMagicLink }).catch(err =>
+      // Welkomstmail: bevestiging abonnement + activatie-link (wachtwoord) +
+      // fallback magic-link (KI-020 / KI-020-A). Bij een bestaande user
+      // zijn beide undefined en valt de template terug op /login.
+      sendPurchaseWelcomeEmail(email, plan as 'monthly' | 'yearly', {
+        activateLink: guestActivateUrl,
+        loginLink: guestLoginUrl,
+      }).catch(err =>
         handleWelcomeMailFailure(err, plan as 'monthly' | 'yearly', userId!)
       ),
     ])

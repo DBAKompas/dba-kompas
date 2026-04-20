@@ -1,13 +1,35 @@
 'use client'
 
 import { createClient } from '@/lib/supabase/client'
-import { useState, Suspense } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { usePostHog } from 'posthog-js/react'
-import { Mail, Lock, Eye, EyeOff, ArrowRight, Check } from 'lucide-react'
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Check, AlertTriangle } from 'lucide-react'
 import BrandLogo from '@/components/marketing/BrandLogo'
 import Link from 'next/link'
 import { EmailCheckoutModal } from '@/components/marketing/EmailCheckoutModal'
+
+/**
+ * Parseert Supabase auth-callback-errors die via querystring of hash-fragment
+ * op /login terechtkomen. Supabase zet `otp_expired` typisch in `location.hash`
+ * (bv. `#error=access_denied&error_code=otp_expired&...`); onze eigen callback
+ * vult de querystring met `?error=auth_callback_error`.
+ * Retourneert een kort, gebruikersvriendelijk bericht of `null`.
+ */
+function readAuthNotice(searchParams: URLSearchParams, hash: string): string | null {
+  const qsError = searchParams.get('error')
+  const hashParams = new URLSearchParams(hash.startsWith('#') ? hash.slice(1) : hash)
+  const hashErrorCode = hashParams.get('error_code')
+  const hashError = hashParams.get('error')
+
+  if (hashErrorCode === 'otp_expired') {
+    return 'Je inloglink is verlopen of al eerder gebruikt. Vraag hieronder een nieuwe aan.'
+  }
+  if (hashError || qsError === 'auth_callback_error') {
+    return 'Inloggen via deze link lukte niet. Vraag hieronder een nieuwe inloglink aan.'
+  }
+  return null
+}
 
 function inputCls(error?: boolean) {
   return [
@@ -30,11 +52,33 @@ function LoginPageContent() {
   const [mode, setMode]               = useState<'password' | 'magic'>('password')
   const [error, setError]             = useState('')
   const [checkoutOpen, setCheckoutOpen] = useState(false)
+  const [authNotice, setAuthNotice] = useState<string | null>(null)
   const supabase = createClient()
   const router   = useRouter()
   const posthog  = usePostHog()
   const searchParams = useSearchParams()
   const nextPath = searchParams.get('next') ?? '/dashboard'
+
+  // Detecteer auth-callback-errors (querystring + hash) en switch direct
+  // naar de magic-link flow zodat de klant alleen nog maar op "Stuur
+  // inloglink" hoeft te klikken. (KI-020-A herstelpad.)
+  useEffect(() => {
+    const notice = readAuthNotice(
+      searchParams,
+      typeof window !== 'undefined' ? window.location.hash : '',
+    )
+    if (notice) {
+      setAuthNotice(notice)
+      setMode('magic')
+      // Ruim hash op zodat een pagina-refresh niet opnieuw de banner toont.
+      if (typeof window !== 'undefined' && window.location.hash) {
+        const clean =
+          window.location.pathname + (window.location.search ?? '')
+        window.history.replaceState(null, '', clean)
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
@@ -109,6 +153,20 @@ function LoginPageContent() {
             {mode === 'password' ? 'Log in op je account' : 'Ontvang een inloglink per e-mail'}
           </p>
         </div>
+
+        {/* Auth callback notice (otp_expired / auth_callback_error) */}
+        {authNotice && (
+          <div
+            role="status"
+            className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50/70 px-4 py-3 text-sm text-amber-900"
+          >
+            <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+            <div className="space-y-1">
+              <p className="font-semibold">Inloglink werkte niet</p>
+              <p className="text-xs leading-relaxed">{authNotice}</p>
+            </div>
+          </div>
+        )}
 
         {/* Card */}
         <div className="glass-card rounded-2xl p-7 space-y-5">
