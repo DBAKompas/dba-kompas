@@ -1,17 +1,33 @@
 # KNOWN_ISSUES.md
 **Bekende problemen en bugs**
-**Laatst bijgewerkt:** 2026-04-20 (sessie 20 — KI-020 toegevoegd)
+**Laatst bijgewerkt:** 2026-04-20 (sessie 20 — KI-020 geïmplementeerd + KI-020-A amendement live, wachten op Postmark-templates + TEST-006 retest)
 
 ---
 
 ## KRITIEK
 
 ### KI-020 — Koopflow te lang: account-first met wachtwoord + e-mailbevestiging voor betaling
-**Status:** IN PROGRESS — 2026-04-20
-**Bestand:** `components/marketing/EmailCheckoutModal.tsx`, `app/register/page.tsx`, `app/api/billing/checkout/route.ts`, `app/api/billing/webhook/route.ts`
+**Status:** PENDING TEST — 2026-04-20 (code live op main, wacht op Postmark-templates en TEST-006 retest)
+**Bestand:** `components/marketing/EmailCheckoutModal.tsx`, `app/register/page.tsx`, `app/api/billing/checkout-guest/route.ts`, `app/api/one-time/checkout-guest/route.ts`, `app/api/billing/webhook/route.ts`, `lib/auth/provision-user.ts`
 **Symptoom:** Bezoeker die op een Koop-knop klikt wordt gevraagd om e-mail + wachtwoord + herhaal + terms, krijgt vervolgens een bevestigingsmail, moet inloggen, kiest pas dan het pakket en landt bij Stripe. Totaal 5-6 schermen. Gebruiker meldde blokkerende frictie.
 **Impact:** Hoge drop-off pre-checkout; direct risico voor launch-conversie.
-**Fix:** Nieuwe guest-email checkout: alleen e-mail + terms -> direct naar Stripe. User wordt aangemaakt door webhook na betaling (`lib/auth/provision-user.ts` + `/api/billing/checkout-guest` + `/api/one-time/checkout-guest`). Welkomstmail bevat magic link voor 1-klik login. Zie `DECISIONS.md` entry 2026-04-20 voor volledige rationale. TEST-006 hangt af van afronding.
+**Fix (doorgevoerd):** Guest-email checkout live op `main` (commits `fdc455b` + `48dfb43` + `3b282b7`). Nieuwe endpoints `/api/billing/checkout-guest` + `/api/one-time/checkout-guest` creëren geen user; webhook roept `provisionUserForCheckout` aan bij ontbrekende `metadata.user_id` (idempotent via `billing_events`). Welkomstmail bevat nu click-through activate-link én magic-link fallback (zie KI-020-A). Volledige rationale in `DECISIONS.md` entry 2026-04-20.
+**Restactie:** Postmark-templates bijwerken + TEST-006 B1/B2/B3 live retest.
+
+---
+
+### KI-020-A — Gmail SafeBrowsing prefetcht rauwe Supabase magic-links vóór klant
+**Status:** PENDING TEST — 2026-04-20 (code live op main, wacht op Postmark-templates en TEST-006 retest)
+**Bestand:** `lib/auth/welcome-token.ts`, `lib/auth/welcome-token-server.ts`, `app/auth/activate/[token]/*`, `app/auth/welcome/[token]/*`, `modules/email/send.ts`, `app/login/page.tsx`, `supabase/migrations/006_welcome_tokens.sql`
+**Symptoom:** Bij TEST-006 werd de magic-link in de welkomstmail door Gmail's SafeBrowsing-scanner geprefetcht vóór de klant kon klikken. Het single-use Supabase-token raakte daardoor verbruikt; de klant zag vervolgens `otp_expired` en belandde op `/login`.
+**Impact:** Kritiek: elke Gmail-ontvanger kan niet inloggen via de welkomstmail. Breekt de guest-checkout-belofte van "1-klik naar dashboard".
+**Fix (doorgevoerd, amendement op KI-020):**
+- Eigen click-through pagina's op dbakompas.nl: `/auth/activate/<token>` (primair, wachtwoord-instel) en `/auth/welcome/<token>` (magic-link fallback).
+- Pagina's zijn POST-only voor token-verbruik (Gmail prefetcht geen POSTs); GET toont alleen de UI.
+- Stateful tokens in `public.welcome_tokens` (HMAC-signed, 24u TTL, RLS aan, service-role-only). Revocation automatisch bij used.
+- `/login`-pagina detecteert `auth_callback_error` / `otp_expired` en schakelt direct naar magic-mode met banner.
+- Build-fix (commit `e77f9e7`): Next.js 16 / React 19 staat in `'use server'`-bestanden alleen async-exports toe. `ActivateActionState` verplaatst naar `types.ts`, `PASSWORD_MIN_LENGTH` intern.
+**Restactie:** Postmark-templates `welkomstmail-eenmalig | -maand | -jaar` handmatig aanpassen: primaire CTA-knop naar `{{ activate_link }}`, secundaire tekst-link naar `{{ login_link }}`, DBA-huisstijl (logo, #0F1A2E, #F5A14C). Daarna TEST-006 B1/B2/B3 retest inclusief 1 magic-link-test.
 
 ---
 
@@ -146,10 +162,10 @@
 ---
 
 ### KI-019 — Welkomstmails nog niet live getest na Stripe live betaling
-**Status:** OPEN (blokkeert niet)
+**Status:** PENDING TEST — 2026-04-20 (samengevoegd met TEST-006 retest voor KI-020-A)
 **Bestand:** `modules/email/send.ts`, `app/api/billing/webhook/route.ts`
-**Symptoom:** Welkomstmails zijn geïmplementeerd en Resend Templates zijn aangemaakt, maar de volledige flow (Stripe webhook → `sendPurchaseWelcomeEmail` → Resend template) is alleen te testen na een echte live Stripe betaling.
-**Actie:** Testen als onderdeel van STRIPE-LIVE end-to-end test.
+**Symptoom:** Welkomstmails zijn geïmplementeerd en Postmark-templates zijn aangemaakt, maar de volledige flow (Stripe webhook → `sendPurchaseWelcomeEmail` → Postmark template → activate-/login-link) is pas volledig getest na een echte live Stripe betaling voor elk van de drie productvarianten.
+**Actie:** Wordt afgevinkt als onderdeel van TEST-006 B1/B2/B3 retest (zie `docs/TEST_006_RESULTS.md`).
 
 ---
 

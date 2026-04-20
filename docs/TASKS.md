@@ -1,30 +1,48 @@
 # TASKS.md
 
-**Laatste update:** 2026-04-18 (sessie 19 afgerond — referral engine live, mijlpaal 5 = 2 maanden)
+**Laatste update:** 2026-04-20 (sessie 20 — KI-020 + KI-020-A geïmplementeerd, deploy groen, wacht op Postmark-templates + TEST-006 retest)
 
 ---
 
 ## IN PROGRESS
 
-### KI-020 — Guest checkout (geen wachtwoord vooraf) + magic link login
+### KI-020 — Guest checkout (geen wachtwoord vooraf)
+**Status:** Code live op main (commit `fdc455b` + `48dfb43`), wacht op TEST-006 retest na templates-update.
 - [x] Plan opgesteld (2026-04-20)
-- [ ] `lib/auth/provision-user.ts` — admin.createUser + magic link generator
-- [ ] `app/api/billing/checkout-guest/route.ts` — publieke subscription-checkout
-- [ ] `app/api/one-time/checkout-guest/route.ts` — publieke eenmalige-checkout
-- [ ] `app/api/billing/webhook/route.ts` — user provisioneren als metadata.user_id ontbreekt
-- [ ] `modules/email/send.ts` — magicLink parameter voor welkomstmails
-- [ ] `components/marketing/EmailCheckoutModal.tsx` — UI vereenvoudigen tot email+terms
-- [ ] Postmark templates: `{{ login_link }}` variabele koppelen aan CTA-knop (handmatig)
-- [ ] Unit-tests voor provisionUser en webhook guest-pad
-- [ ] Deploy + TEST-006 opnieuw in nieuwe flow
+- [x] `lib/auth/provision-user.ts` — admin.createUser + magic link generator
+- [x] `app/api/billing/checkout-guest/route.ts` — publieke subscription-checkout
+- [x] `app/api/one-time/checkout-guest/route.ts` — publieke eenmalige-checkout
+- [x] `app/api/billing/webhook/route.ts` — user provisioneren als metadata.user_id ontbreekt
+- [x] `modules/email/send.ts` — magicLink parameter voor welkomstmails
+- [x] `components/marketing/EmailCheckoutModal.tsx` — UI vereenvoudigd tot email+terms
+- [x] Unit-tests voor provisionUser en webhook guest-pad (8 tests groen)
+- [x] Deploy groen op Vercel
+
+### KI-020-A — Click-through activatie + magic-link fallback (amendement)
+**Status:** Code live op main (commits `3b282b7` + `e77f9e7`), Vercel-deploy groen.
+- [x] `lib/auth/welcome-token.ts` + `welcome-token-server.ts` — HMAC-signed stateful tokens
+- [x] `supabase/migrations/006_welcome_tokens.sql` uitgevoerd in Supabase Studio
+- [x] `app/auth/activate/[token]/` — wachtwoord-instel-flow (page + form + action + types)
+- [x] `app/auth/welcome/[token]/` — magic-link fallback-flow
+- [x] `provisionUserForCheckout` returnt `{activateUrl, loginUrl, isNew}`
+- [x] `modules/email/send.ts` mapt `activateLink` en `loginLink` naar Postmark template-model
+- [x] `app/login/page.tsx` — banner + auto-switch bij `auth_callback_error` / `otp_expired`
+- [x] `__tests__/welcomeToken.test.ts` (11 tests groen) + `provisionUser.test.ts` (8 groen)
+- [x] `WELCOME_TOKEN_SECRET` in Vercel (alle environments)
+- [x] `docs/DECISIONS.md` KI-020-A entry met volledige rationale
+- [x] Build-fix: `'use server'`-restrictie opgelost (ActivateActionState → `types.ts`)
+- [ ] Postmark-templates `welkomstmail-eenmalig | -maand | -jaar` handmatig bijwerken: primaire CTA → `{{ activate_link }}`, secundaire link → `{{ login_link }}`, huisstijl + logo
 
 ### TEST-006 — Welkomstmail end-to-end testen via Postmark
 - [x] Postmark approval ontvangen (2026-04-20, smoke test geslaagd)
-- [x] Vercel env vars aanwezig (POSTMARK_SERVER_TOKEN, STRIPE_WEBHOOK_SECRET, SENTRY_DSN, ADMIN_ALERT_EMAIL)
+- [x] Vercel env vars aanwezig (POSTMARK_SERVER_TOKEN, STRIPE_WEBHOOK_SECRET, SENTRY_DSN, ADMIN_ALERT_EMAIL, WELCOME_TOKEN_SECRET)
 - [x] Stripe live webhook actief met 5 events + recente 200 OK responses
-- [ ] Na KI-020 deploy: B1 one_time live test (guest e-mail → Stripe → welkomstmail met magic link)
-- [ ] B2 monthly live test
-- [ ] B3 yearly live test
+- [x] Vercel-deploy groen na KI-020-A
+- [ ] **Postmark-templates bijgewerkt** (zie KI-020-A laatste subtaak)
+- [ ] B1 one_time live test (guest e-mail → Stripe → welkomstmail → `/auth/activate/<token>` → wachtwoord → dashboard)
+- [ ] B2 monthly live test (idem)
+- [ ] B3 yearly live test (idem)
+- [ ] Magic-link fallback pad: 1 test via `/auth/welcome/<token>` (bij een van B1/B2/B3)
 - [ ] Nazorg: refund test payments, cleanup test accounts
 
 ---

@@ -1,7 +1,7 @@
 # PROJECT_STATE.md
 
-**Laatste update:** 2026-04-18 (sessie 18 afgerond — analyse flow + loading screen fix)
-**Maturity:** ~100% MVP + verbeterde analyse UX (live op dbakompas.nl, Stripe LIVE, nieuws systeem, volledig redesign)
+**Laatste update:** 2026-04-20 (sessie 20 — KI-020 guest-checkout + KI-020-A activate-flow live)
+**Maturity:** ~100% MVP + conversie-geoptimaliseerde koopflow (guest-email checkout, click-through activatie, magic-link fallback)
 
 ---
 
@@ -28,8 +28,11 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
 - Vercel Cron Jobs (weekly/monthly digest triggers)
 - Quick scan funnel volledig meetbaar (Supabase + Loops)
 - **Gidsen volledig geïmplementeerd**: 10 diepgaande gidsen, rijk type-systeem, gestijlde callouts + tabellen
+- **KI-020 guest-email checkout live**: bezoeker geeft alleen e-mail op, wordt direct naar Stripe gestuurd, user-provisioning via webhook na betaling
+- **KI-020-A activatie-flow live**: welkomstmail leidt naar eigen-domein click-through pagina's (`/auth/activate/<token>` primair + `/auth/welcome/<token>` magic-link fallback), stateful `welcome_tokens`-tabel met HMAC-signed tokens, 24u TTL
+- **TEST-006 pre-flight compleet**: Postmark approved + smoke test, live Stripe webhook actief, alle env vars productie, `WELCOME_TOKEN_SECRET` gezet, migration 006_welcome_tokens uitgevoerd
 
-**Status e-mailinfrastructuur:** Postmark volledig operationeel. DKIM + Return-Path geverifieerd, `POSTMARK_SERVER_TOKEN` in Vercel, Supabase SMTP bijgewerkt. Resend volledig verwijderd.
+**Status e-mailinfrastructuur:** Postmark volledig operationeel. DKIM + Return-Path geverifieerd, `POSTMARK_SERVER_TOKEN` in Vercel, Supabase SMTP bijgewerkt. Resend volledig verwijderd. Welkomstmail-templates (`welkomstmail-eenmalig | -maand | -jaar`) ondersteunen `{{ activate_link }}` (primaire CTA) en `{{ login_link }}` (secundaire magic-link).
 
 ---
 
@@ -99,17 +102,39 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
 
 ## WAT NIET WERKT / PENDING
 
-- **SQL migratie**: `user_news_read` tabel aanmaken in Supabase Studio (zie TASKS.md)
+- **Postmark templates handmatig aanpassen**: drie aliases (`welkomstmail-eenmalig | -maand | -jaar`) moeten `{{ activate_link }}`-CTA + `{{ login_link }}`-fallback krijgen met DBA-huisstijl + logo (pending Marvin)
+- **TEST-006 B1/B2/B3 retest**: na templates-update drie live betalingen uitvoeren en activate + magic-link paden valideren in `docs/TEST_006_RESULTS.md`
+- **SQL migratie `user_news_read`**: nog steeds pending (zie TASKS.md, aparte track)
 - **CRON_SECRET**: env var aanmaken in Vercel (`openssl rand -hex 32`)
 - **Eerste RSS refresh**: handmatig triggeren na SQL migratie
 - **Loops**: 3 oude journeys nog te verwijderen (laag risico)
 - **TEST-005**: maximale invoerlengte (3000+ tekens) nog niet handmatig getest
 - **MAIL-001**: info@dbakompas.nl nog niet in Apple Mail
-- **TEST-006**: Welkomstmail end-to-end test — blocked op Postmark goedkeuring
 
 ---
 
 ## SESSIEHISTORIE
+
+### Sessie 2026-04-20 (sessie 20) — KI-020 guest-checkout + KI-020-A activatie-flow
+
+**Context:** Sessie 19 introduceerde KI-020 (guest-email checkout). Bij TEST-006 bleek Gmail's SafeBrowsing-prefetcher rauwe Supabase-magic-links te consumeren vóór de klant kon klikken, waardoor `otp_expired` optrad. Amendement KI-020-A verplaatst de click-through naar eigen domein.
+
+**Opgeleverd:**
+- `lib/auth/welcome-token.ts` + `lib/auth/welcome-token-server.ts`: HMAC-SHA256 stateless signer + DB-state wrapper (issue/validate/markUsed)
+- `supabase/migrations/006_welcome_tokens.sql`: `public.welcome_tokens` (jti PK, user_id, email, created_at, expires_at, used_at, used_ip, used_purpose, revoked_at, revoke_reason), RLS aan, alleen service-role toegang, migratie uitgevoerd in Studio
+- `app/auth/activate/[token]/{page.tsx,ActivateForm.tsx,actions.ts,types.ts}`: wachtwoord-instel flow met policy (min 10 + upper/lower/digit/special), server action met `redirect('/dashboard')`
+- `app/auth/welcome/[token]/{page.tsx,WelcomeForm.tsx,actions.ts}`: magic-link-fallback, POST-only genereert verse Supabase-magic-link
+- `lib/auth/provision-user.ts`: returnt nu `{userId, activateUrl, loginUrl, isNew}`, beide delen hetzelfde token
+- `modules/email/send.ts`: accepteert `{activateLink, loginLink}` → Postmark `TemplateModel.activate_link` + `login_link`
+- `app/api/billing/webhook/route.ts`: gebruikt `result.activateUrl` en `result.loginUrl`
+- `app/login/page.tsx`: banner + auto-switch naar magic-mode bij `?error=auth_callback_error` of `#error_code=otp_expired` (hash-cleanup via `history.replaceState`)
+- `__tests__/welcomeToken.test.ts` (11) + `__tests__/provisionUser.test.ts` (8): allen groen
+- `docs/DECISIONS.md`: uitgebreide KI-020-A entry met rationale, mechanisme, security, observability
+- Env `WELCOME_TOKEN_SECRET` in Vercel (alle environments)
+
+**Build-fix:** `'use server'`-bestanden mogen onder Next.js 16 / React 19 alleen async functies exporteren. `PASSWORD_MIN_LENGTH` gedegradeerd naar interne const; `ActivateActionState` verplaatst naar losse `types.ts`. Vercel-deploy groen na commit `e77f9e7`.
+
+**Openstaand:** Postmark-templates (handmatig) + TEST-006 B1/B2/B3 end-to-end live retest.
 
 ### Sessie 2026-04-18 (sessie 18) — Analyse flow redesign (kern van de app)
 
@@ -215,32 +240,29 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
 
 ## LAATSTE ACTIE
 
-**Sessie:** 2026-04-18 (sessie 17)
-**Laatste commits:**
-- `fcdebe7` — `feat(design): app-wide redesign — consistent spacing, typography en card-stijl` (gepusht via Mac terminal vereist)
-- Gidsen refactor (compacte lijstweergave) — commit nog aanmaken via Mac terminal
+**Sessie:** 2026-04-20 (sessie 20)
+**Laatste commits (beide gepusht naar origin/main, Vercel-deploy groen):**
+- `3b282b7` — `feat(auth): KI-020-A click-through activatie + magic-link fallback`
+- `e77f9e7` — `fix(auth): verplaats ActivateActionState naar ./types zodat 'use server' module alleen async exporteert`
 
 **Openstaande actie voor Marvin:**
-```bash
-rm -f ~/dba-kompas/.git/HEAD.lock
-cd ~/dba-kompas
-git add "app/(app)/gidsen/page.tsx"
-git commit -m "refactor(gidsen): compacte lijstweergave — alleen titel en gradatie"
-git push origin main
-```
+1. Postmark-templates `welkomstmail-eenmalig | -maand | -jaar` handmatig aanpassen: primaire CTA naar `{{ activate_link }}`, secundaire link naar `{{ login_link }}`, huisstijl (logo `https://dbakompas.nl/logo-white-v3-full.png`, #0F1A2E bg, #F5A14C accent).
+2. TEST-006 B1/B2/B3 retest uitvoeren conform `docs/TEST_006_RESULTS.md` voor beide paden (activate + magic-link).
+3. Na PASS: KI-019 op OPGELOST zetten in `docs/KNOWN_ISSUES.md`, TEST-006 naar DONE in `docs/TASKS.md`, KI-020 + KI-020-A in `docs/KNOWN_ISSUES.md` op OPGELOST zetten.
 
 ## VOLGENDE GEPLANDE STAP
 
-**Prioriteit 1 — Operationeel:**
-1. **Push commits** via Mac terminal (zie openstaande actie hierboven)
-2. **SQL migratie** `user_news_read` uitvoeren in Supabase Studio (staat al klaar in TASKS.md)
-3. **CRON_SECRET** env var aanmaken in Vercel (`openssl rand -hex 32`)
-4. **Eerste RSS refresh** handmatig triggeren na SQL migratie
+**Prioriteit 1 — Afronding TEST-006:**
+1. Postmark-templates handmatig bijwerken (3 aliases) naar activate_link + login_link + huisstijl.
+2. TEST-006 B1/B2/B3 live test (guest-e-mail → Stripe → welkomstmail → activate of magic-link → dashboard).
+3. Na PASS: issues en taken-status verplaatsen naar DONE, eindcommit `test(email): TEST-006 afgerond`.
 
-**Prioriteit 2 — Groei:**
-5. **GROWTH-001**: Referral-engine bouwen (volledig plan in `docs/GROWTHPLAN_UITVOERING.md`)
+**Prioriteit 2 — Overige operationele backlog:**
+4. SQL migratie `user_news_read` in Supabase Studio.
+5. `CRON_SECRET` env var in Vercel (`openssl rand -hex 32`).
+6. Eerste RSS refresh handmatig triggeren.
 
-**Prioriteit 3 — Product kwaliteit:**
-6. **INFRA-002**: Admin alerts systeem (`admin_alerts` tabel + e-mail naar Marvin bij events)
-7. **PROD-003**: Notificaties als levend systeem (triggers bij analyse, hoog-impact nieuws, betalingsfout)
-8. **QUAL-001**: Analyse-ervaring verdiepen (heranalyse met diff, Word-download)
+**Prioriteit 3 — Groei & kwaliteit:**
+7. **INFRA-002 vervolg**: admin alerts verder uitrollen (fraude-detectie, nieuwe admin-rol).
+8. **PROD-003**: Notificaties als levend systeem (triggers bij analyse, hoog-impact nieuws, betalingsfout).
+9. **QUAL-001**: Analyse-ervaring verdiepen (heranalyse met diff, Word-download).
