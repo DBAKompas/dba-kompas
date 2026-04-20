@@ -7,6 +7,7 @@ import { captureServerEvent } from '@/lib/posthog'
 import { sendPurchaseWelcomeEmail } from '@/modules/email/send'
 import { trackReferral, qualifyReferral } from '@/lib/referral/engine'
 import { createAlert } from '@/lib/admin/alerts'
+import { provisionUserForCheckout } from '@/lib/auth/provision-user'
 import type Stripe from 'stripe'
 
 /**
@@ -133,11 +134,45 @@ function determinePlan(subscription: Stripe.Subscription): string {
 // ---------- Event Handlers ----------
 
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
-  const userId = session.metadata?.user_id
-  if (!userId) return
-
   const customerId = session.customer as string
   const referralCode = session.metadata?.referral_code ?? null
+
+  // ── Guest-flow provisioning (KI-020) ───────────────────────────────────────
+  // Bij een guest-checkout (metadata.guest_flow === 'true' + metadata.guest_email)
+  // bestaat er nog geen Supabase user. We provisioneren 'm hier NA betaling en
+  // genereren een magic link die de welkomstmail meestuurt voor 1-klik login.
+  let userId = session.metadata?.user_id
+  let guestMagicLink: string | undefined
+
+  const guestEmail = session.metadata?.guest_email
+  const isGuestFlow = session.metadata?.guest_flow === 'true'
+
+  if (!userId && isGuestFlow && guestEmail) {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? ''
+    try {
+      const result = await provisionUserForCheckout({ email: guestEmail, appUrl })
+      userId = result.userId
+      guestMagicLink = result.magicLink
+    } catch (err) {
+      console.error('[webhook] provisionUserForCheckout mislukt:', err)
+      Sentry.captureException(err, {
+        tags: { area: 'guest_provisioning' },
+        extra: { sessionId: session.id, guestEmail },
+      })
+      createAlert({
+        type: 'webhook_error',
+        severity: 'critical',
+        title: 'Guest user provisioning mislukt',
+        message: err instanceof Error ? err.message : String(err),
+        metadata: { sessionId: session.id, guestEmail },
+        sendMail: true,
+      }).catch(() => {})
+      // Geen userId betekent dat we de downstream write-paden niet kunnen uitvoeren.
+      return
+    }
+  }
+
+  if (!userId) return
 
   // ── Referral tracking + kwalificatie (GROWTH-001) ──────────────────────────
   // Stap 1: koppel de referral code aan deze user als die er nog niet was
@@ -190,8 +225,9 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           subscription_status: 'active',
         }, `one-time-${userId}`),
         // Welkomstmail: bevestiging aankoop + upsell aanbod + CTA naar dashboard
-        sendPurchaseWelcomeEmail(email, 'one_time').catch(err =>
-          handleWelcomeMailFailure(err, 'one_time', userId)
+        // (KI-020) magic link wordt meegestuurd bij guest-flow voor 1-klik login
+        sendPurchaseWelcomeEmail(email, 'one_time', { magicLink: guestMagicLink }).catch(err =>
+          handleWelcomeMailFailure(err, 'one_time', userId!)
         ),
       ])
     }
@@ -242,8 +278,9 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         plan: plan as 'monthly' | 'yearly',
       }, `sub-start-${userId}`),
       // Welkomstmail: bevestiging abonnement + CTA naar dashboard
-      sendPurchaseWelcomeEmail(email, plan as 'monthly' | 'yearly').catch(err =>
-        handleWelcomeMailFailure(err, plan as 'monthly' | 'yearly', userId)
+      // (KI-020) magic link wordt meegestuurd bij guest-flow voor 1-klik login
+      sendPurchaseWelcomeEmail(email, plan as 'monthly' | 'yearly', { magicLink: guestMagicLink }).catch(err =>
+        handleWelcomeMailFailure(err, plan as 'monthly' | 'yearly', userId!)
       ),
     ])
   }

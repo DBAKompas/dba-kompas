@@ -5,6 +5,34 @@ Elke beslissing bevat: datum, beslissing, reden, alternatieven overwogen.
 
 ---
 
+## 2026-04-20 — KI-020: Guest-email checkout + magic link login
+
+**Beslissing:** De kern-koopflow voor nieuwe bezoekers gaat niet meer via account-first (registreren + wachtwoord + e-mailbevestiging + inloggen + pakket kiezen + Stripe). In plaats daarvan: bezoeker klikt Koop, vult alleen e-mail in, wordt direct naar Stripe gestuurd. Pas na succesvolle betaling maakt de webhook de Supabase auth-user aan (via `admin.createUser` met `email_confirm: true`). De welkomstmail bevat een magic link waarmee de klant in een klik ingelogd op het dashboard staat.
+
+**Mechanisme:**
+- `lib/auth/provision-user.ts` is de single-source-of-truth voor post-payment user-provisioning. Lookup op `profiles.email` (lowercase genormaliseerd); bestaand -> magic link voor bestaande userId; nieuw -> `admin.createUser` + magic link. De bestaande `on_auth_user_created` trigger vult automatisch `public.profiles`.
+- Twee nieuwe publieke endpoints: `/api/billing/checkout-guest` (subscription) en `/api/one-time/checkout-guest` (eenmalig). Geen auth-vereiste. Stripe session krijgt `customer_email` + `metadata.guest_email` + `metadata.guest_flow = 'true'`.
+- `handleCheckoutCompleted` in de webhook ziet bij ontbrekende `metadata.user_id` de `metadata.guest_email` en roept `provisionUserForCheckout` aan. Idempotent via `billing_events` dedup.
+- Welkomstmail-module (`modules/email/send.ts`) krijgt `magicLink` parameter, gezet als `TemplateModel.login_link`. Postmark-templates moeten handmatig worden aangepast om de CTA-knop te laten verwijzen naar `{{ login_link }}`.
+
+**Reden:**
+- Bezoekers haken af op de account-first flow (6 schermen). Commerciële conversie is kritiek pre-launch.
+- Betaling is sterker eigendomsbewijs dan een bevestigingsmail: wie de kaart gebruikt heeft evident toegang tot het e-mailadres (Stripe stuurt bonnetje) of is de kaarthouder.
+- Magic link maakt eerste login een 1-klik ervaring. Geen onthoud-je-wachtwoord frictie. Klant kan later alsnog wachtwoord instellen via `/update-password`.
+
+**Alternatieven overwogen:**
+- Stripe-only email (Stripe vraagt zelf om e-mail): nog korter, maar we verliezen controle over de terms-of-service acceptatie-moment en over de UI-copy tussen klik en betaling.
+- Complete rewrite naar passwordless overal: te grote scope voor deze sprint; bestaande password-based `/register` en `/login` blijven intact voor dev/admin-paden en voor klanten die later een wachtwoord willen instellen.
+
+**Beveiliging:**
+- Guest-endpoints valideren alleen e-mail + plan, creeren geen user. User-creatie gebeurt uitsluitend in de webhook na verifieerde Stripe signature.
+- Bestaande e-mailadres in profiles -> geen dubbele user, aankoop wordt gekoppeld aan bestaande account. Voorkomt dat iemand een bestaand account kan "overnemen" door te betalen.
+- Magic link TTL: Supabase default (1 uur). Klant kan nieuwe link opvragen via `/login`.
+
+**Verouderde entry:** De entry over Resend-templates (2026-04-13) is ingehaald door de Postmark-migratie (sessie 17-18). Welkomstmails draaien nu via Postmark aliases `welkomstmail-eenmalig | welkomstmail-maand | welkomstmail-jaar` en moeten een `{{ login_link }}` variabele krijgen.
+
+---
+
 ## 2026-04-13 — Nederlandstalige foutmeldingen via centrale vertaalfunctie
 
 **Beslissing:** Supabase Auth geeft altijd Engelse foutmeldingen terug. Deze worden vertaald via een centrale `translateAuthError(message)` functie in `lib/auth-errors.ts`.

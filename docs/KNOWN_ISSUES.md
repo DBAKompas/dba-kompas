@@ -1,10 +1,19 @@
 # KNOWN_ISSUES.md
 **Bekende problemen en bugs**
-**Laatst bijgewerkt:** 2026-04-13 (sessie 7)
+**Laatst bijgewerkt:** 2026-04-20 (sessie 20 — KI-020 toegevoegd)
 
 ---
 
 ## KRITIEK
+
+### KI-020 — Koopflow te lang: account-first met wachtwoord + e-mailbevestiging voor betaling
+**Status:** IN PROGRESS — 2026-04-20
+**Bestand:** `components/marketing/EmailCheckoutModal.tsx`, `app/register/page.tsx`, `app/api/billing/checkout/route.ts`, `app/api/billing/webhook/route.ts`
+**Symptoom:** Bezoeker die op een Koop-knop klikt wordt gevraagd om e-mail + wachtwoord + herhaal + terms, krijgt vervolgens een bevestigingsmail, moet inloggen, kiest pas dan het pakket en landt bij Stripe. Totaal 5-6 schermen. Gebruiker meldde blokkerende frictie.
+**Impact:** Hoge drop-off pre-checkout; direct risico voor launch-conversie.
+**Fix:** Nieuwe guest-email checkout: alleen e-mail + terms -> direct naar Stripe. User wordt aangemaakt door webhook na betaling (`lib/auth/provision-user.ts` + `/api/billing/checkout-guest` + `/api/one-time/checkout-guest`). Welkomstmail bevat magic link voor 1-klik login. Zie `DECISIONS.md` entry 2026-04-20 voor volledige rationale. TEST-006 hangt af van afronding.
+
+---
 
 ### KI-001 — Fase 1 prompt te zwaar (TRUNCATION RISICO)
 **Status:** OPGELOST — 2026-04-07

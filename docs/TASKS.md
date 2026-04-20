@@ -6,14 +6,26 @@
 
 ## IN PROGRESS
 
-*(geen actieve taken)*
+### KI-020 — Guest checkout (geen wachtwoord vooraf) + magic link login
+- [x] Plan opgesteld (2026-04-20)
+- [ ] `lib/auth/provision-user.ts` — admin.createUser + magic link generator
+- [ ] `app/api/billing/checkout-guest/route.ts` — publieke subscription-checkout
+- [ ] `app/api/one-time/checkout-guest/route.ts` — publieke eenmalige-checkout
+- [ ] `app/api/billing/webhook/route.ts` — user provisioneren als metadata.user_id ontbreekt
+- [ ] `modules/email/send.ts` — magicLink parameter voor welkomstmails
+- [ ] `components/marketing/EmailCheckoutModal.tsx` — UI vereenvoudigen tot email+terms
+- [ ] Postmark templates: `{{ login_link }}` variabele koppelen aan CTA-knop (handmatig)
+- [ ] Unit-tests voor provisionUser en webhook guest-pad
+- [ ] Deploy + TEST-006 opnieuw in nieuwe flow
 
 ### TEST-006 — Welkomstmail end-to-end testen via Postmark
-- [ ] Wacht op Postmark account goedkeuring (aangevraagd)
-- [ ] Na goedkeuring: test-betaling uitvoeren op dbakompas.nl (Stripe test card)
-- [ ] Welkomstmail ontvangen in inbox verifiëren
-- [ ] Postmark Activity feed: mail zichtbaar?
-- [ ] Vercel logs: geen `[MAIL] skipped` of errors
+- [x] Postmark approval ontvangen (2026-04-20, smoke test geslaagd)
+- [x] Vercel env vars aanwezig (POSTMARK_SERVER_TOKEN, STRIPE_WEBHOOK_SECRET, SENTRY_DSN, ADMIN_ALERT_EMAIL)
+- [x] Stripe live webhook actief met 5 events + recente 200 OK responses
+- [ ] Na KI-020 deploy: B1 one_time live test (guest e-mail → Stripe → welkomstmail met magic link)
+- [ ] B2 monthly live test
+- [ ] B3 yearly live test
+- [ ] Nazorg: refund test payments, cleanup test accounts
 
 ---
 
