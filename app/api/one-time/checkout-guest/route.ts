@@ -53,7 +53,7 @@ export async function POST(request: Request) {
       payment_method_types: ['card', 'ideal'],
       line_items: [{ price: priceId, quantity: 1 }],
       customer_email: email,
-      success_url: `${appUrl}/dashboard?one_time=success&session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${appUrl}/checkout/success?plan=one_time&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/`,
       metadata: {
         guest_email: email,
