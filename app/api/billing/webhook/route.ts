@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { stripe } from '@/lib/stripe/client'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { sendLoopsEvent, updateLoopsContact } from '@/lib/loops'
@@ -7,6 +8,33 @@ import { sendPurchaseWelcomeEmail } from '@/modules/email/send'
 import { trackReferral, qualifyReferral } from '@/lib/referral/engine'
 import { createAlert } from '@/lib/admin/alerts'
 import type Stripe from 'stripe'
+
+/**
+ * Gedeelde error handler voor mislukte welkomstmails (TEST-006 / KI-019).
+ * Logt naar console, Sentry en slaat een admin_alert op zodat fouten in de live
+ * flow zichtbaar zijn zonder dat de gebruiker blokkeert op de checkout.
+ */
+function handleWelcomeMailFailure(
+  err: unknown,
+  plan: 'one_time' | 'monthly' | 'yearly',
+  userId: string,
+) {
+  console.error(`Welkomstmail (${plan}) kon niet worden verstuurd:`, err)
+  Sentry.captureException(err, {
+    tags: { area: 'welcome_email', plan },
+    extra: { userId },
+  })
+  createAlert({
+    type: 'webhook_error',
+    severity: 'warning',
+    title: `Welkomstmail (${plan}) niet verstuurd`,
+    message: err instanceof Error ? err.message : String(err),
+    metadata: { plan, userId },
+    sendMail: false,
+  }).catch(() => {
+    // createAlert is zelf fout-tolerant; deze catch is vangnet tegen unhandled rejection.
+  })
+}
 
 export async function POST(request: Request) {
   const body = await request.text()
@@ -163,7 +191,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         }, `one-time-${userId}`),
         // Welkomstmail: bevestiging aankoop + upsell aanbod + CTA naar dashboard
         sendPurchaseWelcomeEmail(email, 'one_time').catch(err =>
-          console.error('Welkomstmail (one_time) kon niet worden verstuurd:', err)
+          handleWelcomeMailFailure(err, 'one_time', userId)
         ),
       ])
     }
@@ -215,7 +243,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       }, `sub-start-${userId}`),
       // Welkomstmail: bevestiging abonnement + CTA naar dashboard
       sendPurchaseWelcomeEmail(email, plan as 'monthly' | 'yearly').catch(err =>
-        console.error(`Welkomstmail (${plan}) kon niet worden verstuurd:`, err)
+        handleWelcomeMailFailure(err, plan as 'monthly' | 'yearly', userId)
       ),
     ])
   }
