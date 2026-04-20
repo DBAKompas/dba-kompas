@@ -2,7 +2,8 @@
 
 import { useActionState, useState } from 'react'
 import { Lock, Eye, EyeOff, Check, ArrowRight } from 'lucide-react'
-import { activateAccountAction, type ActivateActionState } from './actions'
+import { activateAccountAction } from './actions'
+import type { ActivateActionState } from './types'
 
 const INITIAL: ActivateActionState = {}
 

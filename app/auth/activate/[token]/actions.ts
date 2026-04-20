@@ -20,12 +20,9 @@ import { redirect } from 'next/navigation'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { validateWelcomeToken, markWelcomeTokenUsed } from '@/lib/auth/welcome-token-server'
+import type { ActivateActionState } from './types'
 
-export type ActivateActionState = {
-  error?: string
-}
-
-export const PASSWORD_MIN_LENGTH = 10
+const PASSWORD_MIN_LENGTH = 10
 const PASSWORD_REGEX = {
   upper:   /[A-Z]/,
   lower:   /[a-z]/,
