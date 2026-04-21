@@ -113,8 +113,9 @@
 - [x] Alert bij herhaalde AI-analyse fouten (>= 3 in 1u per user) ✅ (sessie 22)
 - [x] Alert bij onverwacht nieuwe admin-rol (Postgres-trigger op profiles) ✅ (sessie 22)
 - [x] Supabase migratie 008: `alert_events` tabel + admin-promotie trigger ✅ (sessie 22)
-- [x] KI-022 fix: periodic worker `/api/cron/pending-alerts` elke 5 min ✅ (sessie 22, WACHT OP VALIDATIE)
-- [ ] Rooktest KI-022 fix: nieuwe admin-rol wissel → mail binnen 5 min
+- [x] KI-022 fix: externe cron via GitHub Actions (10 min) + /api/cron/pending-alerts ✅ (sessie 22, WACHT OP GITHUB SECRETS + VALIDATIE)
+- [ ] GitHub Secrets toevoegen: PRODUCTION_URL + CRON_SECRET
+- [ ] Rooktest KI-022 fix: nieuwe admin-rol wissel → mail binnen 10 a 25 min
 - [ ] Rooktest triggers 1, 3, 4 (cron, quota-misbruik, AI-fouten) nog uitvoeren
 - [ ] Alert bij vermoedelijke referral-fraude (na GROWTH-001)
 

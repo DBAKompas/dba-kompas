@@ -24,11 +24,12 @@
 
 **Fix (geïmplementeerd sessie 22):**
 - Nieuwe route `app/api/cron/pending-alerts/route.ts`.
-- Vercel cron in `vercel.json`: `*/5 * * * *` (elke 5 min).
 - Criteria: `email_sent = false AND resolved = false AND severity = 'critical' AND created_at > now() - 1 hour`, cap 10 per run, oplopende `created_at`-volgorde.
 - Idempotent: na succesvolle `sendAlertEmail()` wordt `email_sent = true` gezet.
 - Outer catch roept geen `createAlert` aan om loops te voorkomen.
 - CRON_SECRET Bearer auth (bestaand patroon).
+
+**Cron-trigger (aangepast sessie 22):** eerst geprobeerd via Vercel cron `*/5 * * * *`, maar Vercel Hobby plan blokkeerde de deploy (max 2-3 grandfathered crons, minimum 1x/dag). Nu via GitHub Actions: `.github/workflows/pending-alerts.yml` runt elke 10 minuten (plus handmatig trigger mogelijk via workflow_dispatch) en curlt naar `/api/cron/pending-alerts`. Vereist 2 GitHub Secrets: `PRODUCTION_URL` = `https://dbakompas.nl` en `CRON_SECRET` (zelfde waarde als Vercel env).
 
 **Validatie (nog uit te voeren):**
 1. Wacht tot Vercel de cron heeft ingepland (max 5 min na deploy).

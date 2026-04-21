@@ -1,6 +1,6 @@
 # PROJECT_STATE.md
 
-**Laatste update:** 2026-04-21 (sessie 22 — INFRA-002 vervolg uitgerold + KI-022 fix: periodic mail-worker /api/cron/pending-alerts elke 5 min)
+**Laatste update:** 2026-04-21 (sessie 22 — INFRA-002 vervolg uitgerold + KI-022 fix via GitHub Actions externe cron, omdat Vercel Hobby 4e cron blokkeert)
 **Maturity:** ~100% MVP + conversie-geoptimaliseerde koopflow (guest-email checkout, click-through activatie, magic-link fallback)
 
 ---
@@ -267,7 +267,7 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
    - Triggers ingebouwd voor cron-mislukking, quota-misbruik, AI-analyse herhaalde fouten, admin-rol promotie.
    - Migratie 008 uitgevoerd in Supabase, beide Postgres-triggers bevestigd.
    - Code naar main gepusht, Vercel-deploy groen.
-   - **KI-022 fix geïmplementeerd**: `/api/cron/pending-alerts` route + Vercel cron `*/5 * * * *` die admin_alerts met `email_sent = false` oppikt en via Postmark mailt. Idempotent (email_sent = true na succes), 1-uur venster, cap 10 per run, CRON_SECRET auth.
+   - **KI-022 fix geïmplementeerd via GitHub Actions**: `/api/cron/pending-alerts` route draait, maar Vercel Hobby blokkeerde een 4e cron. Workflow `.github/workflows/pending-alerts.yml` curlt elke 10 min naar het endpoint met CRON_SECRET. Idempotent (email_sent = true na succes), 1-uur venster, cap 10 per run. Vereist GitHub secrets `PRODUCTION_URL` en `CRON_SECRET`.
    - Pending rooktests: nieuwe admin-rol wissel (KI-022 fix), trigger 1 (cron), 3 (quota-misbruik), 4 (AI-fouten).
 8. **PROD-003**: Notificaties als levend systeem (triggers bij analyse, hoog-impact nieuws, betalingsfout).
 9. **QUAL-001**: Analyse-ervaring verdiepen (heranalyse met diff, Word-download).

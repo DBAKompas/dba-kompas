@@ -20,10 +20,6 @@
     {
       "path": "/api/news/refresh",
       "schedule": "0 7 * * *"
-    },
-    {
-      "path": "/api/cron/pending-alerts",
-      "schedule": "0 * * * *"
     }
   ]
 }

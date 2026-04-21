@@ -1,0 +1,57 @@
+name: Pending alerts mail-worker
+
+# KI-022 fix: externe cron omdat Vercel Hobby geen 4e cron-job toestaat.
+# Roept elke 10 minuten de /api/cron/pending-alerts endpoint aan met
+# de CRON_SECRET Bearer. De endpoint pakt admin_alerts met
+# email_sent = false op en mailt via Postmark.
+#
+# Secrets die nodig zijn in GitHub > Settings > Secrets and variables > Actions:
+#   - PRODUCTION_URL : https://dbakompas.nl
+#   - CRON_SECRET    : zelfde waarde als in Vercel env vars
+
+on:
+  schedule:
+    # Elke 10 minuten. GitHub Actions heeft minimum 5 min en kan
+    # 0-15 min jitter hebben bij hoge load. Totale worst-case
+    # latency voor een kritieke alert-mail is dus circa 25 min.
+    - cron: "*/10 * * * *"
+  workflow_dispatch: {}  # Handmatig triggeren via Actions-tab
+
+concurrency:
+  group: pending-alerts
+  cancel-in-progress: false
+
+jobs:
+  mail-pending:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+
+    steps:
+      - name: Call pending-alerts endpoint
+        env:
+          PRODUCTION_URL: ${{ secrets.PRODUCTION_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$PRODUCTION_URL" ] || [ -z "$CRON_SECRET" ]; then
+            echo "::error::PRODUCTION_URL of CRON_SECRET ontbreekt als GitHub secret"
+            exit 1
+          fi
+
+          # Belangrijk: -s (silent) om secret niet in logs te tonen,
+          # -o response.json om body apart te bewaren, -w voor status code.
+          HTTP_CODE=$(curl -sS \
+            -o response.json \
+            -w "%{http_code}" \
+            -X GET \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "$PRODUCTION_URL/api/cron/pending-alerts")
+
+          echo "HTTP status: $HTTP_CODE"
+          echo "Response body:"
+          cat response.json
+          echo ""
+
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "::error::pending-alerts endpoint gaf HTTP $HTTP_CODE"
+            exit 1
+          fi
