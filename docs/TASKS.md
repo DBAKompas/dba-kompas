@@ -113,9 +113,11 @@
 - [x] Alert bij herhaalde AI-analyse fouten (>= 3 in 1u per user) ✅ (sessie 22)
 - [x] Alert bij onverwacht nieuwe admin-rol (Postgres-trigger op profiles) ✅ (sessie 22)
 - [x] Supabase migratie 008: `alert_events` tabel + admin-promotie trigger ✅ (sessie 22)
-- [x] KI-022 fix: externe cron via GitHub Actions (10 min) + /api/cron/pending-alerts ✅ (sessie 22, WACHT OP GITHUB SECRETS + VALIDATIE)
-- [ ] GitHub Secrets toevoegen: PRODUCTION_URL + CRON_SECRET
-- [ ] Rooktest KI-022 fix: nieuwe admin-rol wissel → mail binnen 10 a 25 min
+- [x] KI-022 fix: externe cron via GitHub Actions (10 min) + /api/cron/pending-alerts ✅ (sessie 22)
+- [x] GitHub Secrets toegevoegd: PRODUCTION_URL + CRON_SECRET ✅ (sessie 22)
+- [x] Workflow run #1 succesvol: HTTP 200, response `{"processed":0,"mailed":0,"mailFailed":0,"durationMs":909}` ✅ (sessie 22)
+- [x] Backfill rooktest-alert (id 647a2a4b-c6a9-4153-9398-e0d5570c6a70, created_at naar 2026-04-21 12:35:29) ✅ (sessie 22)
+- [ ] Validatie KI-022: eerstvolgende cron-tick (max 10 min na backfill) moet mail versturen en `email_sent = true` zetten. Check mailbox + `SELECT id, email_sent, email_sent_at FROM admin_alerts WHERE id = '647a2a4b-c6a9-4153-9398-e0d5570c6a70'`
 - [ ] Rooktest triggers 1, 3, 4 (cron, quota-misbruik, AI-fouten) nog uitvoeren
 - [ ] Alert bij vermoedelijke referral-fraude (na GROWTH-001)
 

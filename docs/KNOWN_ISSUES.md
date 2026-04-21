@@ -1,13 +1,13 @@
 # KNOWN_ISSUES.md
 **Bekende problemen en bugs**
-**Laatst bijgewerkt:** 2026-04-21 (sessie 22 — INFRA-002 triggers uitgerold, rooktest admin-rol onthult KI-022: Postgres-trigger omzeilt createAlert, mail niet verstuurd)
+**Laatst bijgewerkt:** 2026-04-21 (sessie 22 eindstand — INFRA-002 triggers live, KI-022 fix via GitHub Actions externe cron gedeployed + Secrets toegevoegd + workflow groen gedraaid, backfill uitgevoerd, wacht op mail-validatie volgende tick)
 
 ---
 
 ## HOOG
 
 ### KI-022 — Admin-rol promotie trigger verstuurt geen mail
-**Status:** FIX GEPUSHT, WACHT OP VALIDATIE — 2026-04-21 (sessie 22 laatste werk — periodic mail-worker geimplementeerd)
+**Status:** FIX OPERATIONEEL, WACHT OP MAIL-VALIDATIE — 2026-04-21 (sessie 22 eindstand — GitHub Actions workflow run #1 groen, backfill uitgevoerd, volgende tick moet mail versturen)
 **Bestand:** `supabase/migrations/008_admin_alert_triggers.sql`, `lib/admin/alerts.ts`
 **Symptoom:** Na handmatige promotie van een testaccount naar `role = 'admin'` verschijnt er correct een rij in `public.admin_alerts` (type `general`, severity `critical`, title "Nieuwe admin-rol toegekend"), maar `email_sent = false` en er komt geen mail aan op `marvinzoetemelk@gmail.com`.
 **Oorzaak:** De Postgres-triggers `notify_admin_role_promotion` en `notify_admin_role_insert` doen een directe `INSERT INTO public.admin_alerts (...)`. Daarmee wordt de TypeScript-laag (`lib/admin/alerts.ts :: createAlert()` → `sendAlertEmail()`) volledig omzeild, en er gaat geen Postmark-mail uit. De andere drie triggers (cron, quota-misbruik, analyse-fouten) gaan wel via `createAlert()` en zullen wel mail versturen, maar dat is nog niet gerooktest.
@@ -31,26 +31,28 @@
 
 **Cron-trigger (aangepast sessie 22):** eerst geprobeerd via Vercel cron `*/5 * * * *`, maar Vercel Hobby plan blokkeerde de deploy (max 2-3 grandfathered crons, minimum 1x/dag). Nu via GitHub Actions: `.github/workflows/pending-alerts.yml` runt elke 10 minuten (plus handmatig trigger mogelijk via workflow_dispatch) en curlt naar `/api/cron/pending-alerts`. Vereist 2 GitHub Secrets: `PRODUCTION_URL` = `https://dbakompas.nl` en `CRON_SECRET` (zelfde waarde als Vercel env).
 
-**Validatie (nog uit te voeren):**
-1. Wacht tot Vercel de cron heeft ingepland (max 5 min na deploy).
-2. Binnen 5 min na deploy krijgt Marvin alsnog de mail van de eerdere "Nieuwe admin-rol toegekend" alert van 09:43:30 (valt buiten 1-uur venster — zie restactie).
-3. Verifieer met:
-   ```sql
-   SELECT id, title, email_sent, created_at
-   FROM public.admin_alerts
-   WHERE title LIKE '%admin-rol%'
-   ORDER BY created_at DESC LIMIT 3;
-   ```
-4. Doe nieuwe rooktest met role-wissel: mail moet binnen 5 min aankomen.
+**Status sessie 22 eindstand:**
+1. GitHub Secrets toegevoegd: `PRODUCTION_URL = https://dbakompas.nl` + `CRON_SECRET` (zelfde waarde als Vercel env).
+2. Handmatige workflow-run #1 gedraaid: HTTP 200, response `{"processed":0,"mailed":0,"mailFailed":0,"durationMs":909}`. Endpoint + auth zijn dus operationeel.
+3. Backfill uitgevoerd op oude rooktest-alert van 09:43:30: rij id `647a2a4b-c6a9-4153-9398-e0d5570c6a70` heeft nu `created_at = 2026-04-21 12:35:29` (valt binnen het 1-uur venster).
+4. Eerstvolgende cron-tick (elke 10 min, plus handmatig via `workflow_dispatch`) moet deze rij oppakken, mail versturen en `email_sent = true` zetten.
 
-**Restactie / caveat:**
-- De eerdere rooktest-alert van 09:43:30 valt buiten het 1-uur venster en wordt NIET door de cron opgepikt. Marvin kan dit handmatig inhalen met:
-  ```sql
-  UPDATE public.admin_alerts
-  SET email_sent = false, created_at = now()
-  WHERE id = '<alert_id>';
-  ```
-  Of simpelweg een nieuwe rooktest doen.
+**Validatie volgende sessie:**
+1. Check mailbox `marvinzoetemelk@gmail.com` op mail met subject "Nieuwe admin-rol toegekend".
+2. Verifieer in Supabase:
+   ```sql
+   SELECT id, title, email_sent, email_sent_at, created_at
+   FROM public.admin_alerts
+   WHERE id = '647a2a4b-c6a9-4153-9398-e0d5570c6a70';
+   ```
+   `email_sent` moet `true` zijn en `email_sent_at` gevuld.
+3. Als succesvol: doe een tweede rooktest met fresh role-wissel om end-to-end pad te valideren.
+4. Daarna KI-022 → OPGELOST zetten in dit bestand en `docs/TASKS.md` regel afvinken.
+
+**Als er niks gebeurt:**
+- Check GitHub Actions tab → laatste "Pending alerts mail-worker" run → logs inspecteren.
+- Check Vercel function logs voor `/api/cron/pending-alerts`.
+- Verifieer dat de rij daadwerkelijk binnen 1 uur van `now()` valt en `severity = 'critical'` heeft.
 
 ---
 
