@@ -23,7 +23,7 @@
     },
     {
       "path": "/api/cron/pending-alerts",
-      "schedule": "*/5 * * * *"
+      "schedule": "0 * * * *"
     }
   ]
 }
