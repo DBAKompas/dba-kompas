@@ -222,7 +222,7 @@ export const LANDING = {
         popular: false,
         cta: "Kies maandelijks",
         features: [
-          "Meerdere analyses",
+          "Tot 20 DBA-checks per maand",
           "Nieuws & updates",
           "Aandachtspunten en suggesties",
           "Maandelijks opzegbaar",
@@ -237,6 +237,7 @@ export const LANDING = {
         popularBadge: "Meest gekozen",
         cta: "Kies jaarlijks",
         features: [
+          "Tot 25 DBA-checks per maand",
           "Alles uit maandelijks",
           "Lager bedrag per maand omgerekend",
           "Geschikt voor structureel gebruik",

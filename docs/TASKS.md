@@ -1,10 +1,31 @@
 # TASKS.md
 
-**Laatste update:** 2026-04-20 (sessie 20 — KI-020 + KI-020-A geïmplementeerd, deploy groen, wacht op Postmark-templates + TEST-006 retest)
+**Laatste update:** 2026-04-21 (sessie 21 — KI-021 quota-cap geïmplementeerd, migration 007 moet nog gedraaid worden)
 
 ---
 
 ## IN PROGRESS
+
+### KI-021 — Quota-cap per plan (vervangt "onbeperkt"-belofte)
+**Status:** Code klaar in repo, migration nog niet uitgevoerd.
+- [x] `supabase/migrations/007_usage_counters.sql` — tabel + RPC `increment_usage_if_under_quota` + RPC `release_usage_reservation` + RLS
+- [x] `modules/usage/quota-config.ts` — MONTHLY 20, YEARLY 25, ONE_TIME 1, FREE 0, WARN 80%, `currentPeriodStart()`
+- [x] `modules/usage/check-quota.ts` — `reserveUsage`, `releaseUsage`, `getUsageForUser` (fail-closed)
+- [x] `modules/billing/entitlements.ts` — nieuwe `getUserQuotaPlan()` zonder bestaande `getUserPlan()` te breken
+- [x] `app/api/dba/analyse/route.ts` — oude rate-limit vervangen door reserveUsage + compensating release
+- [x] `app/api/usage/route.ts` — GET UsageSnapshot voor dashboard
+- [x] `components/dashboard/UsageMeter.tsx` — voortgangsbalk + warn/atLimit UI
+- [x] `app/(app)/dashboard/page.tsx` — UsageMeter ingebouwd, success-banner aangepast
+- [x] `app/upgrade/page.tsx` — features "Tot 20 / 25 DBA-checks per maand"
+- [x] `content/landing.nl.ts` — plan-features geüpdatet
+- [x] `components/marketing/QuickScan.tsx` — tile-subtekst geüpdatet
+- [x] `components/marketing/EmailCheckoutModal.tsx` — monthly/yearly features geüpdatet
+- [x] `email-templates/welkomstmail-maand.html|.txt` + `-jaar.html|.txt` + `-eenmalig.txt` — mailcopy
+- [x] `scripts/create-resend-templates.ts`, `email-preview.html`, `docs/MASTERPLAN_SAAS_PROFESSIONAL.md`
+- [ ] Migration 007 draaien in Supabase Studio
+- [ ] Stripe product-beschrijvingen in Stripe Dashboard aanpassen (Marvin handmatig)
+- [ ] End-to-end test: 20 analyses op monthly → 21e = 429 → verifieer reset op 1e volgende maand
+- [ ] UsageMeter visueel controleren (desktop + mobiel)
 
 ### KI-020 — Guest checkout (geen wachtwoord vooraf)
 **Status:** Code live op main (commit `fdc455b` + `48dfb43`), wacht op TEST-006 retest na templates-update.

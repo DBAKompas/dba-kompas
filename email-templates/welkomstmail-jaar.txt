@@ -1,0 +1,14 @@
+Welkom bij DBA Kompas Pro
+
+Je jaarabonnement is actief. Een vol jaar toegang met tot 25 DBA-checks per maand, alle gidsen en het laatste nieuws over de Wet DBA, zonder dat je er nog naar hoeft om te kijken.
+
+Stel eerst je wachtwoord in via onderstaande link, dan sta je direct op je dashboard.
+
+Activeer je account: {{ activate_link }}
+
+Liever direct inloggen zonder wachtwoord? Gebruik dan deze link: {{ login_link }}
+
+Vragen of hulp nodig? Beantwoord deze mail, of bereik ons via info@dbakompas.nl.
+
+Met vriendelijke groet,
+Het DBA Kompas team

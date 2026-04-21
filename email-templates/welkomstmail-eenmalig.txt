@@ -1,0 +1,14 @@
+Je DBA-check staat klaar
+
+Bedankt voor je aankoop. Je eenmalige DBA-check is geactiveerd. Stel eerst je wachtwoord in via onderstaande link, dan sta je direct in je dashboard.
+
+Activeer je account: {{ activate_link }}
+
+Tip voor intensieve gebruikers: met een maandabonnement analyseer je tot 20 opdrachten per maand en volg je ontwikkelingen rond de Wet DBA op de voet. Je vindt dit aanbod terug in je dashboard onder "Upgraden".
+
+Liever direct inloggen zonder wachtwoord? Gebruik dan deze link: {{ login_link }}
+
+Vragen of hulp nodig? Beantwoord deze mail, of bereik ons via info@dbakompas.nl.
+
+Met vriendelijke groet,
+Het DBA Kompas team

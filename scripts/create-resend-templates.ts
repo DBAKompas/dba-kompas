@@ -44,7 +44,7 @@ const templates = [
     subject: 'Welkom bij DBA Kompas Pro — je maandabonnement is actief',
     html: buildHtml(
       'Welkom bij DBA Kompas Pro',
-      'Je maandabonnement is actief. Je hebt nu onbeperkt toegang tot alle DBA-analyses, gidsen en het laatste nieuws over DBA-wetgeving. Analyseer zoveel opdrachten als je wilt.'
+      'Je maandabonnement is actief. Je hebt nu toegang tot 20 DBA-checks per maand, alle gidsen en het laatste nieuws over DBA-wetgeving.'
     ),
   },
   {
@@ -53,7 +53,7 @@ const templates = [
     subject: 'Welkom bij DBA Kompas Pro — je jaarabonnement is actief',
     html: buildHtml(
       'Welkom bij DBA Kompas Pro',
-      'Je jaarabonnement is actief. Je hebt een vol jaar onbeperkt toegang tot alle DBA-analyses, gidsen en het laatste nieuws over DBA-wetgeving. Analyseer zoveel opdrachten als je wilt.'
+      'Je jaarabonnement is actief. Een vol jaar toegang met tot 25 DBA-checks per maand, alle gidsen en het laatste nieuws over DBA-wetgeving.'
     ),
   },
 ]

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { UsageMeter } from '@/components/dashboard/UsageMeter'
 import {
   FileSearch,
   ShieldCheck,
@@ -103,7 +104,7 @@ export default function DashboardPage() {
             <p className="mt-0.5 text-sm text-green-700">
               {successType === 'one_time'
                 ? 'Uw DBA-analyse credit is gereed. Start direct een nieuwe analyse.'
-                : 'Uw Pro-abonnement is actief. U kunt nu onbeperkt analyses uitvoeren.'}
+                : 'Uw Pro-abonnement is actief. U ziet rechts hoeveel analyses u deze maand nog kunt uitvoeren.'}
             </p>
           </div>
           <button
@@ -115,6 +116,9 @@ export default function DashboardPage() {
           </button>
         </div>
       )}
+
+      {/* Usage meter (KI-021): toont verbruik deze maand */}
+      <UsageMeter />
 
       {/* Stat cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

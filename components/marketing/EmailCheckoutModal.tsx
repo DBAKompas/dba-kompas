@@ -36,7 +36,7 @@ const PLANS = [
     period: "/maand",
     badge: null,
     features: [
-      "Onbeperkt analyses",
+      "Tot 20 DBA-checks per maand",
       "Heranalyse en bijsturen",
       "Risico-indicatie en aandachtspunten",
       "Herschreven opdrachtbrief (Word-download)",
@@ -52,7 +52,7 @@ const PLANS = [
     period: "/jaar",
     badge: "Bespaar 17%",
     features: [
-      "Onbeperkt analyses",
+      "Tot 25 DBA-checks per maand",
       "Heranalyse en bijsturen",
       "Risico-indicatie en aandachtspunten",
       "Herschreven opdrachtbrief (Word-download)",

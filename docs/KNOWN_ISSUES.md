@@ -1,10 +1,33 @@
 # KNOWN_ISSUES.md
 **Bekende problemen en bugs**
-**Laatst bijgewerkt:** 2026-04-20 (sessie 20 — KI-020 geïmplementeerd + KI-020-A amendement live, wachten op Postmark-templates + TEST-006 retest)
+**Laatst bijgewerkt:** 2026-04-21 (sessie 21 — KI-021 quota-cap geïmplementeerd, migration 007 moet nog gedraaid worden)
 
 ---
 
 ## KRITIEK
+
+### KI-021 — "Onbeperkt analyses"-belofte: AI-kostenrisico bij misbruik of accountdelen
+**Status:** CODE LIVE, MIGRATIE PENDING — 2026-04-21 (wacht op uitvoeren migration 007 in Supabase Studio)
+**Bestanden:**
+- Nieuw: `supabase/migrations/007_usage_counters.sql`, `modules/usage/quota-config.ts`, `modules/usage/check-quota.ts`, `app/api/usage/route.ts`, `components/dashboard/UsageMeter.tsx`
+- Aangepast: `modules/billing/entitlements.ts` (nieuwe `getUserQuotaPlan`), `app/api/dba/analyse/route.ts` (reserveUsage + releaseUsage), `app/(app)/dashboard/page.tsx` (UsageMeter + success-tekst), `app/upgrade/page.tsx`, `content/landing.nl.ts`, `components/marketing/QuickScan.tsx`, `components/marketing/EmailCheckoutModal.tsx`, `email-templates/welkomstmail-*.html|.txt`, `scripts/create-resend-templates.ts`, `email-preview.html`, `docs/MASTERPLAN_SAAS_PROFESSIONAL.md`
+**Symptoom:** De oude plan-omschrijvingen beloofden "onbeperkt analyses" bij maand en jaar. Een Claude Haiku 4.5 analyse kost ~€0,004 per call bij gemiddelde input; een bot of gedeeld account kan in één nacht honderden euro's aan AI-kosten genereren.
+**Impact:** Direct financieel risico op launch — geen cap op API-kosten per gebruiker.
+**Fix (doorgevoerd):**
+- Harde quota: monthly 20/mnd, yearly 25/mnd, one_time 1 totaal (lifetime via `dba_assessments` count), free 0.
+- Reset op de 1e van de kalendermaand via `currentPeriodStart()` in `quota-config.ts`.
+- Race-safe increment: Postgres RPC `increment_usage_if_under_quota` met `INSERT ... ON CONFLICT DO NOTHING` + conditional `UPDATE ... WHERE checks_used < p_quota_limit`. Alleen exact N requests slagen. SECURITY DEFINER, alleen service_role mag executeren.
+- Compensating transaction bij AI-fouten: `release_usage_reservation` decrementeert de counter als de analyse faalt vóór opslag.
+- UsageMeter component op dashboard toont "X / Y" met voortgangsbalk (groen/oranje bij 80%, rood bij limiet).
+- Success-banner na checkout is aangepast: van "onbeperkt" naar "u ziet rechts hoeveel analyses u deze maand nog kunt uitvoeren".
+- Upgrade-pagina, landing-content, quickscan modal-tiles, email-checkout modal en welkomstmails (HTML + TXT) tonen nu "Tot 20 DBA-checks per maand" en "Tot 25 DBA-checks per maand".
+**Restactie:**
+1. Migration `007_usage_counters.sql` draaien in Supabase Studio.
+2. Stripe product-beschrijvingen handmatig aanpassen in Stripe Dashboard (productname/description van monthly en yearly plan).
+3. End-to-end test: maak testaccount, voer 20 analyses uit op monthly, verifieer 429 bij 21e, verifieer reset op 1e volgende maand.
+4. Verifieer UsageMeter op dashboard visueel klopt (Chromium desktop + mobiel).
+
+---
 
 ### KI-020 — Koopflow te lang: account-first met wachtwoord + e-mailbevestiging voor betaling
 **Status:** PENDING TEST — 2026-04-20 (code live op main, wacht op Postmark-templates en TEST-006 retest)

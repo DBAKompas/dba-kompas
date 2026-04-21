@@ -1,0 +1,77 @@
+<!--
+  Postmark template alias: welkomstmail-jaar
+  Variabelen: {{ activate_link }}, {{ login_link }}
+  Onderwerpregel: Je DBA Kompas Pro staat klaar (jaarabonnement)
+  Preheader: Activeer je account en start direct met analyseren.
+-->
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark only" />
+  <title>Je DBA Kompas Pro staat klaar</title>
+</head>
+<body style="margin:0; padding:0; background-color:#1a2332;">
+  <div style="display:none; max-height:0; overflow:hidden; font-size:1px; line-height:1px; color:#1a2332;">
+    Activeer je account en start direct met analyseren.
+  </div>
+
+  <div style="font-family:'Rethink Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background-color:#1a2332; padding:60px 24px; margin:0;">
+    <div style="max-width:580px; margin:0 auto;">
+
+      <div style="margin-bottom:52px;">
+        <img src="https://dbakompas.nl/logo-white-v3-full.png" alt="DBA Kompas" width="200" style="display:block; height:auto; border:0;" />
+      </div>
+
+      <p style="color:#ffffff; font-size:26px; font-weight:700; line-height:1.25; margin:0 0 20px 0;">
+        Je DBA Kompas Pro staat klaar
+      </p>
+
+      <p style="color:#ffffff; font-size:17px; line-height:1.7; margin:0 0 32px 0;">
+        Je jaarabonnement is actief. Activeer je account in &eacute;&eacute;n klik en start direct.
+      </p>
+
+      <!-- Wat je krijgt-blok -->
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin:0 0 36px 0;">
+        <tr>
+          <td style="background-color:#22304a; border-left:4px solid #d4782a; border-radius:10px; padding:22px 26px;">
+            <p style="color:#ffffff; font-size:17px; font-weight:700; line-height:1.35; margin:0 0 12px 0;">
+              Een vol jaar volledige toegang
+            </p>
+            <p style="color:#cbd5e1; font-size:15px; line-height:1.7; margin:0;">
+              Tot 25 DBA-checks per maand, alle gidsen en stappenplannen, en automatische updates zodra de Wet DBA verandert. Geen verrassingen, geen maandelijkse betalingen: je bent het hele jaar klaar.
+            </p>
+          </td>
+        </tr>
+      </table>
+
+      <!-- Primaire CTA: activate_link -->
+      <div style="margin-bottom:22px;">
+        <a href="{{ activate_link }}" style="display:inline-block; background-color:#d4782a; color:#ffffff; font-family:'Rethink Sans', sans-serif; font-size:16px; font-weight:700; text-decoration:none; padding:16px 36px; border-radius:999px; letter-spacing:0.01em;">
+          Activeer mijn account
+        </a>
+      </div>
+
+      <!-- Secundaire fallback: login_link -->
+      <p style="color:#94a3b8; font-size:14px; line-height:1.65; margin:0 0 48px 0;">
+        Liever zonder wachtwoord inloggen?
+        <a href="{{ login_link }}" style="color:#d4782a; text-decoration:underline; font-weight:600;">Gebruik dan deze 1-klik-link</a>.
+        Je kunt later altijd een wachtwoord instellen vanuit je dashboard.
+      </p>
+
+      <hr style="border:none; border-top:1px solid #2e3f55; margin:0 0 36px 0;" />
+
+      <p style="color:#ffffff; font-size:15px; line-height:1.7; margin:0 0 20px 0;">
+        Vragen of hulp nodig? Beantwoord deze mail, of stuur ons een bericht via <a href="mailto:info@dbakompas.nl" style="color:#d4782a; text-decoration:underline;">info@dbakompas.nl</a>.
+      </p>
+
+      <p style="color:#ffffff; font-size:15px; line-height:1.7; margin:0;">
+        Met vriendelijke groet,<br />
+        Het DBA Kompas team
+      </p>
+
+    </div>
+  </div>
+</body>
+</html>

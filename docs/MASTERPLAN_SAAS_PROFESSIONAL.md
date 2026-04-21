@@ -221,8 +221,8 @@ Digitale bibliotheek van door Belastingdienst goedgekeurde modelovereenkomsten, 
 ### FUTURE-005: Pro/Enterprise feature differentiatie
 
 Huidige code heeft rate-limiting per plan maar geen echte feature-gating. Toevoegen:
-- Free: 1 analyse/dag, geen gidsen, beperkt nieuws
-- Pro (maand/jaar): onbeperkt analysen, alle gidsen, volledig nieuws, PDF-export, notificaties
+- Free: geen analyses (alleen marketing-scan), geen gidsen, beperkt nieuws
+- Pro (maand/jaar): 20 resp. 25 DBA-checks per maand, alle gidsen, volledig nieuws, PDF-export, notificaties
 - Enterprise: API-toegang, team-workspace, dedicated support
 
 ---

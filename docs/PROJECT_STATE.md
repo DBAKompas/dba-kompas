@@ -61,7 +61,7 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
 - Resultaatpagina UI: colored hero banner, 3-koloms domeinen, actiepunten
 - Draft generatie (compact / full mode, lazy loading)
 - PDF rapport generatie (correct opgemaakt, leesbare tekst)
-- Rate limiting (free: 20/dag, pro: 100/dag, enterprise: 500/dag)
+- Quota systeem (KI-021): monthly 20/mnd, yearly 25/mnd, one_time 1 totaal, free 0. Reset op de 1e van de kalendermaand. Atomic Postgres RPC `increment_usage_if_under_quota` voor race-safe tellen, `release_usage_reservation` als compensating transaction bij AI-fouten. UsageMeter op dashboard toont huidig verbruik.
 - Stripe subscription checkout — TEST-002 BEVESTIGD ✅
 - Stripe one-time checkout — gecorrigeerd en werkend
 - Stripe webhook handler — TEST-003 BEVESTIGD ✅

@@ -2,53 +2,73 @@
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
-<title>DBA Kompas — E-mail previews</title>
+<title>DBA Kompas — E-mail previews (KI-020-A)</title>
 <style>
   body { background: #e5e7eb; font-family: sans-serif; padding: 32px 16px; }
   h2 { font-size: 13px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin: 40px 0 12px; }
   h2:first-child { margin-top: 0; }
+  h1 { font-size: 18px; font-weight: 700; color: #111827; margin: 0 0 8px; }
+  p.intro { font-size: 13px; color: #4b5563; max-width: 640px; margin: 0 0 32px; line-height: 1.6; }
   .frame { border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.15); }
+  code { background: #fff; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
 </style>
 </head>
 <body>
 
-<h2>1 — Eenmalige check</h2>
+<h1>DBA Kompas welkomstmail-templates</h1>
+<p class="intro">
+  Previews van de drie Postmark-templates na KI-020-A. De oranje primaire knop verwijst naar
+  <code>{{ activate_link }}</code> (wachtwoord instellen, dan dashboard). De secundaire tekst-link onder
+  de knop verwijst naar <code>{{ login_link }}</code> (magic-link fallback zonder wachtwoord).
+  De HTML-bronbestanden staan in <code>email-templates/</code> in deze repo.
+</p>
+
+<h2>1 — Eenmalige check (welkomstmail-eenmalig)</h2>
 <div class="frame">
 <div style="font-family: 'Rethink Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background-color: #1a2332; padding: 60px 24px; margin: 0;">
   <div style="max-width: 580px; margin: 0 auto;">
     <div style="margin-bottom: 52px;"><img src="https://dbakompas.nl/logo-white-v3-full.png" alt="DBA Kompas" width="200" style="display: block; height: auto; border: 0;" /></div>
-    <p style="color: #ffffff; font-size: 22px; font-weight: 700; line-height: 1.3; margin: 0 0 24px 0;">Je DBA-check is geactiveerd</p>
-    <p style="color: #ffffff; font-size: 17px; line-height: 1.75; margin: 0 0 40px 0;">Bedankt voor je aankoop. Je eenmalige DBA-check staat klaar. Plak je opdrachtomschrijving in het analyseveld en krijg direct inzicht in je DBA-risico's.</p>
-    <div style="margin-bottom: 52px;"><a href="#" style="display: inline-block; background-color: #d4782a; color: #ffffff; font-family: 'Rethink Sans', sans-serif; font-size: 16px; font-weight: 700; text-decoration: none; padding: 16px 40px; border-radius: 8px; letter-spacing: 0.01em;">Ga naar je dashboard</a></div>
+    <p style="color: #ffffff; font-size: 22px; font-weight: 700; line-height: 1.3; margin: 0 0 24px 0;">Je DBA-check staat klaar</p>
+    <p style="color: #ffffff; font-size: 17px; line-height: 1.75; margin: 0 0 24px 0;">Bedankt voor je aankoop. Je eenmalige DBA-check is geactiveerd. Stel eerst je wachtwoord in via de knop hieronder, dan sta je direct in je dashboard.</p>
+    <p style="color: #ffffff; font-size: 17px; line-height: 1.75; margin: 0 0 40px 0;"><strong style="color:#ffffff;">Tip voor intensieve gebruikers:</strong> met een maandabonnement analyseer je tot 20 opdrachten per maand en volg je ontwikkelingen rond de Wet DBA op de voet. Je vindt dit aanbod terug in je dashboard onder <strong style="color:#ffffff;">Upgraden</strong>.</p>
+    <div style="margin-bottom: 28px;"><a href="#" style="display: inline-block; background-color: #d4782a; color: #ffffff; font-family: 'Rethink Sans', sans-serif; font-size: 16px; font-weight: 700; text-decoration: none; padding: 16px 40px; border-radius: 8px; letter-spacing: 0.01em;">Activeer je account en zie het aanbod</a></div>
+    <p style="color: #ffffff; font-size: 14px; line-height: 1.75; margin: 0 0 52px 0; opacity: 0.8;">Liever direct inloggen zonder wachtwoord? <a href="#" style="color:#d4782a; text-decoration:underline;">Klik hier voor een inlog-link</a>.</p>
     <hr style="border: none; border-top: 1px solid #2e3f55; margin: 0 0 40px 0;" />
+    <p style="color: #ffffff; font-size: 15px; line-height: 1.75; margin: 0 0 24px 0;">Vragen of hulp nodig? Beantwoord deze mail, of bereik ons via <a href="mailto:info@dbakompas.nl" style="color:#d4782a; text-decoration:underline;">info@dbakompas.nl</a>.</p>
     <p style="color: #ffffff; font-size: 15px; line-height: 1.75; margin: 0;">Met vriendelijke groet,<br>Het DBA Kompas team</p>
   </div>
 </div>
 </div>
 
-<h2>2 — Maandabonnement</h2>
+<h2>2 — Maandabonnement (welkomstmail-maand)</h2>
 <div class="frame">
 <div style="font-family: 'Rethink Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background-color: #1a2332; padding: 60px 24px; margin: 0;">
   <div style="max-width: 580px; margin: 0 auto;">
     <div style="margin-bottom: 52px;"><img src="https://dbakompas.nl/logo-white-v3-full.png" alt="DBA Kompas" width="200" style="display: block; height: auto; border: 0;" /></div>
     <p style="color: #ffffff; font-size: 22px; font-weight: 700; line-height: 1.3; margin: 0 0 24px 0;">Welkom bij DBA Kompas Pro</p>
-    <p style="color: #ffffff; font-size: 17px; line-height: 1.75; margin: 0 0 40px 0;">Je maandabonnement is actief. Je hebt nu onbeperkt toegang tot alle DBA-analyses, gidsen en het laatste nieuws over DBA-wetgeving. Analyseer zoveel opdrachten als je wilt.</p>
-    <div style="margin-bottom: 52px;"><a href="#" style="display: inline-block; background-color: #d4782a; color: #ffffff; font-family: 'Rethink Sans', sans-serif; font-size: 16px; font-weight: 700; text-decoration: none; padding: 16px 40px; border-radius: 8px; letter-spacing: 0.01em;">Ga naar je dashboard</a></div>
+    <p style="color: #ffffff; font-size: 17px; line-height: 1.75; margin: 0 0 24px 0;">Je maandabonnement is actief. Tot 20 DBA-checks per maand, alle gidsen en het laatste nieuws over de Wet DBA staan voor je klaar.</p>
+    <p style="color: #ffffff; font-size: 17px; line-height: 1.75; margin: 0 0 40px 0;">Stel eerst je wachtwoord in via de knop hieronder, dan sta je direct op je dashboard.</p>
+    <div style="margin-bottom: 28px;"><a href="#" style="display: inline-block; background-color: #d4782a; color: #ffffff; font-family: 'Rethink Sans', sans-serif; font-size: 16px; font-weight: 700; text-decoration: none; padding: 16px 40px; border-radius: 8px; letter-spacing: 0.01em;">Activeer je account</a></div>
+    <p style="color: #ffffff; font-size: 14px; line-height: 1.75; margin: 0 0 52px 0; opacity: 0.8;">Liever direct inloggen zonder wachtwoord? <a href="#" style="color:#d4782a; text-decoration:underline;">Klik hier voor een inlog-link</a>.</p>
     <hr style="border: none; border-top: 1px solid #2e3f55; margin: 0 0 40px 0;" />
+    <p style="color: #ffffff; font-size: 15px; line-height: 1.75; margin: 0 0 24px 0;">Vragen of hulp nodig? Beantwoord deze mail, of bereik ons via <a href="mailto:info@dbakompas.nl" style="color:#d4782a; text-decoration:underline;">info@dbakompas.nl</a>.</p>
     <p style="color: #ffffff; font-size: 15px; line-height: 1.75; margin: 0;">Met vriendelijke groet,<br>Het DBA Kompas team</p>
   </div>
 </div>
 </div>
 
-<h2>3 — Jaarabonnement</h2>
+<h2>3 — Jaarabonnement (welkomstmail-jaar)</h2>
 <div class="frame">
 <div style="font-family: 'Rethink Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background-color: #1a2332; padding: 60px 24px; margin: 0;">
   <div style="max-width: 580px; margin: 0 auto;">
     <div style="margin-bottom: 52px;"><img src="https://dbakompas.nl/logo-white-v3-full.png" alt="DBA Kompas" width="200" style="display: block; height: auto; border: 0;" /></div>
     <p style="color: #ffffff; font-size: 22px; font-weight: 700; line-height: 1.3; margin: 0 0 24px 0;">Welkom bij DBA Kompas Pro</p>
-    <p style="color: #ffffff; font-size: 17px; line-height: 1.75; margin: 0 0 40px 0;">Je jaarabonnement is actief. Je hebt een vol jaar onbeperkt toegang tot alle DBA-analyses, gidsen en het laatste nieuws over DBA-wetgeving. Analyseer zoveel opdrachten als je wilt.</p>
-    <div style="margin-bottom: 52px;"><a href="#" style="display: inline-block; background-color: #d4782a; color: #ffffff; font-family: 'Rethink Sans', sans-serif; font-size: 16px; font-weight: 700; text-decoration: none; padding: 16px 40px; border-radius: 8px; letter-spacing: 0.01em;">Ga naar je dashboard</a></div>
+    <p style="color: #ffffff; font-size: 17px; line-height: 1.75; margin: 0 0 24px 0;">Je jaarabonnement is actief. Een vol jaar toegang met tot 25 DBA-checks per maand, alle gidsen en het laatste nieuws over de Wet DBA, zonder dat je er nog naar hoeft om te kijken.</p>
+    <p style="color: #ffffff; font-size: 17px; line-height: 1.75; margin: 0 0 40px 0;">Stel eerst je wachtwoord in via de knop hieronder, dan sta je direct op je dashboard.</p>
+    <div style="margin-bottom: 28px;"><a href="#" style="display: inline-block; background-color: #d4782a; color: #ffffff; font-family: 'Rethink Sans', sans-serif; font-size: 16px; font-weight: 700; text-decoration: none; padding: 16px 40px; border-radius: 8px; letter-spacing: 0.01em;">Activeer je account</a></div>
+    <p style="color: #ffffff; font-size: 14px; line-height: 1.75; margin: 0 0 52px 0; opacity: 0.8;">Liever direct inloggen zonder wachtwoord? <a href="#" style="color:#d4782a; text-decoration:underline;">Klik hier voor een inlog-link</a>.</p>
     <hr style="border: none; border-top: 1px solid #2e3f55; margin: 0 0 40px 0;" />
+    <p style="color: #ffffff; font-size: 15px; line-height: 1.75; margin: 0 0 24px 0;">Vragen of hulp nodig? Beantwoord deze mail, of bereik ons via <a href="mailto:info@dbakompas.nl" style="color:#d4782a; text-decoration:underline;">info@dbakompas.nl</a>.</p>
     <p style="color: #ffffff; font-size: 15px; line-height: 1.75; margin: 0;">Met vriendelijke groet,<br>Het DBA Kompas team</p>
   </div>
 </div>

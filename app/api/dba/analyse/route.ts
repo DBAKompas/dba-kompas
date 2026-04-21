@@ -2,44 +2,42 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { analyzeDbaText, type DbaAnalysisResult } from '@/lib/ai'
-import { getUserPlan } from '@/modules/billing/entitlements'
+import { getUserQuotaPlan } from '@/modules/billing/entitlements'
+import { reserveUsage, releaseUsage } from '@/modules/usage/check-quota'
 import { updateLoopsContact } from '@/lib/loops'
 import { captureServerEvent } from '@/lib/posthog'
 
 export const maxDuration = 120
 
-// Rate limits per plan (analyses per 24 uur)
-const RATE_LIMITS: Record<string, number> = {
-  free: 20,
-  pro: 100,
-  enterprise: 500,
-}
-
 export async function POST(request: Request) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  // Quota-check per plan (KI-021):
+  //  - monthly: 20 checks per kalendermaand
+  //  - yearly:  25 checks per kalendermaand
+  //  - one_time: 1 check totaal
+  //  - free:    geen toegang, upsell
+  const plan = await getUserQuotaPlan(user.id)
+  const reservation = await reserveUsage(user.id, plan)
+  if (!reservation.ok) {
+    return NextResponse.json(
+      {
+        error:
+          reservation.reason === 'no_plan'
+            ? 'Voor een DBA-analyse is een actief abonnement of eenmalige check nodig.'
+            : 'Je hebt het maximum aantal analyses voor deze maand bereikt.',
+        code: reservation.reason,
+        used: reservation.used,
+        limit: reservation.limit,
+        plan: reservation.plan,
+      },
+      { status: 429 },
+    )
+  }
+
   try {
-    const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-    // Rate limiting: tel analyses van afgelopen 24 uur
-    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
-    const { count, error: countError } = await supabaseAdmin
-      .from('dba_assessments')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-      .gte('created_at', since)
-
-    if (!countError) {
-      const plan = await getUserPlan()
-      const limit = RATE_LIMITS[plan] ?? RATE_LIMITS.free
-      if ((count ?? 0) >= limit) {
-        return NextResponse.json(
-          { error: 'Daglimiet bereikt', code: 'rate_limit_exceeded', limit, plan },
-          { status: 429 }
-        )
-      }
-    }
-
     const { inputText, parentAssessmentId } = await request.json()
 
     if (!inputText || typeof inputText !== 'string') {
@@ -71,8 +69,11 @@ export async function POST(request: Request) {
       profile?.specialisatie
     )
 
-    // If the input was insufficient or needs more info, return directly (geen DB opslag)
+    // If the input was insufficient or needs more info, return directly (geen DB opslag).
+    // Belangrijk: de gebruiker heeft geen volwaardige analyse ontvangen, dus we geven
+    // de eerder gereserveerde credit terug.
     if ('status' in result && (result.status === 'insufficient_input' || result.status === 'needs_more_input')) {
+      await releaseUsage(user.id, plan)
       return NextResponse.json(result)
     }
 
@@ -109,6 +110,7 @@ export async function POST(request: Request) {
 
     if (insertError) {
       console.error('Failed to insert assessment:', insertError)
+      await releaseUsage(user.id, plan)
       return NextResponse.json({ error: 'Failed to save assessment' }, { status: 500 })
     }
 
@@ -145,6 +147,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ id: assessment.id, ...analysisResult })
   } catch (error) {
     console.error('DBA analysis error:', error)
+    // Onverwachte fout na reservatie: credit teruggeven.
+    await releaseUsage(user.id, plan)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
