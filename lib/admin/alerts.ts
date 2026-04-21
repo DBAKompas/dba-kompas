@@ -174,3 +174,169 @@ export async function resolveAlert(alertId: string, resolvedBy?: string): Promis
   }
   return true
 }
+
+// ============================================================
+// INFRA-002 vervolg: event-logging + threshold-alerts
+// ============================================================
+
+const QUOTA_ABUSE_THRESHOLD = 10          // aantal 429's per user
+const QUOTA_ABUSE_WINDOW_HOURS = 24       // binnen 24 uur
+const ANALYSIS_ERROR_THRESHOLD = 3        // opeenvolgende fouten per user
+const ANALYSIS_ERROR_WINDOW_HOURS = 1     // binnen 1 uur
+const ALERT_MAIL_THROTTLE_HOURS = 24      // per (type + user_id) max 1 mail per 24u
+
+/**
+ * Check of er recent een niet-opgeloste alert van hetzelfde type
+ * voor dezelfde user bestaat. Gebruikt om mail-spam te voorkomen
+ * zonder detectie zelf te onderdrukken.
+ */
+async function hasRecentOpenAlert(type: AlertType, userId: string): Promise<boolean> {
+  const cutoff = new Date(Date.now() - ALERT_MAIL_THROTTLE_HOURS * 3600 * 1000).toISOString()
+  const { data, error } = await supabaseAdmin
+    .from('admin_alerts')
+    .select('id')
+    .eq('type', type)
+    .eq('resolved', false)
+    .contains('metadata', { user_id: userId })
+    .gte('created_at', cutoff)
+    .limit(1)
+
+  if (error) {
+    console.error('[alerts] throttle-check mislukt:', error.message)
+    return false
+  }
+  return (data?.length ?? 0) > 0
+}
+
+/**
+ * Registreert een quota-weigering (429) als event en triggert een
+ * alert zodra de threshold overschreden wordt.
+ * Nooit throwing — silent fallback bij DB-fouten.
+ */
+export async function recordQuotaDenial(params: {
+  userId: string
+  plan: string
+  used: number
+  limit: number
+}): Promise<void> {
+  const { userId, plan, used, limit } = params
+  try {
+    const { error: insertError } = await supabaseAdmin
+      .from('alert_events')
+      .insert({
+        event_type: 'quota_denied',
+        user_id: userId,
+        metadata: { plan, used, limit },
+      })
+    if (insertError) {
+      console.error('[alerts] quota_denied event insert mislukt:', insertError.message)
+      return
+    }
+
+    // Threshold-check
+    const windowCutoff = new Date(
+      Date.now() - QUOTA_ABUSE_WINDOW_HOURS * 3600 * 1000,
+    ).toISOString()
+    const { count, error: countError } = await supabaseAdmin
+      .from('alert_events')
+      .select('id', { count: 'exact', head: true })
+      .eq('event_type', 'quota_denied')
+      .eq('user_id', userId)
+      .gte('occurred_at', windowCutoff)
+
+    if (countError) {
+      console.error('[alerts] quota_denied count mislukt:', countError.message)
+      return
+    }
+
+    const denials = count ?? 0
+    if (denials < QUOTA_ABUSE_THRESHOLD) return
+
+    if (await hasRecentOpenAlert('general', userId)) return
+
+    await createAlert({
+      type: 'general',
+      severity: 'warning',
+      title: 'Verdacht quota-gedrag',
+      message:
+        `Gebruiker ${userId} ontving ${denials} quota-weigeringen in de laatste ${QUOTA_ABUSE_WINDOW_HOURS} uur. ` +
+        `Mogelijk misbruik of een gedeeld account. Controleer via de Control Tower.`,
+      metadata: {
+        user_id: userId,
+        plan,
+        denials_last_24h: denials,
+        threshold: QUOTA_ABUSE_THRESHOLD,
+      },
+      sendMail: true,
+    })
+  } catch (err) {
+    console.error('[alerts] recordQuotaDenial onverwachte fout:', err)
+  }
+}
+
+/**
+ * Registreert een AI-analyse-fout als event en triggert een alert
+ * zodra er N opeenvolgende fouten per user zijn binnen het venster.
+ */
+export async function recordAnalysisError(params: {
+  userId: string
+  stage: 'ai_call' | 'db_insert' | 'unexpected'
+  errorMessage: string
+}): Promise<void> {
+  const { userId, stage, errorMessage } = params
+  try {
+    const { error: insertError } = await supabaseAdmin
+      .from('alert_events')
+      .insert({
+        event_type: 'analysis_error',
+        user_id: userId,
+        metadata: {
+          stage,
+          // voorkom PII en te grote payloads: max 500 chars van errormelding
+          error: errorMessage.slice(0, 500),
+        },
+      })
+    if (insertError) {
+      console.error('[alerts] analysis_error event insert mislukt:', insertError.message)
+      return
+    }
+
+    const windowCutoff = new Date(
+      Date.now() - ANALYSIS_ERROR_WINDOW_HOURS * 3600 * 1000,
+    ).toISOString()
+    const { count, error: countError } = await supabaseAdmin
+      .from('alert_events')
+      .select('id', { count: 'exact', head: true })
+      .eq('event_type', 'analysis_error')
+      .eq('user_id', userId)
+      .gte('occurred_at', windowCutoff)
+
+    if (countError) {
+      console.error('[alerts] analysis_error count mislukt:', countError.message)
+      return
+    }
+
+    const errors = count ?? 0
+    if (errors < ANALYSIS_ERROR_THRESHOLD) return
+
+    if (await hasRecentOpenAlert('analysis_error', userId)) return
+
+    await createAlert({
+      type: 'analysis_error',
+      severity: 'critical',
+      title: 'Herhaalde AI-analyse fouten',
+      message:
+        `Gebruiker ${userId} kreeg ${errors} analyse-fouten binnen ${ANALYSIS_ERROR_WINDOW_HOURS} uur. ` +
+        `Laatste stage: ${stage}. Onderzoek model-uitval, input-problemen of prompt-regressie.`,
+      metadata: {
+        user_id: userId,
+        stage,
+        errors_last_hour: errors,
+        threshold: ANALYSIS_ERROR_THRESHOLD,
+      },
+      sendMail: true,
+    })
+  } catch (err) {
+    console.error('[alerts] recordAnalysisError onverwachte fout:', err)
+  }
+}

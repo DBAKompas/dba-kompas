@@ -6,6 +6,7 @@ import { getUserQuotaPlan } from '@/modules/billing/entitlements'
 import { reserveUsage, releaseUsage } from '@/modules/usage/check-quota'
 import { updateLoopsContact } from '@/lib/loops'
 import { captureServerEvent } from '@/lib/posthog'
+import { recordQuotaDenial, recordAnalysisError } from '@/lib/admin/alerts'
 
 export const maxDuration = 120
 
@@ -22,6 +23,17 @@ export async function POST(request: Request) {
   const plan = await getUserQuotaPlan(user.id)
   const reservation = await reserveUsage(user.id, plan)
   if (!reservation.ok) {
+    // INFRA-002: log quota-weigering. Alleen bij 'quota_exceeded';
+    // 'no_plan' is een normale upsell-flow, geen misbruik.
+    if (reservation.reason === 'quota_exceeded') {
+      recordQuotaDenial({
+        userId: user.id,
+        plan: reservation.plan,
+        used: reservation.used,
+        limit: reservation.limit,
+      }).catch(err => console.error('[alerts] recordQuotaDenial failed:', err))
+    }
+
     return NextResponse.json(
       {
         error:
@@ -111,6 +123,11 @@ export async function POST(request: Request) {
     if (insertError) {
       console.error('Failed to insert assessment:', insertError)
       await releaseUsage(user.id, plan)
+      recordAnalysisError({
+        userId: user.id,
+        stage: 'db_insert',
+        errorMessage: insertError.message ?? 'insert error',
+      }).catch(err => console.error('[alerts] recordAnalysisError failed:', err))
       return NextResponse.json({ error: 'Failed to save assessment' }, { status: 500 })
     }
 
@@ -149,6 +166,11 @@ export async function POST(request: Request) {
     console.error('DBA analysis error:', error)
     // Onverwachte fout na reservatie: credit teruggeven.
     await releaseUsage(user.id, plan)
+    recordAnalysisError({
+      userId: user.id,
+      stage: 'unexpected',
+      errorMessage: error instanceof Error ? error.message : String(error),
+    }).catch(err => console.error('[alerts] recordAnalysisError failed:', err))
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

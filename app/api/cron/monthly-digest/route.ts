@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { sendMonthlyDigest } from '@/lib/email'
+import { createAlert } from '@/lib/admin/alerts'
 
 /**
  * Vercel Cron Job endpoint — maandelijkse digest.
@@ -36,6 +37,14 @@ export async function GET(request: Request) {
 
     if (subError) {
       console.error('[cron/monthly-digest] subscriptions query failed:', subError)
+      await createAlert({
+        type: 'cron_failed',
+        severity: 'critical',
+        title: 'Monthly-digest cron mislukt bij subscriptions-query',
+        message: 'De maandelijkse digest-cron kon de subscriptions-tabel niet lezen. De digest is niet verstuurd.',
+        metadata: { job: 'monthly-digest', stage: 'subscriptions_query', error: subError.message },
+        sendMail: true,
+      })
       return NextResponse.json({ error: 'Database error' }, { status: 500 })
     }
 
@@ -111,7 +120,24 @@ export async function GET(request: Request) {
     }
 
     const duration = Date.now() - startedAt
-    console.log(`[cron/monthly-digest] klaar in ${duration}ms — verstuurd: ${sent}, mislukt: ${failed}`)
+    console.log(`[cron/monthly-digest] klaar in ${duration}ms, verstuurd: ${sent}, mislukt: ${failed}`)
+
+    if (failed > 0) {
+      await createAlert({
+        type: 'cron_failed',
+        severity: failed >= sent ? 'critical' : 'warning',
+        title: `Monthly-digest: ${failed} mislukt`,
+        message: `Van ${sent + failed} digests zijn er ${failed} niet verstuurd. Kijk de failedUserIds na.`,
+        metadata: {
+          job: 'monthly-digest',
+          sent,
+          failed,
+          failedUserIds: errors.slice(0, 25),
+          durationMs: duration,
+        },
+        sendMail: failed >= sent,
+      })
+    }
 
     return NextResponse.json({
       sent,
@@ -121,6 +147,18 @@ export async function GET(request: Request) {
     })
   } catch (error) {
     console.error('[cron/monthly-digest] onverwachte fout:', error)
+    await createAlert({
+      type: 'cron_failed',
+      severity: 'critical',
+      title: 'Monthly-digest cron is gecrasht',
+      message: 'De maandelijkse digest-cron is met een onverwachte fout afgebroken. Geen digests verstuurd in deze run.',
+      metadata: {
+        job: 'monthly-digest',
+        stage: 'outer_catch',
+        error: error instanceof Error ? error.message : String(error),
+      },
+      sendMail: true,
+    })
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

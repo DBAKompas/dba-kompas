@@ -1,6 +1,6 @@
 # KNOWN_ISSUES.md
 **Bekende problemen en bugs**
-**Laatst bijgewerkt:** 2026-04-21 (sessie 21 — KI-021 quota-cap geïmplementeerd, migration 007 moet nog gedraaid worden)
+**Laatst bijgewerkt:** 2026-04-21 (sessie 22 — INFRA-002 triggers uitgerold: cron-mislukking, quota-misbruik, AI-analyse herhaalde fouten, admin-rol promotie. Migratie 008 klaar om uit te voeren.)
 
 ---
 

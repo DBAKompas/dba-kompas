@@ -1,6 +1,6 @@
 # PROJECT_STATE.md
 
-**Laatste update:** 2026-04-20 (sessie 20 — KI-020 guest-checkout + KI-020-A activate-flow live)
+**Laatste update:** 2026-04-21 (sessie 22 — INFRA-002 vervolg: cron-mislukking, quota-misbruik, AI-analyse herhaalde fouten, admin-rol promotie triggers uitgerold)
 **Maturity:** ~100% MVP + conversie-geoptimaliseerde koopflow (guest-email checkout, click-through activatie, magic-link fallback)
 
 ---
@@ -263,6 +263,6 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
 6. Eerste RSS refresh handmatig triggeren.
 
 **Prioriteit 3 — Groei & kwaliteit:**
-7. **INFRA-002 vervolg**: admin alerts verder uitrollen (fraude-detectie, nieuwe admin-rol).
+7. ~~**INFRA-002 vervolg**: admin alerts verder uitrollen (fraude-detectie, nieuwe admin-rol).~~ ✅ (sessie 22, 2026-04-21 — triggers live voor cron-mislukking, quota-misbruik, AI-analyse herhaalde fouten en admin-rol promotie; migratie 008 moet nog uitgevoerd worden in Supabase Studio).
 8. **PROD-003**: Notificaties als levend systeem (triggers bij analyse, hoog-impact nieuws, betalingsfout).
 9. **QUAL-001**: Analyse-ervaring verdiepen (heranalyse met diff, Word-download).

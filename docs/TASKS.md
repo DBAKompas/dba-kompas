@@ -103,14 +103,17 @@
 - [ ] Actiepunten-widget altijd bovenaan CT-root
 
 **INFRA-002: Admin actiepunten & e-mailalerts**
-- [ ] Supabase migratie 006: `admin_alerts` tabel
-- [ ] `lib/admin/alerts.ts`: `createAlert()` + `sendAlertEmail()` via Postmark
-- [ ] `app/api/admin/alerts/route.ts`: GET openstaande alerts
-- [ ] `components/admin/AlertsWidget.tsx`: widget bovenaan CT-root
-- [ ] Webhook uitbreiden: alert bij betalingsfout + e-mail naar marvin.zoetemelk@icloud.com
-- [ ] Cron uitbreiden: alert bij mislukking
+- [x] Supabase migratie 005: `admin_alerts` tabel ✅
+- [x] `lib/admin/alerts.ts`: `createAlert()` + `sendAlertEmail()` via Postmark ✅
+- [x] `app/api/admin/alerts/route.ts`: GET openstaande alerts ✅
+- [x] `components/admin/AlertsWidget.tsx`: widget bovenaan CT-root ✅
+- [x] Webhook uitbreiden: alert bij betalingsfout + e-mail naar admin ✅ (sessie 22, 2026-04-21)
+- [x] Cron uitbreiden: alert bij mislukking (weekly + monthly digest) ✅ (sessie 22)
+- [x] Alert bij vermoedelijke quota-misbruik (>= 10x 429 in 24u per user) ✅ (sessie 22, na KI-021)
+- [x] Alert bij herhaalde AI-analyse fouten (>= 3 in 1u per user) ✅ (sessie 22)
+- [x] Alert bij onverwacht nieuwe admin-rol (Postgres-trigger op profiles) ✅ (sessie 22)
+- [x] Supabase migratie 008: `alert_events` tabel + admin-promotie trigger ✅ (sessie 22)
 - [ ] Alert bij vermoedelijke referral-fraude (na GROWTH-001)
-- [ ] Alert bij onverwacht nieuwe admin-rol
 
 **INFRA-003: E-maillogo en BIMI**
 - [ ] Niveau 1 (direct): DBA Kompas-logo consistent in alle Postmark-templates (welkomst, digest, alert, reset)

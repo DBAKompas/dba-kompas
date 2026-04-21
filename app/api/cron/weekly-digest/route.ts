@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { sendWeeklyDigest } from '@/lib/email'
+import { createAlert } from '@/lib/admin/alerts'
 
 /**
  * Vercel Cron Job endpoint — wekelijkse digest.
@@ -36,6 +37,14 @@ export async function GET(request: Request) {
 
     if (subError) {
       console.error('[cron/weekly-digest] subscriptions query failed:', subError)
+      await createAlert({
+        type: 'cron_failed',
+        severity: 'critical',
+        title: 'Weekly-digest cron mislukt bij subscriptions-query',
+        message: 'De wekelijkse digest-cron kon de subscriptions-tabel niet lezen. De digest is niet verstuurd.',
+        metadata: { job: 'weekly-digest', stage: 'subscriptions_query', error: subError.message },
+        sendMail: true,
+      })
       return NextResponse.json({ error: 'Database error' }, { status: 500 })
     }
 
@@ -111,7 +120,25 @@ export async function GET(request: Request) {
     }
 
     const duration = Date.now() - startedAt
-    console.log(`[cron/weekly-digest] klaar in ${duration}ms — verstuurd: ${sent}, mislukt: ${failed}`)
+    console.log(`[cron/weekly-digest] klaar in ${duration}ms, verstuurd: ${sent}, mislukt: ${failed}`)
+
+    // Partial failure alert: sommige digests mislukt, maar de job zelf niet.
+    if (failed > 0) {
+      await createAlert({
+        type: 'cron_failed',
+        severity: failed >= sent ? 'critical' : 'warning',
+        title: `Weekly-digest: ${failed} mislukt`,
+        message: `Van ${sent + failed} digests zijn er ${failed} niet verstuurd. Kijk de failedUserIds na.`,
+        metadata: {
+          job: 'weekly-digest',
+          sent,
+          failed,
+          failedUserIds: errors.slice(0, 25),
+          durationMs: duration,
+        },
+        sendMail: failed >= sent, // alleen mail bij majority-failure
+      })
+    }
 
     return NextResponse.json({
       sent,
@@ -121,6 +148,18 @@ export async function GET(request: Request) {
     })
   } catch (error) {
     console.error('[cron/weekly-digest] onverwachte fout:', error)
+    await createAlert({
+      type: 'cron_failed',
+      severity: 'critical',
+      title: 'Weekly-digest cron is gecrasht',
+      message: 'De wekelijkse digest-cron is met een onverwachte fout afgebroken. Geen digests verstuurd in deze run.',
+      metadata: {
+        job: 'weekly-digest',
+        stage: 'outer_catch',
+        error: error instanceof Error ? error.message : String(error),
+      },
+      sendMail: true,
+    })
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
