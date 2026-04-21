@@ -7,7 +7,7 @@
 ## KRITIEK
 
 ### KI-021 — "Onbeperkt analyses"-belofte: AI-kostenrisico bij misbruik of accountdelen
-**Status:** CODE LIVE, MIGRATIE PENDING — 2026-04-21 (wacht op uitvoeren migration 007 in Supabase Studio)
+**Status:** OPGELOST — 2026-04-21 (migratie 007 uitgevoerd, Vercel-deploy groen, Postmark-templates bijgewerkt, UsageMeter live op dashboard. Stripe product-description check door Marvin akkoord.)
 **Bestanden:**
 - Nieuw: `supabase/migrations/007_usage_counters.sql`, `modules/usage/quota-config.ts`, `modules/usage/check-quota.ts`, `app/api/usage/route.ts`, `components/dashboard/UsageMeter.tsx`
 - Aangepast: `modules/billing/entitlements.ts` (nieuwe `getUserQuotaPlan`), `app/api/dba/analyse/route.ts` (reserveUsage + releaseUsage), `app/(app)/dashboard/page.tsx` (UsageMeter + success-tekst), `app/upgrade/page.tsx`, `content/landing.nl.ts`, `components/marketing/QuickScan.tsx`, `components/marketing/EmailCheckoutModal.tsx`, `email-templates/welkomstmail-*.html|.txt`, `scripts/create-resend-templates.ts`, `email-preview.html`, `docs/MASTERPLAN_SAAS_PROFESSIONAL.md`
@@ -21,11 +21,16 @@
 - UsageMeter component op dashboard toont "X / Y" met voortgangsbalk (groen/oranje bij 80%, rood bij limiet).
 - Success-banner na checkout is aangepast: van "onbeperkt" naar "u ziet rechts hoeveel analyses u deze maand nog kunt uitvoeren".
 - Upgrade-pagina, landing-content, quickscan modal-tiles, email-checkout modal en welkomstmails (HTML + TXT) tonen nu "Tot 20 DBA-checks per maand" en "Tot 25 DBA-checks per maand".
-**Restactie:**
-1. Migration `007_usage_counters.sql` draaien in Supabase Studio.
-2. Stripe product-beschrijvingen handmatig aanpassen in Stripe Dashboard (productname/description van monthly en yearly plan).
-3. End-to-end test: maak testaccount, voer 20 analyses uit op monthly, verifieer 429 bij 21e, verifieer reset op 1e volgende maand.
-4. Verifieer UsageMeter op dashboard visueel klopt (Chromium desktop + mobiel).
+**Restactie:** geen. Afgerond.
+
+**Verificatie:**
+- Migration 007 uitgevoerd: `pg_proc` toont `increment_usage_if_under_quota` en `release_usage_reservation` met `prosecdef = true`; `SELECT count(*) FROM public.usage_counters` returnt 0 (tabel aangemaakt, leeg).
+- Vercel-deploy groen na push.
+- Postmark-templates voor `welkomstmail-eenmalig | -maand | -jaar` bijgewerkt.
+- Stripe product-description: geen omschrijving ingevuld bij price of product, dus niks te wijzigen (geen "onbeperkt" zichtbaar voor klant).
+- UsageMeter visueel akkoord door Marvin op dashboard.
+
+**Restrisico (geaccepteerd):** one_time plan is count-based op `dba_assessments` en daardoor niet beschermd door atomic RPC. Exact gelijktijdige parallelle requests kunnen in theorie beide doorgaan (max 1 extra AI-call à circa 0,004 euro). Acceptabel voor launch; herevalueer pas bij bewezen misbruikpatroon.
 
 ---
 

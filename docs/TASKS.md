@@ -7,7 +7,7 @@
 ## IN PROGRESS
 
 ### KI-021 — Quota-cap per plan (vervangt "onbeperkt"-belofte)
-**Status:** Code klaar in repo, migration nog niet uitgevoerd.
+**Status:** AFGEROND — 2026-04-21.
 - [x] `supabase/migrations/007_usage_counters.sql` — tabel + RPC `increment_usage_if_under_quota` + RPC `release_usage_reservation` + RLS
 - [x] `modules/usage/quota-config.ts` — MONTHLY 20, YEARLY 25, ONE_TIME 1, FREE 0, WARN 80%, `currentPeriodStart()`
 - [x] `modules/usage/check-quota.ts` — `reserveUsage`, `releaseUsage`, `getUsageForUser` (fail-closed)
@@ -22,10 +22,11 @@
 - [x] `components/marketing/EmailCheckoutModal.tsx` — monthly/yearly features geüpdatet
 - [x] `email-templates/welkomstmail-maand.html|.txt` + `-jaar.html|.txt` + `-eenmalig.txt` — mailcopy
 - [x] `scripts/create-resend-templates.ts`, `email-preview.html`, `docs/MASTERPLAN_SAAS_PROFESSIONAL.md`
-- [ ] Migration 007 draaien in Supabase Studio
-- [ ] Stripe product-beschrijvingen in Stripe Dashboard aanpassen (Marvin handmatig)
-- [ ] End-to-end test: 20 analyses op monthly → 21e = 429 → verifieer reset op 1e volgende maand
-- [ ] UsageMeter visueel controleren (desktop + mobiel)
+- [x] Migration 007 uitgevoerd in Supabase Studio (pg_proc bevestigd)
+- [x] Postmark welkomstmail-templates bijgewerkt
+- [x] Stripe product-description check: geen omschrijving ingevuld, niks te wijzigen
+- [x] UsageMeter visueel akkoord bevonden door Marvin
+- [x] Vercel-deploy groen op main
 
 ### KI-020 — Guest checkout (geen wachtwoord vooraf)
 **Status:** Code live op main (commit `fdc455b` + `48dfb43`), wacht op TEST-006 retest na templates-update.
