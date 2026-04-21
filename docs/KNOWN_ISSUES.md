@@ -7,7 +7,7 @@
 ## HOOG
 
 ### KI-022 — Admin-rol promotie trigger verstuurt geen mail
-**Status:** OPEN — 2026-04-21 (rooktest sessie 22)
+**Status:** FIX GEPUSHT, WACHT OP VALIDATIE — 2026-04-21 (sessie 22 laatste werk — periodic mail-worker geimplementeerd)
 **Bestand:** `supabase/migrations/008_admin_alert_triggers.sql`, `lib/admin/alerts.ts`
 **Symptoom:** Na handmatige promotie van een testaccount naar `role = 'admin'` verschijnt er correct een rij in `public.admin_alerts` (type `general`, severity `critical`, title "Nieuwe admin-rol toegekend"), maar `email_sent = false` en er komt geen mail aan op `marvinzoetemelk@gmail.com`.
 **Oorzaak:** De Postgres-triggers `notify_admin_role_promotion` en `notify_admin_role_insert` doen een directe `INSERT INTO public.admin_alerts (...)`. Daarmee wordt de TypeScript-laag (`lib/admin/alerts.ts :: createAlert()` → `sendAlertEmail()`) volledig omzeild, en er gaat geen Postmark-mail uit. De andere drie triggers (cron, quota-misbruik, analyse-fouten) gaan wel via `createAlert()` en zullen wel mail versturen, maar dat is nog niet gerooktest.
@@ -22,9 +22,34 @@
 
 **Aanbevolen:** optie 2 (periodic worker). Robuust, werkt ook voor toekomstige alert-bronnen die buiten de app-laag draaien (DB-trigger, andere services). Backfill mogelijk voor historische rijen met `email_sent = false`.
 
-**Workaround tot fix:** handmatig Control Tower checken op openstaande alerts, of de query `SELECT * FROM public.admin_alerts WHERE resolved = false AND email_sent = false ORDER BY created_at DESC` periodiek draaien.
+**Fix (geïmplementeerd sessie 22):**
+- Nieuwe route `app/api/cron/pending-alerts/route.ts`.
+- Vercel cron in `vercel.json`: `*/5 * * * *` (elke 5 min).
+- Criteria: `email_sent = false AND resolved = false AND severity = 'critical' AND created_at > now() - 1 hour`, cap 10 per run, oplopende `created_at`-volgorde.
+- Idempotent: na succesvolle `sendAlertEmail()` wordt `email_sent = true` gezet.
+- Outer catch roept geen `createAlert` aan om loops te voorkomen.
+- CRON_SECRET Bearer auth (bestaand patroon).
 
-**Restactie:** volgende sessie optie 2 implementeren en backfill draaien.
+**Validatie (nog uit te voeren):**
+1. Wacht tot Vercel de cron heeft ingepland (max 5 min na deploy).
+2. Binnen 5 min na deploy krijgt Marvin alsnog de mail van de eerdere "Nieuwe admin-rol toegekend" alert van 09:43:30 (valt buiten 1-uur venster — zie restactie).
+3. Verifieer met:
+   ```sql
+   SELECT id, title, email_sent, created_at
+   FROM public.admin_alerts
+   WHERE title LIKE '%admin-rol%'
+   ORDER BY created_at DESC LIMIT 3;
+   ```
+4. Doe nieuwe rooktest met role-wissel: mail moet binnen 5 min aankomen.
+
+**Restactie / caveat:**
+- De eerdere rooktest-alert van 09:43:30 valt buiten het 1-uur venster en wordt NIET door de cron opgepikt. Marvin kan dit handmatig inhalen met:
+  ```sql
+  UPDATE public.admin_alerts
+  SET email_sent = false, created_at = now()
+  WHERE id = '<alert_id>';
+  ```
+  Of simpelweg een nieuwe rooktest doen.
 
 ---
 

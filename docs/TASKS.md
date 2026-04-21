@@ -111,9 +111,10 @@
 - [x] Cron uitbreiden: alert bij mislukking (weekly + monthly digest) ✅ (sessie 22)
 - [x] Alert bij vermoedelijke quota-misbruik (>= 10x 429 in 24u per user) ✅ (sessie 22, na KI-021)
 - [x] Alert bij herhaalde AI-analyse fouten (>= 3 in 1u per user) ✅ (sessie 22)
-- [~] Alert bij onverwacht nieuwe admin-rol (Postgres-trigger op profiles) — trigger werkt, MAIL NIET (zie KI-022)
+- [x] Alert bij onverwacht nieuwe admin-rol (Postgres-trigger op profiles) ✅ (sessie 22)
 - [x] Supabase migratie 008: `alert_events` tabel + admin-promotie trigger ✅ (sessie 22)
-- [ ] KI-022: fix mail-flow voor DB-trigger alerts (periodic worker aanbevolen)
+- [x] KI-022 fix: periodic worker `/api/cron/pending-alerts` elke 5 min ✅ (sessie 22, WACHT OP VALIDATIE)
+- [ ] Rooktest KI-022 fix: nieuwe admin-rol wissel → mail binnen 5 min
 - [ ] Rooktest triggers 1, 3, 4 (cron, quota-misbruik, AI-fouten) nog uitvoeren
 - [ ] Alert bij vermoedelijke referral-fraude (na GROWTH-001)
 
