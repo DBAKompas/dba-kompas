@@ -1,6 +1,6 @@
 # PROJECT_STATE.md
 
-**Laatste update:** 2026-04-21 (sessie 22 — INFRA-002 vervolg: cron-mislukking, quota-misbruik, AI-analyse herhaalde fouten, admin-rol promotie triggers uitgerold)
+**Laatste update:** 2026-04-21 (sessie 22 — INFRA-002 vervolg uitgerold; rooktest admin-rol onthult KI-022: DB-trigger omzeilt mail-flow)
 **Maturity:** ~100% MVP + conversie-geoptimaliseerde koopflow (guest-email checkout, click-through activatie, magic-link fallback)
 
 ---
@@ -263,6 +263,11 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
 6. Eerste RSS refresh handmatig triggeren.
 
 **Prioriteit 3 — Groei & kwaliteit:**
-7. ~~**INFRA-002 vervolg**: admin alerts verder uitrollen (fraude-detectie, nieuwe admin-rol).~~ ✅ (sessie 22, 2026-04-21 — triggers live voor cron-mislukking, quota-misbruik, AI-analyse herhaalde fouten en admin-rol promotie; migratie 008 moet nog uitgevoerd worden in Supabase Studio).
+7. **INFRA-002 vervolg** — grotendeels live (sessie 22, 2026-04-21):
+   - Triggers ingebouwd voor cron-mislukking, quota-misbruik, AI-analyse herhaalde fouten, admin-rol promotie.
+   - Migratie 008 uitgevoerd in Supabase, beide Postgres-triggers bevestigd.
+   - Code naar main gepusht, Vercel-deploy groen.
+   - Rooktest admin-rol: alert-rij staat correct in `admin_alerts` (severity `critical`), maar `email_sent = false` en mail niet aangekomen. Opgenomen als **KI-022** in KNOWN_ISSUES.md.
+   - Pending rooktests: trigger 1 (cron), 3 (quota-misbruik), 4 (AI-fouten).
 8. **PROD-003**: Notificaties als levend systeem (triggers bij analyse, hoog-impact nieuws, betalingsfout).
 9. **QUAL-001**: Analyse-ervaring verdiepen (heranalyse met diff, Word-download).

@@ -1,6 +1,32 @@
 # KNOWN_ISSUES.md
 **Bekende problemen en bugs**
-**Laatst bijgewerkt:** 2026-04-21 (sessie 22 — INFRA-002 triggers uitgerold: cron-mislukking, quota-misbruik, AI-analyse herhaalde fouten, admin-rol promotie. Migratie 008 klaar om uit te voeren.)
+**Laatst bijgewerkt:** 2026-04-21 (sessie 22 — INFRA-002 triggers uitgerold, rooktest admin-rol onthult KI-022: Postgres-trigger omzeilt createAlert, mail niet verstuurd)
+
+---
+
+## HOOG
+
+### KI-022 — Admin-rol promotie trigger verstuurt geen mail
+**Status:** OPEN — 2026-04-21 (rooktest sessie 22)
+**Bestand:** `supabase/migrations/008_admin_alert_triggers.sql`, `lib/admin/alerts.ts`
+**Symptoom:** Na handmatige promotie van een testaccount naar `role = 'admin'` verschijnt er correct een rij in `public.admin_alerts` (type `general`, severity `critical`, title "Nieuwe admin-rol toegekend"), maar `email_sent = false` en er komt geen mail aan op `marvinzoetemelk@gmail.com`.
+**Oorzaak:** De Postgres-triggers `notify_admin_role_promotion` en `notify_admin_role_insert` doen een directe `INSERT INTO public.admin_alerts (...)`. Daarmee wordt de TypeScript-laag (`lib/admin/alerts.ts :: createAlert()` → `sendAlertEmail()`) volledig omzeild, en er gaat geen Postmark-mail uit. De andere drie triggers (cron, quota-misbruik, analyse-fouten) gaan wel via `createAlert()` en zullen wel mail versturen, maar dat is nog niet gerooktest.
+
+**Impact:** Bij een echte security-event (iemand krijgt ten onrechte de admin-rol via direct SQL of seed) zit de melding in de database, maar Marvin ontvangt geen directe mail. Moet actief in Control Tower gekeken worden om de alert op te merken.
+
+**Mogelijke oplossingen (keuze in volgende sessie):**
+1. **Eenvoudigst — app-route-wrapper**: nieuwe `/api/admin/promote` endpoint dat zowel `profiles.role` update als `createAlert()` aanroept. Trigger blijft als fallback voor directe DB-wijzigingen, maar zonder mail.
+2. **Periodic worker**: nieuwe cron `pending-alerts` (elke 5 min) die `admin_alerts` rows selecteert waar `email_sent = false` en severity = `critical` en `created_at > now() - interval '1 hour'`, en per rij `sendAlertEmail` aanroept + `email_sent = true` zet.
+3. **Supabase Edge Function + Database Webhook**: trigger op INSERT naar `admin_alerts` stuurt HTTP POST naar `/api/admin/alerts/mail-pending/:id`.
+4. **pg_net extension**: trigger gebruikt `net.http_post()` om een Next.js-endpoint aan te roepen. Vereist extension en secret-management.
+
+**Aanbevolen:** optie 2 (periodic worker). Robuust, werkt ook voor toekomstige alert-bronnen die buiten de app-laag draaien (DB-trigger, andere services). Backfill mogelijk voor historische rijen met `email_sent = false`.
+
+**Workaround tot fix:** handmatig Control Tower checken op openstaande alerts, of de query `SELECT * FROM public.admin_alerts WHERE resolved = false AND email_sent = false ORDER BY created_at DESC` periodiek draaien.
+
+**Restactie:** volgende sessie optie 2 implementeren en backfill draaien.
+
+---
 
 ---
 
