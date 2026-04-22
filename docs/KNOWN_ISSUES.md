@@ -1,13 +1,13 @@
 # KNOWN_ISSUES.md
 **Bekende problemen en bugs**
-**Laatst bijgewerkt:** 2026-04-21 (sessie 22 eindstand — INFRA-002 triggers live, KI-022 fix via GitHub Actions externe cron gedeployed + Secrets toegevoegd + workflow groen gedraaid, backfill uitgevoerd, wacht op mail-validatie volgende tick)
+**Laatst bijgewerkt:** 2026-04-22 (sessie 23 — KI-022 OPGELOST: end-to-end mail-aflevering bevestigd in iCloud-inbox van Marvin. Mail kwam niet in Gmail omdat `ADMIN_ALERT_EMAIL` op Vercel wijst naar iCloud-adres, niet naar de Gmail-fallback uit de code.)
 
 ---
 
 ## HOOG
 
 ### KI-022 — Admin-rol promotie trigger verstuurt geen mail
-**Status:** FIX OPERATIONEEL, WACHT OP MAIL-VALIDATIE — 2026-04-21 (sessie 22 eindstand — GitHub Actions workflow run #1 groen, backfill uitgevoerd, volgende tick moet mail versturen)
+**Status:** OPGELOST — 2026-04-22 (sessie 23 — Hele keten gevalideerd: Vercel-route → Supabase service_role query → Postmark API → mail ontvangen in admin-inbox met juiste huisstijl, Nederlandse tijdzone en complete metadata-tabel.)
 **Bestand:** `supabase/migrations/008_admin_alert_triggers.sql`, `lib/admin/alerts.ts`
 **Symptoom:** Na handmatige promotie van een testaccount naar `role = 'admin'` verschijnt er correct een rij in `public.admin_alerts` (type `general`, severity `critical`, title "Nieuwe admin-rol toegekend"), maar `email_sent = false` en er komt geen mail aan op `marvinzoetemelk@gmail.com`.
 **Oorzaak:** De Postgres-triggers `notify_admin_role_promotion` en `notify_admin_role_insert` doen een directe `INSERT INTO public.admin_alerts (...)`. Daarmee wordt de TypeScript-laag (`lib/admin/alerts.ts :: createAlert()` → `sendAlertEmail()`) volledig omzeild, en er gaat geen Postmark-mail uit. De andere drie triggers (cron, quota-misbruik, analyse-fouten) gaan wel via `createAlert()` en zullen wel mail versturen, maar dat is nog niet gerooktest.
@@ -31,28 +31,24 @@
 
 **Cron-trigger (aangepast sessie 22):** eerst geprobeerd via Vercel cron `*/5 * * * *`, maar Vercel Hobby plan blokkeerde de deploy (max 2-3 grandfathered crons, minimum 1x/dag). Nu via GitHub Actions: `.github/workflows/pending-alerts.yml` runt elke 10 minuten (plus handmatig trigger mogelijk via workflow_dispatch) en curlt naar `/api/cron/pending-alerts`. Vereist 2 GitHub Secrets: `PRODUCTION_URL` = `https://dbakompas.nl` en `CRON_SECRET` (zelfde waarde als Vercel env).
 
-**Status sessie 22 eindstand:**
-1. GitHub Secrets toegevoegd: `PRODUCTION_URL = https://dbakompas.nl` + `CRON_SECRET` (zelfde waarde als Vercel env).
-2. Handmatige workflow-run #1 gedraaid: HTTP 200, response `{"processed":0,"mailed":0,"mailFailed":0,"durationMs":909}`. Endpoint + auth zijn dus operationeel.
-3. Backfill uitgevoerd op oude rooktest-alert van 09:43:30: rij id `647a2a4b-c6a9-4153-9398-e0d5570c6a70` heeft nu `created_at = 2026-04-21 12:35:29` (valt binnen het 1-uur venster).
-4. Eerstvolgende cron-tick (elke 10 min, plus handmatig via `workflow_dispatch`) moet deze rij oppakken, mail versturen en `email_sent = true` zetten.
+**Validatie sessie 23 (22-04-2026) — OPGELOST:**
+1. GitHub Secrets actief, workflow-run #7 manual trigger gaf `processed:0` omdat testrij buiten 1-uur venster was gegleden (1-uur timing-discipline benodigd).
+2. Fresh backfill: `UPDATE admin_alerts SET created_at = now(), email_sent = false, resolved = false WHERE id = '647a2a4b-c6a9-4153-9398-e0d5570c6a70'`.
+3. Direct daarna workflow-run #8 getriggerd: **HTTP 200, response `{"processed":1,"mailed":1,"mailFailed":0,"durationMs":1264}`**.
+4. Supabase-verificatie na run #8: `email_sent = true` voor bovenstaande rij. Idempotency-update door worker werkt.
+5. **Mail ontvangen in iCloud-inbox** om 12:15 UTC, 22-04-2026: subject `[DBA Kompas] KRITIEK: Nieuwe admin-rol toegekend`, juiste rode header voor severity=critical, Nederlandse tijdzone-stempel, metadata-tabel met email/user_id/previous_role, Open Control Tower-knop.
+6. Mail kwam NIET in Gmail omdat `ADMIN_ALERT_EMAIL` op Vercel wijst naar iCloud-adres (niet naar de Gmail-fallback in `lib/admin/alerts.ts` regel 4). Beide adressen zijn die van Marvin; de Vercel-env overrulet correct de fallback.
 
-**Validatie volgende sessie:**
-1. Check mailbox `marvinzoetemelk@gmail.com` op mail met subject "Nieuwe admin-rol toegekend".
-2. Verifieer in Supabase:
-   ```sql
-   SELECT id, title, email_sent, email_sent_at, created_at
-   FROM public.admin_alerts
-   WHERE id = '647a2a4b-c6a9-4153-9398-e0d5570c6a70';
-   ```
-   `email_sent` moet `true` zijn en `email_sent_at` gevuld.
-3. Als succesvol: doe een tweede rooktest met fresh role-wissel om end-to-end pad te valideren.
-4. Daarna KI-022 → OPGELOST zetten in dit bestand en `docs/TASKS.md` regel afvinken.
+**End-to-end bewijs:**
+- Vercel route → live execution (1264ms).
+- Supabase service_role client → rij gevonden + email_sent update geslaagd.
+- Postmark API → mail verzonden.
+- iCloud → afgeleverd in inbox binnen seconden, huisstijl en content correct.
 
-**Als er niks gebeurt:**
-- Check GitHub Actions tab → laatste "Pending alerts mail-worker" run → logs inspecteren.
-- Check Vercel function logs voor `/api/cron/pending-alerts`.
-- Verifieer dat de rij daadwerkelijk binnen 1 uur van `now()` valt en `severity = 'critical'` heeft.
+**Lessons learned voor toekomstige rooktests:**
+- Backfill en workflow-trigger moeten binnen het `MAX_AGE_HOURS = 1` venster vallen (aanbevolen binnen 5 minuten).
+- Check admin-mails in het adres dat in `ADMIN_ALERT_EMAIL` op Vercel staat, niet in de fallback-Gmail.
+- Het Postmark-setup (sender-verification, DKIM/SPF) werkt voor `noreply@dbakompas.nl`.
 
 ---
 

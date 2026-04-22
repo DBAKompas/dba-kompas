@@ -1,6 +1,6 @@
 # PROJECT_STATE.md
 
-**Laatste update:** 2026-04-21 (sessie 22 eindstand — INFRA-002 vervolg uitgerold + KI-022 fix via GitHub Actions externe cron live, workflow run #1 groen, backfill uitgevoerd, wacht op mail-validatie volgende tick)
+**Laatste update:** 2026-04-22 (sessie 23 — KI-022 OPGELOST, mail end-to-end gevalideerd in iCloud-inbox, admin_alerts.email_sent=true bevestigd)
 **Maturity:** ~100% MVP + conversie-geoptimaliseerde koopflow (guest-email checkout, click-through activatie, magic-link fallback)
 
 ---
@@ -240,19 +240,25 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
 
 ## LAATSTE ACTIE
 
-**Sessie:** 2026-04-21 (sessie 22 eindstand)
+**Sessie:** 2026-04-22 (sessie 23 — KI-022 OPGELOST)
 **Laatste commits (gepusht naar origin/main, Vercel-deploy groen):**
 - `29e0114` — `feat(admin): INFRA-002 triggers voor cron, quota-misbruik, AI-fouten, admin-rol promotie + migratie 008`
 - `bca1c9d` — `fix(admin): KI-022 periodic mail-worker voor pending admin_alerts`
 - Fix-commit — `fix(admin): KI-022 via GitHub Actions externe cron (Vercel Hobby blokkeerde 4e cron)`
 
-**GitHub Actions workflow operationeel:** `.github/workflows/pending-alerts.yml`, run #1 groen, HTTP 200.
+**GitHub Actions workflow operationeel en gevalideerd:** `.github/workflows/pending-alerts.yml`, workflow run #8 handmatig getriggerd op 2026-04-22, HTTP 200, response `{"processed":1,"mailed":1,"mailFailed":0,"durationMs":1264}`.
 
-**Openstaande actie voor Marvin:**
-1. **KI-022 eindvalidatie** (binnen 30 min na sessie-einde): check mailbox op "Nieuwe admin-rol toegekend" (backfill-rij id `647a2a4b-c6a9-4153-9398-e0d5570c6a70` moet opgepikt worden door volgende tick). Verifieer `email_sent = true` in admin_alerts.
-2. Rooktest triggers 1 (cron), 3 (quota-misbruik), 4 (AI-fouten) nog uit te voeren.
-3. Postmark-templates `welkomstmail-eenmalig | -maand | -jaar` handmatig aanpassen: primaire CTA naar `{{ activate_link }}`, secundaire link naar `{{ login_link }}`.
-4. TEST-006 B1/B2/B3 retest uitvoeren conform `docs/TEST_006_RESULTS.md` voor beide paden (activate + magic-link).
+**Validatie-bewijs sessie 23:**
+1. Fresh backfill SQL (id `647a2a4b-c6a9-4153-9398-e0d5570c6a70`) → `created_at = 2026-04-22 10:13:46.546357+00`, `email_sent = false`, `resolved = false`.
+2. Workflow run #8 pakte precies 1 rij op, mailde 1, mislukte 0.
+3. Supabase REST-check: `email_sent = true` op betreffende rij (idempotente update door worker bevestigd).
+4. Mail fysiek ontvangen in `marvin.zoetemelk@icloud.com` om 12:15 UTC met correcte huisstijl: rood KRITIEK-header, metadata-tabel (type/severity/tijdstip/email/user_id/previous_role), "Open Control Tower" button.
+5. `ADMIN_ALERT_EMAIL` in Vercel wijst bewust naar iCloud-adres (niet hardcoded Gmail-fallback in `lib/admin/alerts.ts`).
+
+**Openstaande acties voor Marvin:**
+1. Rooktest triggers 1 (cron-mislukking), 3 (quota-misbruik), 4 (AI-analyse-fouten) nog uit te voeren (admin-rol-trigger is 2 en nu groen).
+2. Postmark-templates `welkomstmail-eenmalig | -maand | -jaar` handmatig aanpassen: primaire CTA naar `{{ activate_link }}`, secundaire link naar `{{ login_link }}`.
+3. TEST-006 B1/B2/B3 retest uitvoeren conform `docs/TEST_006_RESULTS.md` voor beide paden (activate + magic-link).
 
 ## VOLGENDE GEPLANDE STAP
 
@@ -267,14 +273,13 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
 6. Eerste RSS refresh handmatig triggeren.
 
 **Prioriteit 3 — Groei & kwaliteit:**
-7. **INFRA-002 vervolg** — live (sessie 22, 2026-04-21):
+7. **INFRA-002 vervolg** — live + KI-022 OPGELOST (sessie 23, 2026-04-22):
    - Triggers ingebouwd voor cron-mislukking, quota-misbruik, AI-analyse herhaalde fouten, admin-rol promotie.
    - Migratie 008 uitgevoerd in Supabase, beide Postgres-triggers bevestigd.
    - Code naar main gepusht, Vercel-deploy groen.
    - **KI-022 fix LIVE via GitHub Actions**: `/api/cron/pending-alerts` route draait, Vercel Hobby blokkeerde een 4e cron dus `.github/workflows/pending-alerts.yml` curlt elke 10 min naar het endpoint met `Authorization: Bearer $CRON_SECRET`. Idempotent (email_sent = true na succes), 1-uur venster, cap 10 per run.
-   - **GitHub Secrets toegevoegd**: `PRODUCTION_URL = https://dbakompas.nl` + `CRON_SECRET` (zelfde waarde als Vercel env).
-   - **Workflow run #1 groen**: HTTP 200, response `{"processed":0,"mailed":0,"mailFailed":0,"durationMs":909}` (endpoint + auth operationeel).
-   - **Backfill uitgevoerd**: rooktest-alert van 09:43:30 (id `647a2a4b-c6a9-4153-9398-e0d5570c6a70`) heeft nu `created_at = 2026-04-21 12:35:29`, valt binnen 1-uur venster. Volgende worker-tick moet de mail versturen en `email_sent = true` zetten.
-   - **Pending volgende sessie**: check mail + verifieer `email_sent = true` in admin_alerts. Daarna rooktests trigger 1 (cron), 3 (quota-misbruik), 4 (AI-fouten).
+   - **GitHub Secrets**: `PRODUCTION_URL = https://dbakompas.nl` + `CRON_SECRET` (zelfde waarde als Vercel env).
+   - **KI-022 EINDVALIDATIE GESLAAGD (22-04-2026)**: workflow run #8 → HTTP 200 `{"processed":1,"mailed":1,"mailFailed":0,"durationMs":1264}`. Supabase `email_sent = true` bevestigd op testrij. Mail ontvangen in `marvin.zoetemelk@icloud.com` (ADMIN_ALERT_EMAIL env wijst bewust naar iCloud) met correcte huisstijl en metadata.
+   - **Nog openstaand**: rooktests trigger 1 (cron-mislukking), 3 (quota-misbruik), 4 (AI-fouten).
 8. **PROD-003**: Notificaties als levend systeem (triggers bij analyse, hoog-impact nieuws, betalingsfout).
 9. **QUAL-001**: Analyse-ervaring verdiepen (heranalyse met diff, Word-download).

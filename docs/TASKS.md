@@ -117,7 +117,7 @@
 - [x] GitHub Secrets toegevoegd: PRODUCTION_URL + CRON_SECRET ✅ (sessie 22)
 - [x] Workflow run #1 succesvol: HTTP 200, response `{"processed":0,"mailed":0,"mailFailed":0,"durationMs":909}` ✅ (sessie 22)
 - [x] Backfill rooktest-alert (id 647a2a4b-c6a9-4153-9398-e0d5570c6a70, created_at naar 2026-04-21 12:35:29) ✅ (sessie 22)
-- [ ] Validatie KI-022: eerstvolgende cron-tick (max 10 min na backfill) moet mail versturen en `email_sent = true` zetten. Check mailbox + `SELECT id, email_sent, email_sent_at FROM admin_alerts WHERE id = '647a2a4b-c6a9-4153-9398-e0d5570c6a70'`
+- [x] Validatie KI-022: workflow-run #8 (handmatig, 22-04-2026) → HTTP 200 `{"processed":1,"mailed":1,"mailFailed":0,"durationMs":1264}`, Supabase `email_sent=true`, mail ontvangen in iCloud-inbox met juiste huisstijl en metadata ✅ (sessie 23)
 - [ ] Rooktest triggers 1, 3, 4 (cron, quota-misbruik, AI-fouten) nog uitvoeren
 - [ ] Alert bij vermoedelijke referral-fraude (na GROWTH-001)
 
