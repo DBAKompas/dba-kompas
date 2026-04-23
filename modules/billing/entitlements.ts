@@ -158,6 +158,74 @@ export async function getQuotaPlansForUsers(
   return result
 }
 
+/**
+ * Afgeleide status voor een abonnement (maand / jaar).
+ *
+ * 'actief'    = active/trialing en niet aan het aflopen
+ * 'loopt_af'  = active/trialing maar cancel_at_period_end = true
+ * 'inactief'  = past of canceled, past_due, incomplete, of geen sub
+ * 'n.v.t.'    = user heeft geen subscription record (plan niet monthly/yearly)
+ *
+ * Gebruik in admin-overzichten en user-profielen. Losgekoppeld van
+ * resolveQuotaPlan zodat de twee concepten (betaalplan vs lifecycle-status)
+ * niet op elkaar gaan drukken.
+ */
+export type AbonnementStatus = 'actief' | 'loopt_af' | 'inactief' | 'n.v.t.'
+
+export function resolveAbonnementStatus(input: {
+  subscription: {
+    status: string | null
+    plan: string | null
+    cancel_at_period_end: boolean | null
+  } | null
+}): AbonnementStatus {
+  const { subscription } = input
+  if (!subscription) return 'n.v.t.'
+  if (subscription.plan !== 'monthly' && subscription.plan !== 'yearly') {
+    return 'n.v.t.'
+  }
+  const isLive =
+    subscription.status === 'active' || subscription.status === 'trialing'
+  if (!isLive) return 'inactief'
+  return subscription.cancel_at_period_end ? 'loopt_af' : 'actief'
+}
+
+/**
+ * Afgeleide status voor een eenmalige aankoop.
+ *
+ * 'beschikbaar'    = purchased en credit nog niet gebruikt
+ * 'in_uitvoering'  = in_progress
+ * 'vervuld'        = finalized of converted, of credit_used = true
+ * 'vervallen'      = expired
+ * 'n.v.t.'         = user heeft geen one_time_purchase record
+ *
+ * Niet te verwarren met resolveQuotaPlan dat alleen kijkt of een
+ * one_time het plan bepaalt; hier kijken we naar de lifecycle.
+ */
+export type EenmaligStatus =
+  | 'beschikbaar'
+  | 'in_uitvoering'
+  | 'vervuld'
+  | 'vervallen'
+  | 'n.v.t.'
+
+export function resolveEenmaligStatus(input: {
+  oneTimePurchase: {
+    status: string | null
+    credit_used: boolean | null
+  } | null
+}): EenmaligStatus {
+  const { oneTimePurchase } = input
+  if (!oneTimePurchase) return 'n.v.t.'
+  const status = oneTimePurchase.status
+  if (status === 'expired') return 'vervallen'
+  if (status === 'finalized' || status === 'converted') return 'vervuld'
+  if (oneTimePurchase.credit_used === true) return 'vervuld'
+  if (status === 'in_progress') return 'in_uitvoering'
+  if (status === 'purchased') return 'beschikbaar'
+  return 'n.v.t.'
+}
+
 export async function requirePlan(plan: Plan): Promise<boolean> {
   const userPlan = await getUserPlan()
   const hierarchy: Plan[] = ['free', 'pro', 'enterprise']
