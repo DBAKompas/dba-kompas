@@ -75,7 +75,7 @@ function LoadingScreen({ stepIdx }: { stepIdx: number }) {
           <div className="absolute inset-0 rounded-full border-4 border-primary border-t-transparent animate-spin" />
         </div>
 
-        {/* Steps — gecentreerd blok */}
+        {/* Steps - gecentreerd blok */}
         <div className="flex flex-col items-start gap-3">
           {LOADING_STEPS.map((step, i) => (
             <div key={i} className="flex items-center gap-3">
@@ -684,7 +684,7 @@ export default function AnalysePage() {
                 </div>
               )}
 
-              {/* Disclaimer — alleen eerste keer */}
+              {/* Disclaimer - alleen eerste keer */}
               {!hasAcceptedBefore && (
                 <div className="rounded-xl border border-amber-200 bg-amber-50 p-5 space-y-4">
                   <div className="flex items-center gap-2">

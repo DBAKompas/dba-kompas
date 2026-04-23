@@ -5,7 +5,7 @@
  * Stuurt de gebruiker door naar de inlogpagina, die de EmailCheckoutModal
  * bevat voor plan-selectie en account-aanmaak.
  *
- * Server component — geen client-side JS nodig.
+ * Server component - geen client-side JS nodig.
  */
 
 import { redirect } from 'next/navigation'

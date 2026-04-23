@@ -60,14 +60,14 @@ export interface NewsRewrite {
 }
 
 // ============================================================
-// V2 Engine — unified domain-based prompt (Fast Analysis)
+// V2 Engine - unified domain-based prompt (Fast Analysis)
 // ============================================================
 
 function buildDbaFastAnalysisPrompt(sanitizedInput: string, userContext: string, corpusContext: string): string {
   return `Je bent "DBA Analyse Assistent v2". Analyseer een opdrachtomschrijving op DBA-risico-indicatoren.
 
 STRIKTE REGELS:
-1. NOOIT juridische conclusies trekken — altijd indicatieve taal ("verhoogt het risico", "wijst vaker in de richting van", "kan het risico verlagen")
+1. NOOIT juridische conclusies trekken - altijd indicatieve taal ("verhoogt het risico", "wijst vaker in de richting van", "kan het risico verlagen")
 2. VERBODEN zinnen: "dit mag niet", "dit is juridisch onjuist", "dit is toegestaan", "dit is een arbeidsovereenkomst", "DBA-proof", "garantie", "100% compliant", "juridisch goedgekeurd", "veilig voor belastingdienst"
 3. Gebruik NOOIT Z/V-codes in gebruiksveld teksten (schrijf uitgesproken betekenis)
 4. Gebruik actieve, directe taal zonder hoofdletterconstructies. Schrijf conditioneel als dat van toepassing is: "door [aanpassing] neemt het risico op [domein] vermoedelijk af"
@@ -86,7 +86,7 @@ DRIE ANALYSEGEBIEDEN (gelijkwaardig gewicht):
   Onafhankelijkheidsindicatoren: vaste prijs per project, eigen materialen, aansprakelijk voor fouten
   BELANGRIJK: Een uurtarief is GEEN risicofactor zolang dat boven €36 ligt. Beoordeel alleen of er sprake is van eigen risico en aansprakelijkheid, niet het tarieftype.
 
-- Domein 3: Extern ondernemerschap — bewustwording (geen directe beoordelingsfactor voor de opdracht zelf)
+- Domein 3: Extern ondernemerschap - bewustwording (geen directe beoordelingsfactor voor de opdracht zelf)
   Context: Dit domein gaat over de ondernemer als persoon, niet over de opdracht. Gebruik het als aanvullende opmerking voor de ondernemer. Vermeld in het summary-veld altijd expliciet dat dit een bewustwordingspunt is voor de ondernemer zelf, niet een direct aandachtspunt in de opdracht.
   Signalen voor de ondernemer: exclusieve beschikbaarheid bij één opdrachtgever, geen andere opdrachtgevers, geen eigen acquisitie
   Positieve signalen: meerdere opdrachtgevers, eigen acquisitie, BTW-registratie, eigen website en profilering
@@ -110,7 +110,7 @@ DIRECTIONAL ASSESSMENT (typeHint kiezen):
 DUUR EN INZETINTENSITEIT (aparte contextmodule):
 Extraheer uit de tekst:
 - monthsAtClient: geschatte duur in maanden bij deze opdrachtgever (0 als niet vermeld of onbekend)
-- averageHoursPerWeekBand: geschat gemiddeld aantal uur per week — kies precies één van: "0-4" | "4-16" | "16-24" | "24-32" | "more-than-32" (gebruik "16-24" als conservatief standaard bij onduidelijkheid)
+- averageHoursPerWeekBand: geschat gemiddeld aantal uur per week - kies precies één van: "0-4" | "4-16" | "16-24" | "24-32" | "more-than-32" (gebruik "16-24" als conservatief standaard bij onduidelijkheid)
 - summary: 1-2 zinnen over de duur/uren-context en wat dit betekent voor het totaalrisico
 
 VERBETERPUNTEN:
@@ -192,7 +192,7 @@ REGELS:
 1. Gebruik indicatieve taal, geen juridische conclusies
 2. Verboden: "DBA-proof", "garantie", "100% compliant"
 3. Schrijf in begrijpelijk Nederlands, actieve zinnen
-4. ${isHighRisk ? 'Risico is hoog/midden — schrijf conditioneel en eerlijk' : 'Schrijf resultaatgericht en positief'}
+4. ${isHighRisk ? 'Risico is hoog/midden - schrijf conditioneel en eerlijk' : 'Schrijf resultaatgericht en positief'}
 
 CONTEXT:
 - Risico: ${analysisContext.overallRiskLabel}
@@ -228,7 +228,7 @@ REGELS:
 1. Gebruik indicatieve taal, geen juridische conclusies
 2. Verboden: "DBA-proof", "garantie", "100% compliant"
 3. Schrijf in begrijpelijk Nederlands, actieve zinnen
-4. ${isHighRisk ? 'Risico is hoog/midden — schrijf conditioneel en eerlijk over structurele beperkingen' : 'Schrijf resultaatgericht en positief'}
+4. ${isHighRisk ? 'Risico is hoog/midden - schrijf conditioneel en eerlijk over structurele beperkingen' : 'Schrijf resultaatgericht en positief'}
 
 CONTEXT:
 - Risico: ${analysisContext.overallRiskLabel}
@@ -418,7 +418,7 @@ function cleanBriefText(text: string): string {
   return s.replace(/\n{3,}/g, '\n\n').trim();
 }
 
-// KI-008: fase 1 output bevat geen draft-velden — long/compact/blocks zijn altijd undefined
+// KI-008: fase 1 output bevat geen draft-velden - long/compact/blocks zijn altijd undefined
 // hier. De guards (long ? ... : undefined) zijn no-ops maar bewust behouden voor toekomstig
 // hergebruik van deze functie vanuit fase 2 indien nodig.
 function postProcessDbaOutput(output: DbaEngineOutput): DbaEngineOutput {
@@ -476,7 +476,7 @@ export async function analyzeDbaText(
     return createInsufficientInputResponse(validation);
   }
 
-  // Bereken follow-up vragen op basis van signaaldetectie (niet via AI — bespaart tokens)
+  // Bereken follow-up vragen op basis van signaaldetectie (niet via AI - bespaart tokens)
   const followUpQuestions = buildFollowUpQuestions(validation.signals, 5);
 
   const sanitizedInput = sanitizeUserInput(inputText);

@@ -422,7 +422,7 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
     .eq('stripe_subscription_id', subscriptionId)
 
   // Notificatie alleen bij verlenging (subscription_cycle), niet bij eerste betaling.
-  // billing_reason = 'subscription_create' is de eerste betaling — die krijgt al een welkomstmail.
+  // billing_reason = 'subscription_create' is de eerste betaling - die krijgt al een welkomstmail.
   const billingReason = inv.billing_reason as string | null
   if (billingReason !== 'subscription_cycle') return
 

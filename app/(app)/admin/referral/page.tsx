@@ -269,7 +269,7 @@ export default function AdminReferralPage() {
                           <div className="flex items-center gap-1 flex-wrap">
                             {ref.milestones.length > 0
                               ? ref.milestones.map(m => <MilestoneBadge key={m} milestone={m} />)
-                              : <span className="text-xs text-muted-foreground">—</span>
+                              : <span className="text-xs text-muted-foreground">-</span>
                             }
                           </div>
                         </td>
@@ -285,7 +285,7 @@ export default function AdminReferralPage() {
           <div className="rounded-xl border border-border bg-card overflow-hidden">
             <div className="px-5 py-4 border-b border-border">
               <p className="text-sm font-semibold text-foreground">Recente activiteit</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Laatste 20 doorverwijzingen — wie verwees wie en wat er gekocht is</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Laatste 20 doorverwijzingen - wie verwees wie en wat er gekocht is</p>
             </div>
             {data.recentActivity.length === 0 ? (
               <div className="px-5 py-8 text-center text-sm text-muted-foreground">

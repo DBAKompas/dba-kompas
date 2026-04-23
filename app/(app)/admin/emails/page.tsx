@@ -24,21 +24,21 @@ const welcomeTemplates = [
   {
     id: 'one_time',
     label: 'Eenmalige check',
-    subject: 'DBA Kompas — Je check staat klaar',
+    subject: 'DBA Kompas - Je check staat klaar',
     trigger: 'Direct na aankoop eenmalige check',
     alias: 'welkomstmail-eenmalig',
   },
   {
     id: 'monthly',
     label: 'Maandabonnement',
-    subject: 'DBA Kompas — Je maandabonnement is actief',
+    subject: 'DBA Kompas - Je maandabonnement is actief',
     trigger: 'Direct na afsluiten maandabonnement',
     alias: 'welkomstmail-maand',
   },
   {
     id: 'yearly',
     label: 'Jaarabonnement',
-    subject: 'DBA Kompas — Je jaarabonnement is actief',
+    subject: 'DBA Kompas - Je jaarabonnement is actief',
     trigger: 'Direct na afsluiten jaarabonnement',
     alias: 'welkomstmail-jaar',
   },
@@ -256,7 +256,7 @@ export default function AdminEmailsPage() {
             Digest mails
           </h2>
           <p className="text-xs text-muted-foreground/70 mt-0.5">
-            Periodieke samenvattingen naar alle actieve abonnees. Nog niet actief — eerst inrichten, dan aanzetten.
+            Periodieke samenvattingen naar alle actieve abonnees. Nog niet actief - eerst inrichten, dan aanzetten.
           </p>
         </div>
 

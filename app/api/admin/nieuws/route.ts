@@ -22,7 +22,7 @@ async function requireAdmin(): Promise<{ error: NextResponse } | { userId: strin
   return { userId: user.id }
 }
 
-// ─── GET — lijst of enkel bericht ────────────────────────────
+// ─── GET - lijst of enkel bericht ────────────────────────────
 
 export async function GET(req: NextRequest) {
   const auth = await requireAdmin()
@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
 
   const id = req.nextUrl.searchParams.get('id')
 
-  // Enkel bericht ophalen (inclusief volledige content — voor bewerkformulier)
+  // Enkel bericht ophalen (inclusief volledige content - voor bewerkformulier)
   if (id) {
     const { data, error } = await supabaseAdmin
       .from('news_items')
@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(data)
   }
 
-  // Lijst (zonder content veld — voor overzicht)
+  // Lijst (zonder content veld - voor overzicht)
   const limit = parseInt(req.nextUrl.searchParams.get('limit') || '100', 10)
   const { data, error } = await supabaseAdmin
     .from('news_items')
@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
   return NextResponse.json(data)
 }
 
-// ─── POST — nieuw nieuwsbericht aanmaken ─────────────────────
+// ─── POST - nieuw nieuwsbericht aanmaken ─────────────────────
 
 export async function POST(req: NextRequest) {
   const auth = await requireAdmin()
@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json(data, { status: 201 })
 }
 
-// ─── PATCH — bestaand bericht bijwerken ──────────────────────
+// ─── PATCH - bestaand bericht bijwerken ──────────────────────
 
 export async function PATCH(req: NextRequest) {
   const auth = await requireAdmin()
@@ -156,7 +156,7 @@ export async function PATCH(req: NextRequest) {
   return NextResponse.json(data)
 }
 
-// ─── DELETE — bericht verwijderen ────────────────────────────
+// ─── DELETE - bericht verwijderen ────────────────────────────
 
 export async function DELETE(req: NextRequest) {
   const auth = await requireAdmin()

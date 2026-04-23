@@ -101,7 +101,7 @@ export default function FunnelPage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Sales Funnel</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Van quick scan tot betaalde analyse — conversie per stap
+          Van quick scan tot betaalde analyse - conversie per stap
         </p>
       </div>
 
@@ -215,7 +215,7 @@ export default function FunnelPage() {
               <div className="rounded-xl bg-muted/40 px-4 py-3">
                 <p className="text-muted-foreground text-xs mb-1">Quick scan → Registratie</p>
                 <p className="text-2xl font-bold text-foreground">
-                  {s.quickScans.totaal > 0 ? `${s.quickScans.naarRegistratieRate}%` : '—'}
+                  {s.quickScans.totaal > 0 ? `${s.quickScans.naarRegistratieRate}%` : '-'}
                 </p>
                 <p className="text-xs text-muted-foreground/60 mt-0.5">
                   {s.gebruikers.totaal} van {s.quickScans.totaal}
@@ -233,7 +233,7 @@ export default function FunnelPage() {
                 <p className="text-2xl font-bold text-foreground">
                   {s.gebruikers.betaald > 0
                     ? `${Math.round((s.analyses.totaal / s.gebruikers.betaald) * 100)}%`
-                    : '—'}
+                    : '-'}
                 </p>
                 <p className="text-xs text-muted-foreground/60 mt-0.5">
                   {s.analyses.totaal} analyses door {s.gebruikers.betaald} betaald

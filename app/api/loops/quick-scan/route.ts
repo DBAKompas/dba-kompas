@@ -59,7 +59,7 @@ export async function POST(request: Request) {
         }),
       });
     } else {
-      console.warn("[LOOPS] quick-scan contact update skipped — LOOPS_API_KEY niet geconfigureerd");
+      console.warn("[LOOPS] quick-scan contact update skipped - LOOPS_API_KEY niet geconfigureerd");
     }
 
     // Event versturen met alle antwoorden als properties

@@ -90,7 +90,7 @@ export async function POST(request: Request) {
       return NextResponse.json(result)
     }
 
-    // Full analysis result — insert into database
+    // Full analysis result - insert into database
     const analysisResult = result as Record<string, unknown>
 
     const { data: assessment, error: insertError } = await supabaseAdmin

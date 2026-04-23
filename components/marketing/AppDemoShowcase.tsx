@@ -87,7 +87,7 @@ function ScoreGauge({ pct, color, size = 108 }: { pct: number; color: string; si
 }
 
 /* ─────────────────────────────────────────────
-   SCROLL FADE — toont een verloopindicator als er meer inhoud onder is
+   SCROLL FADE - toont een verloopindicator als er meer inhoud onder is
 ───────────────────────────────────────────────── */
 function ScrollFade({
   children,
@@ -190,7 +190,7 @@ function StepDots({ current, total, onDotClick }: { current: number; total: numb
 }
 
 /* ─────────────────────────────────────────────
-   SCREEN 1 — HERO INTRO
+   SCREEN 1 - HERO INTRO
 ───────────────────────────────────────────────── */
 function HeroScreen({ active }: { active: boolean }) {
   const [phase, setPhase] = useState(0);
@@ -207,7 +207,7 @@ function HeroScreen({ active }: { active: boolean }) {
   return (
     <div className="flex flex-col items-center justify-center h-full min-h-[400px] px-6 py-10 text-center" style={{ background: NAVY }}>
 
-      {/* Logo — altijd in DOM, voorkomt layout-verschuiving */}
+      {/* Logo - altijd in DOM, voorkomt layout-verschuiving */}
       <motion.div
         animate={{ opacity: phase >= 1 ? 1 : 0, y: phase >= 1 ? 0 : -16 }}
         transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
@@ -217,7 +217,7 @@ function HeroScreen({ active }: { active: boolean }) {
         <div className="text-white/60 text-sm">Compliance hulpmiddel voor ZZP'ers</div>
       </motion.div>
 
-      {/* Counter — altijd in DOM, tabular-nums voorkomt breedte-schokken */}
+      {/* Counter - altijd in DOM, tabular-nums voorkomt breedte-schokken */}
       <motion.div
         animate={{ opacity: phase >= 1 ? 1 : 0 }}
         transition={{ duration: 0.5 }}
@@ -228,7 +228,7 @@ function HeroScreen({ active }: { active: boolean }) {
         <span>+ analyses gedaan</span>
       </motion.div>
 
-      {/* Tagline — altijd in DOM */}
+      {/* Tagline - altijd in DOM */}
       <motion.p
         animate={{ opacity: phase >= 2 ? 1 : 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
@@ -237,7 +237,7 @@ function HeroScreen({ active }: { active: boolean }) {
         AI-analyse van jouw DBA-opdracht in 60 seconden
       </motion.p>
 
-      {/* Pills — altijd in DOM, stagger via animate */}
+      {/* Pills - altijd in DOM, stagger via animate */}
       <div className="flex flex-wrap justify-center gap-2 mb-8">
         {pills.map((pill, i) => (
           <motion.span
@@ -260,7 +260,7 @@ function HeroScreen({ active }: { active: boolean }) {
 }
 
 /* ─────────────────────────────────────────────
-   SCREEN 2 — INPUT & ANALYSE STARTEN
+   SCREEN 2 - INPUT & ANALYSE STARTEN
 ───────────────────────────────────────────────── */
 function InputScreen({ active, onReady }: { active: boolean; onReady?: () => void }) {
   const [typed, setTyped] = useState("");
@@ -404,7 +404,7 @@ function InputScreen({ active, onReady }: { active: boolean; onReady?: () => voi
 }
 
 /* ─────────────────────────────────────────────
-   SCREEN 3 — AI VERWERKING
+   SCREEN 3 - AI VERWERKING
 ───────────────────────────────────────────────── */
 const STAGES = [
   { label: "Tekst wordt verwerkt", dur: 1200 },
@@ -517,7 +517,7 @@ function ProcessingScreen({ active }: { active: boolean }) {
 }
 
 /* ─────────────────────────────────────────────
-   SCREEN 4 — RESULTATEN
+   SCREEN 4 - RESULTATEN
 ───────────────────────────────────────────────── */
 const DOMAINS = [
   {
@@ -664,7 +664,7 @@ function ResultsScreen({ active }: { active: boolean }) {
           </p>
           <span className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full mb-2"
             style={{ background: "#FEF3C7", color: "#D97706" }}>
-            <AlertTriangle className="w-3 h-3" /> TWIJFEL — Aandacht nodig
+            <AlertTriangle className="w-3 h-3" /> TWIJFEL - Aandacht nodig
           </span>
           <p className="text-[11px] leading-relaxed" style={{ color: "#4B5563" }}>
             De opdracht bevat kenmerken van zelfstandige uitvoering, maar de beperkte vrijheid in aansturing en de lange duur vragen om aandacht. Optimalisatie kan het risico verlagen.
@@ -759,7 +759,7 @@ function ResultsScreen({ active }: { active: boolean }) {
 }
 
 /* ─────────────────────────────────────────────
-   SCREEN 5 — CTA
+   SCREEN 5 - CTA
 ───────────────────────────────────────────────── */
 function CtaScreen({ active, onSubscribe }: { active: boolean; onSubscribe?: () => void }) {
   return (
@@ -836,7 +836,7 @@ function CtaScreen({ active, onSubscribe }: { active: boolean; onSubscribe?: () 
           className="block w-full text-center text-white/60 text-xs hover:text-white transition-colors cursor-pointer"
           aria-label="Eenmalige check"
         >
-          Eenmalige check voor €9,95 — geen abonnement
+          Eenmalige check voor €9,95 - geen abonnement
         </button>
 
       </motion.div>
@@ -886,7 +886,7 @@ export default function AppDemoShowcase({ onSubscribe }: { onSubscribe?: () => v
 
   const advance = useCallback(() => goTo(screen + 1), [goTo, screen]);
 
-  // Auto-advance — alleen nadat de demo in beeld is gekomen
+  // Auto-advance - alleen nadat de demo in beeld is gekomen
   useEffect(() => {
     if (!started) return;
     clearTimeout(timerRef.current);
@@ -930,7 +930,7 @@ export default function AppDemoShowcase({ onSubscribe }: { onSubscribe?: () => v
           </div>
         </div>
 
-        {/* Screen area — fixed height, content scrolls inside */}
+        {/* Screen area - fixed height, content scrolls inside */}
         <div className="relative overflow-hidden" style={{ height: 480 }}>
           <AnimatePresence mode="wait" custom={dir}>
             <motion.div

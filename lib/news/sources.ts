@@ -25,7 +25,7 @@ export const RSS_SOURCES: RssSource[] = [
     name: 'ZipConomy',
     categoryHint: 'ZZP',
     priority: 1,
-    skipFiltering: true, // Dedicated ZZP-bron — altijd relevant
+    skipFiltering: true, // Dedicated ZZP-bron - altijd relevant
   },
   {
     url: 'https://feeds.rijksoverheid.nl/ministeries/ministerie-van-sociale-zaken-en-werkgelegenheid/nieuws.rss',
@@ -100,7 +100,7 @@ export const DBA_KEYWORDS = [
 ]
 
 /**
- * Zoekwoorden die wijzen op nieuws voor grote organisaties — niet relevant voor ZZP.
+ * Zoekwoorden die wijzen op nieuws voor grote organisaties - niet relevant voor ZZP.
  */
 export const LARGE_ORG_KEYWORDS = [
   'grootbedrijf', 'multinational', 'concern',

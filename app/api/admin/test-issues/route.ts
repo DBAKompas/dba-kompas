@@ -16,7 +16,7 @@ async function requireAdmin(): Promise<{ error: NextResponse } | { userId: strin
   return { userId: user.id }
 }
 
-// ── GET — alle issues ophalen ─────────────────────────────────────────────
+// ── GET - alle issues ophalen ─────────────────────────────────────────────
 
 export async function GET(req: NextRequest) {
   const auth = await requireAdmin()
@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
   return NextResponse.json(data ?? [])
 }
 
-// ── POST — nieuw issue aanmaken ───────────────────────────────────────────
+// ── POST - nieuw issue aanmaken ───────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
   const auth = await requireAdmin()
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json(data, { status: 201 })
 }
 
-// ── PATCH — issue oplossen ────────────────────────────────────────────────
+// ── PATCH - issue oplossen ────────────────────────────────────────────────
 
 export async function PATCH(req: NextRequest) {
   const auth = await requireAdmin()

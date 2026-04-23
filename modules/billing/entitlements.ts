@@ -13,7 +13,7 @@ export type Plan = 'free' | 'pro' | 'enterprise'
 export type QuotaPlan = 'free' | 'monthly' | 'yearly' | 'one_time'
 
 /**
- * Pure resolver — bepaalt het effectieve plan op basis van subscription-state
+ * Pure resolver - bepaalt het effectieve plan op basis van subscription-state
  * en eenmalige aankoop. Subscription (active/trialing met monthly/yearly) wint
  * altijd van one_time. Gebruikt door zowel single-user als batch-helpers
  * zodat er één bron van waarheid is voor plan-resolutie.

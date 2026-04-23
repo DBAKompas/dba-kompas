@@ -23,7 +23,7 @@ interface CreateAlertParams {
 
 /**
  * Slaat een alert op in de database en stuurt optioneel een e-mail.
- * Gooit nooit een fout terug — logging via console.error als fallback.
+ * Gooit nooit een fout terug - logging via console.error als fallback.
  */
 export async function createAlert(params: CreateAlertParams): Promise<void> {
   const {
@@ -211,7 +211,7 @@ async function hasRecentOpenAlert(type: AlertType, userId: string): Promise<bool
 /**
  * Registreert een quota-weigering (429) als event en triggert een
  * alert zodra de threshold overschreden wordt.
- * Nooit throwing — silent fallback bij DB-fouten.
+ * Nooit throwing - silent fallback bij DB-fouten.
  */
 export async function recordQuotaDenial(params: {
   userId: string

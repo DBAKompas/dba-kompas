@@ -22,7 +22,7 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // ── 1. Referral cookie opslaan (?ref=CODE in URL) ──────────────────────────
-  // Dit doen we altijd — ook voor niet-ingelogde bezoekers
+  // Dit doen we altijd - ook voor niet-ingelogde bezoekers
   const refCode = request.nextUrl.searchParams.get('ref')
 
   // Publieke routes altijd doorlaten

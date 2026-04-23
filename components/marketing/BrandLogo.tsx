@@ -2,10 +2,10 @@
 
 /**
  * Logo varianten:
- *   dark      — volledig logo (navy tekst + icoon) → lichte achtergronden
- *   white     — volledig logo (witte tekst + icoon) → donkere achtergronden
- *   iconDark  — alleen het kompas-icoon (navy) → lichte achtergronden
- *   iconWhite — alleen het kompas-icoon (wit) → donkere achtergronden
+ *   dark      - volledig logo (navy tekst + icoon) → lichte achtergronden
+ *   white     - volledig logo (witte tekst + icoon) → donkere achtergronden
+ *   iconDark  - alleen het kompas-icoon (navy) → lichte achtergronden
+ *   iconWhite - alleen het kompas-icoon (wit) → donkere achtergronden
  *
  * Verouderde varianten worden doorgestuurd naar de juiste bestanden.
  */
@@ -29,10 +29,10 @@ interface BrandLogoProps {
 
 const srcMap: Record<BrandLogoVariant, string> = {
   // Actuele varianten
-  dark:      "/logo-dark-v3.png",        // volledig wordmark (kompas + DBAKompas tekst) — lichte achtergrond
-  white:     "/logo-white.png",          // volledig logo — donkere achtergrond
-  iconDark:  "/logo-flat-dark.png",      // icoon only — lichte achtergrond
-  iconWhite: "/logo-flat-white.png",     // icoon only — donkere achtergrond
+  dark:      "/logo-dark-v3.png",        // volledig wordmark (kompas + DBAKompas tekst) - lichte achtergrond
+  white:     "/logo-white.png",          // volledig logo - donkere achtergrond
+  iconDark:  "/logo-flat-dark.png",      // icoon only - lichte achtergrond
+  iconWhite: "/logo-flat-white.png",     // icoon only - donkere achtergrond
   // Backwards-compat aliassen
   flatDark:    "/logo-flat-dark.png",
   flatWhite:   "/logo-flat-white.png",

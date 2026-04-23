@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────
-// Gidsen — type-systeem en content
+// Gidsen - type-systeem en content
 // ─────────────────────────────────────────────────────────────
 
 export type GuideBlock =
@@ -49,7 +49,7 @@ export const GUIDES: GuideEntry[] = [
   {
     slug: 'wet-dba-compleet',
     title: 'De Wet DBA: alles wat je moet weten',
-    subtitle: 'Van wetgeving tot handhaving — compleet overzicht',
+    subtitle: 'Van wetgeving tot handhaving - compleet overzicht',
     description: 'Een grondige uitleg van de Wet Deregulering Beoordeling Arbeidsrelaties: de geschiedenis, de criteria, wat er veranderd is in 2025 en wat het betekent voor jou als zzp\'er.',
     category: 'DBA & Arbeidsrelaties',
     readingTime: 12,
@@ -63,7 +63,7 @@ export const GUIDES: GuideEntry[] = [
       imp('Sinds 1 januari 2025 is het handhavingsmoratorium volledig opgeheven. De Belastingdienst handhaaft actief op schijnzelfstandigheid. Zowel opdrachtgevers als zzp\'ers lopen risico op naheffingen en boetes.', 'Handhaving is nu actief'),
 
       h2('De drie kerncriteria'),
-      p('De Belastingdienst beoordeelt of er sprake is van een dienstbetrekking aan de hand van drie elementen. Zijn alle drie aanwezig, dan is er sprake van een arbeidsovereenkomst — ook als partijen dat niet zo hebben bedoeld.'),
+      p('De Belastingdienst beoordeelt of er sprake is van een dienstbetrekking aan de hand van drie elementen. Zijn alle drie aanwezig, dan is er sprake van een arbeidsovereenkomst - ook als partijen dat niet zo hebben bedoeld.'),
 
       {
         type: 'table',
@@ -85,7 +85,7 @@ export const GUIDES: GuideEntry[] = [
 
       h2('Wat zijn de gevolgen bij een overtreding?'),
       ul([
-        'Naheffing loonbelasting en premies volksverzekeringen — met terugwerkende kracht tot vijf jaar.',
+        'Naheffing loonbelasting en premies volksverzekeringen - met terugwerkende kracht tot vijf jaar.',
         'Boete tot 100% van de naheffing bij opzet of grove schuld.',
         'Verlies van zelfstandigenaftrek en MKB-winstvrijstelling.',
         'Pensioenschade: werkgever kan worden verplicht het werknemerspensioen alsnog op te bouwen.',
@@ -93,11 +93,11 @@ export const GUIDES: GuideEntry[] = [
       ]),
 
       h2('Modelovereenkomsten'),
-      p('De Belastingdienst heeft een aantal modelovereenkomsten goedgekeurd die kunnen worden gebruikt als basis voor de contractuele relatie. Het gebruik van een goedgekeurde modelovereenkomst biedt zekerheid — maar alleen als de feitelijke werkwijze ook daadwerkelijk aansluit bij het model.'),
+      p('De Belastingdienst heeft een aantal modelovereenkomsten goedgekeurd die kunnen worden gebruikt als basis voor de contractuele relatie. Het gebruik van een goedgekeurde modelovereenkomst biedt zekerheid - maar alleen als de feitelijke werkwijze ook daadwerkelijk aansluit bij het model.'),
 
       tip('Een modelovereenkomst is een hulpmiddel, geen vrijbrief. Controleer altijd of de dagelijkse praktijk overeenstemt met de tekst van het contract.'),
 
-      h2('Het verschil met loondienst — samengevat'),
+      h2('Het verschil met loondienst - samengevat'),
       {
         type: 'table',
         headers: ['Kenmerk', 'Zzp\'er / opdrachtnemer', 'Werknemer'],
@@ -118,7 +118,7 @@ export const GUIDES: GuideEntry[] = [
   {
     slug: 'gezagsverhouding',
     title: 'Gezagsverhouding herkennen',
-    subtitle: '12 concrete signalen — en hoe je ze neutraliseert',
+    subtitle: '12 concrete signalen - en hoe je ze neutraliseert',
     description: 'De gezagsverhouding is het meest bepalende criterium bij DBA-controles. Leer welke signalen een rol spelen, waarom ze risicovol zijn en hoe je ze aanpakt.',
     category: 'DBA & Arbeidsrelaties',
     readingTime: 9,
@@ -126,7 +126,7 @@ export const GUIDES: GuideEntry[] = [
     tags: ['gezag', 'instructiebevoegdheid', 'arbeidsrelatie', 'dienstbetrekking'],
     blocks: [
       h2('Wat is een gezagsverhouding?'),
-      p('Een gezagsverhouding betekent dat de opdrachtgever bepaalt hoe het werk wordt uitgevoerd — niet alleen wát er wordt opgeleverd. Zodra iemand instructies kan geven over de werkwijze, werktijden, aanpak of gedrag, is er sprake van een mate van gezag. Dit is één van de drie vereisten voor een arbeidsovereenkomst.'),
+      p('Een gezagsverhouding betekent dat de opdrachtgever bepaalt hoe het werk wordt uitgevoerd - niet alleen wát er wordt opgeleverd. Zodra iemand instructies kan geven over de werkwijze, werktijden, aanpak of gedrag, is er sprake van een mate van gezag. Dit is één van de drie vereisten voor een arbeidsovereenkomst.'),
       p('Rechters en de Belastingdienst kijken hierbij naar het totaalplaatje. Eén enkel signaal is zelden doorslaggevend, maar meerdere signalen samen kunnen de relatie juridisch kleuren als een dienstbetrekking.'),
 
       imp('Bij DBA-controles is de gezagsverhouding het vaakst onderzochte criterium. Het telt zwaar mee, ook als de andere criteria (loon en persoonlijke arbeid) minder sterk aanwezig zijn.'),
@@ -134,15 +134,15 @@ export const GUIDES: GuideEntry[] = [
       h2('De 12 voornaamste signalen'),
 
       h3('1. Opdrachtgever bepaalt werktijden'),
-      p('Als je verplicht bent om op vaste tijden aanwezig te zijn — op locatie, in een vergadering, of online — dan heeft de opdrachtgever invloed op wanneer je werkt. Dat is een gezagssignaal.'),
+      p('Als je verplicht bent om op vaste tijden aanwezig te zijn - op locatie, in een vergadering, of online - dan heeft de opdrachtgever invloed op wanneer je werkt. Dat is een gezagssignaal.'),
       tip('Zorg voor een resultaatsverplichting met eigen planning. "Oplevering uiterlijk vrijdag" is beter dan "aanwezig maandag t/m vrijdag van 9 tot 17 uur".'),
 
       h3('2. Directe instructies over de werkwijze'),
-      p('Als een leidinggevende, manager of teamlead aangeeft hoe je taken moet uitvoeren — welke tools je gebruikt, hoe je communiceert, welke methode je volgt — is er sprake van inhoudelijke aansturing.'),
+      p('Als een leidinggevende, manager of teamlead aangeeft hoe je taken moet uitvoeren - welke tools je gebruikt, hoe je communiceert, welke methode je volgt - is er sprake van inhoudelijke aansturing.'),
       warn('Dit speelt sterk in IT-omgevingen waar agile-teams werken. Als de Scrum Master of Product Owner je werk stuurt en prioriteert, is er een gezagsrisico.'),
 
       h3('3. Integratie in de organisatie'),
-      p('Als je volledig onderdeel bent van een team — vaste werkplek, bedrijfsadres op je visitekaartje, deelname aan interne overleggen, toegang tot intern systemen als medewerker — dan is de grens met een dienstbetrekking dun.'),
+      p('Als je volledig onderdeel bent van een team - vaste werkplek, bedrijfsadres op je visitekaartje, deelname aan interne overleggen, toegang tot intern systemen als medewerker - dan is de grens met een dienstbetrekking dun.'),
 
       h3('4. Exclusiviteit of urenplafond'),
       p('Een verbod op het werken voor andere opdrachtgevers of een verplichting om een minimaal aantal uren te werken versterkt het beeld van een arbeidsrelatie.'),
@@ -156,7 +156,7 @@ export const GUIDES: GuideEntry[] = [
       h3('7. Functionerings- of beoordelingsgesprekken'),
       p('Dit is een sterk signaal. Beoordeling van functioneren is typisch iets van een werkgever/werknemer-relatie, niet van een opdrachtgever/opdrachtnemer-relatie.'),
 
-      imp('Als je opdrachtgever je uitnodigt voor een "evaluatiegesprek" of "functioneringsgesprek", vraag dan of dit kan worden omschreven als projectevaluatie — en leg dat vast.'),
+      imp('Als je opdrachtgever je uitnodigt voor een "evaluatiegesprek" of "functioneringsgesprek", vraag dan of dit kan worden omschreven als projectevaluatie - en leg dat vast.'),
 
       h3('8. Toestemming nodig voor verlof of afwezigheid'),
       p('Een zelfstandige hoeft geen verlof aan te vragen. Als je wel toestemming nodig hebt voor afwezigheid, is dat een duidelijk werkgeversrecht dat wordt uitgeoefend.'),
@@ -195,7 +195,7 @@ export const GUIDES: GuideEntry[] = [
     slug: 'zelfstandigheid-aantonen',
     title: 'Zelfstandigheid aantonen',
     subtitle: 'Het praktijkprotocol voor zzp\'ers die hun positie willen beschermen',
-    description: 'Zelfstandigheid is meer dan een KvK-inschrijving. Leer hoe je met concrete stappen aantoont dat je echt ondernemer bent — op papier en in de praktijk.',
+    description: 'Zelfstandigheid is meer dan een KvK-inschrijving. Leer hoe je met concrete stappen aantoont dat je echt ondernemer bent - op papier en in de praktijk.',
     category: 'DBA & Arbeidsrelaties',
     readingTime: 10,
     difficulty: 'gevorderd',
@@ -225,16 +225,16 @@ export const GUIDES: GuideEntry[] = [
         'Sluit een aansprakelijkheidsverzekering af en bewaar de polissen.',
         'Investeer in je eigen werkmateriaal: laptop, software, tools.',
         'Gebruik een zakelijke bankrekening en bewaar bankafschriften.',
-        'Accepteer opdrachten op basis van een vaste prijs of resultaatsverplichting — niet enkel per uur zonder enig risico.',
+        'Accepteer opdrachten op basis van een vaste prijs of resultaatsverplichting - niet enkel per uur zonder enig risico.',
       ]),
-      ex('Je accepteert een opdracht voor €15.000 voor de oplevering van een werkend systeem. Als het meer uren kost dan begroot, draag jij dat risico. Dat is ondernemersrisico. Vergelijk dit met "100 uur à €90 per uur, met goedkeuring voor eventuele meeruren" — dat laatste heeft minder ondernemerskarakter.', 'Voorbeeld van financieel risico'),
+      ex('Je accepteert een opdracht voor €15.000 voor de oplevering van een werkend systeem. Als het meer uren kost dan begroot, draag jij dat risico. Dat is ondernemersrisico. Vergelijk dit met "100 uur à €90 per uur, met goedkeuring voor eventuele meeruren" - dat laatste heeft minder ondernemerskarakter.', 'Voorbeeld van financieel risico'),
 
       h3('Pijler 3: Eigen werkwijze en middelen'),
       p('Jij bepaalt hoe je je werk uitvoert. Jij gebruikt je eigen materialen. Jij beslist welke tools, methoden en processen je inzet.'),
       ul([
         'Werk altijd met je eigen laptop en licenties.',
         'Gebruik je eigen software-abonnementen (Office, design tools, IDE\'s).',
-        'Maak je eigen planningen en kies je eigen werkplek — thuis, op kantoor of elders.',
+        'Maak je eigen planningen en kies je eigen werkplek - thuis, op kantoor of elders.',
         'Leg in het contract vast dat je vrij bent in de keuze van werkwijze.',
       ]),
 
@@ -281,7 +281,7 @@ export const GUIDES: GuideEntry[] = [
     tags: ['opdrachtomschrijving', 'contract', 'resultaat', 'formulering', 'it', 'publiek domein'],
     blocks: [
       h2('Waarom de opdrachtomschrijving zo belangrijk is'),
-      p('De opdrachtomschrijving is het fundament van je DBA-positie. Het is het eerste document dat de Belastingdienst opvraagt bij een controle. Het is ook de basis waarop je opdrachtgever jou aanneemt. Een zwakke opdrachtomschrijving creëert twijfel — over wie je bent, wat je doet, en of je wel écht zelfstandig werkt.'),
+      p('De opdrachtomschrijving is het fundament van je DBA-positie. Het is het eerste document dat de Belastingdienst opvraagt bij een controle. Het is ook de basis waarop je opdrachtgever jou aanneemt. Een zwakke opdrachtomschrijving creëert twijfel - over wie je bent, wat je doet, en of je wel écht zelfstandig werkt.'),
       p('Een sterke opdrachtomschrijving doet vier dingen tegelijk: het beschrijft het resultaat (niet de aanwezigheid), het legt de zelfstandigheid vast, het definieert de grenzen van de opdracht en het maakt duidelijk dat jij de professional bent die de aanpak bepaalt.'),
 
       h2('De zes bouwstenen van een goede opdrachtomschrijving'),
@@ -316,7 +316,7 @@ export const GUIDES: GuideEntry[] = [
 
       h3('6. Looptijd en afloopdatum'),
       p('Definieer de opdracht in tijd. Oneindige opdrachten zonder herdefiniëring van doelstellingen lijken op een vaste aanstelling.'),
-      tip('Herdefinieer bij elke verlenging de te leveren resultaten. Een verlenging is een nieuwe opdracht — behandel het ook zo.'),
+      tip('Herdefinieer bij elke verlenging de te leveren resultaten. Een verlenging is een nieuwe opdracht - behandel het ook zo.'),
 
       divider(),
 
@@ -369,7 +369,7 @@ export const GUIDES: GuideEntry[] = [
     blocks: [
       h2('Het einde van het moratorium'),
       p('Van 2016 tot en met 2024 gold een handhavingsmoratorium: de Belastingdienst kon wel controleren en aanwijzingen geven, maar legde in de meeste gevallen geen correcties op. Per 1 januari 2025 is dit moratorium volledig opgeheven.'),
-      p('Dat betekent dat de Belastingdienst nu actief kan controleren, naheffingen kan opleggen en boetes kan uitschrijven — ook voor situaties die al vóór 2025 speelden, tot vijf jaar terug.'),
+      p('Dat betekent dat de Belastingdienst nu actief kan controleren, naheffingen kan opleggen en boetes kan uitschrijven - ook voor situaties die al vóór 2025 speelden, tot vijf jaar terug.'),
 
       imp('Als je opdrachtrelaties in de afgelopen jaren niet goed waren gedocumenteerd of als de feiten wezen op een dienstbetrekking, loop je nu reëel risico. Onderneem actie.'),
 
@@ -401,7 +401,7 @@ export const GUIDES: GuideEntry[] = [
       ul([
         'Verlies van recht op zelfstandigenaftrek en MKB-winstvrijstelling over de betreffende periode.',
         'Mogelijke aanslagen inkomstenbelasting als het inkomen als loon wordt geherkwalificeerd.',
-        'In sommige gevallen: aanspraak op werknemersverzekeringen (WW, arbeidsongeschiktheid) — maar dat hangt af van de specifieke situatie.',
+        'In sommige gevallen: aanspraak op werknemersverzekeringen (WW, arbeidsongeschiktheid) - maar dat hangt af van de specifieke situatie.',
       ]),
 
       {
@@ -455,14 +455,14 @@ export const GUIDES: GuideEntry[] = [
     blocks: [
       h2('BTW: de basis'),
       p('BTW (Belasting over de Toegevoegde Waarde) is een verbruiksbelasting die je als ondernemer int namens de overheid. Je rekent BTW in rekening aan je klanten en draagt dat af aan de Belastingdienst. De BTW die je zelf betaalt over je zakelijke inkopen mag je aftrekken (voorbelasting).'),
-      p('Per saldo betaal je alleen BTW over de toegevoegde waarde — het verschil tussen wat je verkoopt en wat je inkoopt. In de meeste gevallen is het bedrag dat je ontvangt van klanten groter dan wat je zelf betaalt, en moet je per saldo BTW afdragen.'),
+      p('Per saldo betaal je alleen BTW over de toegevoegde waarde - het verschil tussen wat je verkoopt en wat je inkoopt. In de meeste gevallen is het bedrag dat je ontvangt van klanten groter dan wat je zelf betaalt, en moet je per saldo BTW afdragen.'),
 
       h2('BTW-tarieven in 2025'),
       {
         type: 'table',
         headers: ['Tarief', 'Van toepassing op'],
         rows: [
-          ['21%', 'Meeste diensten en producten — het standaardtarief voor zzp\'ers.'],
+          ['21%', 'Meeste diensten en producten - het standaardtarief voor zzp\'ers.'],
           ['9%', 'Voedingsmiddelen, geneesmiddelen, boeken, logies, arbeidsintensieve diensten.'],
           ['0%', 'Export buiten de EU, intracommunautaire levering, bepaalde vrijgestelde activiteiten.'],
           ['Vrijgesteld', 'Onderwijs, gezondheidszorg, financiële diensten, sommige culturele activiteiten.'],
@@ -492,13 +492,13 @@ export const GUIDES: GuideEntry[] = [
 
       h3('Nadelen KOR'),
       ul([
-        'Je kunt geen voorbelasting meer aftrekken — de BTW op jouw inkopen is definitief een kostenpost.',
+        'Je kunt geen voorbelasting meer aftrekken - de BTW op jouw inkopen is definitief een kostenpost.',
         'Als je omzet boven €20.000 uitkomt, vervalt de KOR direct per overschrijding (niet per jaareinde).',
         'Klanten die BTW kunnen aftrekken (B2B) kunnen je factuur minder aantrekkelijk vinden.',
         'Je bent gebonden voor minimaal drie jaar na aanmelding.',
       ]),
 
-      warn('De KOR is voordelig bij lage omzet en weinig zakelijke inkopen met BTW. Heb je veel investeringen of zakelijke kosten met BTW? Dan is de KOR waarschijnlijk nadelig — je loopt de aftrek van voorbelasting mis.', 'KOR niet voor iedereen voordelig'),
+      warn('De KOR is voordelig bij lage omzet en weinig zakelijke inkopen met BTW. Heb je veel investeringen of zakelijke kosten met BTW? Dan is de KOR waarschijnlijk nadelig - je loopt de aftrek van voorbelasting mis.', 'KOR niet voor iedereen voordelig'),
 
       h2('Buitenlandse opdrachten'),
       h3('Klanten in de EU (B2B)'),
@@ -510,9 +510,9 @@ export const GUIDES: GuideEntry[] = [
       h3('Klanten in de EU (B2C/particulieren)'),
       p('Lever je digitale diensten aan particulieren in andere EU-landen? Dan moet je de BTW afdragen in het land van de klant, tenzij je totale omzet in andere EU-landen onder €10.000 per jaar ligt.'),
 
-      imp('BTW-regels voor internationale diensten zijn complex. Vraag advies bij twijfel — een fout kan leiden tot dubbele BTW-heffing of een boete van het buitenlandse belastingkantoor.'),
+      imp('BTW-regels voor internationale diensten zijn complex. Vraag advies bij twijfel - een fout kan leiden tot dubbele BTW-heffing of een boete van het buitenlandse belastingkantoor.'),
 
-      h2('BTW op je factuur — de verplichte vermeldingen'),
+      h2('BTW op je factuur - de verplichte vermeldingen'),
       ul([
         'Je naam, adres en KvK-nummer.',
         'Je BTW-nummer (NL + 9 cijfers + B + 2 cijfers).',
@@ -541,7 +541,7 @@ export const GUIDES: GuideEntry[] = [
       h2('Welke aftrekposten zijn er?'),
       p('Als zzp\'er met een eenmanszaak of vof betaal je inkomstenbelasting over je winst. Die winst is je omzet min je aftrekbare kosten. Naast gewone zakelijke kosten zijn er specifieke ondernemersaftrekken en vrijstellingen die je winst verder verlagen.'),
 
-      imp('Om gebruik te kunnen maken van de zelfstandigenaftrek en startersaftrek, moet je voldoen aan het urencriterium: minimaal 1.225 uur per jaar aan je onderneming besteden. Dit zijn niet alleen declarabele uren — ook acquisitie, administratie en opleiding tellen mee.'),
+      imp('Om gebruik te kunnen maken van de zelfstandigenaftrek en startersaftrek, moet je voldoen aan het urencriterium: minimaal 1.225 uur per jaar aan je onderneming besteden. Dit zijn niet alleen declarabele uren - ook acquisitie, administratie en opleiding tellen mee.'),
 
       h2('De zelfstandigenaftrek'),
       p('De zelfstandigenaftrek is een vaste aftrek voor ondernemers die aan het urencriterium voldoen. Hij wordt jaarlijks verder afgebouwd.'),
@@ -566,7 +566,7 @@ export const GUIDES: GuideEntry[] = [
       tip('Je hoeft de startersaftrek niet in de eerste drie jaar te claimen. Als je in jaar 1 weinig winst maakt en de aftrek je fiscaal weinig oplevert, kan het voordeliger zijn om te wachten tot een jaar met hogere winst. Overleg dit met je boekhouder.'),
 
       h2('MKB-winstvrijstelling'),
-      p('De MKB-winstvrijstelling is een vrijstelling van 13,31% (2024) over je belastbare winst na aftrek van de ondernemersaftrekken. Je hoeft hier geen uren voor te maken — deze vrijstelling geldt voor alle ondernemers in de inkomstenbelasting.'),
+      p('De MKB-winstvrijstelling is een vrijstelling van 13,31% (2024) over je belastbare winst na aftrek van de ondernemersaftrekken. Je hoeft hier geen uren voor te maken - deze vrijstelling geldt voor alle ondernemers in de inkomstenbelasting.'),
       ex('Stel je hebt €60.000 winst. Na zelfstandigenaftrek (€2.470) is de belastbare winst €57.530. De MKB-winstvrijstelling is 13,31% van €57.530 = €7.657. Jouw belastbare inkomen is dan €57.530 - €7.657 = €49.873.'),
 
       h2('Zakelijke kosten aftrekken'),
@@ -579,11 +579,11 @@ export const GUIDES: GuideEntry[] = [
           ['Laptop, telefoon, software', 'Ja, volledig indien puur zakelijk', 'Gemengd gebruik: zakelijk deel aftrekbaar'],
           ['Auto (zakelijk)', 'Ja, op basis van werkelijke kosten', 'Of kies voor de bijtelling-regeling'],
           ['Auto (privé, zakelijk gereden km)', '€0,23 per km (2025)', 'Bijhouden via kilometeradministratie'],
-          ['Kantoorruimte thuis', 'Beperkt, alleen bij zelfstandige werkruimte', 'Strenge eisen — raadpleeg fiscalist'],
+          ['Kantoorruimte thuis', 'Beperkt, alleen bij zelfstandige werkruimte', 'Strenge eisen - raadpleeg fiscalist'],
           ['Opleiding en cursussen', 'Ja, indien beroepsgerelateerd', 'Bewaar bewijzen'],
           ['Reiskosten (OV, vliegtickets)', 'Ja, zakelijk deel', 'Bewaar bonnetjes/rekeningen'],
-          ['Marketing, website, drukwerk', 'Ja', '—'],
-          ['Verzekeringen (AOV, aansprakelijkheid)', 'Ja', '—'],
+          ['Marketing, website, drukwerk', 'Ja', '-'],
+          ['Verzekeringen (AOV, aansprakelijkheid)', 'Ja', '-'],
           ['Lunch/diner met klant', '80% aftrekbaar', 'Bewijs zakelijk karakter'],
           ['Kleding (zakelijk)', 'Alleen specifieke bedrijfskleding', 'Gewone kleding is niet aftrekbaar'],
         ],
@@ -611,7 +611,7 @@ export const GUIDES: GuideEntry[] = [
     tags: ['administratie', 'boekhouding', 'factuur', 'bewaarplicht', 'tools', 'aangifte'],
     blocks: [
       h2('Waarom een goede administratie essentieel is'),
-      p('Een correcte administratie is niet alleen een wettelijke verplichting — het is ook je bescherming bij een belastingcontrole, je basis voor slimme fiscale beslissingen en het fundament van een gezond ondernemerschap. Zonder goede administratie mis je aftrekposten, loop je risico op boetes en heb je geen grip op je cashflow.'),
+      p('Een correcte administratie is niet alleen een wettelijke verplichting - het is ook je bescherming bij een belastingcontrole, je basis voor slimme fiscale beslissingen en het fundament van een gezond ondernemerschap. Zonder goede administratie mis je aftrekposten, loop je risico op boetes en heb je geen grip op je cashflow.'),
 
       h2('Bewaarplicht: wat en hoe lang?'),
       p('Je bent wettelijk verplicht je administratie minimaal 7 jaar te bewaren. Voor onroerende zaken geldt zelfs 10 jaar. Dit geldt voor alle stukken die relevant zijn voor de belastingaangifte.'),
@@ -712,7 +712,7 @@ export const GUIDES: GuideEntry[] = [
   {
     slug: 'opdrachtovereenkomst',
     title: 'De opdrachtovereenkomst',
-    subtitle: 'Welke clausules beschermen jou — en welke risico\'s loer je over het hoofd?',
+    subtitle: 'Welke clausules beschermen jou - en welke risico\'s loer je over het hoofd?',
     description: 'Een grondige gids over de opdrachtovereenkomst voor zzp\'ers: welke bepalingen zijn essentieel, hoe onderhandel je over lastige clausules en wat zegt de wet?',
     category: 'Administratie & Ondernemen',
     readingTime: 13,
@@ -720,7 +720,7 @@ export const GUIDES: GuideEntry[] = [
     tags: ['contract', 'overeenkomst', 'clausule', 'aansprakelijkheid', 'ip', 'geheimhouding'],
     blocks: [
       h2('De opdrachtovereenkomst als fundament'),
-      p('De opdrachtovereenkomst (ook wel opdrachtencontract of freelancecontract) legt de relatie tussen jou en je opdrachtgever juridisch vast. Het is niet alleen een DBA-document — het regelt je betaling, aansprakelijkheid, intellectueel eigendom, geheimhouding en beëindiging.'),
+      p('De opdrachtovereenkomst (ook wel opdrachtencontract of freelancecontract) legt de relatie tussen jou en je opdrachtgever juridisch vast. Het is niet alleen een DBA-document - het regelt je betaling, aansprakelijkheid, intellectueel eigendom, geheimhouding en beëindiging.'),
       p('Veel zzp\'ers ondertekenen de standaardovereenkomst van de opdrachtgever zonder deze grondig te lezen. Dat is risicovol: de meeste standaardcontracten zijn geschreven in het belang van de opdrachtgever, niet van de zzp\'er.'),
 
       imp('Lees elk contract zorgvuldig. Bepaalde clausules kunnen je aansprakelijkheid onbeperkt maken, je eigendom van je werk wegnemen of je rechten op betaling beperken.'),
@@ -740,7 +740,7 @@ export const GUIDES: GuideEntry[] = [
 
       h3('4. Looptijd en beëindiging'),
       p('Geef aan wanneer de opdracht begint en eindigt. Definieer ook de opzegtermijn voor tussentijdse beëindiging.'),
-      warn('Vermijd te lange opzegtermijnen in het nadeel van de zzp\'er. Een bepaling als "de opdrachtgever kan per direct beëindigen zonder vergoeding" is oneerlijk — probeer een minimale vergoeding of opzegtermijn te bedingen.'),
+      warn('Vermijd te lange opzegtermijnen in het nadeel van de zzp\'er. Een bepaling als "de opdrachtgever kan per direct beëindigen zonder vergoeding" is oneerlijk - probeer een minimale vergoeding of opzegtermijn te bedingen.'),
 
       h3('5. Vrije vervanging'),
       p('Neem op dat je het werk mag (laten) uitvoeren door een andere persoon, mits die beschikt over de vereiste kwalificaties. Dit is ook cruciaal voor DBA-compliance.'),
@@ -771,7 +771,7 @@ export const GUIDES: GuideEntry[] = [
       h2('Rode vlaggen in contracten'),
       ul([
         'Onbeperkte aansprakelijkheid of boetes bij "wanprestatie" zonder definitie van wat dat is.',
-        '"Work for hire" — waarbij al je creatieve output automatisch eigendom van de opdrachtgever wordt.',
+        '"Work for hire" - waarbij al je creatieve output automatisch eigendom van de opdrachtgever wordt.',
         'Concurrentiebeding dat je na de opdracht verhindert voor vergelijkbare opdrachtgevers te werken.',
         'Eenzijdig opzeggingsrecht voor de opdrachtgever zonder vergoeding.',
         'Verplichting tot exclusiviteit (werken voor slechts één opdrachtgever tegelijk).',
@@ -788,7 +788,7 @@ export const GUIDES: GuideEntry[] = [
   {
     slug: 'pensioen-zzp',
     title: 'Pensioenopbouw als zzp\'er',
-    subtitle: 'Van lijfrente tot banksparen — jouw opties concreet uitgelegd',
+    subtitle: 'Van lijfrente tot banksparen - jouw opties concreet uitgelegd',
     description: 'Als zzp\'er bouw je geen pensioen op via een werkgever. Ontdek welke mogelijkheden je hebt, hoe de fiscale aftrek werkt en hoe je een pensioenstrategie kiest die bij jou past.',
     category: 'Fiscaal & Belasting',
     readingTime: 13,
@@ -796,14 +796,14 @@ export const GUIDES: GuideEntry[] = [
     tags: ['pensioen', 'lijfrente', 'banksparen', 'aov', 'jaarruimte', 'reserveringsruimte'],
     blocks: [
       h2('Het pensioenprobleem van de zzp\'er'),
-      p('Als werknemer bouw je automatisch pensioen op via je werkgever — verplicht deelname aan een pensioenfonds. Als zzp\'er heb je dit niet. Je ontvangt wel AOW (Algemene Ouderdomswet) zodra je de AOW-leeftijd bereikt (67 jaar in 2025, en stijgt mee met de levensverwachting), maar dat is slechts een basisinkomen dat voor de meeste zzp\'ers niet toereikend is.'),
+      p('Als werknemer bouw je automatisch pensioen op via je werkgever - verplicht deelname aan een pensioenfonds. Als zzp\'er heb je dit niet. Je ontvangt wel AOW (Algemene Ouderdomswet) zodra je de AOW-leeftijd bereikt (67 jaar in 2025, en stijgt mee met de levensverwachting), maar dat is slechts een basisinkomen dat voor de meeste zzp\'ers niet toereikend is.'),
 
       imp('Veel zzp\'ers realiseren zich pas laat dat hun pensioenpot veel te klein is. Begin vroeg. Zelfs kleine maandelijkse bijdragen, consequent opgebouwd, maken een enorm verschil door rente-op-rente.'),
 
       h2('Je opties voor pensioenopbouw'),
 
       h3('1. Lijfrenteverzekering'),
-      p('Een lijfrenteverzekering is een product bij een verzekeraar waarbij je premie belastingaftrekbaar is in het jaar dat je deze betaalt. Bij uitkering betaal je inkomstenbelasting — maar dan waarschijnlijk in een lager belastingtarief dan nu.'),
+      p('Een lijfrenteverzekering is een product bij een verzekeraar waarbij je premie belastingaftrekbaar is in het jaar dat je deze betaalt. Bij uitkering betaal je inkomstenbelasting - maar dan waarschijnlijk in een lager belastingtarief dan nu.'),
       ul([
         'Premie is aftrekbaar van je belastbaar inkomen (tot jaarruimte).',
         'Uitkering belast als inkomen.',
@@ -827,7 +827,7 @@ export const GUIDES: GuideEntry[] = [
       p('Je kunt ook zelf beleggen via een gewone beleggingsrekening. Het voordeel is volledige flexibiliteit. Het nadeel is dat je geen belastingaftrek geniet en dat het vermogen belast wordt in box 3 (vermogensrendementsheffing).'),
 
       h3('5. Pensioen via de BV (DGA-pensioen)'),
-      p('Werk je via een BV als directeur-grootaandeelhouder (DGA)? Dan kun je een salaris uit je BV nemen en via een extern pensioenfonds of verzekeraar pensioen opbouwen. Dit vereist aparte planning — vraag een fiscalist.'),
+      p('Werk je via een BV als directeur-grootaandeelhouder (DGA)? Dan kun je een salaris uit je BV nemen en via een extern pensioenfonds of verzekeraar pensioen opbouwen. Dit vereist aparte planning - vraag een fiscalist.'),
 
       h2('Jaarruimte: hoeveel mag je aftrekken?'),
       p('De jaarruimte bepaalt hoeveel premie je maximaal fiscaal aftrekbaar kunt storten in een lijfrenteproduct. De berekening is:'),

@@ -1,5 +1,5 @@
 /**
- * welcome-token.ts — HMAC-SHA256 signed tokens voor de post-payment
+ * welcome-token.ts - HMAC-SHA256 signed tokens voor de post-payment
  * account-activatie en magic-link fallback (KI-020-A).
  *
  * Waarom:

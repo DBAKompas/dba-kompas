@@ -31,8 +31,8 @@ function buildHtml(heading: string, body: string): string {
 const templates = [
   {
     envVar: 'RESEND_TEMPLATE_WELCOME_ONE_TIME',
-    name: 'DBA Kompas — Welkom eenmalige check',
-    subject: 'Je DBA-check is geactiveerd — welkom bij DBA Kompas',
+    name: 'DBA Kompas - Welkom eenmalige check',
+    subject: 'Je DBA-check is geactiveerd - welkom bij DBA Kompas',
     html: buildHtml(
       'Je DBA-check is geactiveerd',
       "Bedankt voor je aankoop. Je eenmalige DBA-check staat klaar. Plak je opdrachtomschrijving in het analyseveld en krijg direct inzicht in je DBA-risico's."
@@ -40,8 +40,8 @@ const templates = [
   },
   {
     envVar: 'RESEND_TEMPLATE_WELCOME_MONTHLY',
-    name: 'DBA Kompas — Welkom maandabonnement',
-    subject: 'Welkom bij DBA Kompas Pro — je maandabonnement is actief',
+    name: 'DBA Kompas - Welkom maandabonnement',
+    subject: 'Welkom bij DBA Kompas Pro - je maandabonnement is actief',
     html: buildHtml(
       'Welkom bij DBA Kompas Pro',
       'Je maandabonnement is actief. Je hebt nu toegang tot 20 DBA-checks per maand, alle gidsen en het laatste nieuws over DBA-wetgeving.'
@@ -49,8 +49,8 @@ const templates = [
   },
   {
     envVar: 'RESEND_TEMPLATE_WELCOME_YEARLY',
-    name: 'DBA Kompas — Welkom jaarabonnement',
-    subject: 'Welkom bij DBA Kompas Pro — je jaarabonnement is actief',
+    name: 'DBA Kompas - Welkom jaarabonnement',
+    subject: 'Welkom bij DBA Kompas Pro - je jaarabonnement is actief',
     html: buildHtml(
       'Welkom bij DBA Kompas Pro',
       'Je jaarabonnement is actief. Een vol jaar toegang met tot 25 DBA-checks per maand, alle gidsen en het laatste nieuws over DBA-wetgeving.'

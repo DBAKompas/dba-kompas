@@ -30,7 +30,7 @@ export const LANDING = {
 
   problem: {
     title: "Een onduidelijke opdrachtomschrijving kost tijd, vertrouwen en onderhandelingskracht",
-    intro: "Veel zzp'ers weten niet precies waar hun opdrachtomschrijving vragen oproept — totdat het te laat is.",
+    intro: "Veel zzp'ers weten niet precies waar hun opdrachtomschrijving vragen oproept - totdat het te laat is.",
     points: [
       {
         title: "Vertraging en extra uitleg",
@@ -51,7 +51,7 @@ export const LANDING = {
     badge: "Live demo",
     title: "Bekijk de app in actie",
     subtitle:
-      "Van opdrachtomschrijving naar risico-indicatie, aandachtspunten en een herschreven opdrachtbrief — overzichtelijk in één dashboard.",
+      "Van opdrachtomschrijving naar risico-indicatie, aandachtspunten en een herschreven opdrachtbrief - overzichtelijk in één dashboard.",
   },
 
   steps: {
@@ -257,7 +257,7 @@ export const LANDING = {
       {
         question: "Is DBA Kompas een juridisch advieskanaal?",
         answer:
-          "Nee. DBA Kompas is een ondersteunend hulpmiddel en biedt geen juridisch of fiscaal advies. De uitkomsten zijn indicatief en ondersteunend — je beoordeelt en verifieert output altijd zelf. Voor bindende conclusies raden we aan een gespecialiseerde jurist te raadplegen.",
+          "Nee. DBA Kompas is een ondersteunend hulpmiddel en biedt geen juridisch of fiscaal advies. De uitkomsten zijn indicatief en ondersteunend - je beoordeelt en verifieert output altijd zelf. Voor bindende conclusies raden we aan een gespecialiseerde jurist te raadplegen.",
       },
       {
         question: "Hoe werkt de AI-analyse?",
@@ -267,12 +267,12 @@ export const LANDING = {
       {
         question: "Voor wie is DBA Kompas bedoeld?",
         answer:
-          "DBA Kompas is ontwikkeld voor zakelijk gebruik — door zelfstandigen, freelancers, ondernemers en opdrachtgevers die handelen in de uitoefening van hun beroep of bedrijf. Registratie is uitsluitend bedoeld voor zakelijke gebruikers.",
+          "DBA Kompas is ontwikkeld voor zakelijk gebruik - door zelfstandigen, freelancers, ondernemers en opdrachtgevers die handelen in de uitoefening van hun beroep of bedrijf. Registratie is uitsluitend bedoeld voor zakelijke gebruikers.",
       },
       {
         question: "Hoe gaat DBA Kompas om met mijn gegevens?",
         answer:
-          "Privacy nemen we serieus. Analysegegevens en geëxtraheerde tekst worden standaard maximaal 14 dagen bewaard. Originele uploads worden niet permanent opgeslagen. Betalingen verlopen via Stripe — wij verwerken zelf geen kaart- of bankgegevens. Meer informatie vind je in ons Privacy- en Cookiebeleid.",
+          "Privacy nemen we serieus. Analysegegevens en geëxtraheerde tekst worden standaard maximaal 14 dagen bewaard. Originele uploads worden niet permanent opgeslagen. Betalingen verlopen via Stripe - wij verwerken zelf geen kaart- of bankgegevens. Meer informatie vind je in ons Privacy- en Cookiebeleid.",
       },
       {
         question: "Wat kost DBA Kompas?",

@@ -5,7 +5,7 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
-  // Auth check — alleen admin
+  // Auth check - alleen admin
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -75,8 +75,8 @@ export async function GET() {
 
   const topReferrers = sortedReferrers.map(([id, count]) => ({
     userId: id,
-    email: profileMap[id] ?? '—',
-    code: codeMap[id] ?? '—',
+    email: profileMap[id] ?? '-',
+    code: codeMap[id] ?? '-',
     qualifiedCount: count,
     milestones: rewardsMap[id] ?? [],
   }))
@@ -133,8 +133,8 @@ export async function GET() {
 
   const recentActivity = (recentRaw ?? []).map(row => ({
     id: row.id,
-    referredEmail: activityProfileMap[row.referred_user_id] ?? '—',
-    referrerEmail: activityProfileMap[row.referrer_id] ?? '—',
+    referredEmail: activityProfileMap[row.referred_user_id] ?? '-',
+    referrerEmail: activityProfileMap[row.referrer_id] ?? '-',
     referralCode: row.referral_code,
     status: row.status,
     purchase: purchaseMap[row.referred_user_id] ?? null,

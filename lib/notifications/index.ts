@@ -5,7 +5,7 @@
  * Alle functies zijn fire-and-forget veilig: gooi je ze in een .catch(),
  * dan blokkeert een notificatiefout nooit de hoofd-response.
  *
- * Service_role bypast RLS in Supabase — geen extra INSERT-policy nodig.
+ * Service_role bypast RLS in Supabase - geen extra INSERT-policy nodig.
  */
 
 import { supabaseAdmin } from '@/lib/supabase/admin'
@@ -27,7 +27,7 @@ export interface CreateNotificationParams {
 
 /**
  * Maakt één notificatie aan voor een specifieke gebruiker.
- * Veilig om fire-and-forget te gebruiken (.catch()) — gooit een fout
+ * Veilig om fire-and-forget te gebruiken (.catch()) - gooit een fout
  * die de aanroeper zelf kan afhandelen of negeren.
  */
 export async function createNotification(params: CreateNotificationParams): Promise<void> {

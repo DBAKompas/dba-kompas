@@ -38,7 +38,7 @@ export default function QuickScanModal({ open, onOpenChange }: QuickScanModalPro
           aria-describedby={undefined}
         >
           <DialogPrimitive.Title className="sr-only">
-            Gratis zelfscan — hoe staat jouw opdracht ervoor?
+            Gratis zelfscan - hoe staat jouw opdracht ervoor?
           </DialogPrimitive.Title>
 
           <div className="relative overflow-y-auto overscroll-contain rounded-2xl">

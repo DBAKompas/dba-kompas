@@ -48,7 +48,7 @@ export async function updateLoopsContact(
   dedupKey?: string
 ): Promise<void> {
   if (!LOOPS_API_KEY) {
-    console.warn(`[LOOPS] updateContact skipped — LOOPS_API_KEY not configured`);
+    console.warn(`[LOOPS] updateContact skipped - LOOPS_API_KEY not configured`);
     return;
   }
 
@@ -71,7 +71,7 @@ export async function updateLoopsContact(
     if (!response.ok) {
       const text = await response.text().catch(() => "(no body)");
       console.error(
-        `[LOOPS] updateContact failed for ${maskEmail(email)}: HTTP ${response.status} — ${text}`
+        `[LOOPS] updateContact failed for ${maskEmail(email)}: HTTP ${response.status} - ${text}`
       );
       return;
     }
@@ -98,7 +98,7 @@ export async function sendLoopsEvent(
   { email, userId, properties, dedupKey }: LoopsEventPayload
 ): Promise<void> {
   if (!LOOPS_API_KEY) {
-    console.warn(`[LOOPS] ${eventName} skipped — LOOPS_API_KEY not configured`);
+    console.warn(`[LOOPS] ${eventName} skipped - LOOPS_API_KEY not configured`);
     return;
   }
 
@@ -126,7 +126,7 @@ export async function sendLoopsEvent(
     if (!response.ok) {
       const text = await response.text().catch(() => "(no body)");
       console.error(
-        `[LOOPS] ${eventName} failed for ${maskEmail(email)}: HTTP ${response.status} — ${text}`
+        `[LOOPS] ${eventName} failed for ${maskEmail(email)}: HTTP ${response.status} - ${text}`
       );
       return;
     }

@@ -4,7 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
 import { stripe } from '@/lib/stripe/client'
 
 /**
- * Server component — geen UI, directe server-side actie.
+ * Server component - geen UI, directe server-side actie.
  *
  * Flow:
  * 1. Niet ingelogd            → redirect naar /login?next=/upgrade-to-pro

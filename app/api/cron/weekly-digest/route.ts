@@ -4,7 +4,7 @@ import { sendWeeklyDigest } from '@/lib/email'
 import { createAlert } from '@/lib/admin/alerts'
 
 /**
- * Vercel Cron Job endpoint — wekelijkse digest.
+ * Vercel Cron Job endpoint - wekelijkse digest.
  * Schedule: elke maandag om 07:00 UTC (09:00 CET / 09:00 CEST).
  *
  * Vercel stuurt automatisch de Authorization-header met de CRON_SECRET.
@@ -19,7 +19,7 @@ export async function GET(request: Request) {
 
   // Digest is uitgeschakeld totdat DIGEST_ENABLED=true is ingesteld in Vercel
   if (process.env.DIGEST_ENABLED !== 'true') {
-    console.log('[cron/weekly-digest] overgeslagen — DIGEST_ENABLED is niet ingesteld op true')
+    console.log('[cron/weekly-digest] overgeslagen - DIGEST_ENABLED is niet ingesteld op true')
     return NextResponse.json({ skipped: true, reason: 'DIGEST_ENABLED is not true' })
   }
 

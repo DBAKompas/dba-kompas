@@ -121,7 +121,7 @@ export default function AdminTestsPage() {
       setResults(map)
       setIssues(Array.isArray(dataIssues) ? dataIssues : [])
     } catch {
-      // stil falen — pagina toont pending staat
+      // stil falen - pagina toont pending staat
     } finally {
       setLoadingData(false)
     }
@@ -504,7 +504,7 @@ export default function AdminTestsPage() {
                   <div className="rounded-lg bg-muted/40 border border-border p-3 space-y-2">
                     <div className="flex items-center justify-between">
                       <p className="text-xs font-medium text-muted-foreground">
-                        Gegenereerde prompt — kopieer en plak in de chat
+                        Gegenereerde prompt - kopieer en plak in de chat
                       </p>
                       <button
                         onClick={() => copyPrompt(issue.prompt, issue.id)}

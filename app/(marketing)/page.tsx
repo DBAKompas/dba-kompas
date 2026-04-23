@@ -136,7 +136,7 @@ export default function Home() {
             <BrandLogo variant="dark" className="h-9 w-auto" />
           </Link>
 
-          {/* Hamburger — alleen mobiel */}
+          {/* Hamburger - alleen mobiel */}
           <button
             className="md:hidden flex items-center justify-center w-9 h-9 rounded-lg text-foreground hover:bg-primary/8 transition-colors"
             onClick={() => setMenuOpen(o => !o)}

@@ -1,5 +1,5 @@
 /**
- * /auth/welcome/<token> — magic-link click-through (KI-020-A).
+ * /auth/welcome/<token> - magic-link click-through (KI-020-A).
  *
  * Alternatief voor /auth/activate/<token>: wie geen wachtwoord wil
  * instellen klikt hier en wordt via een verse, server-gegenereerde

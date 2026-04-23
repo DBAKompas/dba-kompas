@@ -1,5 +1,5 @@
 /**
- * /checkout/success — bevestiging na Stripe guest-checkout (KI-020).
+ * /checkout/success - bevestiging na Stripe guest-checkout (KI-020).
  *
  * Deze pagina is de success_url voor zowel `/api/billing/checkout-guest`
  * (subscription) als `/api/one-time/checkout-guest` (eenmalige aankoop).

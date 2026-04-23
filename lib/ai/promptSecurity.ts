@@ -424,7 +424,7 @@ export function checkResponseForBannedPhrases(response: Record<string, unknown>)
 }
 
 // ============================================================
-// V2 Engine Schema — domain-based DBA analysis output
+// V2 Engine Schema - domain-based DBA analysis output
 // ============================================================
 
 const VALID_DOMAIN_KEYS = ['aansturing', 'eigen_rekening_risico', 'ondernemerschap'] as const;
@@ -455,7 +455,7 @@ const directionalAssessmentSchema = z.object({
 });
 
 const simulationHintSchema = z.preprocess(
-  // Haiku sometimes returns strings instead of objects — coerce to object
+  // Haiku sometimes returns strings instead of objects - coerce to object
   (val) => typeof val === 'string' ? { improvement: val, expectedEffect: 'likely_no_change' } : val,
   z.object({
     improvement: z.string(),

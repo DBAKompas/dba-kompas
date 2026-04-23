@@ -48,7 +48,7 @@ export default function ReferralWidget() {
         <div className="flex items-center gap-2">
           <Gift className="size-5 text-violet-600 shrink-0" />
           <div>
-            <p className="font-semibold text-foreground text-sm">Deel DBA Kompas — verdien gratis analyses</p>
+            <p className="font-semibold text-foreground text-sm">Deel DBA Kompas - verdien gratis analyses</p>
             <p className="text-xs text-muted-foreground mt-0.5">
               Stuur uw persoonlijke link naar een collega zzp&apos;er
             </p>

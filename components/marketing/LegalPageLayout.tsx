@@ -20,7 +20,7 @@ export default function LegalPageLayout({
   return (
     <div className="min-h-screen bg-background text-foreground">
 
-      {/* Header — zelfde stijl als landing page */}
+      {/* Header - zelfde stijl als landing page */}
       <header className="border-b border-border/40 bg-background/95 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
           <Link href="/" className="flex items-center" data-testid="legal-link-home">

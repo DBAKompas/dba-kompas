@@ -5,7 +5,7 @@ import { fetchAndStoreNews, isRefreshOnCooldown } from '@/lib/news/fetch'
 // Zowel handmatige POST (door ingelogde gebruiker) als Vercel cron-job (GET)
 
 export async function POST(request: Request) {
-  // Auth check — alleen ingelogde gebruikers
+  // Auth check - alleen ingelogde gebruikers
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {

@@ -59,7 +59,7 @@ export function AlertsWidget() {
       const data = await res.json()
       setAlerts(data.alerts ?? [])
     } catch {
-      // stil falen — widget toont niets als API onbereikbaar is
+      // stil falen - widget toont niets als API onbereikbaar is
     } finally {
       setLoading(false)
     }

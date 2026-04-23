@@ -69,7 +69,7 @@ const ABO_BADGE: Record<AbonnementStatus, { label: string; cls: string }> = {
     cls: 'bg-red-500/10 text-red-600 dark:text-red-400',
   },
   'n.v.t.': {
-    label: '—',
+    label: '-',
     cls: 'text-muted-foreground',
   },
 }
@@ -92,7 +92,7 @@ const EENMALIG_BADGE: Record<EenmaligStatus, { label: string; cls: string }> = {
     cls: 'bg-red-500/10 text-red-600 dark:text-red-400',
   },
   'n.v.t.': {
-    label: '—',
+    label: '-',
     cls: 'text-muted-foreground',
   },
 }
@@ -102,7 +102,7 @@ function planLabel(plan: QuotaPlan): string {
 }
 
 function formatDatum(iso: string | null): string {
-  if (!iso) return '—'
+  if (!iso) return '-'
   return new Date(iso).toLocaleDateString('nl-NL', {
     day: 'numeric',
     month: 'short',
@@ -338,7 +338,7 @@ export default function GebruikersPage() {
                       className="border-b border-border/30 hover:bg-muted/30 transition-colors"
                     >
                       <td className="px-5 py-3 font-medium text-foreground align-top">
-                        {g.email ?? '—'}
+                        {g.email ?? '-'}
                       </td>
                       <td className="px-5 py-3 text-muted-foreground align-top">
                         {planLabel(g.plan)}

@@ -88,7 +88,7 @@ export function EmailCheckoutModal({ onClose, preselectedPlan = "yearly" }: Emai
   const [step, setStep] = useState<1 | 2>(1);
   const [plan, setPlan] = useState<PlanKey>(preselectedPlan);
 
-  // Step 2 state — alleen e-mail + terms. User wordt NA betaling aangemaakt
+  // Step 2 state - alleen e-mail + terms. User wordt NA betaling aangemaakt
   // via de webhook (KI-020 guest-flow).
   const [email, setEmail] = useState("");
   const [agreed, setAgreed] = useState(false);
@@ -291,7 +291,7 @@ export function EmailCheckoutModal({ onClose, preselectedPlan = "yearly" }: Emai
                     >
                       {PLANS.map(p => (
                         <option key={p.key} value={p.key}>
-                          {p.name} — {p.price}{p.period !== "eenmalig" ? p.period : " eenmalig"}
+                          {p.name} - {p.price}{p.period !== "eenmalig" ? p.period : " eenmalig"}
                         </option>
                       ))}
                     </select>

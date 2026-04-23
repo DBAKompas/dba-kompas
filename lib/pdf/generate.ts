@@ -109,7 +109,7 @@ export function generateAssessmentPDF(assessment: AssessmentForPDF): PDFKit.PDFD
   const doc = new PDFDocument({
     size: "A4",
     margins: { top: 0, bottom: 0, left: 0, right: 0 },
-    info: { Title: "DBA Risicoanalyse — DBA Kompas", Author: "DBA Kompas" },
+    info: { Title: "DBA Risicoanalyse - DBA Kompas", Author: "DBA Kompas" },
     autoFirstPage: false,
   });
 
@@ -277,7 +277,7 @@ export function generateAssessmentPDF(assessment: AssessmentForPDF): PDFKit.PDFD
   const compactOk   = compactRaw  && compactRaw.assignmentDescription  !== FALLBACK_DESC;
   const extendedOk  = extendedRaw && extendedRaw.assignmentDescription !== FALLBACK_DESC;
 
-  // Render draft kolom — geeft eindY terug
+  // Render draft kolom - geeft eindY terug
   function renderDraftCol(
     draft: CompactDraft | LongDraft | null,
     ok: boolean,
@@ -300,7 +300,7 @@ export function generateAssessmentPDF(assessment: AssessmentForPDF): PDFKit.PDFD
       y = bodyText(draft.title, x, y, { bold: true, size: FS_BODY + 0.5, color: DARK, lineGap: 1.5 }) + 2;
     }
 
-    // Omschrijving — compact: max 350 chars; uitgebreid: max 600 chars
+    // Omschrijving - compact: max 350 chars; uitgebreid: max 600 chars
     if (draft.assignmentDescription) {
       const maxLen = isLong ? 600 : 350;
       const desc = truncateSentence(draft.assignmentDescription, maxLen);

@@ -1,5 +1,5 @@
 /**
- * provision-user.ts — post-payment user-provisioning voor guest-checkout flow
+ * provision-user.ts - post-payment user-provisioning voor guest-checkout flow
  * (KI-020 + KI-020-A).
  *
  * Gebruikt door de Stripe webhook (`handleCheckoutCompleted`) wanneer een

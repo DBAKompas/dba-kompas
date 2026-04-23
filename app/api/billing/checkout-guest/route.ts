@@ -1,5 +1,5 @@
 /**
- * /api/billing/checkout-guest — publieke subscription-checkout (KI-020).
+ * /api/billing/checkout-guest - publieke subscription-checkout (KI-020).
  *
  * Accepteert een e-mailadres + plan ('monthly' | 'yearly'), maakt een Stripe
  * Checkout Session aan met `customer_email` vooringevuld en `metadata.guest_email`.

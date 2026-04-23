@@ -1,5 +1,5 @@
 /**
- * Referral engine — DBA Kompas
+ * Referral engine - DBA Kompas
  *
  * Verantwoordelijkheden:
  * - Referral code aanmaken en ophalen per gebruiker
@@ -58,7 +58,7 @@ export async function getOrCreateReferralCode(userId: string): Promise<string> {
 
   if (existing?.code) return existing.code
 
-  // Nieuwe code genereren — bij botsing suffix toevoegen
+  // Nieuwe code genereren - bij botsing suffix toevoegen
   let code = generateCode(userId)
   let attempt = 0
   while (attempt < 5) {

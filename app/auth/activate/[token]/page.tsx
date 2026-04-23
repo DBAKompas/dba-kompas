@@ -1,5 +1,5 @@
 /**
- * /auth/activate/<token> — account-activatiepagina na guest-checkout (KI-020-A).
+ * /auth/activate/<token> - account-activatiepagina na guest-checkout (KI-020-A).
  *
  * De welkomstmail verwijst naar deze URL (niet naar een rauwe Supabase-
  * magic-link). Gmail's SafeBrowsing-scanner kan deze pagina prefetchen

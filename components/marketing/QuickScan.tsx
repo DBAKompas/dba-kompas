@@ -50,7 +50,7 @@ interface SuccessCopy {
   body: string;
 }
 
-/** Payload emitted on form submission — ready for Loops / analytics / API. */
+/** Payload emitted on form submission - ready for Loops / analytics / API. */
 interface QuickScanPayload {
   eventName: "quick_scan_completed";
   firstName: string;
@@ -138,12 +138,12 @@ const QUESTIONS: Question[] = [
 
 const SUCCESS_COPY: Record<RiskLevel, SuccessCopy> = {
   low: {
-    headline: "Je scoort laag risico — maar details bepalen of de Belastingdienst het daarmee eens is",
+    headline: "Je scoort laag risico - maar details bepalen of de Belastingdienst het daarmee eens is",
     body: "Een volledige analyse brengt precies in kaart wat er goed staat en waar je formulering nog sterker kan. Zo ga je het gesprek met vertrouwen in.",
   },
   medium: {
     headline: "Je opdracht heeft risicofactoren die bij een beoordeling vragen oproepen",
-    body: "Een analyse helpt je zien wat je kunt aanpassen — vóórdat een inspecteur dat voor je doet. Kleine aanpassingen maken een groot verschil.",
+    body: "Een analyse helpt je zien wat je kunt aanpassen - vóórdat een inspecteur dat voor je doet. Kleine aanpassingen maken een groot verschil.",
   },
   high: {
     headline: "Je opdracht toont meerdere kenmerken van afhankelijkheid. Dat kan duur worden.",
@@ -399,7 +399,7 @@ export default function QuickScan() {
             {/* Pricing tiles */}
             <div className="flex flex-col gap-3">
 
-              {/* Tile 1: Eenmalige check — aanbevolen */}
+              {/* Tile 1: Eenmalige check - aanbevolen */}
               <button
                 type="button"
                 onClick={() => {

@@ -179,7 +179,7 @@ export const TEST_CATEGORIES: TestCategory[] = [
       },
       {
         id: 'chk-005',
-        title: 'Welkomstmail — activatielink werkt',
+        title: 'Welkomstmail - activatielink werkt',
         description: 'Klik op de activatielink uit de welkomstmail.',
         steps: [
           'Ontvang welkomstmail na betaling',
@@ -446,7 +446,7 @@ export const TEST_CATEGORIES: TestCategory[] = [
       },
       {
         id: 'adm-005',
-        title: 'Nieuws beheer — aanmaken en bewerken',
+        title: 'Nieuws beheer - aanmaken en bewerken',
         description: 'Maak een nieuwsbericht aan en bewerk het.',
         steps: [
           'Ga naar /admin/nieuws',
@@ -606,7 +606,7 @@ export function generateIssuePrompt(
     ? `\n## Mogelijk betrokken bestanden\n\n${testCase.relatedFiles.join('\n')}`
     : ''
 
-  return `Je werkt aan DBA Kompas — een Next.js 16 / React 19 / TypeScript / Supabase / Stripe SaaS-app voor Wet DBA compliance-analyse (live op dbakompas.nl).
+  return `Je werkt aan DBA Kompas - een Next.js 16 / React 19 / TypeScript / Supabase / Stripe SaaS-app voor Wet DBA compliance-analyse (live op dbakompas.nl).
 
 Stack: Next.js 16, React 19, TypeScript strict, Supabase (RLS + service_role), Stripe webhooks, Postmark, Loops, PostHog, Vercel Hobby.
 Repo: DBAKompas/dba-kompas

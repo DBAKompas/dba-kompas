@@ -1,6 +1,6 @@
 /**
  * Vertaal Supabase Auth foutmeldingen naar Nederlands.
- * Supabase geeft altijd Engelse foutmeldingen terug — deze functie
+ * Supabase geeft altijd Engelse foutmeldingen terug - deze functie
  * mapt de bekende meldingen naar gebruiksvriendelijk Nederlands.
  */
 export function translateAuthError(message: string): string {

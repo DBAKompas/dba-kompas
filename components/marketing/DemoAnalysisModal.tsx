@@ -330,7 +330,7 @@ export function DemoAnalysisModal() {
           </div>
         )}
 
-        {/* Complete — Verbeterpunten + Aannames */}
+        {/* Complete - Verbeterpunten + Aannames */}
         {phaseIndex >= 4 && isRunning && (
           <div className="space-y-4">
             <div>

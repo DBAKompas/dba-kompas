@@ -157,7 +157,7 @@ async function processSource(source: RssSource): Promise<number> {
     }
     xml = await response.text()
   } catch (err) {
-    console.warn(`[news] ${source.name}: fetch fout —`, err)
+    console.warn(`[news] ${source.name}: fetch fout -`, err)
     return 0
   }
 

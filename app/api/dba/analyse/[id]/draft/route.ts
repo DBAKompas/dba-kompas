@@ -16,7 +16,7 @@ export async function POST(
 
     const { id } = await params
 
-    // Parse mode from query string — default to compact for speed
+    // Parse mode from query string - default to compact for speed
     const url = new URL(request.url)
     const rawMode = url.searchParams.get('mode')
     const mode: 'compact' | 'full' = rawMode === 'full' ? 'full' : 'compact'

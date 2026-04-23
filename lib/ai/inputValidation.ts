@@ -176,7 +176,7 @@ const QUESTION_BANK: Record<keyof InputSignals, QuestionItem> = {
   hasWerkwijzeAutonomie: {
     key: 'hasWerkwijzeAutonomie',
     label: 'Autonomie en werkwijze',
-    question: 'Wie bepaalt de werkwijze, werktijden en aanpak — de opdrachtnemer zelf of de opdrachtgever?',
+    question: 'Wie bepaalt de werkwijze, werktijden en aanpak - de opdrachtnemer zelf of de opdrachtgever?',
     hint: 'Bijv. "werkt zelfstandig" of "werkwijze wordt bepaald door het team van de opdrachtgever".',
     group: 'zelfstandigheid',
   },
@@ -366,7 +366,7 @@ export function createInsufficientInputResponse(validation: InputValidationResul
     missing: validation.missing,
     next_needed: questions.map(q => q.question),
     followUpQuestions: questions,
-    disclaimer: "Indicatieve analyse — geen juridisch advies.",
+    disclaimer: "Indicatieve analyse - geen juridisch advies.",
     validation: {
       charCount: validation.charCount,
       wordCount: validation.wordCount,
@@ -387,7 +387,7 @@ export function createNeedsMoreInputResponse(validation: InputValidationResult):
     missing: validation.missing,
     next_needed: questions.map(q => q.question),
     followUpQuestions: questions,
-    disclaimer: "Indicatieve analyse — geen juridisch advies.",
+    disclaimer: "Indicatieve analyse - geen juridisch advies.",
     validation: {
       charCount: validation.charCount,
       wordCount: validation.wordCount,

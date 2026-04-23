@@ -1,5 +1,5 @@
 /**
- * /api/one-time/checkout-guest — publieke one-time checkout (KI-020).
+ * /api/one-time/checkout-guest - publieke one-time checkout (KI-020).
  *
  * Accepteert alleen een e-mailadres en start direct een Stripe Checkout Session
  * in `mode: 'payment'` voor de one-time DBA analyse (`STRIPE_PRICE_ID_ONE_TIME`).

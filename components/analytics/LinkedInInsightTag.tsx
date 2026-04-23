@@ -4,7 +4,7 @@
  * LinkedIn Insight Tag (GROWTH-002)
  *
  * Laadt alleen als NEXT_PUBLIC_LINKEDIN_PARTNER_ID is ingesteld.
- * Alleen inzetten in de marketing layout — nooit in de app layout,
+ * Alleen inzetten in de marketing layout - nooit in de app layout,
  * omdat de tag dan ook op gevoelige app-pagina's zou draaien.
  *
  * Docs: https://www.linkedin.com/help/lms/answer/a418880

@@ -1,5 +1,5 @@
 /**
- * welcome-token-server.ts — server-side validatie van welcome tokens.
+ * welcome-token-server.ts - server-side validatie van welcome tokens.
  *
  * Combineert de stateless HMAC-check (signatuur + expiry) met de
  * stateful DB-check in `public.welcome_tokens` (uitgegeven? al gebruikt?

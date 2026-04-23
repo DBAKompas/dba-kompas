@@ -1,6 +1,6 @@
 /**
  * Server-side PostHog event capture.
- * Fire-and-forget — nooit blokkerend voor de hoofdflow.
+ * Fire-and-forget - nooit blokkerend voor de hoofdflow.
  * Gebruikt de PostHog REST API direct zodat posthog-node niet nodig is.
  */
 
@@ -15,7 +15,7 @@ export function captureServerEvent({ event, distinct_id, properties = {} }: Capt
   const host = (process.env.NEXT_PUBLIC_POSTHOG_HOST ?? 'https://eu.i.posthog.com').replace(/\/$/, '')
 
   if (!apiKey) {
-    console.warn('[PostHog] NEXT_PUBLIC_POSTHOG_KEY not set — event not captured:', event)
+    console.warn('[PostHog] NEXT_PUBLIC_POSTHOG_KEY not set - event not captured:', event)
     return
   }
 

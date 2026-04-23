@@ -156,7 +156,7 @@ export default function DashboardPage() {
               Nieuwe analyse starten
             </h2>
             <p className="text-sm text-primary-foreground/80 max-w-sm">
-              Upload een overeenkomst of plak tekst — resultaat binnen 30 seconden.
+              Upload een overeenkomst of plak tekst - resultaat binnen 30 seconden.
             </p>
           </div>
           <div className="flex items-center gap-3 shrink-0">

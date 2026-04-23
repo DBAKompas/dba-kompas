@@ -16,7 +16,7 @@ async function requireAdmin(): Promise<{ error: NextResponse } | { userId: strin
   return { userId: user.id }
 }
 
-// ── GET — alle testresultaten ophalen ─────────────────────────────────────
+// ── GET - alle testresultaten ophalen ─────────────────────────────────────
 
 export async function GET() {
   const auth = await requireAdmin()
@@ -31,7 +31,7 @@ export async function GET() {
   return NextResponse.json(data ?? [])
 }
 
-// ── POST — testresultaat opslaan (upsert op test_id) ──────────────────────
+// ── POST - testresultaat opslaan (upsert op test_id) ──────────────────────
 
 export async function POST(req: NextRequest) {
   const auth = await requireAdmin()
