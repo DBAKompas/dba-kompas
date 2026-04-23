@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { getQuotaPlansForUsers } from '@/modules/billing/entitlements'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
@@ -14,13 +15,10 @@ async function requireAdmin() {
   return { userId: user.id }
 }
 
-type QuotaPlan = 'free' | 'monthly' | 'yearly' | 'one_time'
-
 export async function GET() {
   const check = await requireAdmin()
   if ('error' in check) return check.error
 
-  // 1. Profielen (identiteit + rol)
   const { data: profiles, error: profilesError } = await supabaseAdmin
     .from('profiles')
     .select('id, user_id, email, role, created_at')
@@ -31,39 +29,15 @@ export async function GET() {
     return NextResponse.json({ error: 'Database fout' }, { status: 500 })
   }
 
-  // 2. Actieve abonnementen (monthly/yearly)
-  const { data: subs, error: subsError } = await supabaseAdmin
-    .from('subscriptions')
-    .select('user_id, status, plan')
-    .in('status', ['active', 'trialing'])
+  const userIds = (profiles ?? []).map((p) => p.user_id)
 
-  if (subsError) {
-    console.error('[admin/gebruikers] subscriptions query error:', subsError.message)
+  let planPerUser: Map<string, string>
+  try {
+    planPerUser = await getQuotaPlansForUsers(supabaseAdmin, userIds)
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'unknown error'
+    console.error('[admin/gebruikers] plan-resolve error:', message)
     return NextResponse.json({ error: 'Database fout' }, { status: 500 })
-  }
-
-  // 3. Eenmalige aankopen (one_time)
-  const { data: oneTime, error: oneTimeError } = await supabaseAdmin
-    .from('one_time_purchases')
-    .select('user_id')
-    .eq('status', 'purchased')
-
-  if (oneTimeError) {
-    console.error('[admin/gebruikers] one_time_purchases query error:', oneTimeError.message)
-    return NextResponse.json({ error: 'Database fout' }, { status: 500 })
-  }
-
-  // 4. Map user_id -> effectief plan (subscription wint van one_time wint van free)
-  const planPerUser = new Map<string, QuotaPlan>()
-  for (const sub of subs ?? []) {
-    if (sub.plan === 'monthly' || sub.plan === 'yearly') {
-      planPerUser.set(sub.user_id, sub.plan)
-    }
-  }
-  for (const purchase of oneTime ?? []) {
-    if (!planPerUser.has(purchase.user_id)) {
-      planPerUser.set(purchase.user_id, 'one_time')
-    }
   }
 
   const gebruikers = (profiles ?? []).map((p) => ({
