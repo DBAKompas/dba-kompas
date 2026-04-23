@@ -1,6 +1,6 @@
 # PROJECT_STATE.md
 
-**Laatste update:** 2026-04-23 (sessie 25 — `/api/admin/gebruikers` HTTP 500 gefixed: `profiles.plan` kolom niet meer gequeried; plan-resolutie geharmoniseerd via nieuwe `resolveQuotaPlan` + batch-helper `getQuotaPlansForUsers`; unit-tests 9/9 groen)
+**Laatste update:** 2026-04-23 (sessie 25 — `/api/admin/gebruikers` HTTP 500 gefixed + filter-plan Fase A+B uitgevoerd op `feat/ct-gebruikers-filters` / PR #1: pure `resolveAbonnementStatus` + `resolveEenmaligStatus`, API batcht subscriptions/one_time/assessments/news_read/auth.listUsers, UI heeft filterbar met zoek + datum-ranges + plan/rol/status-selects + min-analyses, 27/27 tests groen)
 **Maturity:** ~100% MVP + conversie-geoptimaliseerde koopflow (guest-email checkout, click-through activatie, magic-link fallback)
 
 ---
@@ -324,7 +324,7 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
 
 **Openstaande acties voor Marvin (sessie 26+):**
 1. Live verificeer in Vercel-logs dat `[admin/gebruikers]` errors weg zijn en `/admin/gebruikers` laadt.
-2. **`docs/PLAN_CT_GEBRUIKERS_FILTERS.md`** uitvoeren (gebruikers-lijst met filters, extra kolommen, sort, paginatie). Geschat ~3 uur, atomair per fase. Schone branch `feat/ct-gebruikers-filters`.
+2. ~~**`docs/PLAN_CT_GEBRUIKERS_FILTERS.md`** uitvoeren~~ ✅ Fase A+B uitgevoerd op branch `feat/ct-gebruikers-filters` (PR [#1](https://github.com/DBAKompas/dba-kompas/pull/1)). Review + merge + verifieer op preview. Fase C (sort/paginatie) blijft open voor latere sessie.
 3. `/api/admin/alerts` HTTP 401 triage (bycatch sessie 24).
 4. `/api/billing/portal` UI-feedback (bycatch sessie 24).
 5. Review `docs/IMPLEMENTATIE_PLAN_SUPABASE_KEY_MIGRATION.md` §11 en uitvoeren Fase 1 op schone branch.
