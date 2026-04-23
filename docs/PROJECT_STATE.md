@@ -1,6 +1,6 @@
 # PROJECT_STATE.md
 
-**Laatste update:** 2026-04-23 (sessie 24 — Secret-rotatie-sprint: Sentry DSN + Stripe secret keys + Stripe webhook secret volledig geroteerd en geverifieerd; Supabase key-migratie-plan opgeleverd voor review)
+**Laatste update:** 2026-04-23 (sessie 25 — `/api/admin/gebruikers` HTTP 500 gefixed: `profiles.plan` kolom niet meer gequeried; plan-resolutie geharmoniseerd via nieuwe `resolveQuotaPlan` + batch-helper `getQuotaPlansForUsers`; unit-tests 9/9 groen)
 **Maturity:** ~100% MVP + conversie-geoptimaliseerde koopflow (guest-email checkout, click-through activatie, magic-link fallback)
 
 ---
@@ -114,6 +114,38 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
 ---
 
 ## SESSIEHISTORIE
+
+### Sessie 2026-04-23 (sessie 25) — admin/gebruikers 500 fix + entitlement-harmonisatie
+
+**Context:** Sessie 24 onthulde dat `/api/admin/gebruikers` in productie herhaaldelijk HTTP 500 gaf met `column profiles.plan does not exist`. Admin-gebruikerspagina was hierdoor deels stuk. Deze sessie gefocust op het fixen van deze bug en het wegnemen van het structurele risico erachter.
+
+**Opgeleverd:**
+
+*Bugfix:*
+- `app/api/admin/gebruikers/route.ts`: verwijderde niet-bestaande `profiles.plan` uit GET-select. Plan wordt nu afgeleid uit `subscriptions` (active/trialing) + `one_time_purchases` (purchased), met prioriteit subscription > one_time > free.
+- Geen schema-migratie: data-architectuur is correct (profiles = identiteit, subscriptions = abonnement, one_time_purchases = credits), alleen de query was niet bijgewerkt.
+- Commit `28f92ff` (de eerste fix eerder in sessie: `57e1a80` inline merge, daarna deze refactor).
+
+*Harmonisatie (één bron van waarheid):*
+- Nieuw: pure functie `resolveQuotaPlan({subscription, hasOneTimePurchase})` in `modules/billing/entitlements.ts`. Bevat de regel "active/trialing met monthly/yearly wint > one_time purchased wint > free".
+- `getUserQuotaPlan` gerefactord naar dezelfde resolver (gedragsneutraal).
+- Nieuw: `getQuotaPlansForUsers(client, userIds)` batch-helper. Twee queries totaal (geen N+1), client als parameter zodat admin-flows `supabaseAdmin` gebruiken en user-flows RLS behouden.
+- `/api/admin/gebruikers` gebruikt nu deze helper (geen duplicatie meer).
+
+*Testdekking:*
+- Nieuw: `__tests__/entitlements.test.ts`. 9 cases: 7 pure-resolver cases (free, monthly, yearly trialing, one_time, sub-wint-van-one_time, cancelled-zonder-one_time, cancelled-met-one_time) + 2 batch-helper cases (lege input + multi-user fixture met canceled en expired noise).
+- Vitest: 9/9 groen. Full suite: 109/110 groen. Enige failure (`__tests__/loops.test.ts`) is pre-existent en niet gerelateerd.
+- `tsc --noEmit`: geen nieuwe errors. `eslint` op gewijzigde files: exit 0.
+
+**Operationele issue:**
+- `.git/index.lock` bleef achter na een `git stash`-poging vanuit de sandbox. Marvin loste het op met `rm -f .git/index.lock`. Vastgelegd in auto-memory (`feedback_no_git_stash_sandbox.md`).
+
+**Openstaand voor sessie 26+:**
+1. Live verificatie in Vercel: `/admin/gebruikers` laadt, geen `[admin/gebruikers]` errors in logs.
+2. `/api/admin/alerts` HTTP 401 fix (bycatch sessie 24, niet in deze sessie).
+3. `/api/billing/portal` UI-feedback verbetering (bycatch sessie 24, niet in deze sessie).
+4. Sentry SDK volledig activeren onder Next.js 16.
+5. Supabase key-migratie Fase 1.
 
 ### Sessie 2026-04-23 (sessie 24) — Secret-rotatie-sprint + Supabase migratie-plan
 
@@ -283,23 +315,24 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
 
 ## LAATSTE ACTIE
 
-**Sessie:** 2026-04-23 (sessie 24 — Secret-rotatie-sprint)
-
-**Afgeronde rotaties deze sessie:**
-1. **Sentry DSN**: nieuwe key actief in Vercel (`SENTRY_DSN` Sensitive, Prod + Preview, redeploy no-cache), oude default-key disabled in Sentry.
-2. **Stripe secret keys**: `sk_live_...1ft7` en `sk_live_...xndF` Expired. Nieuwe `sk_live_...g7dc` (DBA Kompas Live) actief. Verificatie via `/upgrade-to-pro` → Stripe Checkout load + `Last used`-beweging op `g7dc`.
-3. **Stripe webhook secret**: `...qcyP` vervangen door `whsec_...4w5W9`. Verificatie via Resend op historisch event → HTTP 200, response `{"received": true, "deduplicated": true}`.
+**Sessie:** 2026-04-23 (sessie 25 — admin/gebruikers 500 fix + entitlement-harmonisatie)
 
 **Opgeleverd deze sessie:**
-- `docs/IMPLEMENTATIE_PLAN_SUPABASE_KEY_MIGRATION.md` (4-fasen-plan, klaar voor review §11).
-- Productie-bycatch-bugs genoteerd op backlog (admin/gebruikers-500, admin/alerts-401, billing/portal-UI-feedback).
+1. **Fix** `/api/admin/gebruikers` HTTP 500: `profiles.plan` kolom werd gequeried maar bestaat niet. Commit `57e1a80` loste het op met inline merge-logica.
+2. **Harmonisatie** in commit `28f92ff`: pure `resolveQuotaPlan` + batch-helper `getQuotaPlansForUsers` in `modules/billing/entitlements.ts`. `getUserQuotaPlan` en admin-route gebruiken nu dezelfde resolver. Eén bron van waarheid voor plan-resolutie.
+3. **Testdekking**: `__tests__/entitlements.test.ts` met 9 cases (7 pure-resolver + 2 batch-helper fixtures). 9/9 groen. Full suite 109/110 (loops.test.ts-failure is pre-existent).
 
-**Openstaande acties voor Marvin (sessie 25+):**
-1. Review `docs/IMPLEMENTATIE_PLAN_SUPABASE_KEY_MIGRATION.md` §11 (checklist) en Fase 1 uitvoeren in verse sessie met schone git-branch.
-2. Sentry SDK volledig activeren (withSentryConfig + instrumentation.ts + instrumentation-client.ts), daarna echte error-smoke-test op nieuwe DSN.
-3. Rooktest admin-alert-triggers 1/3/4 (trigger 2 is in sessie 23 groen gevalideerd).
-4. Postmark-templates `welkomstmail-eenmalig | -maand | -jaar` handmatig aanpassen: primaire CTA `{{ activate_link }}`, secundaire `{{ login_link }}`.
-5. TEST-006 B1/B2/B3 live retest (guest-e-mail → Stripe → welkomstmail → activate of magic-link → dashboard).
+**Openstaande acties voor Marvin (sessie 26+):**
+1. Live verificeer in Vercel-logs dat `[admin/gebruikers]` errors weg zijn en `/admin/gebruikers` laadt.
+2. **`docs/PLAN_CT_GEBRUIKERS_FILTERS.md`** uitvoeren (gebruikers-lijst met filters, extra kolommen, sort, paginatie). Geschat ~3 uur, atomair per fase. Schone branch `feat/ct-gebruikers-filters`.
+3. `/api/admin/alerts` HTTP 401 triage (bycatch sessie 24).
+4. `/api/billing/portal` UI-feedback (bycatch sessie 24).
+5. Review `docs/IMPLEMENTATIE_PLAN_SUPABASE_KEY_MIGRATION.md` §11 en uitvoeren Fase 1 op schone branch.
+6. Sentry SDK volledig activeren (withSentryConfig + instrumentation.ts + instrumentation-client.ts), daarna echte error-smoke-test op nieuwe DSN.
+7. Rooktest admin-alert-triggers 1/3/4 (trigger 2 is in sessie 23 groen gevalideerd).
+8. Postmark-templates `welkomstmail-eenmalig | -maand | -jaar` handmatig aanpassen: primaire CTA `{{ activate_link }}`, secundaire `{{ login_link }}`.
+9. TEST-006 B1/B2/B3 live retest (guest-e-mail → Stripe → welkomstmail → activate of magic-link → dashboard).
+10. SQL migratie `user_news_read` in Supabase Studio (zacht vereist voor "Laatste nieuws vernieuwd"-kolom uit filter-plan).
 
 ## VOLGENDE GEPLANDE STAP
 
@@ -320,7 +353,7 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
 8. Admin-rooktests 1/3/4.
 
 **Prioriteit 5 — Bycatch backlog uit productie-logs sessie 24:**
-9. `/api/admin/gebruikers` HTTP 500: kolom `profiles.plan` bestaat niet in productie-schema. Of query aanpassen, of migratie toevoegen.
+9. ~~`/api/admin/gebruikers` HTTP 500~~ **AFGEROND in sessie 25** (commits `57e1a80` + `28f92ff`).
 10. `/api/admin/alerts` HTTP 401: auth-laag inspectie.
 11. `/api/billing/portal` UI-feedback: wanneer endpoint 404 `No subscription found` retourneert, tonen als nette melding in profielpagina i.p.v. stille failure.
 
