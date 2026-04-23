@@ -312,7 +312,7 @@ export default function GebruikersPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[1400px] text-sm">
               <thead>
                 <tr className="border-b border-border/50">
                   <Th>E-mail</Th>
