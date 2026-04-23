@@ -6,6 +6,7 @@ import {
   Shield, Zap, FileText, X, ChevronDown, ChevronUp, Lock,
 } from "lucide-react";
 import BrandLogo from "@/components/marketing/BrandLogo";
+import { InfoTooltip, DBA_GLOSSARY } from "@/components/ui/info-tooltip";
 
 const APP_URL =
   (process.env.NEXT_PUBLIC_APP_URL as string | undefined)?.replace(/\/+$/, "") ||
@@ -235,6 +236,7 @@ function HeroScreen({ active }: { active: boolean }) {
         className="text-white/80 text-base mb-6 mt-2 max-w-xs"
       >
         AI-analyse van jouw DBA-opdracht in 60 seconden
+        <InfoTooltip explanation={DBA_GLOSSARY.wetDba} className="opacity-70" />
       </motion.p>
 
       {/* Pills - altijd in DOM, stagger via animate */}
@@ -589,7 +591,15 @@ function DomainCard({ domain, autoExpand }: { domain: typeof DOMAINS[0]; autoExp
           </div>
         </div>
         <div className="flex-1 min-w-0 text-left">
-          <p className="text-xs font-bold truncate" style={{ color: NAVY }}>{domain.title}</p>
+          <p className="text-xs font-bold truncate" style={{ color: NAVY }}>
+            {domain.title}
+            {domain.title === "Aansturing & Gezag" && (
+              <InfoTooltip explanation={DBA_GLOSSARY.gezagsverhouding} />
+            )}
+            {domain.title === "Eigen Rekening & Risico" && (
+              <InfoTooltip explanation={DBA_GLOSSARY.eigenRekeningRisico} />
+            )}
+          </p>
           <span
             className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full"
             style={{ background: `${domain.color}20`, color: domain.color }}

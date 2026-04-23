@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import ReferralWidget from '@/components/referral/ReferralWidget'
+import { InfoTooltip, DBA_GLOSSARY } from '@/components/ui/info-tooltip'
 import {
   ArrowLeft,
   Download,
@@ -476,7 +477,18 @@ export default function AssessmentDetailPage() {
                         {/* Mini score cirkel */}
                         <ScoreCircle score={dScore} color={dr.circle} size={48} strokeWidth={5} />
                         <div className="min-w-0 pt-1">
-                          <span className="font-semibold text-sm leading-tight block">{domain.title}</span>
+                          <span className="font-semibold text-sm leading-tight">
+                            {domain.title}
+                            {domain.key === 'aansturing' && (
+                              <InfoTooltip explanation={DBA_GLOSSARY.gezagsverhouding} />
+                            )}
+                            {domain.key === 'eigen_rekening_risico' && (
+                              <InfoTooltip explanation={DBA_GLOSSARY.eigenRekeningRisico} />
+                            )}
+                            {domain.key === 'ondernemerschap' && (
+                              <InfoTooltip explanation="De mate waarin je als zzp'er zichtbaar ondernemer bent: meerdere opdrachtgevers, eigen marketing, ondernemersrisico. Telt mee als context, niet als hoofdcriterium." />
+                            )}
+                          </span>
                           <span className={`inline-flex mt-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${dr.badge}`}>
                             {domain.scoreLabel}
                           </span>
@@ -498,6 +510,7 @@ export default function AssessmentDetailPage() {
                         <div>
                           <p className="text-xs font-semibold text-red-600 uppercase tracking-wide mb-1.5">
                             Risico-indicatoren
+                            <InfoTooltip explanation={DBA_GLOSSARY.risicosignaal} />
                           </p>
                           <ul className="space-y-1">
                             {domain.indicatorsForRisk.map((ind, i) => (

@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { InfoTooltip, DBA_GLOSSARY } from '@/components/ui/info-tooltip'
 import BrandLogo from '@/components/marketing/BrandLogo'
 import {
   Upload,
@@ -349,6 +350,7 @@ export default function AnalysePage() {
         <h1 className="text-3xl font-bold tracking-tight">Analyse</h1>
         <p className="text-sm text-muted-foreground mt-1">
           Controleer uw overeenkomst op DBA-compliance
+          <InfoTooltip explanation={DBA_GLOSSARY.wetDba} />
         </p>
       </div>
 
@@ -481,6 +483,7 @@ export default function AnalysePage() {
                       <div className="flex items-center justify-between text-xs">
                         <span className="font-medium text-foreground">
                           Kernsignalen herkend
+                          <InfoTooltip explanation={DBA_GLOSSARY.risicosignaal} />
                         </span>
                         <span className={`font-bold ${foundCount >= 5 ? 'text-emerald-600' : 'text-amber-600'}`}>
                           {foundCount} / {totalSignalen}
@@ -653,7 +656,7 @@ export default function AnalysePage() {
                 <div className="space-y-2.5">
                   {[
                     'Volledig DBA-risicooordeel (laag / gemiddeld / hoog)',
-                    'Analyse per domein: gezag, eigen risico, persoonlijke arbeid',
+                    'Analyse per domein: gezag, eigen risico en persoonlijke arbeid',
                     'Concrete verbeterpunten voor uw overeenkomst',
                     'Professionele opdrachtomschrijving op maat',
                     'Mogelijkheid tot verfijning met aanvullende informatie',
