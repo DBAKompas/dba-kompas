@@ -1,6 +1,6 @@
 # PROJECT_STATE.md
 
-**Laatste update:** 2026-04-22 (sessie 23 — KI-022 OPGELOST, mail end-to-end gevalideerd in iCloud-inbox, admin_alerts.email_sent=true bevestigd)
+**Laatste update:** 2026-04-23 (sessie 24 — Secret-rotatie-sprint: Sentry DSN + Stripe secret keys + Stripe webhook secret volledig geroteerd en geverifieerd; Supabase key-migratie-plan opgeleverd voor review)
 **Maturity:** ~100% MVP + conversie-geoptimaliseerde koopflow (guest-email checkout, click-through activatie, magic-link fallback)
 
 ---
@@ -114,6 +114,49 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
 ---
 
 ## SESSIEHISTORIE
+
+### Sessie 2026-04-23 (sessie 24) — Secret-rotatie-sprint + Supabase migratie-plan
+
+**Context:** Brede audit op uitgelekte of verouderde productie-secrets. Drie sporen parallel: Sentry DSN, Stripe API keys + webhook secret, en voorbereiding Supabase keys-migratie.
+
+**Opgeleverd:**
+
+*Sentry DSN rotatie:*
+- Nieuwe DSN gegenereerd in Sentry project `javascript-nextjs` (= DBA Kompas), oude default-key disabled (niet verwijderd).
+- `SENTRY_DSN` in Vercel bijgewerkt (Sensitive, Production + Preview), redeploy zonder cache. Geen `NEXT_PUBLIC_SENTRY_DSN` aangemaakt, conform huidige `sentry.client.config.ts` setup.
+- Diagnose: Sentry SDK is niet volledig geactiveerd onder Next.js 16 + `@sentry/nextjs 10.47.0`. Vereist `withSentryConfig`-wrapper in `next.config.ts` + `instrumentation.ts` + `instrumentation-client.ts`. Op backlog P1. Smoke-test geparkeerd tot SDK volledig verbonden is.
+
+*Stripe secret keys:*
+- `sk_live_...1ft7` (default template-key, nooit gebruikt) → Expired in Stripe.
+- `sk_live_...xndF` (SaaS Starter, Apr 4) → Expired na verificatie.
+- `sk_live_...g7dc` (DBA Kompas Live, Apr 23) → nieuwe productie-key, `STRIPE_SECRET_KEY` in Vercel bijgewerkt.
+- Verificatie-methode: `/upgrade-to-pro`-knop getriggerd om `stripe.checkout.sessions.create()` te activeren. Stripe Checkout-pagina laadde (`cs_live_...`), `Last used` op `g7dc` sprong naar 2026-04-23, `xndF` bleef op 2026-04-20. Bewijs dat Vercel productie op `g7dc` draait.
+
+*Stripe webhook secret:*
+- Oude signing secret eindigend op `...qcyP` vervangen door nieuwe `whsec_...4w5W9` via Stripe Webhooks → endpoint `dbakompas.nl/api/billing/webhook` → Roll.
+- `STRIPE_WEBHOOK_SECRET` in Vercel bijgewerkt.
+- Verificatie: Resend op eerder event `checkout.session.completed` (Apr 20) in Stripe Workbench. Nieuwe delivery 2026-04-23 09:54:03 CEST, HTTP 200, response `{"received": true, "deduplicated": true}`. Signature-validatie slaagt tegen nieuwe secret, idempotency-laag werkt correct op Event-ID.
+
+*Supabase key-migratie (gepland, nog niet uitgevoerd):*
+- Ontdekking: Supabase is gemigreerd naar nieuw keys-model (ECC P-256 JWT signing + `sb_publishable_` / `sb_secret_` API-keys). Klassieke "regenerate JWT secret"-flow niet meer beschikbaar. `NEXT_PUBLIC_SUPABASE_ANON_KEY` en `SUPABASE_SERVICE_ROLE_KEY` staan nog op legacy-keys.
+- `docs/IMPLEMENTATIE_PLAN_SUPABASE_KEY_MIGRATION.md` opgeleverd: 4-fasen-plan (code + env vars + redeploy → 24h wait → disable legacy keys → cleanup → documentatie). Bevestigd via Supabase docs dat `sb_publishable_` / `sb_secret_` drop-in replacements zijn, RLS-policies met `auth.role() = 'service_role'` blijven werken zonder refactor.
+- Uitvoering Fase 1 gaat in een verse sessie op een schone git-branch, niet hier.
+
+*Productie-logs backlog (bycatch uit verificatie):*
+- `/api/admin/gebruikers` retourneert herhaaldelijk HTTP 500 met `column profiles.plan does not exist`. Schema-mismatch tussen query en productie-DB.
+- `/api/admin/alerts` retourneert HTTP 401. Auth-laag probleem.
+- `/api/billing/portal` geeft functioneel correcte HTTP 404 `No subscription found` voor gebruikers zonder Stripe-customer, maar UI toont geen user-feedback (knop "Abonnement beheren" faalt stil).
+
+**Openstaand voor sessie 25+:**
+1. Review `docs/IMPLEMENTATIE_PLAN_SUPABASE_KEY_MIGRATION.md` §11 en uitvoering Fase 1.
+2. Sentry SDK volledig activeren onder Next.js 16 (`withSentryConfig` + `instrumentation.ts` + `instrumentation-client.ts`). Daarna echte error-smoke-test op nieuwe DSN.
+3. Backlog-bugs admin-gebruikers-schema, admin-alerts-401 en billing-portal-UI-feedback triage.
+
+### Sessie 2026-04-22 (sessie 23) — KI-022 OPGELOST, mail end-to-end gevalideerd
+
+- INFRA-002 triggers live + migratie 008 in Supabase.
+- KI-022 periodic mail-worker op Vercel Hobby geblokkeerd (4e cron), opgelost via GitHub Actions workflow `.github/workflows/pending-alerts.yml` die elke 10 min curlt naar `/api/cron/pending-alerts` met `Authorization: Bearer $CRON_SECRET`.
+- Eindvalidatie: workflow run #8 → HTTP 200 `{"processed":1,"mailed":1,"mailFailed":0,"durationMs":1264}`. Supabase `email_sent = true` bevestigd op testrij. Mail fysiek ontvangen in `marvin.zoetemelk@icloud.com`.
 
 ### Sessie 2026-04-20 (sessie 20) — KI-020 guest-checkout + KI-020-A activatie-flow
 
@@ -240,46 +283,47 @@ DBA Kompas is een **live** Next.js 16.2 SaaS applicatie op `dbakompas.nl` die op
 
 ## LAATSTE ACTIE
 
-**Sessie:** 2026-04-22 (sessie 23 — KI-022 OPGELOST)
-**Laatste commits (gepusht naar origin/main, Vercel-deploy groen):**
-- `29e0114` — `feat(admin): INFRA-002 triggers voor cron, quota-misbruik, AI-fouten, admin-rol promotie + migratie 008`
-- `bca1c9d` — `fix(admin): KI-022 periodic mail-worker voor pending admin_alerts`
-- Fix-commit — `fix(admin): KI-022 via GitHub Actions externe cron (Vercel Hobby blokkeerde 4e cron)`
+**Sessie:** 2026-04-23 (sessie 24 — Secret-rotatie-sprint)
 
-**GitHub Actions workflow operationeel en gevalideerd:** `.github/workflows/pending-alerts.yml`, workflow run #8 handmatig getriggerd op 2026-04-22, HTTP 200, response `{"processed":1,"mailed":1,"mailFailed":0,"durationMs":1264}`.
+**Afgeronde rotaties deze sessie:**
+1. **Sentry DSN**: nieuwe key actief in Vercel (`SENTRY_DSN` Sensitive, Prod + Preview, redeploy no-cache), oude default-key disabled in Sentry.
+2. **Stripe secret keys**: `sk_live_...1ft7` en `sk_live_...xndF` Expired. Nieuwe `sk_live_...g7dc` (DBA Kompas Live) actief. Verificatie via `/upgrade-to-pro` → Stripe Checkout load + `Last used`-beweging op `g7dc`.
+3. **Stripe webhook secret**: `...qcyP` vervangen door `whsec_...4w5W9`. Verificatie via Resend op historisch event → HTTP 200, response `{"received": true, "deduplicated": true}`.
 
-**Validatie-bewijs sessie 23:**
-1. Fresh backfill SQL (id `647a2a4b-c6a9-4153-9398-e0d5570c6a70`) → `created_at = 2026-04-22 10:13:46.546357+00`, `email_sent = false`, `resolved = false`.
-2. Workflow run #8 pakte precies 1 rij op, mailde 1, mislukte 0.
-3. Supabase REST-check: `email_sent = true` op betreffende rij (idempotente update door worker bevestigd).
-4. Mail fysiek ontvangen in `marvin.zoetemelk@icloud.com` om 12:15 UTC met correcte huisstijl: rood KRITIEK-header, metadata-tabel (type/severity/tijdstip/email/user_id/previous_role), "Open Control Tower" button.
-5. `ADMIN_ALERT_EMAIL` in Vercel wijst bewust naar iCloud-adres (niet hardcoded Gmail-fallback in `lib/admin/alerts.ts`).
+**Opgeleverd deze sessie:**
+- `docs/IMPLEMENTATIE_PLAN_SUPABASE_KEY_MIGRATION.md` (4-fasen-plan, klaar voor review §11).
+- Productie-bycatch-bugs genoteerd op backlog (admin/gebruikers-500, admin/alerts-401, billing/portal-UI-feedback).
 
-**Openstaande acties voor Marvin:**
-1. Rooktest triggers 1 (cron-mislukking), 3 (quota-misbruik), 4 (AI-analyse-fouten) nog uit te voeren (admin-rol-trigger is 2 en nu groen).
-2. Postmark-templates `welkomstmail-eenmalig | -maand | -jaar` handmatig aanpassen: primaire CTA naar `{{ activate_link }}`, secundaire link naar `{{ login_link }}`.
-3. TEST-006 B1/B2/B3 retest uitvoeren conform `docs/TEST_006_RESULTS.md` voor beide paden (activate + magic-link).
+**Openstaande acties voor Marvin (sessie 25+):**
+1. Review `docs/IMPLEMENTATIE_PLAN_SUPABASE_KEY_MIGRATION.md` §11 (checklist) en Fase 1 uitvoeren in verse sessie met schone git-branch.
+2. Sentry SDK volledig activeren (withSentryConfig + instrumentation.ts + instrumentation-client.ts), daarna echte error-smoke-test op nieuwe DSN.
+3. Rooktest admin-alert-triggers 1/3/4 (trigger 2 is in sessie 23 groen gevalideerd).
+4. Postmark-templates `welkomstmail-eenmalig | -maand | -jaar` handmatig aanpassen: primaire CTA `{{ activate_link }}`, secundaire `{{ login_link }}`.
+5. TEST-006 B1/B2/B3 live retest (guest-e-mail → Stripe → welkomstmail → activate of magic-link → dashboard).
 
 ## VOLGENDE GEPLANDE STAP
 
-**Prioriteit 1 — Afronding TEST-006:**
-1. Postmark-templates handmatig bijwerken (3 aliases) naar activate_link + login_link + huisstijl.
-2. TEST-006 B1/B2/B3 live test (guest-e-mail → Stripe → welkomstmail → activate of magic-link → dashboard).
-3. Na PASS: issues en taken-status verplaatsen naar DONE, eindcommit `test(email): TEST-006 afgerond`.
+**Prioriteit 1 — Supabase key-migratie Fase 1 (verse sessie):**
+1. Review plan §11. Schone git-branch `feat/supabase-keys-migration`. Codewijzigingen in `lib/supabase/{client,server,admin}.ts` + helpers + env-vars.
+2. Vercel env-vars toevoegen (`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`), redeploy, smoke-tests (admin, analyse, checkout, webhook, cron).
+3. Pas na 24h succesvol draaien: Fase 2 (disable legacy keys) + Fase 3 (cleanup oude Vercel-vars) + Fase 4 (docs).
 
-**Prioriteit 2 — Overige operationele backlog:**
-4. SQL migratie `user_news_read` in Supabase Studio.
-5. `CRON_SECRET` env var in Vercel (`openssl rand -hex 32`).
-6. Eerste RSS refresh handmatig triggeren.
+**Prioriteit 2 — Afronding Sentry-activatie:**
+4. `withSentryConfig`-wrapper in `next.config.ts`, `instrumentation.ts` + `instrumentation-client.ts` toevoegen conform `@sentry/nextjs 10.x` + Next.js 16-guide. Echte throw uitvoeren na deploy en bevestigen dat het event in Sentry landt.
 
-**Prioriteit 3 — Groei & kwaliteit:**
-7. **INFRA-002 vervolg** — live + KI-022 OPGELOST (sessie 23, 2026-04-22):
-   - Triggers ingebouwd voor cron-mislukking, quota-misbruik, AI-analyse herhaalde fouten, admin-rol promotie.
-   - Migratie 008 uitgevoerd in Supabase, beide Postgres-triggers bevestigd.
-   - Code naar main gepusht, Vercel-deploy groen.
-   - **KI-022 fix LIVE via GitHub Actions**: `/api/cron/pending-alerts` route draait, Vercel Hobby blokkeerde een 4e cron dus `.github/workflows/pending-alerts.yml` curlt elke 10 min naar het endpoint met `Authorization: Bearer $CRON_SECRET`. Idempotent (email_sent = true na succes), 1-uur venster, cap 10 per run.
-   - **GitHub Secrets**: `PRODUCTION_URL = https://dbakompas.nl` + `CRON_SECRET` (zelfde waarde als Vercel env).
-   - **KI-022 EINDVALIDATIE GESLAAGD (22-04-2026)**: workflow run #8 → HTTP 200 `{"processed":1,"mailed":1,"mailFailed":0,"durationMs":1264}`. Supabase `email_sent = true` bevestigd op testrij. Mail ontvangen in `marvin.zoetemelk@icloud.com` (ADMIN_ALERT_EMAIL env wijst bewust naar iCloud) met correcte huisstijl en metadata.
-   - **Nog openstaand**: rooktests trigger 1 (cron-mislukking), 3 (quota-misbruik), 4 (AI-fouten).
-8. **PROD-003**: Notificaties als levend systeem (triggers bij analyse, hoog-impact nieuws, betalingsfout).
-9. **QUAL-001**: Analyse-ervaring verdiepen (heranalyse met diff, Word-download).
+**Prioriteit 3 — Afronding TEST-006:**
+5. Postmark-templates bijwerken + TEST-006 B1/B2/B3 live test.
+
+**Prioriteit 4 — Operationele backlog:**
+6. SQL migratie `user_news_read` in Supabase Studio.
+7. Eerste RSS refresh handmatig triggeren.
+8. Admin-rooktests 1/3/4.
+
+**Prioriteit 5 — Bycatch backlog uit productie-logs sessie 24:**
+9. `/api/admin/gebruikers` HTTP 500: kolom `profiles.plan` bestaat niet in productie-schema. Of query aanpassen, of migratie toevoegen.
+10. `/api/admin/alerts` HTTP 401: auth-laag inspectie.
+11. `/api/billing/portal` UI-feedback: wanneer endpoint 404 `No subscription found` retourneert, tonen als nette melding in profielpagina i.p.v. stille failure.
+
+**Prioriteit 6 — Groei & kwaliteit:**
+12. **PROD-003**: Notificaties als levend systeem (triggers bij analyse, hoog-impact nieuws, betalingsfout).
+13. **QUAL-001**: Analyse-ervaring verdiepen (heranalyse met diff, Word-download).
