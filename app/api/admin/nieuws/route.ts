@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { fanOutNotification } from '@/lib/notifications'
 
 // ─── Auth helper ──────────────────────────────────────────────
 
@@ -90,6 +91,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Kon bericht niet opslaan' }, { status: 500 })
   }
 
+  // Fire-and-forget: fan-out notificatie bij hoog-impact nieuws (PROD-003)
+  if (impact === 'hoog') {
+    fanOutNotification({
+      title: 'Nieuw DBA-nieuws met hoge impact',
+      message: data.title,
+      type: 'info',
+      relatedItemId: data.id,
+      relatedItemType: 'news_item',
+    }).then(({ count }) => {
+      console.log(`[notifications] hoog-impact nieuws fan-out: ${count} notificaties aangemaakt`)
+    }).catch(err => console.error('[notifications] fan-out mislukt:', err))
+  }
+
   return NextResponse.json(data, { status: 201 })
 }
 
@@ -122,6 +136,21 @@ export async function PATCH(req: NextRequest) {
 
   if (error) {
     return NextResponse.json({ error: 'Kon bericht niet bijwerken' }, { status: 500 })
+  }
+
+  // Fire-and-forget: fan-out notificatie als impact expliciet naar 'hoog' wordt gezet (PROD-003).
+  // We sturen alleen als het update-object 'impact' bevat én de waarde 'hoog' is, zodat
+  // herhaaldelijke bewerkingen zonder impact-wijziging geen dubbele notificaties sturen.
+  if ('impact' in sanitized && sanitized.impact === 'hoog') {
+    fanOutNotification({
+      title: 'Nieuw DBA-nieuws met hoge impact',
+      message: data.title,
+      type: 'info',
+      relatedItemId: data.id,
+      relatedItemType: 'news_item',
+    }).then(({ count }) => {
+      console.log(`[notifications] hoog-impact nieuws fan-out (update): ${count} notificaties aangemaakt`)
+    }).catch(err => console.error('[notifications] fan-out (update) mislukt:', err))
   }
 
   return NextResponse.json(data)

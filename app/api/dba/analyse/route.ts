@@ -7,6 +7,7 @@ import { reserveUsage, releaseUsage } from '@/modules/usage/check-quota'
 import { updateLoopsContact } from '@/lib/loops'
 import { captureServerEvent } from '@/lib/posthog'
 import { recordQuotaDenial, recordAnalysisError } from '@/lib/admin/alerts'
+import { createNotification } from '@/lib/notifications'
 
 export const maxDuration = 120
 
@@ -144,6 +145,16 @@ export async function POST(request: Request) {
         result_category: analysisResult.analysisStatus as string | undefined,
       },
     })
+
+    // Fire-and-forget: in-app notificatie "analyse klaar" (PROD-003)
+    createNotification({
+      userId: user.id,
+      title: 'Uw analyse is klaar',
+      message: 'Bekijk de resultaten van uw DBA-analyse.',
+      type: 'success',
+      relatedItemId: assessment.id,
+      relatedItemType: 'assessment',
+    }).catch(err => console.error('[notifications] analyse klaar notificatie mislukt:', err))
 
     // Fire-and-forget: Loops contact bijwerken na succesvolle analyse
     if (user.email) {

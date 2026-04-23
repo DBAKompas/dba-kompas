@@ -7,6 +7,7 @@ import { captureServerEvent } from '@/lib/posthog'
 import { sendPurchaseWelcomeEmail } from '@/modules/email/send'
 import { trackReferral, qualifyReferral } from '@/lib/referral/engine'
 import { createAlert } from '@/lib/admin/alerts'
+import { createNotification } from '@/lib/notifications'
 import { provisionUserForCheckout } from '@/lib/auth/provision-user'
 import type Stripe from 'stripe'
 
@@ -410,7 +411,8 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
 }
 
 async function handleInvoicePaid(invoice: Stripe.Invoice) {
-  const subscriptionId = (invoice as unknown as Record<string, unknown>).subscription as string | null
+  const inv = invoice as unknown as Record<string, unknown>
+  const subscriptionId = inv.subscription as string | null
   if (!subscriptionId) return
 
   // Reset payment_failed flag on successful payment
@@ -418,6 +420,38 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
     .from('subscriptions')
     .update({ payment_failed: false })
     .eq('stripe_subscription_id', subscriptionId)
+
+  // Notificatie alleen bij verlenging (subscription_cycle), niet bij eerste betaling.
+  // billing_reason = 'subscription_create' is de eerste betaling — die krijgt al een welkomstmail.
+  const billingReason = inv.billing_reason as string | null
+  if (billingReason !== 'subscription_cycle') return
+
+  const { data: existingSub } = await supabaseAdmin
+    .from('subscriptions')
+    .select('user_id, current_period_end')
+    .eq('stripe_subscription_id', subscriptionId)
+    .single()
+
+  if (!existingSub) return
+
+  const periodeEind = existingSub.current_period_end
+    ? new Date(existingSub.current_period_end).toLocaleDateString('nl-NL', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      })
+    : null
+
+  const message = periodeEind
+    ? `Uw abonnement is automatisch verlengd en loopt door tot ${periodeEind}.`
+    : 'Uw abonnement is automatisch verlengd.'
+
+  createNotification({
+    userId: existingSub.user_id,
+    title: 'Abonnement verlengd',
+    message,
+    type: 'success',
+  }).catch(err => console.error('[notifications] abonnement verlengd notificatie mislukt:', err))
 }
 
 async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
@@ -450,6 +484,14 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
       dedupKey: `pf-${invoice.id}`,
     })
   }
+
+  // In-app notificatie voor de gebruiker (PROD-003)
+  createNotification({
+    userId: existingSub.user_id,
+    title: 'Betaling mislukt',
+    message: 'Uw automatische betaling kon niet worden verwerkt. Pas uw betaalgegevens aan om uw abonnement actief te houden.',
+    type: 'warning',
+  }).catch(err => console.error('[notifications] betaling mislukt notificatie mislukt:', err))
 
   // Admin alert: betaling mislukt
   await createAlert({
