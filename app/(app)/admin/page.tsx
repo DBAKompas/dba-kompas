@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/components/auth/AuthContext'
-import { Loader2, Users, Mail, FileSearch, TrendingUp, Newspaper, Share2 } from 'lucide-react'
+import { Loader2, Users, Mail, FileSearch, TrendingUp, Newspaper, Share2, ClipboardCheck } from 'lucide-react'
 import { AlertsWidget } from '@/components/admin/AlertsWidget'
 
 type Stats = {
@@ -56,6 +56,12 @@ const tiles = [
     title: 'Referral',
     description: 'Doorverwijzingen, conversies, top referrers en beloningen inzien.',
     icon: <Share2 className="size-5" />,
+  },
+  {
+    href: '/admin/tests',
+    title: 'Testmodule',
+    description: 'End-to-end testcases afvinken, issues melden en voortgang bewaken.',
+    icon: <ClipboardCheck className="size-5" />,
   },
 ]
 
