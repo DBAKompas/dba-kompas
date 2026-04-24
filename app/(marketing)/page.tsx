@@ -93,6 +93,7 @@ export default function Home() {
   const [quickScanOpen, setQuickScanOpen] = useState(false);
 
   function scrollToPricing() {
+    trackPricingViewed('landing')
     document.getElementById("prijzen")?.scrollIntoView({ behavior: "smooth" });
   }
 
@@ -106,6 +107,10 @@ export default function Home() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+  useEffect(() => {
+    trackLandingPageView()
+    return useScrollTracking('landing')
+  }, [])
 
   function handleLogout() {
     const supabase = createClient();
