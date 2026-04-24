@@ -21,6 +21,7 @@ import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { viewportConfig } from "@/lib/motion";
 import { trackLandingPageView, useScrollTracking } from '@/lib/dba-analytics'
+import { trackFaqOpened } from '@/lib/dba-analytics'
 
 const APP_URL = (process.env.NEXT_PUBLIC_APP_URL as string | undefined)?.replace(/\/+$/, "") || "https://app.dbakompas.nl";
 
@@ -56,7 +57,10 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
     <div className="border border-border/50 rounded-xl overflow-hidden">
       <button
         className="w-full flex items-center justify-between px-6 py-4 text-left font-semibold text-foreground hover:bg-primary/4 transition-colors"
-        onClick={() => setOpen(!open)}
+        onClick={() => {
+          if (!open) trackFaqOpened(question, 'landing')
+          setOpen(!open)
+        }}
       >
         <span>{question}</span>
         <ChevronDown
