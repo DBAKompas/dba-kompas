@@ -4,6 +4,7 @@ import { useState } from "react";
 import { X, ArrowRight, ArrowLeft, Mail, Check, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { trackCheckoutStarted } from '@/lib/dba-analytics'
 
 type PlanKey = "monthly" | "yearly" | "one_time_dba";
 
@@ -132,6 +133,10 @@ export function EmailCheckoutModal({ onClose, preselectedPlan = "yearly" }: Emai
         return;
       }
 
+      const priceMap = { one_time_dba: 9.95, monthly: 20, yearly: 200 }
+trackCheckoutStarted(plan, priceMap[plan])
+window.location.href = json.url;
+      
       window.location.href = json.url;
     } catch {
       setApiError("Er is iets misgegaan. Probeer het opnieuw.");
