@@ -43,18 +43,21 @@ export default async function CheckoutSuccessPage({
   const plan: PlanKey = isPlanKey(planParam) ? planParam : 'one_time'
   const planInfo = PLAN_COPY[plan]
 
-  return (
+return (
     <main className="min-h-screen flex items-center justify-center bg-background px-4 hero-gradient">
+      <PurchaseTracker
+        plan={plan}
+        priceEur={plan === 'monthly' ? 20 : plan === 'yearly' ? 200 : 9.95}
+        sessionId={params.session_id ?? ''}
+      />
       <div className="w-full max-w-md text-center space-y-6">
         <Link href="/" className="inline-flex justify-center">
           <BrandLogo variant="dark" className="h-10 w-auto" />
         </Link>
-
         <div className="glass-card p-8 space-y-5">
           <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
             <Check className="w-7 h-7 text-primary" />
           </div>
-
           <h1 className="text-2xl font-bold text-foreground">
             Betaling gelukt
           </h1>
