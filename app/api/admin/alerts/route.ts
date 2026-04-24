@@ -22,18 +22,46 @@ async function requireAdmin() {
   return user
 }
 
-// ── GET: haal openstaande alerts op ──────────────────────────────────────────
+// ── GET: haal alerts op (met optionele filters) ───────────────────────────────
+//
+// Query params:
+//   status   = 'open' (default) | 'resolved' | 'all'
+//   severity = 'critical' | 'warning' | 'info'  (optioneel)
+//   type     = alert type string                  (optioneel)
+//   limit    = max aantal resultaten (default 100, max 200)
 
-export async function GET() {
+export async function GET(request: Request) {
   const user = await requireAdmin()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { data, error } = await supabaseAdmin
+  const { searchParams } = new URL(request.url)
+  const status   = searchParams.get('status')   ?? 'open'
+  const severity = searchParams.get('severity') ?? ''
+  const type     = searchParams.get('type')     ?? ''
+  const limit    = Math.min(parseInt(searchParams.get('limit') ?? '100', 10), 200)
+
+  let query = supabaseAdmin
     .from('admin_alerts')
-    .select('id, type, severity, title, message, metadata, email_sent, created_at')
-    .eq('resolved', false)
+    .select('id, type, severity, title, message, metadata, email_sent, resolved, resolved_at, resolved_by, created_at')
     .order('created_at', { ascending: false })
-    .limit(50)
+    .limit(limit)
+
+  if (status === 'open') {
+    query = query.eq('resolved', false)
+  } else if (status === 'resolved') {
+    query = query.eq('resolved', true)
+  }
+  // status === 'all' → geen filter op resolved
+
+  if (severity) {
+    query = query.eq('severity', severity)
+  }
+
+  if (type) {
+    query = query.eq('type', type)
+  }
+
+  const { data, error } = await query
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })

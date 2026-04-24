@@ -10,6 +10,7 @@ export type AlertType =
   | 'analysis_error'
   | 'webhook_error'
   | 'referral_error'
+  | 'admin_promoted'
   | 'general'
 
 interface CreateAlertParams {
