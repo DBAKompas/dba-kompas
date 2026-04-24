@@ -5,6 +5,7 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
+  try {
   // Auth check - alleen admin
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -201,4 +202,9 @@ export async function GET() {
     recentActivity,
     weekTrend,
   })
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error('[api/admin/referral] onverwachte fout:', msg)
+    return NextResponse.json({ error: msg }, { status: 500 })
+  }
 }
