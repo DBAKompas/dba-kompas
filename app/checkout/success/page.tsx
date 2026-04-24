@@ -17,6 +17,7 @@
 import Link from 'next/link'
 import { Mail, Check } from 'lucide-react'
 import BrandLogo from '@/components/marketing/BrandLogo'
+import { PurchaseTracker } from '@/components/analytics/PurchaseTracker'
 
 type PlanKey = 'monthly' | 'yearly' | 'one_time'
 
