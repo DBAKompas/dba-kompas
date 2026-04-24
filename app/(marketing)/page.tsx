@@ -20,6 +20,7 @@ import { useMarketingAuth as useAuth } from "@/components/marketing/useMarketing
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { viewportConfig } from "@/lib/motion";
+import { trackLandingPageView, useScrollTracking } from '@/lib/dba-analytics'
 
 const APP_URL = (process.env.NEXT_PUBLIC_APP_URL as string | undefined)?.replace(/\/+$/, "") || "https://app.dbakompas.nl";
 
