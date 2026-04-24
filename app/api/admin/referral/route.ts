@@ -59,16 +59,26 @@ export async function GET() {
   // Haal emails + codes op voor de top referrers
   const topReferrerIds = sortedReferrers.map(([id]) => id)
 
-  const [{ data: topProfiles }, { data: topCodes }, { data: topRewards }] = await Promise.all([
-    supabaseAdmin.from('profiles').select('id, email').in('id', topReferrerIds),
-    supabaseAdmin.from('referral_codes').select('user_id, code').in('user_id', topReferrerIds),
-    supabaseAdmin.from('referral_rewards').select('referrer_id, milestone, reward_type').in('referrer_id', topReferrerIds),
-  ])
+  // Supabase .in() met een lege array gooit een fout — skip de queries als er geen referrers zijn
+  let topProfiles: { id: string; email: string }[] = []
+  let topCodes: { user_id: string; code: string }[] = []
+  let topRewards: { referrer_id: string; milestone: number; reward_type: string }[] = []
 
-  const profileMap = Object.fromEntries((topProfiles ?? []).map(p => [p.id, p.email]))
-  const codeMap = Object.fromEntries((topCodes ?? []).map(c => [c.user_id, c.code]))
+  if (topReferrerIds.length > 0) {
+    const [profilesRes, codesRes, rewardsRes] = await Promise.all([
+      supabaseAdmin.from('profiles').select('id, email').in('id', topReferrerIds),
+      supabaseAdmin.from('referral_codes').select('user_id, code').in('user_id', topReferrerIds),
+      supabaseAdmin.from('referral_rewards').select('referrer_id, milestone, reward_type').in('referrer_id', topReferrerIds),
+    ])
+    topProfiles = profilesRes.data ?? []
+    topCodes    = codesRes.data ?? []
+    topRewards  = rewardsRes.data ?? []
+  }
+
+  const profileMap = Object.fromEntries(topProfiles.map(p => [p.id, p.email]))
+  const codeMap = Object.fromEntries(topCodes.map(c => [c.user_id, c.code]))
   const rewardsMap: Record<string, number[]> = {}
-  for (const r of topRewards ?? []) {
+  for (const r of topRewards) {
     if (!rewardsMap[r.referrer_id]) rewardsMap[r.referrer_id] = []
     rewardsMap[r.referrer_id].push(r.milestone)
   }

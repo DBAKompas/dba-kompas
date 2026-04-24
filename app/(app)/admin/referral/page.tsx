@@ -155,8 +155,14 @@ export default function AdminReferralPage() {
   useEffect(() => {
     if (!loading && isAdmin) {
       fetch('/api/admin/referral')
-        .then(r => r.json())
-        .then(d => setData(d))
+        .then(r => {
+          if (!r.ok) throw new Error(`HTTP ${r.status}`)
+          return r.json()
+        })
+        .then(d => {
+          if (d?.totals) setData(d)
+          else console.error('[referral] onverwacht API-antwoord:', d)
+        })
         .catch(console.error)
         .finally(() => setDataLoading(false))
     }
