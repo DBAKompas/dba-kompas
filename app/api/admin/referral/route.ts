@@ -106,36 +106,44 @@ export async function GET() {
     activityUserIds.add(row.referrer_id)
   }
 
-  const { data: activityProfiles } = await supabaseAdmin
-    .from('profiles')
-    .select('id, email')
-    .in('id', Array.from(activityUserIds))
+  const activityUserIdList = Array.from(activityUserIds)
+  let activityProfiles: { id: string; email: string }[] = []
+  if (activityUserIdList.length > 0) {
+    const res = await supabaseAdmin.from('profiles').select('id, email').in('id', activityUserIdList)
+    activityProfiles = res.data ?? []
+  }
 
-  const activityProfileMap = Object.fromEntries((activityProfiles ?? []).map(p => [p.id, p.email]))
+  const activityProfileMap = Object.fromEntries(activityProfiles.map(p => [p.id, p.email]))
 
   // Zoek aan wat er gekocht is per referred_user_id
   const referredIds = (recentRaw ?? []).map(r => r.referred_user_id)
 
-  const [{ data: otp }, { data: subs }] = await Promise.all([
-    supabaseAdmin
-      .from('one_time_purchases')
-      .select('user_id, product_type, status, created_at')
-      .in('user_id', referredIds)
-      .not('product_type', 'eq', 'referral_free_check'),
-    supabaseAdmin
-      .from('subscriptions')
-      .select('user_id, plan, status, created_at')
-      .in('user_id', referredIds),
-  ])
+  let otp: { user_id: string; product_type: string; status: string; created_at: string }[] = []
+  let subs: { user_id: string; plan: string; status: string; created_at: string }[] = []
+  if (referredIds.length > 0) {
+    const [otpRes, subsRes] = await Promise.all([
+      supabaseAdmin
+        .from('one_time_purchases')
+        .select('user_id, product_type, status, created_at')
+        .in('user_id', referredIds)
+        .not('product_type', 'eq', 'referral_free_check'),
+      supabaseAdmin
+        .from('subscriptions')
+        .select('user_id, plan, status, created_at')
+        .in('user_id', referredIds),
+    ])
+    otp  = otpRes.data ?? []
+    subs = subsRes.data ?? []
+  }
 
   // Bouw purchase lookup: user_id → beschrijving
   const purchaseMap: Record<string, string> = {}
-  for (const p of otp ?? []) {
+  for (const p of otp) {
     if (p.status === 'granted') {
       purchaseMap[p.user_id] = `Losse analyse (${p.product_type})`
     }
   }
-  for (const s of subs ?? []) {
+  for (const s of subs) {
     if (s.status === 'active') {
       purchaseMap[s.user_id] = `Abonnement ${s.plan}`
     }
