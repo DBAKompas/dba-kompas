@@ -6,20 +6,24 @@
  * - Referral tracking opslaan (code → referred_user_id)
  * - Referral kwalificeren na succesvolle betaling
  * - Rewards uitschrijven op mijlpalen (1 / 3 / 5)
+ * - Stripe reward appliceren (coupon op abonnement of refund bij jaarabonnement)
  * - Anti-fraud guards
  */
 
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { stripe } from '@/lib/stripe/client'
+import { sendEmail } from '@/lib/email'
 import { sendLoopsEvent } from '@/lib/loops'
+import { createNotification } from '@/lib/notifications'
 
 // ── Constanten ────────────────────────────────────────────────────────────────
 
 const MAX_CODES_PER_USER = 5
 
-const MILESTONES: Record<number, { reward_type: string; coupon?: string }> = {
+const MILESTONES: Record<number, { reward_type: string; coupon?: string; months?: number }> = {
   1: { reward_type: 'free_check' },
-  3: { reward_type: 'month_discount',     coupon: 'REFERRAL_MONTH_DISCOUNT' },
-  5: { reward_type: 'two_month_discount', coupon: 'REFERRAL_TWO_MONTH_DISCOUNT' },
+  3: { reward_type: 'month_discount',     coupon: 'REFERRAL_MONTH_DISCOUNT',     months: 1 },
+  5: { reward_type: 'two_month_discount', coupon: 'REFERRAL_TWO_MONTH_DISCOUNT', months: 2 },
 }
 
 // Mijlpaal-statusberichten zoals getoond in de widget
@@ -34,11 +38,6 @@ export const MILESTONE_MESSAGES: Record<number, string> = {
 
 // ── Code generatie ────────────────────────────────────────────────────────────
 
-/**
- * Genereer een leesbare 8-tekens referral code op basis van een seed-string.
- * Format: 4 letters + 4 cijfers (bijv. DBKX1234)
- * Geen verwarring-tekens (I, O, 0, 1).
- */
 function generateCode(seed: string): string {
   const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ'
   const digits  = '23456789'
@@ -61,11 +60,6 @@ function generateCode(seed: string): string {
 
 // ── 5 codes ophalen of aanmaken ───────────────────────────────────────────────
 
-/**
- * Haalt de 5 referral codes op van de gebruiker.
- * Maakt ontbrekende codes aan als er nog geen 5 zijn.
- * Retourneert altijd exact MAX_CODES_PER_USER codes.
- */
 export async function getOrCreateReferralCodes(userId: string): Promise<ReferralCode[]> {
   const { data: existing } = await supabaseAdmin
     .from('referral_codes')
@@ -74,26 +68,19 @@ export async function getOrCreateReferralCodes(userId: string): Promise<Referral
     .order('created_at', { ascending: true })
 
   const codes = existing ?? []
-
-  // Maak ontbrekende codes aan
   const missing = MAX_CODES_PER_USER - codes.length
+
   for (let i = 0; i < missing; i++) {
     const seed = `${userId}-${codes.length + i}-${Date.now()}`
     let candidate = generateCode(seed)
     let attempts = 0
-
     while (attempts < 10) {
       const { data: inserted, error } = await supabaseAdmin
         .from('referral_codes')
         .insert({ user_id: userId, code: candidate })
         .select('id, code, is_used, used_at')
         .single()
-
-      if (!error && inserted) {
-        codes.push(inserted)
-        break
-      }
-      // Collision: varieer de seed
+      if (!error && inserted) { codes.push(inserted); break }
       candidate = generateCode(`${seed}-retry-${attempts}`)
       attempts++
     }
@@ -107,10 +94,6 @@ export async function getOrCreateReferralCodes(userId: string): Promise<Referral
   }))
 }
 
-/**
- * Backward-compat: geeft de eerste beschikbare (niet-gebruikte) code terug.
- * Voor gebruik in bestaande webhook-logica.
- */
 export async function getOrCreateReferralCode(userId: string): Promise<string> {
   const codes = await getOrCreateReferralCodes(userId)
   const available = codes.find(c => !c.isUsed)
@@ -119,42 +102,31 @@ export async function getOrCreateReferralCode(userId: string): Promise<string> {
 
 // ── Referral tracking opslaan ─────────────────────────────────────────────────
 
-/**
- * Slaat op dat referred_user_id is binnengekomen via referral_code.
- * Markeert de code als gebruikt.
- * Idempotent: als er al een tracking bestaat voor deze user, skip.
- */
 export async function trackReferral(params: {
   referredUserId: string
   referralCode: string
 }): Promise<void> {
   const { referredUserId, referralCode } = params
 
-  // Zoek de code-rij op (moet niet-gebruikt zijn)
   const { data: codeRow } = await supabaseAdmin
     .from('referral_codes')
     .select('id, user_id, is_used')
     .eq('code', referralCode.toUpperCase())
     .single()
 
-  if (!codeRow) return                    // onbekende code
-  if (codeRow.is_used) return             // al verzilverd
+  if (!codeRow) return
+  if (codeRow.is_used) return
 
   const referrerId = codeRow.user_id
-
-  // Anti-fraud: zelfverwijzing blokkeren
   if (referrerId === referredUserId) return
 
-  // Idempotent: al getrackt?
   const { data: existing } = await supabaseAdmin
     .from('referral_tracking')
     .select('id')
     .eq('referred_user_id', referredUserId)
     .single()
-
   if (existing) return
 
-  // Tracking aanmaken
   await supabaseAdmin.from('referral_tracking').insert({
     referred_user_id: referredUserId,
     referral_code: referralCode.toUpperCase(),
@@ -162,19 +134,214 @@ export async function trackReferral(params: {
     status: 'pending',
   })
 
-  // Code markeren als gebruikt
   await supabaseAdmin
     .from('referral_codes')
     .update({ is_used: true, used_by: referredUserId, used_at: new Date().toISOString() })
     .eq('id', codeRow.id)
 }
 
-// ── Referral kwalificeren na betaling ─────────────────────────────────────────
+// ── Stripe reward appliceren ──────────────────────────────────────────────────
+
+type RewardMethod =
+  | 'monthly_coupon'
+  | 'yearly_refund'
+  | 'no_subscription_notified'
+  | 'skipped'
+
+interface RewardResult {
+  method: RewardMethod
+  detail?: string
+}
 
 /**
- * Wordt aangeroepen vanuit de Stripe webhook na checkout.session.completed.
- * Kwalificeert de referral en verdeelt rewards op mijlpalen.
+ * Past de Stripe-beloning toe voor mijlpaal 3 of 5.
+ *
+ * - Maandabonnee  → coupon op lopend abonnement (volgende factuur gratis)
+ * - Jaarabonnee   → proportionele refund (1 of 2 maanden van jaarbedrag)
+ * - Geen abonnement (eenmalig/free) → in-app notificatie + mail met uitleg
+ *
+ * Gooit nooit — fouten worden gelogd en teruggegeven als detail.
  */
+async function applyReferralReward(params: {
+  referrerId: string
+  referrerEmail: string
+  milestone: number
+}): Promise<RewardResult> {
+  const { referrerId, referrerEmail, milestone } = params
+  const def = MILESTONES[milestone]
+  if (!def?.coupon || !def.months) return { method: 'skipped' }
+
+  const couponId   = def.coupon
+  const months     = def.months
+  const monthLabel = months === 1 ? '1 maand' : '2 maanden'
+
+  try {
+    // Zoek actief abonnement
+    const { data: sub } = await supabaseAdmin
+      .from('subscriptions')
+      .select('stripe_subscription_id, plan')
+      .eq('user_id', referrerId)
+      .in('status', ['active', 'trialing'])
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single()
+
+    // ── Maandabonnee: coupon toepassen ──────────────────────────────────────
+    // In Stripe API 2025-03-31.basil is 'coupon' vervangen door 'discounts'.
+    if (sub?.stripe_subscription_id && sub.plan === 'monthly') {
+      await stripe.subscriptions.update(sub.stripe_subscription_id, {
+        discounts: [{ coupon: couponId }],
+      })
+
+      await Promise.allSettled([
+        createNotification({
+          userId: referrerId,
+          title: `Beloning: ${monthLabel} gratis`,
+          message: `Je hebt mijlpaal ${milestone} bereikt! Je volgende ${monthLabel === '1 maand' ? 'maand is' : '2 maanden zijn'} gratis. Dit wordt automatisch verwerkt op je volgende factuur.`,
+          type: 'success',
+        }),
+        sendRewardEmail(referrerEmail, milestone, monthLabel, 'monthly'),
+      ])
+
+      return { method: 'monthly_coupon', detail: sub.stripe_subscription_id }
+    }
+
+    // ── Jaarabonnee: proportionele refund ────────────────────────────────────
+    if (sub?.stripe_subscription_id && sub.plan === 'yearly') {
+      const stripeSub = await stripe.subscriptions.retrieve(sub.stripe_subscription_id)
+      const latestInvoiceId = stripeSub.latest_invoice as string | null
+
+      if (!latestInvoiceId) {
+        console.error('[referral] jaarabonnee: geen latest_invoice gevonden')
+        return { method: 'yearly_refund', detail: 'no_invoice' }
+      }
+
+      const invoice = await stripe.invoices.retrieve(latestInvoiceId)
+      // charge kan string | Stripe.Charge | null zijn — normaliseer naar string
+      const chargeRaw = (invoice as unknown as { charge?: unknown }).charge
+      const chargeId = typeof chargeRaw === 'string' ? chargeRaw : null
+
+      if (!chargeId) {
+        console.error('[referral] jaarabonnee: geen charge op invoice')
+        return { method: 'yearly_refund', detail: 'no_charge' }
+      }
+
+      // 1/12 of 2/12 van het betaalde jaarbedrag
+      const refundCents = Math.round((invoice.amount_paid / 12) * months)
+
+      if (refundCents <= 0) {
+        return { method: 'yearly_refund', detail: 'zero_amount' }
+      }
+
+      await stripe.refunds.create({
+        charge: chargeId,
+        amount: refundCents,
+        reason: 'requested_by_customer',
+        metadata: {
+          reden: `referral_reward_milestone_${milestone}`,
+          referrer_id: referrerId,
+          maanden: String(months),
+        },
+      })
+
+      const refundEuro = (refundCents / 100).toFixed(2).replace('.', ',')
+
+      await Promise.allSettled([
+        createNotification({
+          userId: referrerId,
+          title: `Beloning: ${monthLabel} teruggestort`,
+          message: `Je hebt mijlpaal ${milestone} bereikt! We storten €${refundEuro} terug op je rekening — dit staat binnen 5-10 werkdagen op je rekening.`,
+          type: 'success',
+        }),
+        sendRewardEmail(referrerEmail, milestone, monthLabel, 'yearly', refundEuro),
+      ])
+
+      return { method: 'yearly_refund', detail: `${refundCents} ct` }
+    }
+
+    // ── Geen actief abonnement: notificeer voor handmatige upgrade ───────────
+    await Promise.allSettled([
+      createNotification({
+        userId: referrerId,
+        title: `Beloning: ${monthLabel} gratis`,
+        message: `Je hebt mijlpaal ${milestone} bereikt en verdient ${monthLabel} gratis toegang. Upgrade naar een abonnement — je eerste ${monthLabel === '1 maand' ? 'maand is' : '2 maanden zijn'} gratis met code ${couponId}.`,
+        type: 'success',
+      }),
+      sendRewardEmail(referrerEmail, milestone, monthLabel, 'no_subscription', undefined, couponId),
+    ])
+
+    return { method: 'no_subscription_notified', detail: couponId }
+
+  } catch (err) {
+    console.error(`[referral] applyReferralReward milestone ${milestone} fout:`, err)
+    return { method: 'skipped', detail: err instanceof Error ? err.message : String(err) }
+  }
+}
+
+// ── Reward e-mail ─────────────────────────────────────────────────────────────
+
+async function sendRewardEmail(
+  email: string,
+  milestone: number,
+  monthLabel: string,
+  planType: 'monthly' | 'yearly' | 'no_subscription',
+  refundEuro?: string,
+  couponCode?: string,
+): Promise<void> {
+  const subjectEmoji = milestone === 3 ? '🎉' : '⭐'
+  const subject = `${subjectEmoji} Beloning verdiend: ${monthLabel} gratis DBA Kompas`
+
+  const bodyPerPlan: Record<string, string> = {
+    monthly: `
+      <p>Je hebt <strong>${milestone} succesvolle doorverwijzingen</strong> gedaan!</p>
+      <p>Als beloning is je volgende ${monthLabel === '1 maand' ? 'maand' : '2 maanden'} gratis.
+      Dit wordt automatisch verwerkt op je eerstvolgende factuur — je hoeft zelf niets te doen.</p>
+    `,
+    yearly: `
+      <p>Je hebt <strong>${milestone} succesvolle doorverwijzingen</strong> gedaan!</p>
+      <p>Als beloning ontvang je een terugbetaling van <strong>€${refundEuro}</strong> (${monthLabel} van je jaarabonnement).
+      Dit staat binnen 5–10 werkdagen op je rekening.</p>
+    `,
+    no_subscription: `
+      <p>Je hebt <strong>${milestone} succesvolle doorverwijzingen</strong> gedaan!</p>
+      <p>Als beloning krijg je <strong>${monthLabel} gratis toegang</strong> tot DBA Kompas.
+      Gebruik de code <strong>${couponCode}</strong> bij het afsluiten van een abonnement
+      en je eerste ${monthLabel === '1 maand' ? 'maand is' : '2 maanden zijn'} gratis.</p>
+      <p><a href="https://dbakompas.nl/upgrade" style="display:inline-block;background:#1e3a5f;color:#fff;padding:10px 20px;text-decoration:none;border-radius:6px;font-weight:600;">Abonnement afsluiten</a></p>
+    `,
+  }
+
+  const html = `<!DOCTYPE html>
+<html><head><meta charset="utf-8"></head>
+<body style="font-family:Arial,sans-serif;line-height:1.6;color:#1a1a1a;background:#f5f5f5;margin:0;padding:0;">
+<div style="max-width:540px;margin:0 auto;padding:24px;">
+  <div style="background:#1e3a5f;color:#fff;padding:20px 24px;border-radius:8px 8px 0 0;">
+    <div style="font-size:13px;opacity:0.8;margin-bottom:4px;">DBA Kompas — Referral beloning</div>
+    <div style="font-size:20px;font-weight:700;">${subjectEmoji} ${monthLabel} gratis — mijlpaal ${milestone} bereikt!</div>
+  </div>
+  <div style="background:#fff;padding:24px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px;">
+    ${bodyPerPlan[planType] ?? bodyPerPlan['no_subscription']}
+    <hr style="border:none;border-top:1px solid #f0f0f0;margin:20px 0;">
+    <p style="font-size:12px;color:#6b7280;">
+      Vragen? Stuur een mail naar <a href="mailto:info@dbakompas.nl">info@dbakompas.nl</a>.
+    </p>
+  </div>
+</div>
+</body></html>`
+
+  const text = `DBA Kompas — Beloning ontvangen\n\nJe hebt ${milestone} succesvolle doorverwijzingen gedaan.\n${
+    planType === 'monthly'
+      ? `Je volgende ${monthLabel} is gratis op je abonnement.`
+      : planType === 'yearly'
+        ? `We storten €${refundEuro} terug op je rekening.`
+        : `Gebruik code ${couponCode} bij het afsluiten van een abonnement.`
+  }\n\nDBA Kompas — dbakompas.nl`
+
+  await sendEmail({ to: email, subject, html, text })
+}
+
+// ── Referral kwalificeren na betaling ─────────────────────────────────────────
+
 export async function qualifyReferral(params: {
   referredUserId: string
   checkoutSessionId: string
@@ -182,7 +349,6 @@ export async function qualifyReferral(params: {
 }): Promise<void> {
   const { referredUserId, checkoutSessionId, referrerEmail } = params
 
-  // Zoek openstaande tracking
   const { data: tracking } = await supabaseAdmin
     .from('referral_tracking')
     .select('id, referrer_id, status')
@@ -194,13 +360,11 @@ export async function qualifyReferral(params: {
 
   const referrerId = tracking.referrer_id
 
-  // Markeer als gekwalificeerd
   await supabaseAdmin
     .from('referral_tracking')
     .update({ status: 'qualified', checkout_session_id: checkoutSessionId })
     .eq('id', tracking.id)
 
-  // Tel hoeveel geldige referrals de referrer nu heeft
   const { count } = await supabaseAdmin
     .from('referral_tracking')
     .select('id', { count: 'exact', head: true })
@@ -209,7 +373,18 @@ export async function qualifyReferral(params: {
 
   const totalQualified = count ?? 0
 
-  // Check welke mijlpalen bereikt zijn en nog geen reward hebben
+  // Haal referrer-email op als die niet meegegeven is
+  const resolvedEmail = referrerEmail ?? (await (async () => {
+    const { data } = await supabaseAdmin
+      .from('profiles')
+      .select('email')
+      .eq('user_id', referrerId)
+      .single()
+    return data?.email ?? null
+  })())
+
+  let highestRewardedMilestone = 0
+
   for (const [milestoneStr, rewardDef] of Object.entries(MILESTONES)) {
     const milestone = parseInt(milestoneStr)
     if (totalQualified < milestone) continue
@@ -223,7 +398,7 @@ export async function qualifyReferral(params: {
 
     if (existingReward) continue
 
-    // Reward schrijven
+    // ── Reward opslaan ─────────────────────────────────────────────────────
     await supabaseAdmin.from('referral_rewards').insert({
       referrer_id: referrerId,
       referred_id: referredUserId,
@@ -232,7 +407,7 @@ export async function qualifyReferral(params: {
       stripe_coupon_id: rewardDef.coupon ?? null,
     })
 
-    // Milestone 1: gratis check als one_time_purchase credit
+    // ── Mijlpaal 1: gratis analyse credit ──────────────────────────────────
     if (rewardDef.reward_type === 'free_check') {
       await supabaseAdmin.from('one_time_purchases').insert({
         user_id: referrerId,
@@ -240,12 +415,29 @@ export async function qualifyReferral(params: {
         status: 'granted',
         stripe_checkout_session_id: `referral_milestone_${milestone}_${referrerId}`,
       })
+      // In-app notificatie
+      await createNotification({
+        userId: referrerId,
+        title: 'Beloning: 1 gratis analyse',
+        message: 'Je hebt je eerste succesvolle referral gedaan! Je kunt nu een extra DBA-analyse uitvoeren.',
+        type: 'success',
+      }).catch(err => console.error('[referral] notificatie milestone 1 mislukt:', err))
     }
 
-    // Loops event naar referrer
-    if (referrerEmail) {
+    // ── Mijlpaal 3 + 5: Stripe reward ─────────────────────────────────────
+    if ((milestone === 3 || milestone === 5) && resolvedEmail) {
+      const result = await applyReferralReward({
+        referrerId,
+        referrerEmail: resolvedEmail,
+        milestone,
+      })
+      console.log(`[referral] milestone ${milestone} reward applied:`, result.method, result.detail ?? '')
+    }
+
+    // ── Loops event ────────────────────────────────────────────────────────
+    if (resolvedEmail) {
       await sendLoopsEvent(`referral_milestone_${milestone}` as Parameters<typeof sendLoopsEvent>[0], {
-        email: referrerEmail,
+        email: resolvedEmail,
         userId: referrerId,
         properties: { milestone, reward_type: rewardDef.reward_type },
         dedupKey: `referral-reward-${referrerId}-${milestone}`,
@@ -254,13 +446,15 @@ export async function qualifyReferral(params: {
       )
     }
 
-    // Markeer tracking als rewarded bij de hoogst bereikbare mijlpaal
-    if (milestone === Math.max(...Object.keys(MILESTONES).map(Number).filter(m => totalQualified >= m))) {
-      await supabaseAdmin
-        .from('referral_tracking')
-        .update({ status: 'rewarded' })
-        .eq('id', tracking.id)
-    }
+    highestRewardedMilestone = milestone
+  }
+
+  // Markeer tracking als 'rewarded' als er een beloning is toegekend
+  if (highestRewardedMilestone > 0) {
+    await supabaseAdmin
+      .from('referral_tracking')
+      .update({ status: 'rewarded' })
+      .eq('id', tracking.id)
   }
 }
 
@@ -275,7 +469,6 @@ export interface ReferralCode {
 
 export interface ReferralStats {
   codes: ReferralCode[]
-  /** @deprecated gebruik codes[0].code - alleen voor backward compat */
   code: string
   referralBaseUrl: string
   qualifiedCount: number
@@ -300,7 +493,6 @@ export async function getReferralStats(userId: string): Promise<ReferralStats> {
     .order('milestone')
 
   const qualifiedCount = count ?? 0
-  // Pak het meest relevante bericht: exacte match of 0
   const cappedCount = Math.min(qualifiedCount, 5)
   const statusMessage = MILESTONE_MESSAGES[cappedCount] ?? MILESTONE_MESSAGES[5]
 
