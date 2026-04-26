@@ -26,6 +26,8 @@ import {
   Check,
   Layers,
   Zap,
+  GitCompare,
+  FileDown,
 } from 'lucide-react'
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -76,6 +78,15 @@ interface Assessment {
   optimized_brief: string | object | null
   follow_up_questions: FollowUpQuestion[] | string[] | null
   input_text: string
+  created_at: string
+  parent_assessment_id: string | null
+}
+
+interface ParentAssessment {
+  id: string
+  overall_risk_label: string
+  overall_summary: string
+  domains: Domain[]
   created_at: string
 }
 
@@ -265,6 +276,7 @@ export default function AssessmentDetailPage() {
   const params = useParams<{ id: string }>()
   const router = useRouter()
   const [assessment, setAssessment] = useState<Assessment | null>(null)
+  const [parentAssessment, setParentAssessment] = useState<ParentAssessment | null>(null)
   const [loading, setLoading] = useState(true)
   const [draftLoading, setDraftLoading] = useState(false)
   const [fullDraftLoading, setFullDraftLoading] = useState(false)
@@ -275,6 +287,7 @@ export default function AssessmentDetailPage() {
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [activeScenario, setActiveScenario] = useState<number | null>(null)
   const [heranalyseText, setHeranalyseText] = useState('')
+  const [diffOpen, setDiffOpen] = useState(true)
 
   useEffect(() => {
     if (!params.id) return
@@ -286,6 +299,15 @@ export default function AssessmentDetailPage() {
       .then((data) => { setAssessment(data); setLoading(false) })
       .catch((err) => { setError(err.message); setLoading(false) })
   }, [params.id])
+
+  // Haal parent op zodra assessment geladen is en parent_assessment_id aanwezig is
+  useEffect(() => {
+    if (!assessment?.parent_assessment_id) return
+    fetch(`/api/dba/assessments/${assessment.parent_assessment_id}`)
+      .then((res) => res.ok ? res.json() : null)
+      .then((data) => { if (data) setParentAssessment(data) })
+      .catch(() => { /* parent ophalen is best-effort */ })
+  }, [assessment?.parent_assessment_id])
 
   const toggleDomain = (i: number) =>
     setExpandedDomains((prev) => {
@@ -340,7 +362,7 @@ export default function AssessmentDetailPage() {
       const res = await fetch('/api/dba/analyse', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ inputText: combined }),
+        body: JSON.stringify({ inputText: combined, parentAssessmentId: params.id }),
       })
       const data = await res.json()
       if (data.id) router.push(`/analyse/${data.id}`)
@@ -418,13 +440,22 @@ export default function AssessmentDetailPage() {
             <Link href="/analyse" className="inline-flex items-center gap-1.5 text-sm text-white/80 hover:text-white transition-colors">
               <ArrowLeft className="size-4" /> Terug
             </Link>
-            <a
-              href={`/api/dba/assessments/${params.id}/pdf`}
-              download
-              className="inline-flex items-center gap-1.5 rounded-lg border border-white/30 bg-white/10 px-3 py-1.5 text-sm text-white hover:bg-white/20 transition-colors"
-            >
-              <Download className="size-4" /> PDF
-            </a>
+            <div className="flex items-center gap-2">
+              <a
+                href={`/api/dba/assessments/${params.id}/pdf`}
+                download
+                className="inline-flex items-center gap-1.5 rounded-lg border border-white/30 bg-white/10 px-3 py-1.5 text-sm text-white hover:bg-white/20 transition-colors"
+              >
+                <Download className="size-4" /> PDF
+              </a>
+              <a
+                href={`/api/dba/assessments/${params.id}/docx`}
+                download
+                className="inline-flex items-center gap-1.5 rounded-lg border border-white/30 bg-white/10 px-3 py-1.5 text-sm text-white hover:bg-white/20 transition-colors"
+              >
+                <FileDown className="size-4" /> Word
+              </a>
+            </div>
           </div>
 
           <div className="mt-6 flex items-center gap-6">
@@ -455,6 +486,111 @@ export default function AssessmentDetailPage() {
 
       {/* ── Pagina-inhoud ──────────────────────────────────────────────────── */}
       <div className="mx-auto max-w-5xl px-6 py-8 space-y-10">
+
+        {/* ── Vergelijking met vorige analyse (diff) ────────────────────────── */}
+        {parentAssessment && (
+          <section>
+            <button
+              onClick={() => setDiffOpen((v) => !v)}
+              className="w-full flex items-center justify-between gap-3 rounded-xl border-2 border-violet-200 bg-violet-50 px-5 py-3 text-left hover:bg-violet-100 transition-colors"
+            >
+              <div className="flex items-center gap-2.5">
+                <GitCompare className="size-5 text-violet-600 shrink-0" />
+                <div>
+                  <p className="font-semibold text-sm text-violet-800">Vergelijking met vorige analyse</p>
+                  <p className="text-xs text-violet-600 mt-0.5">
+                    Vorige analyse: {new Date(parentAssessment.created_at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })}
+                  </p>
+                </div>
+              </div>
+              {diffOpen
+                ? <ChevronUp className="size-4 text-violet-500 shrink-0" />
+                : <ChevronDown className="size-4 text-violet-500 shrink-0" />
+              }
+            </button>
+
+            {diffOpen && (
+              <div className="mt-3 rounded-xl border border-violet-200 bg-white overflow-hidden">
+                {/* Overall risico vergelijking */}
+                <div className="grid grid-cols-2 divide-x divide-violet-100 border-b border-violet-100">
+                  <div className="px-5 py-4">
+                    <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-2">Vorige analyse</p>
+                    <div className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${riskConfig(parentAssessment.overall_risk_label).badge}`}>
+                      {(() => { const I = riskConfig(parentAssessment.overall_risk_label).icon; return <I className="size-3.5" /> })()}
+                      {riskConfig(parentAssessment.overall_risk_label).label}
+                    </div>
+                    <p className="mt-2 text-xs text-muted-foreground leading-snug line-clamp-3">{parentAssessment.overall_summary}</p>
+                  </div>
+                  <div className="px-5 py-4">
+                    <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-2">Huidige analyse</p>
+                    <div className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${risk.badge}`}>
+                      {<RiskIcon className="size-3.5" />}
+                      {risk.label}
+                    </div>
+                    <p className="mt-2 text-xs text-muted-foreground leading-snug line-clamp-3">{assessment.overall_summary}</p>
+                  </div>
+                </div>
+
+                {/* Domeinen vergelijking */}
+                {parentAssessment.domains?.length > 0 && domains.length > 0 && (
+                  <div className="divide-y divide-violet-50">
+                    {domains.map((domain, idx) => {
+                      const prev = parentAssessment.domains?.[idx]
+                      if (!prev) return null
+                      const prevCfg = riskConfig(prev.scoreLabel)
+                      const currCfg = riskConfig(domain.scoreLabel)
+                      const changed = prev.scoreLabel !== domain.scoreLabel
+                      // Bepaal pijl: hoog→laag = verbetering (groen pijl omlaag), laag→hoog = verslechtering
+                      const scoreNum = (l: string) => l === 'laag' ? 0 : l === 'midden' ? 1 : 2
+                      const delta = scoreNum(domain.scoreLabel) - scoreNum(prev.scoreLabel)
+                      const arrowEl = !changed
+                        ? <span className="text-xs text-muted-foreground font-medium">ongewijzigd</span>
+                        : delta < 0
+                          ? <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600">↓ verbeterd</span>
+                          : <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-500">↑ verslechterd</span>
+
+                      return (
+                        <div key={domain.key ?? idx} className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 px-5 py-3">
+                          {/* Oud */}
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className={`shrink-0 inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${prevCfg.badge}`}>
+                              {prev.scoreLabel}
+                            </span>
+                            <span className="text-xs text-muted-foreground truncate">{prev.summary?.slice(0, 60)}{prev.summary?.length > 60 ? '…' : ''}</span>
+                          </div>
+
+                          {/* Domein naam + pijl */}
+                          <div className="flex flex-col items-center gap-1 min-w-[120px] text-center">
+                            <span className="text-[10px] font-semibold text-foreground">{domain.title}</span>
+                            {arrowEl}
+                          </div>
+
+                          {/* Nieuw */}
+                          <div className="flex items-center justify-end gap-2 min-w-0">
+                            <span className="text-xs text-muted-foreground text-right truncate">{domain.summary?.slice(0, 60)}{domain.summary?.length > 60 ? '…' : ''}</span>
+                            <span className={`shrink-0 inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${currCfg.badge}`}>
+                              {domain.scoreLabel}
+                            </span>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+
+                {/* Footer met link naar vorige analyse */}
+                <div className="border-t border-violet-100 px-5 py-3 bg-violet-50/50">
+                  <Link
+                    href={`/analyse/${parentAssessment.id}`}
+                    className="text-xs text-violet-600 hover:text-violet-800 font-medium hover:underline"
+                  >
+                    Bekijk vorige analyse →
+                  </Link>
+                </div>
+              </div>
+            )}
+          </section>
+        )}
 
         {/* ── Beoordeling per domein ────────────────────────────────────────── */}
         <section>
