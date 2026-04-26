@@ -1,6 +1,6 @@
 # PROJECT_STATE.md
 
-**Laatste update:** 2026-04-26 (sessie 28)
+**Laatste update:** 2026-04-26 (sessie 29)
 **Maturity:** Live, actief in ontwikkeling — MVP compleet, groei-features actief
 
 ---
@@ -14,7 +14,8 @@ DBA Kompas is een **live** Next.js 16 SaaS applicatie op `dbakompas.nl` die opdr
 ## WAT LIVE IS (volledig operationeel)
 
 - Authenticatie (Supabase, custom SMTP via Postmark, magic link, wachtwoordreset)
-- DBA-analyse via Claude Haiku (two-phase, nuclear validator, PDF export)
+- DBA-analyse via Claude Haiku (two-phase, nuclear validator, PDF export, Word export)
+- Heranalyse-diff: vergelijking oud vs. nieuw per domein naast elkaar op de detail-pagina
 - Quota-cap per plan (monthly 20/mnd, yearly 25/mnd, one_time 1x, free 0)
 - Stripe subscription + one-time checkout (live mode actief)
 - Stripe webhooks (signature-validatie + idempotency)
@@ -62,8 +63,7 @@ DBA Kompas is een **live** Next.js 16 SaaS applicatie op `dbakompas.nl` die opdr
 
 ## BACKLOG (prioriteitsvolgorde)
 
-1. **QUAL-001** — Heranalyse met diff + Word-download rapport
-2. **Postmark-templates** — `{{ activate_link }}` + `{{ login_link }}` toevoegen
+1. **Postmark-templates** — `{{ activate_link }}` + `{{ login_link }}` toevoegen in welkomstmails
 3. **TEST-005** — Maximale invoerlengte (3000+ tekens) handmatig testen
 4. **MAIL-001** — info@dbakompas.nl in Apple Mail
 5. **Polish** — Loops journeys nieuws/betaling, Sentry source maps, Supabase key-migratie
