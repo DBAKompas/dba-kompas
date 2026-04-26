@@ -241,6 +241,28 @@ export default function GebruikersPage() {
     }
   }
 
+  async function stuurWelkomstmail(userId: string, plan: string, email: string | null) {
+    if (!email) return
+    const key = `welkom-${userId}`
+    setBezig(key)
+    setMelding(null)
+    try {
+      const res = await fetch('/api/admin/resend-welcome', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, plan }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Onbekende fout')
+      setMelding(data.bericht)
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Onbekende fout'
+      setMelding(`Fout: ${msg}`)
+    } finally {
+      setBezig(null)
+    }
+  }
+
   const gefilterd = useMemo(
     () => filterGebruikers(gebruikers, filters),
     [gebruikers, filters]
@@ -380,22 +402,30 @@ export default function GebruikersPage() {
                         {formatDatum(g.created_at)}
                       </td>
                       <td className="px-5 py-3 text-right align-top">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => stuurResetMail(g.email)}
-                          disabled={bezig === g.email}
-                          className="text-xs"
-                        >
-                          {bezig === g.email ? (
-                            <>
-                              <Loader2 className="size-3 animate-spin mr-1" />
-                              Bezig...
-                            </>
-                          ) : (
-                            'Wachtwoord reset'
-                          )}
-                        </Button>
+                        <div className="flex flex-col gap-1 items-end">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => stuurResetMail(g.email)}
+                            disabled={bezig === g.email}
+                            className="text-xs"
+                          >
+                            {bezig === g.email ? (
+                              <><Loader2 className="size-3 animate-spin mr-1" />Bezig...</>
+                            ) : 'Wachtwoord reset'}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => stuurWelkomstmail(g.user_id, g.plan, g.email)}
+                            disabled={bezig === `welkom-${g.user_id}`}
+                            className="text-xs text-violet-600 hover:text-violet-700"
+                          >
+                            {bezig === `welkom-${g.user_id}` ? (
+                              <><Loader2 className="size-3 animate-spin mr-1" />Bezig...</>
+                            ) : 'Welkomstmail'}
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   )
