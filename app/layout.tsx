@@ -15,12 +15,13 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
-
 export const metadata: Metadata = {
   title: "DBA Kompas",
   description: "Toets je zzp-opdracht op DBA-risico voordat je het gesprek aangaat",
+  verification: {
+    google: "uBWkCLzDPcZScL8QLspMCqUu84Ll-_zPDmofXAce0rQ",
+  },
 };
-
 export default function RootLayout({
   children,
 }: Readonly<{
