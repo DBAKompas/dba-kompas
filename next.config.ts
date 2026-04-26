@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next'
+import { withSentryConfig } from '@sentry/nextjs'
 
 const nextConfig: NextConfig = {
   // pdfkit gebruikt fs om fonts te laden - niet bundelen maar als externe Node.js module behandelen
@@ -28,4 +29,15 @@ const nextConfig: NextConfig = {
   ],
 }
 
-export default nextConfig
+export default withSentryConfig(nextConfig, {
+  // Geen Sentry-buildlogs in de terminal (behalve op CI)
+  silent: !process.env.CI,
+
+  // Source maps configuratie
+  sourcemaps: {
+    disable: true, // Geen uploads totdat SENTRY_AUTH_TOKEN in Vercel is gezet
+  },
+
+  // Tree-shake Sentry-logger weg in productie
+  disableLogger: true,
+})
