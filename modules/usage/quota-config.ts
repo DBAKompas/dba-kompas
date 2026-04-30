@@ -13,6 +13,7 @@ export const MONTHLY_QUOTA = 20
 export const YEARLY_QUOTA = 25
 export const ONE_TIME_QUOTA = 1
 export const FREE_QUOTA = 0
+export const ADMIN_QUOTA = 999
 
 /**
  * Drempel waarop de UsageMeter een waarschuwing toont
@@ -26,6 +27,7 @@ export function getQuotaForPlan(plan: QuotaPlan): number {
     case 'yearly':   return YEARLY_QUOTA
     case 'one_time': return ONE_TIME_QUOTA
     case 'free':     return FREE_QUOTA
+    case 'admin':    return ADMIN_QUOTA
   }
 }
 

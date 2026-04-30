@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/server'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 
 export type Plan = 'free' | 'pro' | 'enterprise'
 
@@ -9,8 +10,9 @@ export type Plan = 'free' | 'pro' | 'enterprise'
  * 'monthly'  = maandabonnement actief / trialing
  * 'yearly'   = jaarabonnement actief / trialing
  * 'one_time' = alleen eenmalige check gekocht (geen sub)
+ * 'admin'    = beheerder — onbeperkt, bypast quota volledig
  */
-export type QuotaPlan = 'free' | 'monthly' | 'yearly' | 'one_time'
+export type QuotaPlan = 'free' | 'monthly' | 'yearly' | 'one_time' | 'admin'
 
 /**
  * Pure resolver - bepaalt het effectieve plan op basis van subscription-state
@@ -77,6 +79,15 @@ export async function getUserQuotaPlan(userId?: string): Promise<QuotaPlan> {
     if (!user) return 'free'
     uid = user.id
   }
+
+  // Admin-bypass: admins krijgen onbeperkte quota (service_role om RLS te omzeilen).
+  const { data: profile } = await supabaseAdmin
+    .from('profiles')
+    .select('role')
+    .eq('user_id', uid)
+    .maybeSingle()
+
+  if (profile?.role === 'admin') return 'admin'
 
   const { data: subscription } = await supabase
     .from('subscriptions')

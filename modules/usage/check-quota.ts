@@ -13,6 +13,7 @@ import {
   currentPeriodStart,
   getQuotaForPlan,
   WARN_THRESHOLD_RATIO,
+  ADMIN_QUOTA,
 } from './quota-config'
 
 export type QuotaReservationResult =
@@ -34,6 +35,11 @@ export async function reserveUsage(
 ): Promise<QuotaReservationResult> {
   if (plan === 'free') {
     return { ok: false, reason: 'no_plan', used: 0, limit: 0, plan }
+  }
+
+  // Admin-bypass: altijd toestaan, geen DB-mutaties.
+  if (plan === 'admin') {
+    return { ok: true, newCount: 0, limit: ADMIN_QUOTA, plan }
   }
 
   // One-time: lifetime cap van 1 check, gemeten via bestaande
@@ -115,6 +121,11 @@ export type UsageSnapshot = {
  * Idempotent, muteert niets.
  */
 export async function getUsageForUser(userId: string, plan: QuotaPlan): Promise<UsageSnapshot> {
+  // Admin heeft geen zinvolle teller — geef een vaste snapshot terug.
+  if (plan === 'admin') {
+    return { plan, used: 0, limit: ADMIN_QUOTA, remaining: ADMIN_QUOTA, percentage: 0, warn: false, atLimit: false }
+  }
+
   const limit = getQuotaForPlan(plan)
 
   let used = 0
