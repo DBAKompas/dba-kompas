@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { InfoTooltip, DBA_GLOSSARY } from '@/components/ui/info-tooltip'
@@ -204,8 +204,12 @@ export default function AnalysePage() {
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  // Initieel tab op basis van ?tab=eerder querystring (bijv. van dashboard-link)
+  const searchParams = useSearchParams()
+  const initialTab = (searchParams.get('tab') as PageTab) === 'eerder' ? 'eerder' : 'nieuw'
+
   // Wizard state
-  const [tab, setTab] = useState<PageTab>('nieuw')
+  const [tab, setTab] = useState<PageTab>(initialTab)
   const [step, setStep] = useState<WizardStep>('input')
   const [inputMode, setInputMode] = useState<InputMode>(null)
   const [text, setText] = useState('')

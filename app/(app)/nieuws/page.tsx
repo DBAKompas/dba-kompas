@@ -4,8 +4,10 @@ import { useEffect, useState, useCallback, useMemo } from 'react'
 import {
   Search, Filter, Eye, RefreshCw, Loader2, ChevronDown, ChevronUp,
   ThumbsUp, ThumbsDown, AlertTriangle, ExternalLink, Info, X, Link2,
+  Lock,
 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
+import Link from 'next/link'
 
 // ─── Types ────────────────────────────────────────────────────
 
@@ -119,6 +121,8 @@ function FeedbackRow({ itemId, feedback, onFeedback }: {
 // ─── Hoofdpagina ──────────────────────────────────────────────
 
 export default function NieuwsPage() {
+  const [quotaPlan, setQuotaPlan] = useState<string | null>(null)
+  const [planLoading, setPlanLoading] = useState(true)
   const [items, setItems]       = useState<NewsItem[]>([])
   const [loading, setLoading]   = useState(true)
   const [refreshing, setRefreshing] = useState(false)
@@ -136,6 +140,16 @@ export default function NieuwsPage() {
   const [sourceFilters, setSourceFilters] = useState<string[]>([])
   const [dateFilter, setDateFilter]     = useState('all')
   const [unreadOnly, setUnreadOnly]     = useState(false)
+
+  // ─── Plan check ─────────────────────────────────────────────
+
+  useEffect(() => {
+    fetch('/api/user/quota')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => setQuotaPlan(d?.quotaPlan ?? 'free'))
+      .catch(() => setQuotaPlan('free'))
+      .finally(() => setPlanLoading(false))
+  }, [])
 
   // ─── Laden ──────────────────────────────────────────────────
 
@@ -249,6 +263,45 @@ export default function NieuwsPage() {
     return (
       <div className="flex h-64 items-center justify-center">
         <Loader2 className="size-6 animate-spin text-primary/40" />
+      </div>
+    )
+  }
+
+  // ─── Lockdown voor eenmalige check ──────────────────────────
+
+  if (planLoading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <Loader2 className="size-8 animate-spin text-muted-foreground" />
+      </div>
+    )
+  }
+
+  if (quotaPlan === 'one_time') {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Nieuws Feed</h1>
+          <p className="mt-1 text-sm text-muted-foreground">DBA- en ZZP-nieuws</p>
+        </div>
+        <div className="rounded-xl border border-border bg-card p-12 flex flex-col items-center text-center gap-4">
+          <div className="flex items-center justify-center size-14 rounded-full bg-muted">
+            <Lock className="size-6 text-muted-foreground" />
+          </div>
+          <div className="space-y-1.5 max-w-sm">
+            <p className="font-semibold text-base">Nieuws is beschikbaar bij een abonnement</p>
+            <p className="text-sm text-muted-foreground">
+              De nieuwsfeed met actuele DBA- en ZZP-updates is inbegrepen bij het maand- en jaarabonnement.
+              Upgrade om direct toegang te krijgen.
+            </p>
+          </div>
+          <Link
+            href="/profiel"
+            className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
+          >
+            Abonnement upgraden
+          </Link>
+        </div>
       </div>
     )
   }

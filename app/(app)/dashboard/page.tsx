@@ -178,7 +178,7 @@ export default function DashboardPage() {
             </p>
           </div>
           <Button variant="outline" size="sm" asChild>
-            <Link href="/analyse">
+            <Link href="/analyse?tab=eerder">
               Bekijk alles
               <ArrowRight className="size-3.5" />
             </Link>
