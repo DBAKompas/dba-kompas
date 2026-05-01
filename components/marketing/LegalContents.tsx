@@ -152,7 +152,7 @@ export function AlgemeneVoorwaardenContent() {
 
       <h2>15. Derde-partij diensten en bronnen</h2>
       <h3>15.1</h3>
-      <p>De Dienst kan afhankelijk zijn van derde partijen voor hosting, database, AI, betalingen, e-mail en andere infrastructuur. Storingen, beperkingen of wijzigingen bij zulke partijen kunnen de werking of beschikbaarheid van de Dienst beïnvloeden.</p>
+      <p>DBA Kompas maakt gebruik van externe leveranciers waaronder Vercel (hosting), Supabase (database en authenticatie), Anthropic (AI-modellen), Stripe (betalingen), Postmark (transactionele e-mail), Loops (marketing e-mailautomatisering), PostHog (analytics) en Sentry (foutmonitoring). Storingen, beperkingen of wijzigingen bij zulke partijen kunnen de werking of beschikbaarheid van de Dienst beïnvloeden. DBA Kompas is niet aansprakelijk voor tekortkomingen aan de zijde van deze leveranciers.</p>
       <h3>15.2</h3>
       <p>Nieuwsbronnen, links en externe inhoud zijn afkomstig van derden. DBA Kompas is niet verantwoordelijk voor de inhoud, volledigheid of beschikbaarheid van externe bronnen.</p>
 
@@ -319,15 +319,19 @@ export function PrivacyEnCookiebeleidContent() {
       <p>Branche- en specialisatiegegevens zijn in beginsel optioneel. Als je deze niet verstrekt, kan gepersonaliseerde nieuwsselectie minder nauwkeurig zijn.</p>
 
       <h2>7. Ontvangers en dienstverleners</h2>
-      <p>Wij schakelen dienstverleners in voor onderdelen van de Dienst, waaronder hosting, database, betaling, e-mail en AI-functionaliteiten.</p>
-      <p>Afhankelijk van de actuele productie-inrichting kunnen daaronder onder meer vallen:</p>
+      <p>Wij schakelen dienstverleners in voor onderdelen van de Dienst, waaronder hosting, database, authenticatie, betaling, e-mail en AI-functionaliteiten.</p>
+      <p>Afhankelijk van de actuele productie-inrichting maken wij gebruik van onder meer de volgende categorieën leveranciers:</p>
       <ul>
-        <li>Replit voor hosting of app-infrastructuur;</li>
-        <li>Neon voor databasehosting;</li>
-        <li>OpenAI voor AI-analyse en tekstgeneratie;</li>
-        <li>Stripe voor betalingen, abonnementen en klantportaal;</li>
-        <li>STRATO en/of een andere actuele e-mailleverancier voor domein- en e-mailfunctionaliteit.</li>
+        <li>Vercel voor hosting en serverinfrastructuur (VS);</li>
+        <li>Supabase voor database en authenticatie (VS/EU, afhankelijk van configuratie);</li>
+        <li>Anthropic voor AI-modellen voor analyse en tekstgeneratie (VS);</li>
+        <li>Stripe voor betalingen, abonnementen en klantportaal (VS);</li>
+        <li>Postmark voor transactionele e-mailverzending, zoals bevestigingen en notificaties (VS);</li>
+        <li>Loops voor marketing e-mailautomatisering (VS);</li>
+        <li>PostHog voor gebruiksanalytics (EU);</li>
+        <li>Sentry voor foutmonitoring en foutrapportage (VS).</li>
       </ul>
+      <p>Doorgifte naar landen buiten de Europese Economische Ruimte vindt waar vereist plaats op basis van passende waarborgen, zoals standaardcontractbepalingen als bedoeld in artikel 46 AVG.</p>
       <p>Waar leveranciers persoonsgegevens namens ons verwerken, sluiten wij waar nodig passende contractuele afspraken. Bij sommige diensten, met name betaaldiensten, kan een leverancier daarnaast voor bepaalde verwerkingen een eigen zelfstandige rol onder de privacywetgeving hebben.</p>
       <p>Wij verkopen geen persoonsgegevens en verstrekken geen persoonsgegevens aan derden voor hun eigen marketingdoeleinden.</p>
 
@@ -446,10 +450,16 @@ export function AiDataUseNoticeContent() {
       <p>Platformbeheerde back-ups, herstelpunten en technische geschiedenisfuncties kunnen tijdelijk langer blijven bestaan.</p>
 
       <h2>5. Externe leveranciers en internationale doorgifte</h2>
-      <p>DBA Kompas gebruikt externe leveranciers voor onder meer hosting, database, e-mail, betalingen en AI-functionaliteit.</p>
-      <p>Ingevoerde tekst, inclusief geëxtraheerde uploadtekst, kan voor AI-analyse worden doorgestuurd naar een externe AI-dienstverlener.</p>
-      <p>Betalingen en abonnementen verlopen via Stripe of een opvolgende betaaldienstverlener. DBA Kompas verwerkt zelf in beginsel geen volledige kaart- of bankgegevens.</p>
-      <p>Deze verwerkingen kunnen, afhankelijk van de gebruikte leverancier en configuratie, plaatsvinden buiten de Europese Economische Ruimte. Waar vereist worden passende waarborgen toegepast, zoals standaardcontractbepalingen, een adequaatheidsbesluit of een ander toepasselijk doorgiftemechanisme.</p>
+      <p>DBA Kompas maakt gebruik van de volgende externe leveranciers die betrokken kunnen zijn bij de verwerking van ingevoerde of geëxtraheerde tekst:</p>
+      <ul>
+        <li>Anthropic: AI-modellen voor DBA-analyse en tekstgeneratie (VS). Ingevoerde tekst, inclusief geëxtraheerde uploadtekst, kan voor AI-analyse worden doorgestuurd naar Anthropic.</li>
+        <li>Vercel: hosting en serverinfrastructuur (VS).</li>
+        <li>Supabase: database en authenticatie (VS/EU, afhankelijk van configuratie).</li>
+        <li>Stripe: betalingsverwerking (VS). DBA Kompas verwerkt zelf in beginsel geen volledige kaart- of bankgegevens.</li>
+        <li>Postmark: transactionele e-mailverzending, zoals bevestigingen en notificaties (VS).</li>
+        <li>Loops: marketing e-mailautomatisering (VS).</li>
+      </ul>
+      <p>Verwerkingen bij leveranciers in landen buiten de Europese Economische Ruimte vinden waar vereist plaats op basis van passende waarborgen, zoals standaardcontractbepalingen als bedoeld in artikel 46 AVG.</p>
 
       <h2>6. Technische instellingen en retentiebeperking</h2>
       <p>DBA Kompas kan technische instellingen gebruiken die bedoeld zijn om opslag van verzoekinhoud aan leverancierszijde te beperken. Zulke instellingen zijn geen garantie op volledige afwezigheid van retentie, logging of andere technische verwerking bij de leverancier.</p>

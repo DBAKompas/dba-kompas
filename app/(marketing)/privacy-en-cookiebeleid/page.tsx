@@ -8,7 +8,7 @@ export default function PrivacyEnCookiebeleidsPage() {
     <LegalPageLayout
       title="Privacy- en Cookiebeleid"
       subtitle="Hoe DBA Kompas omgaat met persoonsgegevens en cookies."
-      lastUpdated="maart 2026"
+      lastUpdated="april 2026"
     >
       <PrivacyEnCookiebeleidContent />
     </LegalPageLayout>

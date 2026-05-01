@@ -8,7 +8,7 @@ export default function AlgemeneVoorwardenPage() {
     <LegalPageLayout
       title="Algemene Voorwaarden"
       subtitle="Van toepassing op alle diensten van DBA Kompas."
-      lastUpdated="maart 2026"
+      lastUpdated="april 2026"
     >
       <AlgemeneVoorwaardenContent />
     </LegalPageLayout>
