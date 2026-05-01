@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { AlertTriangle, Zap, ArrowRight } from 'lucide-react'
 
 type UsageSnapshot = {
-  plan: 'free' | 'monthly' | 'yearly' | 'one_time'
+  plan: 'free' | 'monthly' | 'yearly' | 'one_time' | 'admin'
   used: number
   limit: number
   remaining: number
@@ -19,6 +19,7 @@ const PLAN_LABELS: Record<UsageSnapshot['plan'], string> = {
   monthly:  'Maandabonnement',
   yearly:   'Jaarabonnement',
   one_time: 'Eenmalige check',
+  admin:    'Beheerder',
 }
 
 export function UsageMeter() {
@@ -123,6 +124,23 @@ export function UsageMeter() {
               Upgraden
             </Link>
           )}
+        </div>
+      )}
+
+      {/* Upgrade-suggestie voor eenmalige check */}
+      {snapshot.plan === 'one_time' && (
+        <div className="mt-4 rounded-lg border border-orange-200 bg-orange-50 p-3 space-y-2">
+          <p className="text-xs font-semibold text-orange-800">Upgrade naar maandabonnement</p>
+          <p className="text-xs text-orange-700 leading-relaxed">
+            Omdat je al &euro;9,95 hebt betaald, betaal je slechts &euro;10,05 voor je eerste maand. Daarna gewoon &euro;20 per maand.
+          </p>
+          <Link
+            href="/upgrade"
+            className="inline-flex items-center gap-1.5 rounded-md bg-orange-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-orange-700 transition-colors"
+          >
+            Bekijk upgrade
+            <ArrowRight className="size-3" />
+          </Link>
         </div>
       )}
     </div>

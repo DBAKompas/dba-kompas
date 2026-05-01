@@ -16,13 +16,37 @@ export async function POST(request: Request) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  // Lees body eerst zodat we weten of het een heranalyse is (parentAssessmentId).
+  // Dit is nodig om de quota-check correct te doen voor eenmalige checks.
+  let inputText: string
+  let parentAssessmentId: string | undefined
+  try {
+    const body = await request.json()
+    inputText = body.inputText
+    parentAssessmentId = body.parentAssessmentId
+  } catch {
+    return NextResponse.json({ error: 'Ongeldig verzoek' }, { status: 400 })
+  }
+
+  if (!inputText || typeof inputText !== 'string') {
+    return NextResponse.json({ error: 'inputText is required' }, { status: 400 })
+  }
+
   // Quota-check per plan (KI-021):
   //  - monthly: 20 checks per kalendermaand
   //  - yearly:  25 checks per kalendermaand
-  //  - one_time: 1 check totaal
+  //  - one_time: 1 originele analyse; heranalyses zijn gratis (onderdeel van de check)
   //  - free:    geen toegang, upsell
   const plan = await getUserQuotaPlan(user.id)
-  const reservation = await reserveUsage(user.id, plan)
+
+  // Heranalyse bij eenmalige check bypast quota: een heranalyse is geen
+  // nieuwe check maar een verfijning van de bestaande analyse.
+  const isOneTimeHeranalyse = plan === 'one_time' && !!parentAssessmentId
+
+  const reservation = isOneTimeHeranalyse
+    ? { ok: true as const, newCount: 0, limit: 1, plan }
+    : await reserveUsage(user.id, plan)
+
   if (!reservation.ok) {
     // INFRA-002: log quota-weigering. Alleen bij 'quota_exceeded';
     // 'no_plan' is een normale upsell-flow, geen misbruik.
@@ -40,7 +64,9 @@ export async function POST(request: Request) {
         error:
           reservation.reason === 'no_plan'
             ? 'Voor een DBA-analyse is een actief abonnement of eenmalige check nodig.'
-            : 'Je hebt het maximum aantal analyses voor deze maand bereikt.',
+            : plan === 'one_time'
+              ? 'Je eenmalige check is afgerond. Start een abonnement voor meer analyses.'
+              : 'Je hebt het maximum aantal analyses voor deze maand bereikt.',
         code: reservation.reason,
         used: reservation.used,
         limit: reservation.limit,
@@ -51,11 +77,6 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { inputText, parentAssessmentId } = await request.json()
-
-    if (!inputText || typeof inputText !== 'string') {
-      return NextResponse.json({ error: 'inputText is required' }, { status: 400 })
-    }
 
     // PostHog: analyse gestart
     captureServerEvent({

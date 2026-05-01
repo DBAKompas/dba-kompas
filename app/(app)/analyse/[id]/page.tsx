@@ -285,9 +285,12 @@ export default function AssessmentDetailPage() {
   const [expandedDomains, setExpandedDomains] = useState<Set<number>>(new Set([0, 1, 2]))
   const [draftTab, setDraftTab] = useState<'compact' | 'uitgebreid' | 'bouwstenen'>('compact')
   const [answers, setAnswers] = useState<Record<string, string>>({})
-  const [activeScenario, setActiveScenario] = useState<number | null>(null)
+  const [selectedScenarios, setSelectedScenarios] = useState<Set<number>>(new Set())
   const [heranalyseText, setHeranalyseText] = useState('')
   const [diffOpen, setDiffOpen] = useState(true)
+  const [quotaPlan, setQuotaPlan] = useState<string | null>(null)
+  const [finalizing, setFinalizing] = useState(false)
+  const [finalized, setFinalized] = useState(false)
 
   useEffect(() => {
     if (!params.id) return
@@ -299,6 +302,14 @@ export default function AssessmentDetailPage() {
       .then((data) => { setAssessment(data); setLoading(false) })
       .catch((err) => { setError(err.message); setLoading(false) })
   }, [params.id])
+
+  // Haal quotaPlan op voor Analyse afronden-knop
+  useEffect(() => {
+    fetch('/api/user/quota')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => setQuotaPlan(d?.quotaPlan ?? null))
+      .catch(() => null)
+  }, [])
 
   // Haal parent op zodra assessment geladen is en parent_assessment_id aanwezig is
   useEffect(() => {
@@ -410,6 +421,36 @@ export default function AssessmentDetailPage() {
   const improvements = (assessment.top_improvements as string[]) ?? []
   const hasAnswers = Object.values(answers).some((v) => v.trim()) || heranalyseText.trim().length > 0
   const scenarioRec = scenarioLabel(assessment.overall_risk_label)
+  const isOneTime = quotaPlan === 'one_time'
+  const isOriginalAnalysis = !assessment.parent_assessment_id
+
+  // Toggle scenario: meerdere scenario's mogen geselecteerd zijn.
+  // De heranalyse-tekst wordt opgebouwd uit alle geselecteerde scenario's,
+  // gescheiden door een witregel.
+  const toggleScenario = (i: number) => {
+    const next = new Set(selectedScenarios)
+    if (next.has(i)) {
+      next.delete(i)
+    } else {
+      next.add(i)
+    }
+    setSelectedScenarios(next)
+    const texts = Array.from(next)
+      .sort((a, b) => a - b)
+      .map(idx => `Ik heb de volgende aanpassing doorgevoerd: ${improvements[idx]}`)
+    setHeranalyseText(texts.join('\n\n'))
+  }
+
+  const handleFinalize = async () => {
+    if (!confirm('Weet je zeker dat je de analyse wilt afronden? Daarna zijn geen heranalyses meer mogelijk.')) return
+    setFinalizing(true)
+    try {
+      const res = await fetch('/api/dba/assessments/finalize', { method: 'POST' })
+      if (res.ok) setFinalized(true)
+    } catch { /* stille fout */ } finally {
+      setFinalizing(false)
+    }
+  }
 
   if (isFallback) {
     return (
@@ -730,39 +771,35 @@ export default function AssessmentDetailPage() {
               </span>
             </div>
             <p className="text-sm text-muted-foreground mb-4">
-              Klik op een scenario om een voorbeeldtekst te laden in het heranalyse-veld.
+              Klik op een of meerdere scenario&apos;s om de teksten te laden in het heranalyse-veld. Meerdere selecties worden samengevoegd.
             </p>
             <div className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden">
-              {improvements.map((imp, i) => (
-                <button
-                  key={i}
-                  onClick={() => {
-                    setActiveScenario(i === activeScenario ? null : i)
-                    setHeranalyseText(
-                      i === activeScenario
-                        ? ''
-                        : `Ik heb de volgende aanpassing doorgevoerd: ${imp}`
-                    )
-                  }}
-                  className={`w-full flex items-start gap-3 px-5 py-4 text-left transition-colors ${
-                    activeScenario === i ? 'bg-violet-50' : 'hover:bg-muted/40'
-                  }`}
-                >
-                  <div className={`flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold mt-0.5 transition-colors ${
-                    activeScenario === i ? 'bg-violet-600 text-white' : 'bg-muted text-muted-foreground'
-                  }`}>
-                    {activeScenario === i ? <Check className="size-3" /> : i + 1}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-foreground leading-relaxed">{imp}</p>
-                    {activeScenario === i && (
-                      <p className="text-xs text-violet-600 font-medium mt-1">
-                        ✓ Voorbeeldtekst geladen in heranalyse-veld
-                      </p>
-                    )}
-                  </div>
-                </button>
-              ))}
+              {improvements.map((imp, i) => {
+                const isSelected = selectedScenarios.has(i)
+                return (
+                  <button
+                    key={i}
+                    onClick={() => toggleScenario(i)}
+                    className={`w-full flex items-start gap-3 px-5 py-4 text-left transition-colors ${
+                      isSelected ? 'bg-violet-50' : 'hover:bg-muted/40'
+                    }`}
+                  >
+                    <div className={`flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold mt-0.5 transition-colors ${
+                      isSelected ? 'bg-violet-600 text-white' : 'bg-muted text-muted-foreground'
+                    }`}>
+                      {isSelected ? <Check className="size-3" /> : i + 1}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-foreground leading-relaxed">{imp}</p>
+                      {isSelected && (
+                        <p className="text-xs text-violet-600 font-medium mt-1">
+                          ✓ Toegevoegd aan heranalyse-veld
+                        </p>
+                      )}
+                    </div>
+                  </button>
+                )
+              })}
             </div>
           </section>
         )}
@@ -796,10 +833,10 @@ export default function AssessmentDetailPage() {
               </div>
             )}
 
-            {/* Scenario heranalyse tekstveld */}
+            {/* Heranalyse tekstveld */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">
-                {activeScenario !== null ? 'Scenario-tekst (bewerken indien gewenst)' : 'Aanvullende opmerkingen'}
+                {selectedScenarios.size > 0 ? `${selectedScenarios.size} scenario${selectedScenarios.size > 1 ? "'s" : ''} geselecteerd (bewerken indien gewenst)` : 'Aanvullende opmerkingen'}
               </label>
               <textarea
                 className={`w-full rounded-xl border-2 bg-card px-4 py-3 text-sm outline-none resize-none leading-relaxed transition-colors min-h-[100px] ${
@@ -807,20 +844,20 @@ export default function AssessmentDetailPage() {
                     ? 'border-violet-400 focus:ring-2 focus:ring-violet-400/20'
                     : 'border-border focus:border-ring focus:ring-2 focus:ring-ring/20'
                 }`}
-                placeholder="Beschrijf hier aanpassingen of geselecteerd scenario..."
+                placeholder="Beschrijf hier aanpassingen of selecteer een of meer scenario's hierboven..."
                 value={heranalyseText}
                 onChange={(e) => {
                   setHeranalyseText(e.target.value)
-                  if (activeScenario !== null && e.target.value === '') setActiveScenario(null)
+                  if (e.target.value === '') setSelectedScenarios(new Set())
                 }}
-                rows={3}
+                rows={4}
               />
             </div>
 
-            <div className="mt-3">
+            <div className="mt-3 flex flex-wrap items-center gap-3">
               <button
                 onClick={handleReanalyse}
-                disabled={!hasAnswers || reanalyseLoading}
+                disabled={!hasAnswers || reanalyseLoading || finalized}
                 className="inline-flex items-center gap-2 rounded-lg bg-slate-800 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 {reanalyseLoading
@@ -828,6 +865,26 @@ export default function AssessmentDetailPage() {
                   : <><RefreshCw className="size-4" /> Heranalyseer met aanvullingen</>
                 }
               </button>
+
+              {/* Analyse afronden — alleen voor eenmalige check op de originele analyse */}
+              {isOneTime && isOriginalAnalysis && !finalized && (
+                <button
+                  onClick={handleFinalize}
+                  disabled={finalizing}
+                  className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  {finalizing
+                    ? <><Loader2 className="size-4 animate-spin" /> Afronden...</>
+                    : <><Check className="size-4" /> Analyse afronden</>
+                  }
+                </button>
+              )}
+
+              {finalized && (
+                <p className="text-xs text-emerald-600 font-medium flex items-center gap-1.5">
+                  <Check className="size-3.5" /> Analyse afgerond. Geen heranalyses meer mogelijk.
+                </p>
+              )}
             </div>
           </section>
         )}

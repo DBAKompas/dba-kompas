@@ -79,7 +79,7 @@ export const GUIDES: GuideEntry[] = [
 
       h2('Wat veranderde er in 2025?'),
       p('Tot en met 31 december 2024 gold een handhavingsmoratorium: de Belastingdienst controleerde wel, maar legde in de meeste gevallen geen correcties op. Dat is voorbij. Per 1 januari 2025 handhaaft de Belastingdienst volledig, ook met terugwerkende kracht tot vijf jaar.'),
-      p('De Wet VBAR (Verduidelijking Beoordeling Arbeidsrelaties en Rechtsvermoeden), die het criterium "werken in dienst van" nader definieert, treedt naar verwachting ook in 2025 in werking. Daarin wordt een rechtsvermoeden van een arbeidsovereenkomst ingevoerd bij een uurtarief onder een bepaalde drempel.'),
+      p('De Wet VBAR (Verduidelijking Beoordeling Arbeidsrelaties en Rechtsvermoeden), die het criterium "werken in dienst van" nader definieert, is per 1 januari 2025 in werking getreden. Daarin wordt een rechtsvermoeden van een arbeidsovereenkomst ingevoerd bij een laag uurtarief, waardoor de bewijslast bij opdrachtgever en opdrachtnemer ligt om aan te tonen dat er geen arbeidsrelatie bestaat.'),
 
       tip('Controleer je huidige en recente opdrachten op de DBA-criteria. Als je twijfelt: gebruik DBA Kompas om je opdrachtomschrijvingen te analyseren voordat je ze indient of verlengt.', 'Wat kun je nu doen?'),
 
@@ -457,7 +457,7 @@ export const GUIDES: GuideEntry[] = [
       p('BTW (Belasting over de Toegevoegde Waarde) is een verbruiksbelasting die je als ondernemer int namens de overheid. Je rekent BTW in rekening aan je klanten en draagt dat af aan de Belastingdienst. De BTW die je zelf betaalt over je zakelijke inkopen mag je aftrekken (voorbelasting).'),
       p('Per saldo betaal je alleen BTW over de toegevoegde waarde - het verschil tussen wat je verkoopt en wat je inkoopt. In de meeste gevallen is het bedrag dat je ontvangt van klanten groter dan wat je zelf betaalt, en moet je per saldo BTW afdragen.'),
 
-      h2('BTW-tarieven in 2025'),
+      h2('BTW-tarieven'),
       {
         type: 'table',
         headers: ['Tarief', 'Van toepassing op'],
@@ -561,7 +561,7 @@ export const GUIDES: GuideEntry[] = [
       warn('De zelfstandigenaftrek wordt de komende jaren sterk afgebouwd. Dit is bewust beleid om de fiscale behandeling van zzp\'ers en werknemers dichter bij elkaar te brengen. Houd rekening met een hogere belastingdruk in 2026 en 2027.', 'Afbouw heeft grote impact'),
 
       h2('De startersaftrek'),
-      p('Ben je een startende ondernemer? Dan heb je recht op een extra aftrek van €2.123 (2025) bovenop de zelfstandigenaftrek. Je mag de startersaftrek maximaal drie keer in de eerste vijf jaar van je onderneming claimen, maar nooit in meer dan drie belastingjaren.'),
+      p('Ben je een startende ondernemer? Dan heb je recht op een extra aftrek bovenop de zelfstandigenaftrek (voor 2025: €2.123). Je mag de startersaftrek maximaal drie keer in de eerste vijf jaar van je onderneming claimen, maar nooit in meer dan drie belastingjaren. Controleer het actuele bedrag voor het lopende belastingjaar via de Belastingdienst.'),
 
       tip('Je hoeft de startersaftrek niet in de eerste drie jaar te claimen. Als je in jaar 1 weinig winst maakt en de aftrek je fiscaal weinig oplevert, kan het voordeliger zijn om te wachten tot een jaar met hogere winst. Overleg dit met je boekhouder.'),
 
@@ -796,7 +796,7 @@ export const GUIDES: GuideEntry[] = [
     tags: ['pensioen', 'lijfrente', 'banksparen', 'aov', 'jaarruimte', 'reserveringsruimte'],
     blocks: [
       h2('Het pensioenprobleem van de zzp\'er'),
-      p('Als werknemer bouw je automatisch pensioen op via je werkgever - verplicht deelname aan een pensioenfonds. Als zzp\'er heb je dit niet. Je ontvangt wel AOW (Algemene Ouderdomswet) zodra je de AOW-leeftijd bereikt (67 jaar in 2025, en stijgt mee met de levensverwachting), maar dat is slechts een basisinkomen dat voor de meeste zzp\'ers niet toereikend is.'),
+      p('Als werknemer bouw je automatisch pensioen op via je werkgever - verplicht deelname aan een pensioenfonds. Als zzp\'er heb je dit niet. Je ontvangt wel AOW (Algemene Ouderdomswet) zodra je de AOW-leeftijd bereikt (in 2026: 67 jaar en 3 maanden, en stijgt mee met de levensverwachting), maar dat is slechts een basisinkomen dat voor de meeste zzp\'ers niet toereikend is.'),
 
       imp('Veel zzp\'ers realiseren zich pas laat dat hun pensioenpot veel te klein is. Begin vroeg. Zelfs kleine maandelijkse bijdragen, consequent opgebouwd, maken een enorm verschil door rente-op-rente.'),
 

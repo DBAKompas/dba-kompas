@@ -42,17 +42,37 @@ export async function reserveUsage(
     return { ok: true, newCount: 0, limit: ADMIN_QUOTA, plan }
   }
 
-  // One-time: lifetime cap van 1 check, gemeten via bestaande
-  // dba_assessments tabel. Geen usage_counters nodig voor dit plan.
+  // One-time: 1 originele analyse toegestaan. Heranalyses worden apart
+  // afgehandeld in de API-route (skipQuota). Na "Analyse afronden"
+  // (credit_used = true) zijn ook heranalyses geblokkeerd.
   if (plan === 'one_time') {
+    // Check of de check al is afgerond via de "Analyse afronden"-knop.
+    const { data: purchase, error: purchaseError } = await supabaseAdmin
+      .from('one_time_purchases')
+      .select('credit_used')
+      .eq('user_id', userId)
+      .eq('status', 'purchased')
+      .maybeSingle()
+
+    if (purchaseError) {
+      console.error('[quota] one_time purchase check error:', purchaseError)
+      return { ok: false, reason: 'quota_exceeded', used: 1, limit: 1, plan }
+    }
+
+    if (purchase?.credit_used) {
+      return { ok: false, reason: 'quota_exceeded', used: 1, limit: 1, plan }
+    }
+
+    // Tel alleen originele analyses (geen heranalyses) om te bepalen
+    // of de eenmalige check al is gestart.
     const { count, error } = await supabaseAdmin
       .from('dba_assessments')
       .select('id', { count: 'exact', head: true })
       .eq('user_id', userId)
+      .is('parent_assessment_id', null)
 
     if (error) {
       console.error('[quota] one_time count error:', error)
-      // Fail-closed: bij onverwachte DB-fout niet door laten.
       return { ok: false, reason: 'quota_exceeded', used: 0, limit: 1, plan }
     }
     const used = count ?? 0
