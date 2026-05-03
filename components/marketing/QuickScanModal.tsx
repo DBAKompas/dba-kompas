@@ -41,7 +41,7 @@ export default function QuickScanModal({ open, onOpenChange }: QuickScanModalPro
             Gratis zelfscan - hoe staat jouw opdracht ervoor?
           </DialogPrimitive.Title>
 
-          <div className="relative overflow-y-auto overscroll-contain rounded-2xl">
+          <div className="relative flex-1 min-h-0 overflow-y-auto overscroll-contain rounded-2xl">
             <DialogPrimitive.Close
               className={cn(
                 "absolute right-3 top-3 z-10",

@@ -62,8 +62,11 @@ export async function POST(request: Request) {
       console.warn("[LOOPS] quick-scan contact update skipped - LOOPS_API_KEY niet geconfigureerd");
     }
 
-    // Event versturen met alle antwoorden als properties
-    await sendLoopsEvent("quick_scan_completed", {
+    // Stuur een risico-specifiek event zodat Loops journeys direct kunnen
+    // triggeren op het eventnaam zonder extra filterCondities te hoeven instellen.
+    // Eventnamen: quick_scan_completed_laag | quick_scan_completed_gemiddeld | quick_scan_completed_hoog
+    const eventName = `quick_scan_completed_${riskNL}`
+    await sendLoopsEvent(eventName, {
       email,
       properties: {
         firstName,

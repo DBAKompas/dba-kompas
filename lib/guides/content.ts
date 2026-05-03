@@ -79,7 +79,7 @@ export const GUIDES: GuideEntry[] = [
 
       h2('Wat veranderde er in 2025?'),
       p('Tot en met 31 december 2024 gold een handhavingsmoratorium: de Belastingdienst controleerde wel, maar legde in de meeste gevallen geen correcties op. Dat is voorbij. Per 1 januari 2025 handhaaft de Belastingdienst volledig, ook met terugwerkende kracht tot vijf jaar.'),
-      p('De Wet VBAR (Verduidelijking Beoordeling Arbeidsrelaties en Rechtsvermoeden), die het criterium "werken in dienst van" nader definieert, is per 1 januari 2025 in werking getreden. Daarin wordt een rechtsvermoeden van een arbeidsovereenkomst ingevoerd bij een laag uurtarief, waardoor de bewijslast bij opdrachtgever en opdrachtnemer ligt om aan te tonen dat er geen arbeidsrelatie bestaat.'),
+      p('Het wetsvoorstel VBAR (Verduidelijking Beoordeling Arbeidsrelaties en Rechtsvermoeden) is in juli 2025 ingediend bij de Tweede Kamer en treedt naar verwachting in werking per 1 juli 2026. Het voorstel introduceert een rechtsvermoeden van een arbeidsovereenkomst bij een uurtarief onder €36, waardoor de bewijslast bij opdrachtgever en opdrachtnemer komt te liggen om aan te tonen dat er geen arbeidsrelatie bestaat. Let op: dit wetsvoorstel is nog in behandeling en kan nog worden gewijzigd.'),
 
       tip('Controleer je huidige en recente opdrachten op de DBA-criteria. Als je twijfelt: gebruik DBA Kompas om je opdrachtomschrijvingen te analyseren voordat je ze indient of verlengt.', 'Wat kun je nu doen?'),
 
