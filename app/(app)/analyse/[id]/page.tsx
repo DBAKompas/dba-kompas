@@ -866,8 +866,8 @@ export default function AssessmentDetailPage() {
                 }
               </button>
 
-              {/* Analyse afronden — alleen voor eenmalige check op de originele analyse */}
-              {isOneTime && isOriginalAnalysis && !finalized && (
+              {/* Analyse afronden — zichtbaar voor alle plan-types op de originele analyse */}
+              {isOriginalAnalysis && !finalized && (
                 <button
                   onClick={handleFinalize}
                   disabled={finalizing}
