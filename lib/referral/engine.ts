@@ -15,6 +15,8 @@ import { stripe } from '@/lib/stripe/client'
 import { sendEmail } from '@/lib/email'
 import { sendLoopsEvent } from '@/lib/loops'
 import { createNotification } from '@/lib/notifications'
+import { shareCodeExpiry, isExpired } from '@/lib/referral/expiry'
+import { recordSuccessfulReferral } from '@/lib/referral/staffel'
 
 // ── Constanten ────────────────────────────────────────────────────────────────
 
@@ -61,10 +63,13 @@ function generateCode(seed: string): string {
 // ── 5 codes ophalen of aanmaken ───────────────────────────────────────────────
 
 export async function getOrCreateReferralCodes(userId: string): Promise<ReferralCode[]> {
+  // Alleen share-codes van deze gebruiker. Welcome-codes (admin uitgegeven) zijn
+  // bewust uitgesloten zodat een admin zijn eigen share-set niet vervuilt.
   const { data: existing } = await supabaseAdmin
     .from('referral_codes')
-    .select('id, code, is_used, used_at')
+    .select('id, code, is_used, used_at, expires_at')
     .eq('user_id', userId)
+    .eq('code_type', 'share')
     .order('created_at', { ascending: true })
 
   const codes = existing ?? []
@@ -77,8 +82,14 @@ export async function getOrCreateReferralCodes(userId: string): Promise<Referral
     while (attempts < 10) {
       const { data: inserted, error } = await supabaseAdmin
         .from('referral_codes')
-        .insert({ user_id: userId, code: candidate })
-        .select('id, code, is_used, used_at')
+        .insert({
+          user_id: userId,
+          code: candidate,
+          code_type: 'share',
+          issuer_role: 'user',
+          expires_at: shareCodeExpiry().toISOString(),
+        })
+        .select('id, code, is_used, used_at, expires_at')
         .single()
       if (!error && inserted) { codes.push(inserted); break }
       candidate = generateCode(`${seed}-retry-${attempts}`)
@@ -91,6 +102,7 @@ export async function getOrCreateReferralCodes(userId: string): Promise<Referral
     code: c.code,
     isUsed: c.is_used ?? false,
     usedAt: c.used_at ?? null,
+    expiresAt: c.expires_at ?? null,
   }))
 }
 
@@ -102,42 +114,67 @@ export async function getOrCreateReferralCode(userId: string): Promise<string> {
 
 // ── Referral tracking opslaan ─────────────────────────────────────────────────
 
+export type TrackReferralResult =
+  | { ok: true; redemptionKind: 'welcome_free_check' | 'share_pending_qualification' }
+  | { ok: false; reason: 'not_found' | 'expired' | 'already_used' | 'self_referral' | 'already_tracked' }
+
+function extractEmailDomain(email?: string | null): string | null {
+  if (!email) return null
+  const at = email.indexOf('@')
+  if (at < 0) return null
+  return email.slice(at + 1).toLowerCase()
+}
+
 export async function trackReferral(params: {
   referredUserId: string
   referralCode: string
-}): Promise<void> {
-  const { referredUserId, referralCode } = params
+  redeemerEmail?: string | null
+  redeemerIpHash?: string | null
+}): Promise<TrackReferralResult> {
+  const { referredUserId, referralCode, redeemerEmail, redeemerIpHash } = params
 
   const { data: codeRow } = await supabaseAdmin
     .from('referral_codes')
-    .select('id, user_id, is_used')
+    .select('id, user_id, is_used, expires_at, code_type')
     .eq('code', referralCode.toUpperCase())
     .single()
 
-  if (!codeRow) return
-  if (codeRow.is_used) return
+  if (!codeRow) return { ok: false, reason: 'not_found' }
+  if (codeRow.is_used) return { ok: false, reason: 'already_used' }
+  if (codeRow.expires_at && isExpired(codeRow.expires_at)) {
+    return { ok: false, reason: 'expired' }
+  }
 
   const referrerId = codeRow.user_id
-  if (referrerId === referredUserId) return
+  if (referrerId === referredUserId) return { ok: false, reason: 'self_referral' }
 
   const { data: existing } = await supabaseAdmin
     .from('referral_tracking')
     .select('id')
     .eq('referred_user_id', referredUserId)
     .single()
-  if (existing) return
+  if (existing) return { ok: false, reason: 'already_tracked' }
+
+  const codeType = (codeRow.code_type ?? 'share') as 'welcome' | 'share'
+  const redemptionKind: 'welcome_free_check' | 'share_pending_qualification' =
+    codeType === 'welcome' ? 'welcome_free_check' : 'share_pending_qualification'
 
   await supabaseAdmin.from('referral_tracking').insert({
     referred_user_id: referredUserId,
     referral_code: referralCode.toUpperCase(),
     referrer_id: referrerId,
     status: 'pending',
+    redemption_kind: redemptionKind,
+    redeemer_email_domain: extractEmailDomain(redeemerEmail),
+    redeemer_ip_hash: redeemerIpHash ?? null,
   })
 
   await supabaseAdmin
     .from('referral_codes')
     .update({ is_used: true, used_by: referredUserId, used_at: new Date().toISOString() })
     .eq('id', codeRow.id)
+
+  return { ok: true, redemptionKind }
 }
 
 // ── Stripe reward appliceren ──────────────────────────────────────────────────
@@ -456,6 +493,48 @@ export async function qualifyReferral(params: {
       .update({ status: 'rewarded' })
       .eq('id', tracking.id)
   }
+
+  // ── v2: staffel-window bijwerken (alleen voor share-redemptions) ────────────
+  // Welcome-redemptions tellen niet mee voor de staffel, dus we filteren op
+  // redemption_kind. Onbekende/oude rijen worden als 'share' behandeld.
+  const { data: kindRow } = await supabaseAdmin
+    .from('referral_tracking')
+    .select('redemption_kind')
+    .eq('id', tracking.id)
+    .single()
+
+  const isShareRedemption =
+    !kindRow?.redemption_kind || kindRow.redemption_kind === 'share_pending_qualification'
+
+  if (isShareRedemption) {
+    try {
+      await recordSuccessfulReferral({ referrerUserId: referrerId })
+    } catch (err) {
+      console.error('[referral] recordSuccessfulReferral fout:', err)
+    }
+
+    // share_codes_redeemed mirrorveld op profiles bijwerken (best effort)
+    try {
+      const { data: profile } = await supabaseAdmin
+        .from('profiles')
+        .select('share_codes_redeemed, first_successful_referral_at')
+        .eq('user_id', referrerId)
+        .single()
+
+      const current = profile?.share_codes_redeemed ?? 0
+      const updates: Record<string, unknown> = { share_codes_redeemed: current + 1 }
+      if (!profile?.first_successful_referral_at) {
+        updates.first_successful_referral_at = new Date().toISOString()
+      }
+
+      await supabaseAdmin
+        .from('profiles')
+        .update(updates)
+        .eq('user_id', referrerId)
+    } catch (err) {
+      console.error('[referral] profiles share_codes_redeemed update fout:', err)
+    }
+  }
 }
 
 // ── Statistieken voor widget ──────────────────────────────────────────────────
@@ -465,6 +544,7 @@ export interface ReferralCode {
   code: string
   isUsed: boolean
   usedAt: string | null
+  expiresAt: string | null
 }
 
 export interface ReferralStats {
