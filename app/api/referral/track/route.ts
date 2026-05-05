@@ -65,6 +65,9 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'self_referral_not_allowed' }, { status: 400 })
       case 'already_tracked':
         return NextResponse.json({ error: 'user_already_has_referral' }, { status: 409 })
+      case 'insert_failed':
+      case 'update_failed':
+        return NextResponse.json({ error: result.reason }, { status: 500 })
       default:
         return NextResponse.json({ error: 'unknown' }, { status: 500 })
     }

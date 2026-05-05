@@ -115,8 +115,8 @@ export async function getOrCreateReferralCode(userId: string): Promise<string> {
 // ── Referral tracking opslaan ─────────────────────────────────────────────────
 
 export type TrackReferralResult =
-  | { ok: true; redemptionKind: 'welcome_free_check' | 'share_pending_qualification' }
-  | { ok: false; reason: 'not_found' | 'expired' | 'already_used' | 'self_referral' | 'already_tracked' }
+  | { ok: true; redemptionKind: 'one_time' | 'subscription' }
+  | { ok: false; reason: 'not_found' | 'expired' | 'already_used' | 'self_referral' | 'already_tracked' | 'insert_failed' | 'update_failed' }
 
 function extractEmailDomain(email?: string | null): string | null {
   if (!email) return null
@@ -133,13 +133,13 @@ export async function trackReferral(params: {
 }): Promise<TrackReferralResult> {
   const { referredUserId, referralCode, redeemerEmail, redeemerIpHash } = params
 
-  const { data: codeRow } = await supabaseAdmin
+  const { data: codeRow, error: codeLookupError } = await supabaseAdmin
     .from('referral_codes')
     .select('id, user_id, is_used, expires_at, code_type')
     .eq('code', referralCode.toUpperCase())
     .single()
 
-  if (!codeRow) return { ok: false, reason: 'not_found' }
+  if (codeLookupError || !codeRow) return { ok: false, reason: 'not_found' }
   if (codeRow.is_used) return { ok: false, reason: 'already_used' }
   if (codeRow.expires_at && isExpired(codeRow.expires_at)) {
     return { ok: false, reason: 'expired' }
@@ -152,14 +152,14 @@ export async function trackReferral(params: {
     .from('referral_tracking')
     .select('id')
     .eq('referred_user_id', referredUserId)
-    .single()
+    .maybeSingle()
   if (existing) return { ok: false, reason: 'already_tracked' }
 
   const codeType = (codeRow.code_type ?? 'share') as 'welcome' | 'share'
-  const redemptionKind: 'welcome_free_check' | 'share_pending_qualification' =
-    codeType === 'welcome' ? 'welcome_free_check' : 'share_pending_qualification'
+  const redemptionKind: 'one_time' | 'subscription' =
+    codeType === 'welcome' ? 'one_time' : 'subscription'
 
-  await supabaseAdmin.from('referral_tracking').insert({
+  const { error: insertError } = await supabaseAdmin.from('referral_tracking').insert({
     referred_user_id: referredUserId,
     referral_code: referralCode.toUpperCase(),
     referrer_id: referrerId,
@@ -169,10 +169,20 @@ export async function trackReferral(params: {
     redeemer_ip_hash: redeemerIpHash ?? null,
   })
 
-  await supabaseAdmin
+  if (insertError) {
+    console.error('[trackReferral] referral_tracking insert fout:', insertError)
+    return { ok: false, reason: 'insert_failed' }
+  }
+
+  const { error: updateError } = await supabaseAdmin
     .from('referral_codes')
     .update({ is_used: true, used_by: referredUserId, used_at: new Date().toISOString() })
     .eq('id', codeRow.id)
+
+  if (updateError) {
+    console.error('[trackReferral] referral_codes update fout:', updateError)
+    return { ok: false, reason: 'update_failed' }
+  }
 
   return { ok: true, redemptionKind }
 }
