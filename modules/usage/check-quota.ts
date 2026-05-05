@@ -151,11 +151,22 @@ export async function getUsageForUser(userId: string, plan: QuotaPlan): Promise<
   let used = 0
 
   if (plan === 'one_time') {
-    const { count } = await supabaseAdmin
-      .from('dba_assessments')
-      .select('id', { count: 'exact', head: true })
+    const { data: purchase } = await supabaseAdmin
+      .from('one_time_purchases')
+      .select('credit_used')
       .eq('user_id', userId)
-    used = count ?? 0
+      .eq('status', 'purchased')
+      .maybeSingle()
+
+    if (purchase?.credit_used) {
+      used = 1
+    } else {
+      const { count } = await supabaseAdmin
+        .from('dba_assessments')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', userId)
+      used = count ?? 0
+    }
   } else if (plan === 'monthly' || plan === 'yearly') {
     const periodStart = currentPeriodStart()
     const { data } = await supabaseAdmin
