@@ -9,7 +9,7 @@
  *   3. Supabase user aanmaken met email_confirm=true (geen mailbevestiging)
  *      → DB-trigger maakt profile-rij met meegegeven name/username
  *   4. trackReferral() koppelt code aan nieuwe gebruiker (welcome_free_check)
- *   5. one_time_purchases-row voor product_type='referral_welcome_check', status='granted'
+ *   5. one_time_purchases-row voor product_type='referral_welcome_check', status='purchased'
  *
  * Aangeroepen door /api/onboarding/welcome. Niet rechtstreeks vanuit UI.
  */
@@ -201,10 +201,12 @@ export async function redeemWelcomeOnboarding(params: {
   }
 
   // 5. one_time_purchases-rij voor de gratis check
+  // Status='purchased' is conform de gedocumenteerde enum in 001_initial_schema.sql.
+  // Het feit dat dit een gratis credit is wordt al gemarkeerd door product_type.
   const { error: grantError } = await supabaseAdmin.from('one_time_purchases').insert({
     user_id: userId,
     product_type: 'referral_welcome_check',
-    status: 'granted',
+    status: 'purchased',
     stripe_checkout_session_id: `welcome_redeem_${code}_${userId}`,
   })
 

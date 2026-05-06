@@ -138,9 +138,12 @@ export async function GET() {
   }
 
   // Bouw purchase lookup: user_id → beschrijving
+  // Sinds migratie 012 hanteren we voor alle credits (paid + gratis) status='purchased'.
+  // Het onderscheid paid vs gratis blijkt uit product_type (referral_welcome_check,
+  // referral_free_check vs one_time_dba e.d.).
   const purchaseMap: Record<string, string> = {}
   for (const p of otp) {
-    if (p.status === 'granted') {
+    if (p.status === 'purchased') {
       purchaseMap[p.user_id] = `Losse analyse (${p.product_type})`
     }
   }

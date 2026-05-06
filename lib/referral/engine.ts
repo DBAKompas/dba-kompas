@@ -456,10 +456,12 @@ export async function qualifyReferral(params: {
 
     // ── Mijlpaal 1: gratis analyse credit ──────────────────────────────────
     if (rewardDef.reward_type === 'free_check') {
+      // Status='purchased' is conform de gedocumenteerde enum in 001_initial_schema.sql.
+      // Het feit dat dit een gratis credit is wordt al gemarkeerd door product_type.
       await supabaseAdmin.from('one_time_purchases').insert({
         user_id: referrerId,
         product_type: 'referral_free_check',
-        status: 'granted',
+        status: 'purchased',
         stripe_checkout_session_id: `referral_milestone_${milestone}_${referrerId}`,
       })
       // In-app notificatie
