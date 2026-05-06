@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
-import { createHash } from 'node:crypto'
+import { createClient } from '@/lib/supabase/server'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 import { redeemWelcomeOnboarding } from '@/lib/onboarding/welcome'
+import { extractIp, hashIp } from '@/lib/auth/ip-hash'
 
 export const dynamic = 'force-dynamic'
 
@@ -21,20 +23,21 @@ export const dynamic = 'force-dynamic'
  * Response 500: aanmaak of grant gefaald
  */
 
-function hashIp(ip: string | null): string | null {
-  if (!ip) return null
-  const salt = process.env.REFERRAL_IP_HASH_SALT ?? 'dba-kompas-default-salt'
-  return createHash('sha256').update(`${salt}:${ip}`).digest('hex').slice(0, 32)
-}
-
-function extractIp(request: Request): string | null {
-  const xff = request.headers.get('x-forwarded-for')
-  if (xff) return xff.split(',')[0]?.trim() ?? null
-  return request.headers.get('x-real-ip')
-}
-
 export async function POST(request: Request) {
   try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+
+    const { data: profile } = await supabaseAdmin
+      .from('profiles')
+      .select('role')
+      .eq('user_id', user.id)
+      .single()
+    if (profile?.role !== 'admin') {
+      return NextResponse.json({ error: 'forbidden' }, { status: 403 })
+    }
+
     const body = await request.json().catch(() => null)
     if (!body || typeof body !== 'object') {
       return NextResponse.json({ error: 'invalid_json_body' }, { status: 400 })

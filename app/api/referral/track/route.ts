@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
-import { createHash } from 'node:crypto'
 import { createClient } from '@/lib/supabase/server'
 import { trackReferral } from '@/lib/referral/engine'
+import { extractIp, hashIp } from '@/lib/auth/ip-hash'
 
 /**
  * POST /api/referral/track
@@ -20,17 +20,6 @@ import { trackReferral } from '@/lib/referral/engine'
  *   500 server error        onverwachte fout
  */
 
-function hashIp(ip: string | null): string | null {
-  if (!ip) return null
-  const salt = process.env.REFERRAL_IP_HASH_SALT ?? 'dba-kompas-default-salt'
-  return createHash('sha256').update(`${salt}:${ip}`).digest('hex').slice(0, 32)
-}
-
-function extractIp(request: Request): string | null {
-  const xff = request.headers.get('x-forwarded-for')
-  if (xff) return xff.split(',')[0]?.trim() ?? null
-  return request.headers.get('x-real-ip')
-}
 
 export async function POST(request: Request) {
   try {

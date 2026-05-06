@@ -25,6 +25,7 @@ export type WelcomeOnboardingFailure =
   | { ok: false; reason: 'code_already_used'; status: 409 }
   | { ok: false; reason: 'code_expired'; status: 410 }
   | { ok: false; reason: 'email_already_registered'; status: 409 }
+  | { ok: false; reason: 'ip_already_redeemed'; status: 409 }
   | { ok: false; reason: 'auth_create_failed'; status: 500; detail?: string }
   | { ok: false; reason: 'track_failed'; status: 500; detail?: string }
   | { ok: false; reason: 'grant_failed'; status: 500; detail?: string }
@@ -127,6 +128,22 @@ export async function redeemWelcomeOnboarding(params: {
   }
   // Voorkom verwijzing naar de ongebruikte 'existing' var
   void existing
+
+  // 2b. IP-recency check (misbruikdetectie)
+  // Een email-paid check is niet nodig: een account aanmaken op een bestaande email
+  // faalt sowieso op email_already_registered hierboven.
+  if (params.redeemerIpHash) {
+    const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+    const { count: ipCount } = await supabaseAdmin
+      .from('referral_tracking')
+      .select('id', { count: 'exact', head: true })
+      .eq('redeemer_ip_hash', params.redeemerIpHash)
+      .eq('redemption_kind', 'one_time')
+      .gte('created_at', since)
+    if ((ipCount ?? 0) > 0) {
+      return { ok: false, reason: 'ip_already_redeemed', status: 409 }
+    }
+  }
 
   // 3. Auth user aanmaken (met email_confirm=true, geen mailbevestiging)
   const { data: created, error: createError } = await supabaseAdmin.auth.admin.createUser({
