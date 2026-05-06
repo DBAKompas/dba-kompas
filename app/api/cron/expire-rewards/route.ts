@@ -75,7 +75,7 @@ export async function GET(request: Request) {
           const { data: profile } = await supabaseAdmin
             .from('profiles')
             .select('email')
-            .eq('id', row.referrer_id)
+            .eq('user_id', row.referrer_id)
             .single()
 
           if (!profile?.email) {
@@ -146,7 +146,7 @@ export async function GET(request: Request) {
             const { data: profile } = await supabaseAdmin
               .from('profiles')
               .select('email')
-              .eq('id', row.referrer_id)
+              .eq('user_id', row.referrer_id)
               .single()
 
             if (profile?.email) {
