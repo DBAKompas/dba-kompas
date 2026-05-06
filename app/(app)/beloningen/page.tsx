@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Copy, Check, Share2, Gift, ChevronRight } from 'lucide-react'
+import { Copy, Check, Share2, Gift, ChevronRight, Tag } from 'lucide-react'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -23,9 +23,24 @@ interface ReferralStats {
 // ── Mijlpalen config ───────────────────────────────────────────────────────────
 
 const MILESTONES = [
-  { count: 1, reward: '1 gratis analyse', detail: 'Jij ontvangt direct een extra analysecheck.' },
-  { count: 3, reward: '1 maand gratis', detail: 'Een volledige maand DBA Kompas Pro zonder kosten.' },
-  { count: 5, reward: '2 maanden gratis', detail: 'Twee maanden lang onbeperkt analyses draaien.' },
+  {
+    count: 1,
+    reward: '1 gratis analyse',
+    detail: 'Jij ontvangt direct een extra analysecheck.',
+    validity: '30 dagen geldig',
+  },
+  {
+    count: 3,
+    reward: '1 maand gratis',
+    detail: 'Een volledige maand DBA Kompas Pro zonder kosten.',
+    validity: '60 dagen om in te zetten',
+  },
+  {
+    count: 5,
+    reward: '2 maanden gratis',
+    detail: 'Twee maanden DBA Kompas Pro zonder kosten.',
+    validity: '60 dagen om in te zetten',
+  },
 ]
 
 const MAX_MILESTONE = 5
@@ -39,6 +54,7 @@ function VoortgangsBar({ count }: { count: number }) {
   const nextMilestone = MILESTONES.find(m => count < m.count)
   const remaining = nextMilestone ? nextMilestone.count - count : 0
   const allDone = count >= MAX_MILESTONE
+  const [active, setActive] = useState<number | null>(null)
 
   return (
     <div className="rounded-xl border border-border bg-card p-6 space-y-5">
@@ -65,7 +81,7 @@ function VoortgangsBar({ count }: { count: number }) {
       </div>
 
       {/* Balk */}
-      <div className="relative">
+      <div className="relative pt-3 pb-3">
         <div className="h-3 w-full rounded-full bg-muted overflow-hidden">
           <div
             className="h-full rounded-full bg-gradient-to-r from-orange-400 to-orange-500 transition-all duration-700"
@@ -73,27 +89,48 @@ function VoortgangsBar({ count }: { count: number }) {
           />
         </div>
 
-        {/* Mijlpaalstippen */}
+        {/* Mijlpaalstippen met tooltip op hover/focus/tap */}
         {MILESTONES.map((m) => {
           const pos = (m.count / MAX_MILESTONE) * 100
           const reached = count >= m.count
+          const isNext = !reached && nextMilestone?.count === m.count
+          const isActive = active === m.count
           return (
-            <div
+            <button
+              type="button"
               key={m.count}
-              className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2"
+              className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 cursor-help focus:outline-none"
               style={{ left: `${pos}%` }}
+              onMouseEnter={() => setActive(m.count)}
+              onMouseLeave={() => setActive(null)}
+              onFocus={() => setActive(m.count)}
+              onBlur={() => setActive(null)}
+              onClick={() => setActive(isActive ? null : m.count)}
+              aria-label={`Mijlpaal ${m.count}: ${m.reward}, ${m.validity}`}
             >
-              <div className={`size-4 rounded-full border-2 ${
-                reached
-                  ? 'bg-orange-500 border-orange-500'
-                  : 'bg-card border-border'
-              }`} />
-            </div>
+              <div
+                className={`size-4 rounded-full border-2 transition-all duration-300 ${
+                  reached
+                    ? 'bg-orange-500 border-orange-500 scale-110'
+                    : isNext
+                    ? 'bg-card border-orange-400 ring-4 ring-orange-200/60 animate-pulse'
+                    : 'bg-card border-border'
+                } ${isActive ? 'scale-150 shadow-lg shadow-orange-500/40' : ''}`}
+              />
+              {isActive && (
+                <div className="absolute left-1/2 -translate-x-1/2 -top-16 z-10 w-48 rounded-lg bg-foreground text-background text-xs font-medium shadow-xl px-3 py-2 pointer-events-none">
+                  <p className="font-bold">{m.count} doorverwijzing{m.count === 1 ? '' : 'en'}</p>
+                  <p className="opacity-80 mt-0.5">{m.reward}</p>
+                  <p className="opacity-60 mt-0.5 text-[10px] uppercase tracking-wide">{m.validity}</p>
+                  <span className="absolute left-1/2 -translate-x-1/2 -bottom-1 size-2 bg-foreground rotate-45" />
+                </div>
+              )}
+            </button>
           )
         })}
       </div>
 
-      {/* Labels onder de balk */}
+      {/* Labels onder de balk (zonder x) */}
       <div className="relative h-5">
         {MILESTONES.map((m) => {
           const pos = (m.count / MAX_MILESTONE) * 100
@@ -107,7 +144,7 @@ function VoortgangsBar({ count }: { count: number }) {
               <span className={`text-[11px] font-medium ${
                 reached ? 'text-orange-600' : 'text-muted-foreground'
               }`}>
-                {m.count}×
+                {m.count}
               </span>
             </div>
           )
@@ -133,12 +170,12 @@ function CodeRij({ code, isUsed, baseUrl }: { code: string; isUsed: boolean; bas
     if (navigator.share) {
       await navigator.share({
         title: 'DBA Kompas',
-        text: 'Probeer DBA Kompas gratis — analyseer opdrachtomschrijvingen op DBA-risico:',
+        text: 'Probeer DBA Kompas met 20% korting via mijn uitnodigingscode:',
         url,
       })
     } else {
       window.open(
-        `https://wa.me/?text=${encodeURIComponent(`Probeer DBA Kompas gratis: ${url}`)}`,
+        `https://wa.me/?text=${encodeURIComponent(`Probeer DBA Kompas met 20% korting: ${url}`)}`,
         '_blank'
       )
     }
@@ -150,19 +187,16 @@ function CodeRij({ code, isUsed, baseUrl }: { code: string; isUsed: boolean; bas
         ? 'border-border bg-muted/30'
         : 'border-border bg-card hover:border-orange-200'
     }`}>
-      {/* Status indicator */}
       <div className={`size-2.5 rounded-full shrink-0 ${
         isUsed ? 'bg-emerald-500' : 'bg-muted-foreground/20'
       }`} />
 
-      {/* Code */}
       <span className={`font-mono text-sm font-bold tracking-widest flex-1 truncate ${
         isUsed ? 'text-muted-foreground' : 'text-foreground'
       }`}>
         {code}
       </span>
 
-      {/* Status / acties */}
       {isUsed ? (
         <span className="shrink-0 flex items-center gap-1.5 text-xs font-semibold text-emerald-600">
           <Check className="size-3.5" /> Verzilverd
@@ -224,11 +258,22 @@ function BeloningenOverzicht({ count }: { count: number }) {
                 {reached ? <Check className="size-4" /> : m.count}
               </div>
               <div className="flex-1 min-w-0">
-                <p className={`text-sm font-semibold ${
-                  reached ? 'text-emerald-700' : isNext ? 'text-orange-700' : 'text-foreground'
-                }`}>
-                  {m.reward}
-                </p>
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <p className={`text-sm font-semibold ${
+                    reached ? 'text-emerald-700' : isNext ? 'text-orange-700' : 'text-foreground'
+                  }`}>
+                    {m.reward}
+                  </p>
+                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${
+                    reached
+                      ? 'bg-emerald-100 text-emerald-700'
+                      : isNext
+                      ? 'bg-orange-100 text-orange-700'
+                      : 'bg-muted text-muted-foreground'
+                  }`}>
+                    {m.validity}
+                  </span>
+                </div>
                 <p className="text-xs text-muted-foreground mt-0.5">{m.detail}</p>
               </div>
               {reached && (
@@ -293,7 +338,20 @@ export default function BeloningenPage() {
         </p>
       </div>
 
-      {/* Voortgangsbalk — altijd zichtbaar */}
+      {/* 20% regel uitleg */}
+      <div className="rounded-xl border border-orange-200 bg-orange-50 p-5 flex items-start gap-3">
+        <Tag className="size-5 text-orange-600 shrink-0 mt-0.5" />
+        <div className="space-y-1">
+          <p className="text-sm font-semibold text-orange-900">
+            Iedereen die jouw code gebruikt krijgt 20% korting
+          </p>
+          <p className="text-xs text-orange-800/90 leading-relaxed">
+            Je vriend of collega krijgt 20% korting op de eerste DBA-check of het eerste abonnement. Jij verdient ondertussen een mijlpaal-beloning. Zo snijdt het mes aan twee kanten.
+          </p>
+        </div>
+      </div>
+
+      {/* Voortgangsbalk */}
       <VoortgangsBar count={stats.qualifiedCount} />
 
       {/* Codes */}
@@ -305,7 +363,7 @@ export default function BeloningenPage() {
           </span>
         </div>
         <p className="text-xs text-muted-foreground -mt-1">
-          Deel een code of link. Je vriend krijgt een gratis DBA-check, jij bouwt punten op.
+          Deel een code of link. Je vriend krijgt 20% korting, jij bouwt punten op.
         </p>
         <div className="space-y-2">
           {stats.codes.map(c => (
@@ -327,9 +385,10 @@ export default function BeloningenPage() {
         <p className="text-sm font-semibold">Hoe werkt het?</p>
         <ol className="space-y-1.5 text-sm text-muted-foreground list-decimal list-inside">
           <li>Deel een van jouw codes of kopieer de uitnodigingslink.</li>
-          <li>Jouw contactpersoon start een gratis check via jouw code.</li>
+          <li>Jouw contactpersoon start een check via jouw code en krijgt 20% korting.</li>
           <li>Zodra zij succesvol betaald hebben, telt dit als doorverwijzing.</li>
           <li>Bij elke mijlpaal ontvang jij automatisch de bijbehorende beloning.</li>
+          <li>Beloningen blijven beperkt geldig (zie het label per mijlpaal).</li>
         </ol>
       </div>
 
