@@ -26,6 +26,10 @@ const nextConfig: NextConfig = {
         },
       ],
     },
+    {
+      source: '/c/:path*',
+      headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+    },
   ],
 }
 
