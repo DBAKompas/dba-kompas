@@ -71,7 +71,7 @@ export function WelcomeForm({ token }: Props) {
       const data = await res.json().catch(() => null)
       if (!data || data.ok !== true) {
         window.turnstile?.reset(widgetIdRef.current ?? undefined)
-        setError('Deze link is niet langer geldig of is al gebruikt. Probeer het later opnieuw of neem contact op met support.')
+        setError('Er ging iets mis. Controleer je gegevens (wachtwoord minimaal 10 tekens) en probeer opnieuw, of neem contact op met support als het blijft mislukken.')
         setSubmitting(false)
         return
       }
@@ -132,19 +132,19 @@ export function WelcomeForm({ token }: Props) {
           <input
             type="password"
             required
-            minLength={8}
+            minLength={10}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
           />
-          <p className="mt-1 text-xs text-slate-500">Minimaal 8 tekens.</p>
+          <p className="mt-1 text-xs text-slate-500">Minimaal 10 tekens.</p>
         </div>
         <div ref={widgetRef} className="flex justify-center" />
         {error ? <p className="text-sm text-red-600">{error}</p> : null}
         <button
           type="submit"
           disabled={submitting}
-          className="w-full rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 disabled:opacity-60"
+          className="w-full rounded-lg bg-orange-500 hover:bg-orange-600 text-white font-medium py-2.5 disabled:opacity-60"
         >
           {submitting ? 'Bezig...' : 'Activeer mijn gratis DBA Check'}
         </button>
