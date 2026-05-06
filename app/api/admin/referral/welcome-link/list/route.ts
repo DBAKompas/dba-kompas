@@ -23,11 +23,6 @@ interface ProfileRow {
   last_name: string | null
 }
 
-interface AuthUserRow {
-  id: string
-  email: string | null
-}
-
 function deriveStatus(row: WelcomeLinkRow): LinkStatus {
   if (row.used_at) return 'used'
   if (row.expires_at && new Date(row.expires_at) < new Date()) return 'expired'
@@ -94,6 +89,7 @@ export async function GET(req: NextRequest) {
   if (userIds.size > 0) {
     const ids = Array.from(userIds)
 
+    // Profile-namen via gewone tabel (RLS bypass via service-role)
     const { data: profiles } = await supabaseAdmin
       .from('profiles')
       .select('user_id, first_name, last_name')
@@ -103,16 +99,25 @@ export async function GET(req: NextRequest) {
       ((profiles ?? []) as ProfileRow[]).map(p => [p.user_id, p])
     )
 
-    // Email kan alleen via auth.users (admin client) opgehaald worden
-    const { data: authUsers } = await supabaseAdmin
-      .schema('auth')
-      .from('users')
-      .select('id, email')
-      .in('id', ids)
-
-    emailById = new Map<string, string | null>(
-      ((authUsers ?? []) as AuthUserRow[]).map(u => [u.id, u.email])
-    )
+    // E-mails via auth.admin.listUsers (Supabase JS client kan auth.users niet
+    // via .schema('auth').from('users') queryen). perPage 1000 is voldoende
+    // voor admin-counts; pagination wordt pas relevant boven 1000 users.
+    try {
+      const { data: authData, error: authErr } = await supabaseAdmin.auth.admin
+        .listUsers({ perPage: 1000 })
+      if (authErr) {
+        console.warn('[admin/welcome-link/list] auth.admin.listUsers fout:', authErr.message)
+      } else {
+        const wantedIds = new Set(ids)
+        emailById = new Map<string, string | null>(
+          (authData?.users ?? [])
+            .filter(u => wantedIds.has(u.id))
+            .map(u => [u.id, u.email ?? null])
+        )
+      }
+    } catch (err) {
+      console.warn('[admin/welcome-link/list] auth.admin.listUsers exception:', err)
+    }
   }
 
   const items = rows
