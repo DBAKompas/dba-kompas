@@ -22,6 +22,7 @@ import {
   Lock,
   ChevronRight,
 } from 'lucide-react'
+import { CLIENT_MIN_CHARS, CLIENT_MIN_WORDS } from '@/lib/ai'
 
 // ── DBA kernsignalen voor realtime client-side detectie ──────────────────────
 const DBA_SIGNALEN = [
@@ -277,10 +278,11 @@ export default function AnalysePage() {
   // Stats
   const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0
   const charCount = text.length
-  const minChars = 120
+  const minChars = CLIENT_MIN_CHARS
+  const minWords = CLIENT_MIN_WORDS
 
   // Validatie
-  const canProceedText = inputMode === 'text' && text.trim().length >= minChars
+  const canProceedText = inputMode === 'text' && text.trim().length >= minChars && wordCount >= minWords
   const canProceedFile = inputMode === 'file' && file !== null
   const canProceed = canProceedText || canProceedFile
   const allDisclaimerChecked = disclaimerChecks.every(Boolean)
@@ -334,9 +336,20 @@ export default function AnalysePage() {
       }
       if (!response.ok) {
         const data = await response.json().catch(() => ({}))
+        // 422: input was te kort of mist signalen. Toon de servertoelichting.
+        if (response.status === 422) {
+          throw new Error(
+            data?.summary ||
+              'De tekst is te kort of mist informatie. Voeg meer context toe en probeer opnieuw.'
+          )
+        }
         throw new Error(data.error || 'Er is een fout opgetreden')
       }
       const data = await response.json()
+      if (!data?.id) {
+        // Vangnet: 200 zonder id. Niet navigeren naar /analyse/undefined.
+        throw new Error('De analyse is niet opgeslagen. Probeer het opnieuw.')
+      }
       router.push(`/analyse/${data.id}`)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Er is een fout opgetreden')
@@ -476,8 +489,10 @@ export default function AnalysePage() {
                   {/* Tekstteller */}
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <span>{charCount} tekens · {wordCount} woorden</span>
-                    {charCount > 0 && charCount < minChars && (
-                      <span className="text-amber-600">Minimaal {minChars} tekens vereist</span>
+                    {charCount > 0 && (charCount < minChars || wordCount < minWords) && (
+                      <span className="text-amber-600">
+                        Minimaal {minChars} tekens en {minWords} woorden vereist
+                      </span>
                     )}
                   </div>
 

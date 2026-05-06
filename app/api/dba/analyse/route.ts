@@ -108,7 +108,9 @@ export async function POST(request: Request) {
     // de eerder gereserveerde credit terug.
     if ('status' in result && (result.status === 'insufficient_input' || result.status === 'needs_more_input')) {
       await releaseUsage(user.id, plan)
-      return NextResponse.json(result)
+      // Status 422: server begreep het verzoek maar input was onvoldoende.
+      // Voorkomt dat de client navigeert naar /analyse/undefined omdat data.id ontbreekt.
+      return NextResponse.json(result, { status: 422 })
     }
 
     // Full analysis result - insert into database
