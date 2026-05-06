@@ -22,7 +22,7 @@ import {
   Lock,
   ChevronRight,
 } from 'lucide-react'
-import { CLIENT_MIN_CHARS, CLIENT_MIN_WORDS } from '@/lib/ai'
+import { CLIENT_MIN_CHARS, CLIENT_MIN_WORDS } from '@/lib/ai/inputValidation'
 
 // ── DBA kernsignalen voor realtime client-side detectie ──────────────────────
 const DBA_SIGNALEN = [
