@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { stripe } from '@/lib/stripe/client'
+import { getShareRedemptionDiscount } from '@/lib/referral/firstCheckoutDiscount'
 
 export async function POST(request: Request) {
   try {
@@ -22,15 +23,23 @@ export async function POST(request: Request) {
       .eq('user_id', user.id)
       .single()
 
+    // Share-redemption first-time discount detecteren
+    const shareDiscount = await getShareRedemptionDiscount(supabase, user.id)
+
     const sessionParams: Record<string, unknown> = {
       mode: 'payment',
       payment_method_types: ['card', 'ideal'],
       line_items: [{ price: priceId, quantity: 1 }],
+      // discounts en allow_promotion_codes zijn mutually exclusive in Stripe
+      ...(shareDiscount
+        ? { discounts: shareDiscount }
+        : { allow_promotion_codes: true }),
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?one_time=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
       metadata: {
         user_id: user.id,
         product_type: 'one_time_dba',
+        ...(shareDiscount ? { share_redemption_discount: 'REFERRAL_FRIEND_20PCT' } : {}),
       },
     }
 

@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { stripe } from '@/lib/stripe/client'
 import { captureServerEvent } from '@/lib/posthog'
 import { cookies } from 'next/headers'
+import { getShareRedemptionDiscount } from '@/lib/referral/firstCheckoutDiscount'
 
 export async function POST(request: Request) {
   try {
@@ -33,17 +34,24 @@ export async function POST(request: Request) {
     const cookieStore = await cookies()
     const referralCode = cookieStore.get('dba_ref')?.value ?? null
 
+    // Share-redemption first-time discount detecteren
+    const shareDiscount = await getShareRedemptionDiscount(supabase, user.id)
+
     const sessionParams: Record<string, unknown> = {
       mode: checkoutMode,
       // payment_method_types bewust weggelaten: Stripe beheert dit automatisch op basis van mode.
       // iDEAL werkt niet voor subscription mode en mag hier niet worden meegegeven.
       line_items: [{ price: effectivePriceId, quantity: 1 }],
-      allow_promotion_codes: true,
+      // discounts en allow_promotion_codes zijn mutually exclusive in Stripe
+      ...(shareDiscount
+        ? { discounts: shareDiscount }
+        : { allow_promotion_codes: true }),
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
       metadata: {
         user_id: user.id,
         ...(referralCode ? { referral_code: referralCode } : {}),
+        ...(shareDiscount ? { share_redemption_discount: 'REFERRAL_FRIEND_20PCT' } : {}),
       },
     }
 
