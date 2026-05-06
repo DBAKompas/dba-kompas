@@ -10,6 +10,8 @@ import {
   STAFFEL_WINDOW_DAYS,
   UPGRADE_OFFER_VALID_DAYS,
   BONUS_CHECK_VALID_DAYS,
+  REWARD_MONTH_DISCOUNT_VALID_DAYS,
+  REWARD_TWO_MONTH_DISCOUNT_VALID_DAYS,
 } from './config'
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000
@@ -65,4 +67,28 @@ export function upgradeOfferExpiry(triggeredAt: Date = new Date()): Date {
 /** Verloopdatum van een gratis bonus-check uit mijlpaal 1 (30 dagen) */
 export function bonusCheckExpiry(grantedAt: Date = new Date()): Date {
   return addDays(grantedAt, BONUS_CHECK_VALID_DAYS)
+}
+
+/**
+ * Verloopdatum van een referral_rewards rij, afhankelijk van reward_type.
+ * - free_check          → 30 dagen (mijlpaal 1, gratis bonus-check)
+ * - month_discount      → 60 dagen (mijlpaal 3, 1 maand gratis abo)
+ * - two_month_discount  → 60 dagen (mijlpaal 5, 2 maanden gratis abo)
+ * Onbekende types → null (geen verloop, defensief).
+ */
+export function rewardExpiry(
+  rewardType: string,
+  grantedAt: Date | string = new Date(),
+): Date | null {
+  const start = typeof grantedAt === 'string' ? new Date(grantedAt) : grantedAt
+  switch (rewardType) {
+    case 'free_check':
+      return addDays(start, BONUS_CHECK_VALID_DAYS)
+    case 'month_discount':
+      return addDays(start, REWARD_MONTH_DISCOUNT_VALID_DAYS)
+    case 'two_month_discount':
+      return addDays(start, REWARD_TWO_MONTH_DISCOUNT_VALID_DAYS)
+    default:
+      return null
+  }
 }

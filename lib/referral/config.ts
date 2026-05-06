@@ -53,6 +53,12 @@ export const MILESTONES = [1, 3, 5] as const
 /** Geldigheidsduur van een gratis bonus-check uit mijlpaal 1 */
 export const BONUS_CHECK_VALID_DAYS = 30
 
+/** Verloopduur van een mijlpaal-3 reward (1 maand gratis abo): 60 dagen na granting */
+export const REWARD_MONTH_DISCOUNT_VALID_DAYS = 60
+
+/** Verloopduur van een mijlpaal-5 reward (2 maanden gratis abo): 60 dagen na granting */
+export const REWARD_TWO_MONTH_DISCOUNT_VALID_DAYS = 60
+
 // ── Bestaande Stripe coupons (voor mijlpaal 3 en 5, blijven onveranderd) ─────
 
 /** Mijlpaal 3 reward: 1 maand gratis */
