@@ -16,6 +16,7 @@ import { cookies } from 'next/headers'
 import { stripe } from '@/lib/stripe/client'
 import { captureServerEvent } from '@/lib/posthog'
 import { normalizeEmail } from '@/lib/auth/provision-user'
+import { getShareRedemptionDiscountByCode } from '@/lib/referral/firstCheckoutDiscount'
 
 type GuestCheckoutBody = {
   email?: string
@@ -53,10 +54,14 @@ export async function POST(request: Request) {
 
     const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? '').replace(/\/+$/, '')
 
+    const shareDiscount = await getShareRedemptionDiscountByCode(referralCode)
+
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       line_items: [{ price: priceId, quantity: 1 }],
-      allow_promotion_codes: true,
+      ...(shareDiscount
+        ? { discounts: shareDiscount }
+        : { allow_promotion_codes: true }),
       customer_email: email,
       success_url: `${appUrl}/checkout/success?plan=${plan}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/`,
@@ -64,6 +69,7 @@ export async function POST(request: Request) {
         guest_email: email,
         guest_flow: 'true',
         ...(referralCode ? { referral_code: referralCode } : {}),
+        ...(shareDiscount ? { share_redemption_discount: 'REFERRAL_FRIEND_20PCT' } : {}),
       },
     })
 
