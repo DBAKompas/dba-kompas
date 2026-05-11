@@ -1,7 +1,7 @@
 /**
  * E-mail templates voor reward verloop.
  *
- * Dark navy huisstijl (#0b1d3a) met oranje accent (#f97316),
+ * Dark navy huisstijl (#0b1d3a) met oranje accent (#d4782a),
  * conform DBA Kompas welkomstmail. Inline CSS voor e-mailclient compat.
  */
 
@@ -44,8 +44,8 @@ function shell(title: string, bodyHtml: string): string {
         <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background:#102a4d;border-radius:14px;overflow:hidden;">
           <tr>
             <td style="padding:28px 32px;border-bottom:1px solid #1d3b66;">
-              <div style="font-size:22px;font-weight:700;color:#ffffff;letter-spacing:0.3px;">DBA Kompas</div>
-              <div style="font-size:13px;color:#9bb0d1;margin-top:2px;">${title}</div>
+              <img src="https://dbakompas.nl/logo-white-v3-full.png" alt="DBA Kompas" width="200" style="display:block; height:auto; border:0;" />
+              <div style="font-size:13px;color:#9bb0d1;margin-top:10px;">${title}</div>
             </td>
           </tr>
           <tr>
@@ -68,7 +68,7 @@ function shell(title: string, bodyHtml: string): string {
 
 function ctaButton(href: string, label: string): string {
   return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:24px 0;">
-    <tr><td style="background:#f97316;border-radius:8px;">
+    <tr><td style="background:#d4782a;border-radius:8px;">
       <a href="${href}" style="display:inline-block;padding:12px 22px;color:#ffffff;font-weight:600;text-decoration:none;font-size:15px;">${label}</a>
     </td></tr>
   </table>`
@@ -82,7 +82,7 @@ export function reminderEmailHtml(rewardType: RewardType, daysLeft: number): str
   const days = Math.max(1, Math.round(daysLeft))
   const body = `
     <h2 style="margin:0 0 12px 0;font-size:20px;color:#ffffff;">Je beloning verloopt binnenkort</h2>
-    <p style="margin:0 0 12px 0;">Je hebt nog <strong style="color:#f97316;">${days} ${days === 1 ? 'dag' : 'dagen'}</strong> om je beloning te gebruiken: <strong>${label}</strong>.</p>
+    <p style="margin:0 0 12px 0;">Je hebt nog <strong style="color:#d4782a;">${days} ${days === 1 ? 'dag' : 'dagen'}</strong> om je beloning te gebruiken: <strong>${label}</strong>.</p>
     <p style="margin:0 0 8px 0;">Je verdiende deze beloning omdat één van je deelcodes succesvol werd gebruikt. Bedankt dat je DBA Kompas deelt!</p>
     ${ctaButton(cta, REWARD_CTA_LABEL[rewardType])}
     <p style="margin:0;font-size:13px;color:#9bb0d1;">Wacht je te lang? Dan vervalt deze beloning automatisch.</p>
