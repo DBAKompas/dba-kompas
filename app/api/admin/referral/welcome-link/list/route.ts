@@ -19,8 +19,7 @@ interface WelcomeLinkRow {
 
 interface ProfileRow {
   user_id: string
-  first_name: string | null
-  last_name: string | null
+  name: string | null
 }
 
 function deriveStatus(row: WelcomeLinkRow): LinkStatus {
@@ -92,7 +91,7 @@ export async function GET(req: NextRequest) {
     // Profile-namen via gewone tabel (RLS bypass via service-role)
     const { data: profiles } = await supabaseAdmin
       .from('profiles')
-      .select('user_id, first_name, last_name')
+      .select('user_id, name')
       .in('user_id', ids)
 
     profilesById = new Map<string, ProfileRow>(
@@ -135,12 +134,12 @@ export async function GET(req: NextRequest) {
         usedAt: r.used_at,
         creator: r.created_by ? {
           userId: r.created_by,
-          name: [creator?.first_name, creator?.last_name].filter(Boolean).join(' ') || null,
+          name: creator?.name ?? null,
           email: emailById.get(r.created_by) ?? null,
         } : null,
         redeemer: r.used_by ? {
           userId: r.used_by,
-          name: [redeemer?.first_name, redeemer?.last_name].filter(Boolean).join(' ') || null,
+          name: redeemer?.name ?? null,
           email: emailById.get(r.used_by) ?? null,
         } : null,
       }
