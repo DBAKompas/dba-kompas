@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { UsageMeter } from '@/components/dashboard/UsageMeter'
+import { NoAccessView } from './NoAccessView'
 import {
   FileSearch,
   ShieldCheck,
@@ -23,11 +24,16 @@ interface Stats {
   unreadNotifications: number
 }
 
+type AccessStatus = 'loading' | 'has_access' | 'no_access'
+
 export default function DashboardPage() {
   const [stats, setStats] = useState<Stats | null>(null)
   const [loading, setLoading] = useState(true)
   const [showSuccess, setShowSuccess] = useState(false)
   const [successType, setSuccessType] = useState<'subscription' | 'one_time' | null>(null)
+
+  const [accessStatus, setAccessStatus] = useState<AccessStatus>('loading')
+  const [availableCodes, setAvailableCodes] = useState(0)
 
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -47,7 +53,42 @@ export default function DashboardPage() {
     }
   }, [searchParams, router])
 
+  // Access-check + codes parallel ophalen. UI-only: server-side endpoints
+  // blokkeren bij /analyse en /nieuws alsnog op quota.
   useEffect(() => {
+    Promise.all([
+      fetch('/api/user/quota').then((r) => (r.ok ? r.json() : null)),
+      fetch('/api/one-time/entitlement').then((r) => (r.ok ? r.json() : null)),
+      fetch('/api/referral/code').then((r) => (r.ok ? r.json() : null)),
+    ])
+      .then(([quotaResp, entResp, refResp]) => {
+        const plan: string | null = quotaResp?.quotaPlan ?? null
+        const hasEntitlement: boolean = entResp?.hasEntitlement === true
+
+        const hasAccess =
+          plan === 'admin' ||
+          plan === 'monthly' ||
+          plan === 'yearly' ||
+          (plan === 'one_time' && hasEntitlement)
+
+        setAccessStatus(hasAccess ? 'has_access' : 'no_access')
+
+        if (refResp?.codes && Array.isArray(refResp.codes)) {
+          setAvailableCodes(
+            refResp.codes.filter((c: { isUsed: boolean }) => !c.isUsed).length
+          )
+        }
+      })
+      .catch(() => {
+        // Failsafe: bij netwerkfout val terug op has_access om betalende
+        // gebruikers niet onterecht te blokkeren. De daadwerkelijke
+        // gating gebeurt server-side bij /analyse en /nieuws.
+        setAccessStatus('has_access')
+      })
+  }, [])
+
+  useEffect(() => {
+    if (accessStatus !== 'has_access') return
     fetch('/api/stats')
       .then((res) => res.json())
       .then((data) => {
@@ -55,8 +96,23 @@ export default function DashboardPage() {
         setLoading(false)
       })
       .catch(() => setLoading(false))
-  }, [])
+  }, [accessStatus])
 
+  // Laad-state tijdens access-check
+  if (accessStatus === 'loading') {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <Loader2 className="size-8 animate-spin text-muted-foreground" />
+      </div>
+    )
+  }
+
+  // Geen actieve toegang: welkom-terug view met upgrade- en referral-route
+  if (accessStatus === 'no_access') {
+    return <NoAccessView availableCodes={availableCodes} />
+  }
+
+  // Heeft toegang: huidige dashboard
   const statCards = [
     {
       title: 'Totaal Analyses',
