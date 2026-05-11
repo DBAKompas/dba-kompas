@@ -68,8 +68,8 @@ export async function GET(request: Request) {
         // Haal gebruikersprofiel op
         const { data: profile } = await supabaseAdmin
           .from('profiles')
-          .select('email, full_name')
-          .eq('id', userId)
+          .select('email, name')
+          .eq('user_id', userId)
           .single()
 
         if (!profile?.email) {
@@ -108,7 +108,7 @@ export async function GET(request: Request) {
           newsItems: newsItems ?? [],
           documentsSummary: { processed, compliant, warnings },
           notifications: notifications ?? [],
-          userProfile: { name: profile.full_name ?? profile.email },
+          userProfile: { name: profile.name ?? profile.email },
         })
 
         sent++
