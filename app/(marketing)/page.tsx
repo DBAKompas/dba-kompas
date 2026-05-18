@@ -829,16 +829,20 @@ export default function Home() {
             transition={{ duration: 0.5 }}
             viewport={viewportConfig}
           >
-            <SectionBadge>{LANDING.pricing.badge}</SectionBadge>
+            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent">{LANDING.pricing.badge}</p>
             <h2 className="text-3xl md:text-4xl font-bold">{LANDING.pricing.title}</h2>
             <p className="text-muted-foreground">{LANDING.pricing.subtitle}</p>
           </motion.div>
+
+          <p className="text-center text-sm text-muted-foreground max-w-xl mx-auto">
+            {LANDING.pricing.steeringText}
+          </p>
 
           <div className="grid md:grid-cols-3 gap-5 items-stretch">
             {LANDING.pricing.plans.map((plan, i) => (
               <motion.div
                 key={i}
-                className={`relative flex flex-col rounded-2xl p-7 border transition-all duration-200 ${
+                className={`relative flex flex-col rounded-2xl p-7 md:p-10 border transition-all duration-200 ${
                   plan.popular
                     ? "pricing-popular pricing-glow border-primary/30"
                     : "glass-card border-border/50 hover-elevate"
@@ -879,10 +883,7 @@ export default function Home() {
                 <ul className="space-y-2.5 mb-8 flex-1">
                   {plan.features.map((feat, fi) => (
                     <li key={fi} className="flex items-start gap-2.5 text-sm">
-                      {plan.popular
-                        ? <img src="/logo-flat-white.png" alt="" className="h-4 w-auto object-contain flex-shrink-0 opacity-80 mt-0.5" />
-                        : <BulletIcon />
-                      }
+                      <span className="flex-shrink-0 mt-px opacity-40 leading-[1.4rem] select-none" aria-hidden="true">·</span>
                       <span className={plan.popular ? "text-primary-foreground/85" : "text-muted-foreground"}>
                         {feat}
                       </span>
