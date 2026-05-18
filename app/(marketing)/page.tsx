@@ -494,6 +494,30 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── INZET ──────────────────────────────── */}
+      <section className="px-4 sm:px-6 py-16 md:py-20 max-w-7xl mx-auto w-full section-divider">
+        <motion.div
+          className="max-w-2xl mx-auto space-y-5"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          viewport={viewportConfig}
+        >
+          <h2 className="text-3xl md:text-4xl font-bold leading-tight">Je opdracht is je inkomen</h2>
+          <p className="text-muted-foreground leading-relaxed">
+            Als de manier waarop je opdracht is ingericht vragen oproept over zelfstandigheid, kan dat
+            gevolgen hebben: een opdrachtgever die de opdracht wil herzien, een intermediair die om extra
+            stukken vraagt, of een opdracht die niet wordt verlengd. Sinds 2025 handhaaft de
+            Belastingdienst weer op schijnzelfstandigheid, en opdrachtgevers zijn daardoor voorzichtiger
+            geworden. Dat raakt jou direct.
+          </p>
+          <p className="text-muted-foreground leading-relaxed">
+            DBA Kompas laat je vooraf zien waar je opdrachtomschrijving die vragen oproept, zodat je niet
+            voor verrassingen komt te staan.
+          </p>
+        </motion.div>
+      </section>
+
       {/* ── HOW IT WORKS ───────────────────────── */}
       <section className="px-4 sm:px-6 py-16 md:py-20 max-w-7xl mx-auto w-full section-divider">
         <motion.div
