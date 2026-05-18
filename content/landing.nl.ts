@@ -5,7 +5,7 @@ export const LANDING = {
     features: "Functies",
     faq: "FAQ",
     login: "Ga naar de app",
-    tryNow: "Probeer nu",
+    tryNow: "Start je gratis zelfscan",
     goToApp: "Ga naar app",
   },
 
@@ -16,8 +16,8 @@ export const LANDING = {
     subtitle:
       "DBA Kompas helpt je om sneller te zien waar je opdracht vragen oproept. Je plakt je opdrachtomschrijving of uploadt een document en ontvangt een risico-indicatie, aandachtspunten en een herschreven opdrachtbrief.",
     supporting: "Ontdek in 1 minuut of jouw opdracht op belangrijke punten vragen oproept.",
-    ctaPrimary: "Start DBA Quick Scan (1 minuut)",
-    ctaSecondary: "Start met DBA Kompas",
+    ctaPrimary: "Start je gratis zelfscan",
+    ctaSecondary: "Toets je opdracht voor €9,95",
     trustLine: "Van opdrachtomschrijving naar duidelijke aandachtspunten en gerichte vervolgstappen.",
   },
 
@@ -299,7 +299,7 @@ export const LANDING = {
     title: "Klaar om te starten?",
     subtitle:
       "Ontdek binnen enkele minuten de mogelijke aandachtspunten in je opdrachtomschrijving.",
-    primary: "Start je analyse",
+    primary: "Toets je opdracht voor €9,95",
     secondary: "Bekijk voorbeeld",
   },
 

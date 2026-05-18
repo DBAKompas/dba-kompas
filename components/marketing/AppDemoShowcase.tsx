@@ -835,10 +835,10 @@ function CtaScreen({ active, onSubscribe }: { active: boolean; onSubscribe?: () 
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-bold cursor-pointer"
           style={{ background: ORANGE, color: NAVY }}
-          aria-label="Analyseer jouw opdracht nu"
+          aria-label="Start je gratis zelfscan"
           data-testid="demo-cta-link"
         >
-          Analyseer jouw opdracht nu <ArrowRight className="w-4 h-4" />
+          Start je gratis zelfscan <ArrowRight className="w-4 h-4" />
         </motion.button>
 
         <button

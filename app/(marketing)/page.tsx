@@ -216,7 +216,7 @@ export default function Home() {
                 </Button>
                 <Button
                   size="sm"
-                  onClick={() => setEmailCheckoutPlan("yearly")}
+                  onClick={() => setQuickScanOpen(true)}
                   className="btn-magnetic"
                 >
                   {LANDING.nav.tryNow}
@@ -296,7 +296,7 @@ export default function Home() {
                   <>
                     <Button
                       className="w-full justify-center text-base py-5 btn-magnetic"
-                      onClick={() => { setMenuOpen(false); setEmailCheckoutPlan("yearly"); }}
+                      onClick={() => { setMenuOpen(false); setQuickScanOpen(true); }}
                     >
                       {LANDING.nav.tryNow}
                       <ArrowRight className="w-4 h-4 ml-2" />
@@ -352,11 +352,20 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.35 }}
           >
-            <Button size="lg" onClick={() => setQuickScanOpen(true)} className="btn-magnetic min-w-[240px]">
+            <Button
+              size="lg"
+              onClick={() => setQuickScanOpen(true)}
+              className="btn-magnetic min-w-[240px] bg-accent text-white hover:bg-accent/90 border-0"
+            >
               <Zap className="w-4 h-4 mr-2 flex-shrink-0" />
               {LANDING.hero.ctaPrimary}
             </Button>
-            <Button size="lg" variant="outline" onClick={scrollToPricing}>
+            <Button
+              size="lg"
+              variant="outline"
+              onClick={() => setEmailCheckoutPlan("one_time_dba")}
+              className="border-accent text-accent hover:bg-accent/8 hover:text-accent"
+            >
               {LANDING.hero.ctaSecondary}
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
@@ -489,7 +498,7 @@ export default function Home() {
             transition={{ duration: 0.8 }}
             viewport={viewportConfig}
           >
-            <AppDemoShowcase onSubscribe={() => setEmailCheckoutPlan("yearly")} />
+            <AppDemoShowcase onSubscribe={() => setQuickScanOpen(true)} />
           </motion.div>
         </div>
       </section>
@@ -764,8 +773,8 @@ export default function Home() {
             <div className="space-y-3">
               <h3 className="text-2xl font-bold">{LANDING.benefits.showcase.title}</h3>
               <p className="text-muted-foreground">{LANDING.benefits.showcase.subtitle}</p>
-              <Button className="btn-magnetic mt-2" onClick={() => setEmailCheckoutPlan("yearly")}>
-                Start je analyse
+              <Button className="btn-magnetic mt-2" onClick={() => setQuickScanOpen(true)}>
+                {LANDING.hero.ctaPrimary}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </div>
@@ -956,7 +965,7 @@ export default function Home() {
           <div className="flex justify-center pt-2 relative z-10">
             <Button
               size="lg"
-              onClick={() => setEmailCheckoutPlan("yearly")}
+              onClick={() => setEmailCheckoutPlan("one_time_dba")}
               className="btn-magnetic w-full sm:w-auto sm:min-w-[260px] bg-white text-primary border-0 hover:bg-accent hover:text-white transition-colors"
             >
               {LANDING.cta.primary}
