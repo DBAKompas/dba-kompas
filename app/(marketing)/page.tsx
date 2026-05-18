@@ -556,6 +556,67 @@ export default function Home() {
         </motion.div>
       </section>
 
+      {/* ── CHATGPT BEZWAAR ────────────────────── */}
+      <section className="px-4 sm:px-6 py-16 md:py-20 max-w-7xl mx-auto w-full section-divider">
+        <motion.div
+          className="space-y-10"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          viewport={viewportConfig}
+        >
+          <div className="text-center space-y-4 max-w-2xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold leading-tight">Kan ChatGPT dit niet ook?</h2>
+            <p className="text-muted-foreground leading-relaxed">
+              Een eerlijke vraag. ChatGPT of Claude kunnen je inderdaad helpen nadenken over je
+              opdracht, als je precies weet wat je moet vragen en hoe je het antwoord moet wegen.
+              DBA Kompas neemt dat werk uit handen.
+            </p>
+            <p className="text-muted-foreground leading-relaxed">
+              Je hoeft het beoordelingskader niet te kennen en geen goede prompt te bedenken. Je
+              plakt je opdrachtomschrijving en krijgt elke keer dezelfde gestructureerde analyse,
+              plus een herschreven opdrachtbrief als werkdocument. Geen lap tekst in een
+              chatvenster, maar iets dat je direct meeneemt naar het gesprek.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-5">
+            <motion.div
+              className="glass-card p-6 space-y-3"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              viewport={viewportConfig}
+            >
+              <h3 className="font-semibold text-muted-foreground">Met een algemene chatbot</h3>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li className="leading-relaxed">Je bedenkt zelf de juiste vragen.</li>
+                <li className="leading-relaxed">Je krijgt per keer een ander antwoord.</li>
+                <li className="leading-relaxed">Je houdt tekst in een chatvenster.</li>
+                <li className="leading-relaxed">Je analyse is weg zodra je het gesprek sluit.</li>
+              </ul>
+            </motion.div>
+
+            <motion.div
+              className="glass-card p-6 space-y-3"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.1 }}
+              viewport={viewportConfig}
+            >
+              <span className="block w-6 h-0.5 bg-primary/60" />
+              <h3 className="font-semibold text-foreground">Met DBA Kompas</h3>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li className="leading-relaxed">Een vast proces dat de juiste vragen al stelt.</li>
+                <li className="leading-relaxed">Elke opdracht op dezelfde manier beoordeeld.</li>
+                <li className="leading-relaxed">Een herschreven opdrachtbrief als werkdocument.</li>
+                <li className="leading-relaxed">Je analyses blijven bewaard terwijl je meebeweegt met de wet.</li>
+              </ul>
+            </motion.div>
+          </div>
+        </motion.div>
+      </section>
+
       {/* ── FEATURES ───────────────────────────── */}
       <section id="features" className="px-4 sm:px-6 py-16 md:py-24 max-w-7xl mx-auto w-full">
         <div className="space-y-12">
