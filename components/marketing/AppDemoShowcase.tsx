@@ -45,27 +45,6 @@ De architect bepaalt zelfstandig de technische aanpak, planning en werktijden. E
 De opdracht beslaat maximaal 6 kalendermaanden. Verlenging vereist een nieuwe overeenkomst.`;
 
 /* ─────────────────────────────────────────────
-   ANIMATED COUNTER
-───────────────────────────────────────────────── */
-function AnimatedCounter({ target, active }: { target: number; active: boolean }) {
-  const [count, setCount] = useState(0);
-  const prefersReducedMotion = useReducedMotion();
-  useEffect(() => {
-    if (!active) { setCount(0); return; }
-    if (prefersReducedMotion) { setCount(target); return; }
-    const dur = 1400;
-    const start = performance.now();
-    const tick = (now: number) => {
-      const t = Math.min((now - start) / dur, 1);
-      setCount(Math.round((1 - Math.pow(1 - t, 3)) * target));
-      if (t < 1) requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
-  }, [active, target, prefersReducedMotion]);
-  return <>{count.toLocaleString("nl-NL")}</>;
-}
-
-/* ─────────────────────────────────────────────
    SVG GAUGE
 ───────────────────────────────────────────────── */
 function ScoreGauge({ pct, color, size = 108 }: { pct: number; color: string; size?: number }) {
@@ -216,17 +195,6 @@ function HeroScreen({ active }: { active: boolean }) {
       >
         <BrandLogo variant="flatWhiteV3" className="h-12 w-auto mx-auto mb-3" />
         <div className="text-white/60 text-sm">Compliance hulpmiddel voor ZZP'ers</div>
-      </motion.div>
-
-      {/* Counter - altijd in DOM, tabular-nums voorkomt breedte-schokken */}
-      <motion.div
-        animate={{ opacity: phase >= 1 ? 1 : 0 }}
-        transition={{ duration: 0.5 }}
-        className="text-4xl font-bold text-white mb-1 tabular-nums"
-        data-testid="demo-counter"
-      >
-        <AnimatedCounter target={1247} active={phase >= 1} />
-        <span>+ analyses gedaan</span>
       </motion.div>
 
       {/* Tagline - altijd in DOM */}
@@ -512,7 +480,7 @@ function ProcessingScreen({ active }: { active: boolean }) {
         transition={{ duration: 2.5, repeat: Infinity }}
         className="mt-10 text-xs text-white/50 text-center max-w-xs"
       >
-        Onze AI analyseert meer dan 40 jurisprudentiepunten...
+        Beoordeling op basis van Wet DBA en aanverwante jurisprudentie...
       </motion.p>
     </div>
   );
@@ -796,19 +764,10 @@ function CtaScreen({ active, onSubscribe }: { active: boolean; onSubscribe?: () 
         Klaar om jouw opdracht te analyseren?
       </motion.h2>
 
-      <motion.p
-        initial={{ opacity: 0, y: 8 }}
-        animate={active ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
-        transition={{ delay: 0.35, duration: 0.4 }}
-        className="text-white/70 text-sm mb-6 max-w-xs"
-      >
-        Meer dan 1.200 ZZP'ers gebruiken DBA Kompas al.
-      </motion.p>
-
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={active ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
-        transition={{ delay: 0.45, duration: 0.4 }}
+        transition={{ delay: 0.35, duration: 0.4 }}
         className="flex items-center justify-center gap-6 mb-8"
       >
         {[
