@@ -626,6 +626,102 @@ export default function Home() {
         </motion.div>
       </section>
 
+      {/* ── METHODIEK & MAKER ──────────────────── */}
+      <section className="w-full py-20 md:py-28 bg-[#0b1d3a]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+
+          {/* DEEL A: Methodiek */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={viewportConfig}
+          >
+            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent text-center">Methodiek</p>
+            <h2 className="text-3xl md:text-4xl font-bold leading-tight text-primary-foreground text-center max-w-3xl mx-auto mt-4">
+              Eén vaste methodiek, die meebeweegt met de wet
+            </h2>
+
+            <div className="grid md:grid-cols-3 gap-8 mt-12">
+              {[
+                { num: "1", title: "Aansturing en gezag",      desc: "Wie bepaalt hoe en wanneer je werkt." },
+                { num: "2", title: "Eigen rekening en risico", desc: "Wie draagt het risico en de kosten." },
+                { num: "3", title: "Ondernemerschap",          desc: "Of je je als ondernemer gedraagt." },
+              ].map((item, i) => (
+                <motion.div
+                  key={i}
+                  className="text-center md:text-left"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: i * 0.1 }}
+                  viewport={viewportConfig}
+                >
+                  <span className="block text-6xl md:text-7xl font-bold text-accent leading-none">{item.num}</span>
+                  <h3 className="text-xl font-semibold text-primary-foreground mt-3">{item.title}</h3>
+                  <p className="text-primary-foreground/70 mt-2">{item.desc}</p>
+                </motion.div>
+              ))}
+            </div>
+
+            <div className="max-w-3xl mx-auto mt-12">
+              <p className="text-base md:text-lg leading-relaxed text-primary-foreground/80 mb-4">
+                DBA Kompas werkt niet op onderbuik. Elke opdracht wordt beoordeeld via hetzelfde kader, op
+                de drie kernpunten waarop arbeidsrelaties worden getoetst: aansturing en gezag, eigen
+                rekening en risico, en ondernemerschap. Die kernpunten zijn de vertaling van de negen
+                gezichtspunten die de Hoge Raad in het Deliveroo-arrest heeft benoemd en die de
+                Belastingdienst gebruikt.
+              </p>
+              <p className="text-base md:text-lg leading-relaxed text-primary-foreground/80">
+                De wetgeving rond zzp-werk staat niet stil. De handhaving is hervat, en er wordt gewerkt
+                aan nieuwe regels rond zelfstandigen. DBA Kompas wordt op die ontwikkelingen onderhouden.
+                Verandert het kader, dan beweegt de analyse mee. Jij hoeft die ontwikkelingen niet zelf
+                bij te houden.
+              </p>
+            </div>
+
+            <p className="text-sm text-primary-foreground/60 italic text-center mt-8">
+              Gebaseerd op het Deliveroo-arrest van de Hoge Raad en het beoordelingskader van de Belastingdienst.
+            </p>
+          </motion.div>
+
+          <hr className="border-primary-foreground/10 my-16" />
+
+          {/* DEEL B: Maker */}
+          <motion.div
+            className="grid md:grid-cols-[320px_1fr] gap-12 items-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={viewportConfig}
+          >
+            <div className="flex justify-center md:justify-start">
+              <img
+                src="/team/marvin-zoetemelk.png"
+                alt="Marvin Zoetemelk"
+                className="w-full max-w-[280px] md:max-w-none md:w-[320px] rounded-2xl border border-white/10 object-cover"
+              />
+            </div>
+
+            <div>
+              <h3 className="text-2xl md:text-3xl font-bold text-primary-foreground">Gemaakt vanuit de praktijk</h3>
+              <p className="text-base md:text-lg leading-relaxed text-primary-foreground/80 mt-4">
+                DBA Kompas is ontwikkeld door Marvin Zoetemelk. Hij werkt sinds zes jaar met externe
+                inhuur en heeft zich gespecialiseerd in opdrachtbeoordeling voor onder meer gemeenten,
+                GGD, COA en provincies. De Wet DBA en de gevolgen voor zzp'ers volgt hij dagelijks.
+                Daaruit groeide DBA Kompas: een vaste, herhaalbare manier om opdrachten te toetsen.
+              </p>
+              <p className="text-base md:text-lg text-primary-foreground/80 mt-6">
+                Bereikbaar via{" "}
+                <a href="mailto:info@dbakompas.nl" className="text-accent hover:underline">
+                  info@dbakompas.nl
+                </a>
+              </p>
+            </div>
+          </motion.div>
+
+        </div>
+      </section>
+
       {/* ── FEATURES ───────────────────────────── */}
       <section id="features" className="px-4 sm:px-6 py-16 md:py-24 max-w-7xl mx-auto w-full">
         <div className="space-y-12">
