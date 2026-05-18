@@ -299,7 +299,7 @@ export const LANDING = {
     title: "Klaar om te starten?",
     subtitle:
       "Ontdek binnen enkele minuten de mogelijke aandachtspunten in je opdrachtomschrijving.",
-    primary: "Toets je opdracht voor €9,95",
+    primary: "Start je gratis zelfscan",
     secondary: "Bekijk voorbeeld",
   },
 

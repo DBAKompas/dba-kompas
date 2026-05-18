@@ -965,7 +965,7 @@ export default function Home() {
           <div className="flex justify-center pt-2 relative z-10">
             <Button
               size="lg"
-              onClick={() => setEmailCheckoutPlan("one_time_dba")}
+              onClick={() => setQuickScanOpen(true)}
               className="btn-magnetic w-full sm:w-auto sm:min-w-[260px] bg-white text-primary border-0 hover:bg-accent hover:text-white transition-colors"
             >
               {LANDING.cta.primary}
