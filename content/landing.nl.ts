@@ -237,7 +237,7 @@ export const LANDING = {
         price: "€200",
         period: "/jaar",
         popular: true,
-        popularBadge: "Beste keuze bij meerdere opdrachten",
+        popularBadge: "Voordeligst per maand",
         cta: "Kies jaarlijks",
         features: [
           "Alles uit maandelijks",

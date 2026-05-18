@@ -853,8 +853,8 @@ export default function Home() {
                 viewport={viewportConfig}
               >
                 {plan.popular && plan.popularBadge && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                    <span className="px-4 py-1 rounded-full bg-accent text-xs font-bold text-white shadow-sm">
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 flex justify-center">
+                    <span className="whitespace-nowrap px-4 py-1 rounded-full bg-accent text-xs font-bold text-white shadow-sm">
                       {plan.popularBadge}
                     </span>
                   </div>
@@ -871,7 +871,7 @@ export default function Home() {
                   )}
                 </div>
 
-                <div className="flex items-baseline gap-1 mb-6">
+                <div className={`flex items-baseline gap-1 ${plan.planKey === "yearly" ? "mb-2" : "mb-6"}`}>
                   <span className={`text-4xl font-extrabold ${plan.popular ? "text-primary-foreground" : "text-foreground"}`}>
                     {plan.price}
                   </span>
@@ -879,6 +879,10 @@ export default function Home() {
                     {plan.period}
                   </span>
                 </div>
+
+                {plan.planKey === "yearly" && (
+                  <p className="text-sm text-primary-foreground/60 mb-4">Bespaar €40 ten opzichte van maandelijks</p>
+                )}
 
                 <ul className="space-y-2.5 mb-8 flex-1">
                   {plan.features.map((feat, fi) => (
