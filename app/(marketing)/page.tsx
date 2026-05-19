@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from "react";
 import {
-  ArrowRight, LogOut, CheckCircle, Zap, Target, MessageSquare,
-  AlertTriangle, FileText, Edit3, Newspaper, Users, Building2, Network,
-  Clock, Shield, PenTool, Bell, Lock, ChevronDown, Check,
-  ClipboardList, TrendingUp, BarChart3, Menu, X,
+  ArrowRight, LogOut, Zap, AlertTriangle, Edit3, Newspaper,
+  Users, Building2, Network, Shield, Lock, ChevronDown,
+  ClipboardList, Menu, X,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import BrandLogo from "@/components/marketing/BrandLogo";
@@ -36,17 +35,6 @@ function SectionBadge({ children, withIcon }: { children: string; withIcon?: boo
       )}
       {children}
     </span>
-  );
-}
-
-/** Kompas-icoon als subtiele bullet voor opsommingen */
-function BulletIcon() {
-  return (
-    <img
-      src="/logo-bullet.png"
-      alt=""
-      className="h-3.5 w-auto object-contain flex-shrink-0 opacity-55 mt-0.5"
-    />
   );
 }
 
@@ -122,11 +110,8 @@ export default function Home() {
     });
   }
 
-  const valueIcons = [Zap, Target, CheckCircle, MessageSquare];
-  const problemIcons = [AlertTriangle, TrendingUp, BarChart3];
   const featureIcons = [ClipboardList, Edit3, Newspaper];
   const audienceIcons = [Users, Building2, Network];
-  const benefitIcons = [Clock, Shield, PenTool, Bell];
   const trustIcons = [Shield, AlertTriangle, Lock];
 
   return (
@@ -379,70 +364,6 @@ export default function Home() {
             {LANDING.hero.supporting}
           </motion.p>
         </div>
-      </section>
-
-      {/* ── VALUE STRIP ────────────────────────── */}
-      <section className="px-4 sm:px-6 py-6 max-w-7xl mx-auto w-full section-divider">
-        <motion.div
-          className="grid grid-cols-2 md:grid-cols-4 gap-3"
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          viewport={viewportConfig}
-        >
-          {LANDING.valueStrip.map((item, i) => {
-            const Icon = valueIcons[i];
-            return (
-              <div
-                key={i}
-                className="glass-card hover-elevate flex items-center gap-3 px-4 py-3.5 cursor-default"
-              >
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <Icon className="w-4 h-4 text-primary" />
-                </div>
-                <span className="text-sm font-semibold text-foreground leading-tight">{item.label}</span>
-              </div>
-            );
-          })}
-        </motion.div>
-      </section>
-
-      {/* ── PROBLEM ────────────────────────────── */}
-      <section className="px-4 sm:px-6 py-16 md:py-20 max-w-7xl mx-auto w-full section-divider">
-        <motion.div
-          className="space-y-10"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          viewport={viewportConfig}
-        >
-          <div className="text-center space-y-3 max-w-2xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold leading-tight">{LANDING.problem.title}</h2>
-            <p className="text-muted-foreground">{LANDING.problem.intro}</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-5">
-            {LANDING.problem.points.map((pt, i) => {
-              const Icon = problemIcons[i];
-              return (
-                <motion.div
-                  key={i}
-                  className="glass-card hover-elevate p-6 space-y-3"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: i * 0.1 }}
-                  viewport={viewportConfig}
-                >
-                  <div className="w-10 h-10 rounded-xl bg-accent/15 flex items-center justify-center">
-                    <Icon className="w-5 h-5 text-accent" />
-                  </div>
-                  <h3 className="font-bold text-base">{pt.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{pt.desc}</p>
-                </motion.div>
-              );
-            })}
-          </div>
-        </motion.div>
       </section>
 
       {/* ── INZET ──────────────────────────────── */}
@@ -728,27 +649,6 @@ export default function Home() {
             })}
           </div>
 
-          {/* Continuing value block */}
-          <motion.div
-            className="glass-card p-8 md:p-10 flex flex-col md:flex-row gap-8 items-start"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            viewport={viewportConfig}
-          >
-            <div className="flex-1 space-y-3">
-              <h3 className="text-xl font-bold">{LANDING.continuingValue.title}</h3>
-              <p className="text-muted-foreground leading-relaxed">{LANDING.continuingValue.body}</p>
-            </div>
-            <div className="flex-1 space-y-1">
-              {LANDING.continuingValue.bullets.map((b, i) => (
-                <div key={i} className="checklist-row">
-                  <BulletIcon />
-                  <span className="text-sm font-medium">{b}</span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
         </div>
       </section>
 
@@ -788,72 +688,6 @@ export default function Home() {
             })}
           </div>
         </motion.div>
-      </section>
-
-      {/* ── BENEFITS ───────────────────────────── */}
-      <section className="px-4 sm:px-6 py-16 md:py-24 max-w-7xl mx-auto w-full">
-        <div className="space-y-12">
-          <motion.div
-            className="text-center space-y-3 max-w-xl mx-auto"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            viewport={viewportConfig}
-          >
-            <SectionBadge>{LANDING.benefits.badge}</SectionBadge>
-            <h2 className="text-3xl md:text-4xl font-bold">{LANDING.benefits.title}</h2>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 gap-5">
-            {LANDING.benefits.items.map((item, i) => {
-              const Icon = benefitIcons[i];
-              return (
-                <motion.div
-                  key={i}
-                  className="glass-card hover-elevate p-5 flex items-start gap-4"
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: i * 0.08 }}
-                  viewport={viewportConfig}
-                >
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <Icon className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold mb-1">{item.title}</h3>
-                    <p className="text-sm text-muted-foreground">{item.description}</p>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
-
-          {/* Showcase / checklist block */}
-          <motion.div
-            className="glass-card pricing-glow p-8 md:p-10 grid md:grid-cols-2 gap-8 items-center"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={viewportConfig}
-          >
-            <div className="space-y-3">
-              <h3 className="text-2xl font-bold">{LANDING.benefits.showcase.title}</h3>
-              <p className="text-muted-foreground">{LANDING.benefits.showcase.subtitle}</p>
-              <Button className="btn-magnetic mt-2" onClick={() => setQuickScanOpen(true)}>
-                {LANDING.hero.ctaPrimary}
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </div>
-            <div className="space-y-1">
-              {LANDING.benefits.checklist.map((item, i) => (
-                <div key={i} className="checklist-row">
-                  <BulletIcon />
-                  <span className="text-sm font-medium">{item}</span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
       </section>
 
       {/* ── TRUST ──────────────────────────────── */}
