@@ -12,6 +12,8 @@ import AppDemoShowcase from "@/components/marketing/AppDemoShowcase";
 import { AuthModal } from "@/components/marketing/AuthModals";
 import { EmailCheckoutModal } from "@/components/marketing/EmailCheckoutModal";
 import QuickScanModal from "@/components/marketing/QuickScanModal";
+import { HeroAnimations } from "@/components/marketing/HeroAnimations";
+import { AnswerBlockAnimation } from "@/components/marketing/AnswerBlockAnimation";
 import { useMarketingAuth as useAuth } from "@/components/marketing/useMarketingAuth";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
@@ -384,68 +386,78 @@ export default function Home() {
       </AnimatePresence>
 
       {/* ── HERO ───────────────────────────────── */}
-      <section className="hero-gradient hero-shimmer px-4 sm:px-6 pt-20 pb-10 md:pt-28 md:pb-14 max-w-7xl mx-auto w-full">
-        <div className="text-center space-y-6 max-w-3xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent text-center mb-3">VOOR ZZP&apos;ERS</p>
-          </motion.div>
+      <section className="relative hero-gradient hero-shimmer px-4 sm:px-6 pt-20 pb-10 md:pt-28 md:pb-14 max-w-7xl mx-auto w-full">
+        <HeroAnimations />
+        <div
+          className="absolute inset-0 -z-10 overflow-hidden pointer-events-none"
+          data-hero-bg
+        >
+          <div className="absolute -top-1/2 left-1/2 -translate-x-1/2 w-[120%] h-[200%] bg-[radial-gradient(circle_at_center,_rgba(212,120,42,0.08),_transparent_60%)]" />
+        </div>
 
-          <motion.h1
-            className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight text-foreground"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
-            {LANDING.hero.title}{" "}
-            <span className="text-primary">{LANDING.hero.titleHighlight}</span>
-          </motion.h1>
+        <div className="grid md:grid-cols-[55fr_45fr] gap-12 items-center">
+          {/* Linker kolom: tekst + CTA's */}
+          <div className="text-center md:text-left space-y-6">
+            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-3">VOOR ZZP&apos;ERS</p>
 
-          <motion.p
-            className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            {LANDING.hero.subtitle}
-          </motion.p>
-
-          <motion.div
-            className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.35 }}
-          >
-            <Button
-              size="lg"
-              onClick={() => setQuickScanOpen(true)}
-              className="btn-magnetic min-w-[240px] bg-accent text-white hover:bg-accent/90 border-0"
+            <h1
+              data-hero-h1
+              className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight text-foreground"
             >
-              <Zap className="w-4 h-4 mr-2 flex-shrink-0" />
-              {LANDING.hero.ctaPrimary}
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              onClick={() => setEmailCheckoutPlan("one_time_dba")}
-              className="border-accent text-accent hover:bg-accent/8 hover:text-accent"
-            >
-              {LANDING.hero.ctaSecondary}
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-          </motion.div>
+              {LANDING.hero.title.split(" ").map((w, i) => (
+                <span key={`t${i}`} className="inline-block">{w}&nbsp;</span>
+              ))}
+              {LANDING.hero.titleHighlight.split(" ").map((w, i, arr) => (
+                <span key={`h${i}`} className="inline-block text-primary">
+                  {w}{i < arr.length - 1 ? " " : ""}
+                </span>
+              ))}
+            </h1>
 
-          <motion.p
-            className="text-sm text-muted-foreground/70 pt-1"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-          >
-            {LANDING.hero.supporting}
-          </motion.p>
+            <p
+              data-hero-subhead
+              className="text-lg md:text-xl text-muted-foreground max-w-2xl md:mx-0 mx-auto leading-relaxed"
+            >
+              {LANDING.hero.subtitle}
+            </p>
+
+            <div
+              data-hero-cta
+              className="flex flex-col sm:flex-row items-center md:justify-start justify-center gap-3 pt-2"
+            >
+              <Button
+                size="lg"
+                onClick={() => setQuickScanOpen(true)}
+                className="btn-magnetic min-w-[240px] bg-accent text-white hover:bg-accent/90 border-0"
+              >
+                <Zap className="w-4 h-4 mr-2 flex-shrink-0" />
+                {LANDING.hero.ctaPrimary}
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={() => setEmailCheckoutPlan("one_time_dba")}
+                className="border-accent text-accent hover:bg-accent/8 hover:text-accent"
+              >
+                {LANDING.hero.ctaSecondary}
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
+
+            <p className="text-sm text-muted-foreground/70 pt-1">
+              {LANDING.hero.supporting}
+            </p>
+          </div>
+
+          {/* Rechter kolom: productscreenshot */}
+          <div className="relative" data-hero-mockup>
+            <div className="absolute inset-0 -z-10 rounded-3xl bg-gradient-to-br from-accent/10 via-transparent to-primary/10 blur-3xl" />
+            <img
+              src="/hero/app-result.png"
+              alt="DBA Kompas resultaat-pagina met risicoscore"
+              className="w-full rounded-2xl shadow-2xl ring-1 ring-foreground/10"
+            />
+          </div>
         </div>
       </section>
 
@@ -462,9 +474,7 @@ export default function Home() {
           <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground">
             Wat is DBA Kompas?
           </h2>
-          <p className="mt-6 text-base md:text-lg leading-relaxed text-muted-foreground">
-            {ANSWER_BLOCK_TEXT}
-          </p>
+          <AnswerBlockAnimation text={ANSWER_BLOCK_TEXT} />
         </motion.div>
       </section>
 
