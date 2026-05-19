@@ -18,6 +18,8 @@ import { AnswerBlockAnimations } from "@/components/marketing/AnswerBlockAnimati
 import { InzetIllustration } from "@/components/marketing/InzetIllustration";
 import { InzetAnimations } from "@/components/marketing/InzetAnimations";
 import { HowItWorksCarousel } from "@/components/marketing/HowItWorksCarousel";
+import { NieuwsIllustration } from "@/components/marketing/news/NieuwsIllustration";
+import { NieuwsAnimations } from "@/components/marketing/news/NieuwsAnimations";
 import { CompassDecoration } from "@/components/marketing/CompassDecoration";
 import { AppDemoHero } from "@/components/marketing/AppDemoHero";
 import { useMarketingAuth as useAuth } from "@/components/marketing/useMarketingAuth";
@@ -787,6 +789,34 @@ export default function Home() {
             </div>
           </motion.div>
 
+        </div>
+      </section>
+
+      {/* ── NIEUWS / ALTIJD ACTUEEL ────────────── */}
+      <section className="relative px-4 sm:px-6 py-20 md:py-28 max-w-7xl mx-auto w-full overflow-hidden section-divider">
+        <NieuwsAnimations />
+        <div className="grid md:grid-cols-[6fr_5fr] gap-12 md:gap-16 items-center">
+          <div data-nieuws-text>
+            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">ALTIJD ACTUEEL</p>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-foreground mb-6">
+              <SplitWords text="Beweeg mee met de wet" dataAttr="data-nieuws-word" />
+            </h2>
+            <div className="space-y-4 text-base md:text-lg leading-relaxed text-muted-foreground">
+              <p>
+                <SplitWords
+                  text="De wetgeving rond zzp-werk verandert snel. Handhaving is hervat sinds 2025, de Zelfstandigenwet is in aantocht, en het rechtsvermoeden van werknemerschap staat op de agenda."
+                  dataAttr="data-nieuws-word-body"
+                />
+              </p>
+              <p>
+                <SplitWords
+                  text="DBA Kompas houdt de ontwikkelingen voor je bij en vertaalt ze naar wat het betekent voor jouw opdrachten. Met een abonnement krijg je relevante updates en blijft je analyse meebewegen met het kader."
+                  dataAttr="data-nieuws-word-body"
+                />
+              </p>
+            </div>
+          </div>
+          <NieuwsIllustration />
         </div>
       </section>
 
