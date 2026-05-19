@@ -693,7 +693,7 @@ export default function Home() {
           >
             <div className="flex justify-center md:justify-start">
               <img
-                src="/team/marvin-zoetemelk.png"
+                src="/team/marvin-zoetemelk.jpg"
                 alt="Marvin Zoetemelk"
                 className="w-full max-w-[280px] md:max-w-none md:w-[320px] rounded-2xl border border-white/10 object-cover"
               />

@@ -10,7 +10,6 @@ export const LANDING = {
   },
 
   hero: {
-    badge: "Voor zzp'ers die sterker het gesprek in willen",
     title: "Toets je zzp-opdracht",
     titleHighlight: "voordat je het gesprek aangaat",
     subtitle:
@@ -21,34 +20,7 @@ export const LANDING = {
     trustLine: "Van opdrachtomschrijving naar duidelijke aandachtspunten en gerichte vervolgstappen.",
   },
 
-  valueStrip: [
-    { label: "Sneller duidelijkheid" },
-    { label: "Minder losse interpretatie" },
-    { label: "Direct bruikbaar" },
-    { label: "Meer houvast in het gesprek" },
-  ],
-
-  problem: {
-    title: "Een onduidelijke opdrachtomschrijving kost tijd, vertrouwen en onderhandelingskracht",
-    intro: "Veel zzp'ers weten niet precies waar hun opdrachtomschrijving vragen oproept - totdat het te laat is.",
-    points: [
-      {
-        title: "Vertraging en extra uitleg",
-        desc: "Onduidelijkheid leidt tot onnodige herstelrondes en extra verduidelijkingen richting opdrachtgever of intermediair.",
-      },
-      {
-        title: "Zwakke onderhandelingspositie",
-        desc: "Zonder concreet houvast is het moeilijker om sterk en gericht het gesprek in te gaan.",
-      },
-      {
-        title: "Meer beoordeling, minder zekerheid",
-        desc: "Vage opdrachtomschrijvingen roepen vragen op en leiden tot extra discussie over de inrichting van de opdracht.",
-      },
-    ],
-  },
-
   appDemo: {
-    badge: "Live demo",
     title: "Bekijk de app in actie",
     subtitle: "Zo werkt het in de app.",
   },
@@ -79,7 +51,6 @@ export const LANDING = {
   },
 
   values: {
-    badge: "Dit levert DBA Kompas je direct op",
     subtitle: "Drie functies die direct helpen bij het beoordelen en verbeteren van je zzp-opdracht.",
     items: [
       {
@@ -97,16 +68,6 @@ export const LANDING = {
         description:
           "Volg relevante ontwikkelingen rond zzp-wetgeving, beleid en rechtspraak, zodat je sneller ziet wat invloed kan hebben op opdrachten.",
       },
-    ],
-  },
-
-  continuingValue: {
-    title: "Meer dan een eenmalige check",
-    body: "Een opdracht beoordelen is vaak niet het eindpunt. Daarom helpt DBA Kompas je ook om ontwikkelingen te volgen en eerdere analyses terug te zien.",
-    bullets: [
-      "Eerdere analyses terugzien",
-      "Relevante updates volgen",
-      "Meer context voor vervolggesprekken",
     ],
   },
 
@@ -129,46 +90,7 @@ export const LANDING = {
     ],
   },
 
-  benefits: {
-    badge: "Voordelen",
-    title: "Waarom DBA Kompas werkt in de praktijk",
-    items: [
-      {
-        title: "Bespaar tijd",
-        description:
-          "Je hoeft niet zelf alles uit je opdrachtomschrijving te halen.",
-      },
-      {
-        title: "Werk met meer houvast",
-        description:
-          "De analyse maakt sneller duidelijk waar aandacht nodig is.",
-      },
-      {
-        title: "Verbeter direct je tekst",
-        description:
-          "Niet alleen signalen, maar ook concrete vervolgstappen.",
-      },
-      {
-        title: "Blijf up-to-date",
-        description:
-          "Volg relevante ontwikkelingen op één centrale plek.",
-      },
-    ],
-    showcase: {
-      title: "Van twijfel naar duidelijker vertrekpunt",
-      subtitle: "Gebruik de uitkomst om scherper en beter voorbereid het gesprek in te gaan.",
-    },
-    checklist: [
-      "Risico-indicatie op je opdrachtomschrijving",
-      "Overzicht van aandachtspunten",
-      "Concrete verbeterpunten",
-      "Herschreven opdrachtbrief",
-      "Relevante zzp-updates",
-    ],
-  },
-
   trust: {
-    badge: "Heldere grenzen, duidelijke output",
     subtitle:
       "Geen grote claims, wel duidelijke uitleg over de werking en de grenzen van de dienst.",
     items: [
@@ -249,7 +171,6 @@ export const LANDING = {
   },
 
   faq: {
-    badge: "Veelgestelde vragen",
     items: [
       {
         question: "Wat is DBA Kompas?",

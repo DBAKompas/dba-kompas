@@ -447,7 +447,7 @@ export default function QuickScan() {
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <p className="font-bold text-base text-foreground leading-tight">Maandabonnement</p>
-                    <p className="text-sm text-muted-foreground mt-0.5">Flexibel opzegbaar, tot 20 checks per maand</p>
+                    <p className="text-sm text-muted-foreground mt-0.5">Flexibel opzegbaar, toegang tot alle DBA-checks</p>
                   </div>
                   <div className="text-right shrink-0">
                     <p className="text-2xl font-bold text-foreground">€20</p>
