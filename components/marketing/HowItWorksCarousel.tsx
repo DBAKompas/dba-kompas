@@ -1,32 +1,39 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ComponentType } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { InputView } from "./app-views/InputView";
+import { AnalyzingView } from "./app-views/AnalyzingView";
+import { ResultView } from "./app-views/ResultView";
 
-const STEPS = [
+type ViewComponent = ComponentType<{ active?: boolean }>;
+
+const STEPS: Array<{
+  number: string;
+  title: string;
+  description: string;
+  view: ViewComponent;
+}> = [
   {
     number: "01",
     title: "Plak of upload je opdracht",
     description: "Je opdrachtomschrijving of het document, direct in de app.",
-    image: "/how-it-works/step-1.jpg",
-    imageAlt: "DBA Kompas invoer-scherm met opdrachttekst en kernsignalen",
+    view: InputView,
   },
   {
     number: "02",
     title: "Bekijk je risico-indicatie",
     description: "De analyse laat per kernpunt zien waar aandacht nodig is.",
-    image: "/how-it-works/step-2.png",
-    imageAlt: "DBA Kompas analyse-loading-scherm",
+    view: AnalyzingView,
   },
   {
     number: "03",
     title: "Ga sterker het gesprek in",
     description: "Gebruik de aandachtspunten en de herschreven opdrachtbrief.",
-    image: "/how-it-works/step-3.jpg",
-    imageAlt: "DBA Kompas resultaat-scherm met risicoscore en domeinen",
+    view: ResultView,
   },
 ];
 
-const AUTOPLAY_MS = 5000;
+const AUTOPLAY_MS = 4500;
 const TICK_MS = 50;
 
 export function HowItWorksCarousel() {
@@ -41,9 +48,7 @@ export function HowItWorksCarousel() {
   }, []);
 
   useEffect(() => {
-    if (reduced || isPaused) {
-      return;
-    }
+    if (reduced || isPaused) return;
     let elapsed = 0;
     setProgress(0);
     const id = setInterval(() => {
@@ -62,6 +67,8 @@ export function HowItWorksCarousel() {
     setActiveIndex(i);
     setProgress(0);
   };
+
+  const ActiveView = STEPS[activeIndex].view;
 
   return (
     <div
@@ -126,20 +133,20 @@ export function HowItWorksCarousel() {
           })}
         </div>
 
-        {/* RECHTS: grote screenshot */}
+        {/* RECHTS: live view-component voor active step */}
         <div className="relative">
           <div className="relative aspect-[16/10] rounded-2xl overflow-hidden bg-card shadow-[0_30px_60px_-20px_rgba(0,0,0,0.25)] ring-1 ring-black/10">
             <AnimatePresence mode="wait">
-              <motion.img
+              <motion.div
                 key={activeIndex}
-                src={STEPS[activeIndex].image}
-                alt={STEPS[activeIndex].imageAlt}
-                className="absolute inset-0 w-full h-full object-cover"
+                className="absolute inset-0"
                 initial={{ opacity: 0, scale: 1.02 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.98 }}
                 transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-              />
+              >
+                <ActiveView active />
+              </motion.div>
             </AnimatePresence>
           </div>
         </div>
