@@ -8,7 +8,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import BrandLogo from "@/components/marketing/BrandLogo";
 import { Button } from "@/components/ui/button";
 import { LANDING } from "@/content/landing.nl";
-import AppDemoShowcase from "@/components/marketing/AppDemoShowcase";
 import { AuthModal } from "@/components/marketing/AuthModals";
 import { EmailCheckoutModal } from "@/components/marketing/EmailCheckoutModal";
 import QuickScanModal from "@/components/marketing/QuickScanModal";
@@ -603,34 +602,6 @@ export default function Home() {
         </div>
 
         <HowItWorksCarousel />
-      </section>
-
-      {/* ── DEMO ───────────────────────────────── */}
-      <section className="px-4 sm:px-6 py-16 md:py-24 max-w-7xl mx-auto w-full">
-        <div className="space-y-12">
-          <motion.div
-            className="text-center space-y-4 max-w-2xl mx-auto"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            viewport={viewportConfig}
-          >
-            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent text-center mb-3">LIVE DEMO</p>
-            <h2 className="text-3xl md:text-4xl font-bold">{LANDING.appDemo.title}</h2>
-            <p className="text-muted-foreground">{LANDING.appDemo.subtitle}</p>
-          </motion.div>
-
-          <motion.div
-            className="demo-glow-wrapper rounded-2xl overflow-hidden"
-            style={{ boxShadow: "0 0 0 1px hsl(217 44% 20% / 0.1), 0 16px 48px hsl(217 44% 20% / 0.12)" }}
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={viewportConfig}
-          >
-            <AppDemoShowcase onSubscribe={() => setQuickScanOpen(true)} />
-          </motion.div>
-        </div>
       </section>
 
       {/* ── CHATGPT BEZWAAR ────────────────────── */}
