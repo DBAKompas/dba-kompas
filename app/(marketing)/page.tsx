@@ -15,6 +15,7 @@ import QuickScanModal from "@/components/marketing/QuickScanModal";
 import { HeroAnimations } from "@/components/marketing/HeroAnimations";
 import { AnswerBlockAnimation } from "@/components/marketing/AnswerBlockAnimation";
 import { CompassDecoration } from "@/components/marketing/CompassDecoration";
+import { AppDemoHero } from "@/components/marketing/AppDemoHero";
 import { useMarketingAuth as useAuth } from "@/components/marketing/useMarketingAuth";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
@@ -142,6 +143,7 @@ export default function Home() {
   const [authModal, setAuthModal] = useState<"login" | null>(null);
   const [emailCheckoutPlan, setEmailCheckoutPlan] = useState<"monthly" | "yearly" | "one_time_dba" | null>(null);
   const [quickScanOpen, setQuickScanOpen] = useState(false);
+  const [mockupHovered, setMockupHovered] = useState(false);
 
   function scrollToPricing() {
     trackPricingViewed('landing')
@@ -452,29 +454,25 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Rechter kolom: laptop met productscreenshot + cards */}
+          {/* Rechter kolom: laptop met levende mini-app demo */}
           <div className="relative">
             {/* Soft glow achter laptop */}
             <div className="absolute inset-0 -z-10 rounded-3xl bg-gradient-to-br from-accent/10 via-transparent to-primary/10 blur-3xl" />
 
-            {/* Laptop-frame met screenshot */}
+            {/* Laptop-frame met live demo */}
             <div
               data-hero-mockup
-              className="relative z-10 cursor-zoom-in transition-transform duration-500 ease-out hover:scale-[1.06] hover:z-30"
+              onMouseEnter={() => setMockupHovered(true)}
+              onMouseLeave={() => setMockupHovered(false)}
+              className="relative z-10 cursor-zoom-in transition-transform duration-500 ease-out hover:scale-[1.08] hover:z-30"
             >
               {/* Body / bezel */}
               <div className="relative rounded-t-xl bg-gradient-to-b from-neutral-200 to-neutral-300 p-2 shadow-2xl ring-1 ring-foreground/10">
-                {/* Camera-stip bovenrand */}
                 <div className="absolute top-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-neutral-400" />
-                {/* Scherm */}
                 <div className="relative rounded-md overflow-hidden bg-card">
-                  <img
-                    src="/hero/app-result.png"
-                    alt="DBA Kompas resultaat-pagina met risicoscore"
-                    className="block w-full"
-                  />
-                  {/* LIVE-indicator (D) — binnen scherm */}
-                  <div className="absolute top-3 right-3 flex items-center gap-2 bg-card/90 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-lg border border-border/50 z-20">
+                  <AppDemoHero paused={mockupHovered} />
+                  {/* LIVE-indicator binnen scherm */}
+                  <div className="absolute top-3 right-3 flex items-center gap-2 bg-card/90 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-lg border border-border/50 z-30">
                     <span className="relative flex h-2.5 w-2.5">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                       <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
@@ -486,34 +484,6 @@ export default function Home() {
               {/* Hinge / base */}
               <div className="h-3 bg-gradient-to-b from-neutral-300 to-neutral-400 rounded-b-2xl shadow-lg" />
               <div className="h-2 bg-neutral-200 rounded-b-3xl mx-8 -mt-1" />
-            </div>
-
-            {/* Micro-statistiek cards naast de laptop */}
-            <div
-              data-hero-card-a
-              className="group-hover-pulse hidden md:block absolute -left-20 lg:-left-28 top-8 bg-card rounded-lg shadow-xl ring-1 ring-foreground/10 px-5 py-4 backdrop-blur-sm transition-transform duration-300 hover:scale-[1.04] hover:shadow-2xl z-20"
-            >
-              <p className="text-[11px] uppercase tracking-[0.08em] font-semibold text-muted-foreground mb-1">ANALYSE</p>
-              <p className="text-2xl font-bold text-foreground leading-none">23 sec</p>
-              <p className="text-xs text-muted-foreground mt-1">tot risico-indicatie</p>
-            </div>
-
-            <div
-              data-hero-card-b
-              className="group-hover-pulse hidden md:block absolute -right-16 lg:-right-24 top-1/2 -translate-y-1/2 bg-card rounded-lg shadow-xl ring-1 ring-foreground/10 px-5 py-4 backdrop-blur-sm transition-transform duration-300 hover:scale-[1.04] hover:shadow-2xl z-20"
-            >
-              <p className="text-[11px] uppercase tracking-[0.08em] font-semibold text-muted-foreground mb-1">UITKOMST</p>
-              <p className="text-2xl font-bold text-accent leading-none">Laag risico</p>
-              <p className="text-xs text-muted-foreground mt-1">88% indicatie</p>
-            </div>
-
-            <div
-              data-hero-card-c
-              className="group-hover-pulse hidden md:block absolute -left-16 lg:-left-20 -bottom-2 bg-card rounded-lg shadow-xl ring-1 ring-foreground/10 px-5 py-4 backdrop-blur-sm transition-transform duration-300 hover:scale-[1.04] hover:shadow-2xl z-20"
-            >
-              <p className="text-[11px] uppercase tracking-[0.08em] font-semibold text-muted-foreground mb-1">EXPORT</p>
-              <p className="text-2xl font-bold text-foreground leading-none">Word-document</p>
-              <p className="text-xs text-muted-foreground mt-1">herschreven opdrachtbrief</p>
             </div>
           </div>
         </div>

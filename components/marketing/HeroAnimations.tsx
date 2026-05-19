@@ -44,26 +44,6 @@ export function HeroAnimations() {
         delay: 0.4,
       });
 
-      // Entry: cards na mockup, één voor één
-      const cardsTl = gsap.timeline({ delay: 1.4 });
-      cardsTl
-        .from("[data-hero-card-a]", {
-          x: -30,
-          opacity: 0,
-          duration: 0.6,
-          ease: "power2.out",
-        })
-        .from(
-          "[data-hero-card-b]",
-          { x: 30, opacity: 0, duration: 0.6, ease: "power2.out" },
-          "-=0.3",
-        )
-        .from(
-          "[data-hero-card-c]",
-          { x: -30, opacity: 0, duration: 0.6, ease: "power2.out" },
-          "-=0.3",
-        );
-
       // Scroll-parallax mockup en achtergrond
       gsap.to("[data-hero-mockup]", {
         y: -50,
