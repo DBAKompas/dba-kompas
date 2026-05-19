@@ -14,7 +14,7 @@ export const LANDING = {
     title: "Toets je zzp-opdracht",
     titleHighlight: "voordat je het gesprek aangaat",
     subtitle:
-      "DBA Kompas helpt je om sneller te zien waar je opdracht vragen oproept. Je plakt je opdrachtomschrijving of uploadt een document en ontvangt een risico-indicatie, aandachtspunten en een herschreven opdrachtbrief.",
+      "Plak je opdracht of upload een document. Binnen een minuut zie je waar je opdracht vragen oproept, met concrete aandachtspunten en een herschreven opdrachtbrief.",
     supporting: "Ontdek in 1 minuut of jouw opdracht op belangrijke punten vragen oproept.",
     ctaPrimary: "Start je gratis zelfscan",
     ctaSecondary: "Toets je opdracht voor €9,95",
@@ -50,8 +50,7 @@ export const LANDING = {
   appDemo: {
     badge: "Live demo",
     title: "Bekijk de app in actie",
-    subtitle:
-      "Van opdrachtomschrijving naar risico-indicatie, aandachtspunten en een herschreven opdrachtbrief - overzichtelijk in één dashboard.",
+    subtitle: "Zo werkt het in de app.",
   },
 
   steps: {

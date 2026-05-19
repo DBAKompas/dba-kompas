@@ -27,17 +27,6 @@ const APP_URL = (process.env.NEXT_PUBLIC_APP_URL as string | undefined)?.replace
 // Sub-components
 // ─────────────────────────────────────────
 
-function SectionBadge({ children, withIcon }: { children: string; withIcon?: boolean }) {
-  return (
-    <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/8 text-primary text-sm font-semibold border border-primary/12">
-      {withIcon && (
-        <img src="/logo-icon-badge.png" alt="" className="h-4 w-auto object-contain" />
-      )}
-      {children}
-    </span>
-  );
-}
-
 function FaqItem({ question, answer }: { question: string; answer: string }) {
   const [open, setOpen] = useState(false);
   return (
@@ -301,14 +290,14 @@ export default function Home() {
       </AnimatePresence>
 
       {/* ── HERO ───────────────────────────────── */}
-      <section className="hero-gradient hero-shimmer px-4 sm:px-6 pt-20 pb-16 md:pt-28 md:pb-24 max-w-7xl mx-auto w-full">
+      <section className="hero-gradient hero-shimmer px-4 sm:px-6 pt-20 pb-10 md:pt-28 md:pb-14 max-w-7xl mx-auto w-full">
         <div className="text-center space-y-6 max-w-3xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <SectionBadge withIcon>{LANDING.hero.badge}</SectionBadge>
+            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent text-center mb-3">VOOR ZZP&apos;ERS</p>
           </motion.div>
 
           <motion.h1
@@ -369,12 +358,13 @@ export default function Home() {
       {/* ── INZET ──────────────────────────────── */}
       <section className="px-4 sm:px-6 py-16 md:py-20 max-w-7xl mx-auto w-full section-divider">
         <motion.div
-          className="max-w-2xl mx-auto space-y-5"
+          className="max-w-3xl mx-auto space-y-5 text-center"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           viewport={viewportConfig}
         >
+          <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent text-center mb-3">WAAROM HET ER NU TOE DOET</p>
           <h2 className="text-3xl md:text-4xl font-bold leading-tight">Je opdracht is je inkomen</h2>
           <p className="text-muted-foreground leading-relaxed">
             Als de manier waarop je opdracht is ingericht vragen oproept over zelfstandigheid, kan dat
@@ -400,6 +390,7 @@ export default function Home() {
           viewport={viewportConfig}
         >
           <div className="text-center space-y-3 max-w-xl mx-auto">
+            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent text-center mb-3">HOE HET WERKT</p>
             <h2 className="text-3xl md:text-4xl font-bold">{LANDING.steps.title}</h2>
             <p className="text-muted-foreground">{LANDING.steps.subtitle}</p>
           </div>
@@ -438,7 +429,7 @@ export default function Home() {
             transition={{ duration: 0.5 }}
             viewport={viewportConfig}
           >
-            <SectionBadge>{LANDING.appDemo.badge}</SectionBadge>
+            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent text-center mb-3">LIVE DEMO</p>
             <h2 className="text-3xl md:text-4xl font-bold">{LANDING.appDemo.title}</h2>
             <p className="text-muted-foreground">{LANDING.appDemo.subtitle}</p>
           </motion.div>
@@ -466,6 +457,7 @@ export default function Home() {
           viewport={viewportConfig}
         >
           <div className="text-center space-y-4 max-w-2xl mx-auto">
+            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent text-center mb-3">HET ECHTE VERSCHIL</p>
             <h2 className="text-3xl md:text-4xl font-bold leading-tight">Kan ChatGPT dit niet ook?</h2>
             <p className="text-muted-foreground leading-relaxed">
               Een eerlijke vraag. ChatGPT of Claude kunnen je inderdaad helpen nadenken over je
@@ -623,7 +615,7 @@ export default function Home() {
             transition={{ duration: 0.5 }}
             viewport={viewportConfig}
           >
-            <SectionBadge>{LANDING.values.badge}</SectionBadge>
+            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent text-center mb-3">WAT JE KRIJGT</p>
             <p className="text-muted-foreground">{LANDING.values.subtitle}</p>
           </motion.div>
 
@@ -662,6 +654,7 @@ export default function Home() {
           viewport={viewportConfig}
         >
           <div className="text-center space-y-3 max-w-xl mx-auto">
+            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent text-center mb-3">VOOR WIE</p>
             <h2 className="text-3xl md:text-4xl font-bold">{LANDING.audience.title}</h2>
             <p className="text-muted-foreground">{LANDING.audience.supporting}</p>
           </div>
@@ -699,6 +692,7 @@ export default function Home() {
           transition={{ duration: 0.5 }}
           viewport={viewportConfig}
         >
+          <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent text-center mb-3">DE REKENSOM</p>
           <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground">
             Wat kost een onduidelijke opdracht je echt?
           </h2>
@@ -811,7 +805,7 @@ export default function Home() {
           viewport={viewportConfig}
         >
           <div className="text-center space-y-3 max-w-xl mx-auto">
-            <SectionBadge>{LANDING.trust.badge}</SectionBadge>
+            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent text-center mb-3">HELDERE GRENZEN</p>
             <p className="text-muted-foreground">{LANDING.trust.subtitle}</p>
           </div>
 
@@ -849,7 +843,7 @@ export default function Home() {
           viewport={viewportConfig}
         >
           <div className="text-center space-y-3">
-            <SectionBadge>{LANDING.faq.badge}</SectionBadge>
+            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent text-center mb-3">VEELGESTELDE VRAGEN</p>
           </div>
 
           <div className="space-y-3">
@@ -880,6 +874,7 @@ export default function Home() {
           {/* shimmer overlay */}
           <div className="pointer-events-none absolute inset-0 cta-shimmer" />
           <img src="/logo-white-v3.png" alt="DBA Kompas" className="h-10 w-auto mx-auto relative z-10" />
+          <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent text-center mb-3 relative z-10">STARTEN</p>
           <h2 className="text-3xl md:text-4xl font-bold text-white relative z-10">{LANDING.cta.title}</h2>
           <p className="text-white/70 relative z-10">{LANDING.cta.subtitle}</p>
           <div className="flex justify-center pt-2 relative z-10">
