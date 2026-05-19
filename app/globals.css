@@ -210,7 +210,18 @@
     .animate-pulse {
       animation: none !important;
     }
+    .group-hover-pulse:hover {
+      animation: none !important;
+    }
   }
+}
+
+@keyframes soft-pulse {
+  0%, 100% { transform: scale(1.04); }
+  50% { transform: scale(1.06); }
+}
+.group-hover-pulse:hover {
+  animation: soft-pulse 1.5s ease-in-out infinite;
 }
 
 /* ─────────────────────────────────────────
