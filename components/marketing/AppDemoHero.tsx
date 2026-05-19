@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-type Phase = "input" | "analyzing" | "result";
+type Phase = "logo-intro" | "input" | "analyzing" | "result";
 
 const SAMPLE_TEXT =
   "IT-architect voor digitale transformatie. De opdrachtnemer werkt zelfstandig vanuit eigen kantoor, factureert per maand, gebruikt eigen apparatuur en heeft meerdere opdrachtgevers in 2026.";
@@ -31,6 +31,7 @@ const DOMAINS = [
 ];
 
 const TIMINGS: Record<Phase, number> = {
+  "logo-intro": 1800,
   input: 5000,
   analyzing: 3000,
   result: 5000,
@@ -43,28 +44,52 @@ const phaseTransition = {
   transition: { duration: 0.3 },
 };
 
-export function AppDemoHero({ paused = false }: { paused?: boolean }) {
-  const [phase, setPhase] = useState<Phase>("input");
+export function AppDemoHero({
+  paused = false,
+  startDelayMs = 0,
+}: {
+  paused?: boolean;
+  startDelayMs?: number;
+}) {
+  const [phase, setPhase] = useState<Phase>("logo-intro");
+  const [started, setStarted] = useState(false);
   const [reduced, setReduced] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     const r = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     setReduced(r);
-    if (r) setPhase("result");
-  }, []);
+    if (r) {
+      setPhase("result");
+      setStarted(true);
+      return;
+    }
+    const t = setTimeout(() => setStarted(true), startDelayMs);
+    return () => clearTimeout(t);
+  }, [startDelayMs]);
 
   useEffect(() => {
-    if (reduced || paused) return;
+    if (reduced || paused || !started) return;
     const next: Phase =
-      phase === "input" ? "analyzing" : phase === "analyzing" ? "result" : "input";
+      phase === "logo-intro"
+        ? "input"
+        : phase === "input"
+          ? "analyzing"
+          : phase === "analyzing"
+            ? "result"
+            : "input"; // result → input (logo-intro maar eerste keer)
     const t = setTimeout(() => setPhase(next), TIMINGS[phase]);
     return () => clearTimeout(t);
-  }, [phase, paused, reduced]);
+  }, [phase, paused, reduced, started]);
 
   return (
     <div className="relative w-full aspect-[16/10] bg-card overflow-hidden">
       <AnimatePresence mode="wait">
+        {phase === "logo-intro" && (
+          <motion.div key="logo-intro" {...phaseTransition} className="absolute inset-0">
+            <LogoIntroView />
+          </motion.div>
+        )}
         {phase === "input" && (
           <motion.div key="input" {...phaseTransition} className="absolute inset-0">
             <InputView />
@@ -81,6 +106,29 @@ export function AppDemoHero({ paused = false }: { paused?: boolean }) {
           </motion.div>
         )}
       </AnimatePresence>
+    </div>
+  );
+}
+
+function LogoIntroView() {
+  return (
+    <div className="h-full w-full bg-card flex flex-col items-center justify-center gap-3 p-6">
+      <motion.img
+        src="/logo-dark-v3.png"
+        alt="DBA Kompas"
+        className="h-10 md:h-12 w-auto"
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+      />
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+        className="text-xs md:text-sm text-muted-foreground"
+      >
+        Compliance hulpmiddel voor ZZP&apos;ers
+      </motion.p>
     </div>
   );
 }

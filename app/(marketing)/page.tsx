@@ -389,7 +389,7 @@ export default function Home() {
       </AnimatePresence>
 
       {/* ── HERO ───────────────────────────────── */}
-      <section className="relative hero-gradient hero-shimmer px-4 sm:px-6 pt-20 pb-10 md:pt-28 md:pb-14 max-w-7xl mx-auto w-full">
+      <section className="relative overflow-x-hidden hero-gradient hero-shimmer px-4 sm:px-6 pt-20 pb-10 md:pt-28 md:pb-14 max-w-7xl mx-auto w-full">
         <HeroAnimations />
         <div
           className="absolute inset-0 -z-10 overflow-hidden pointer-events-none"
@@ -400,7 +400,7 @@ export default function Home() {
         </div>
         <CompassDecoration />
 
-        <div className="grid md:grid-cols-2 gap-8 lg:gap-12 items-center">
+        <div className="grid md:grid-cols-[55fr_45fr] gap-8 lg:gap-12 items-center">
           {/* Linker kolom: tekst + CTA's */}
           <div className="text-center md:text-left space-y-6">
             <p data-hero-eyebrow className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-3">VOOR ZZP&apos;ERS</p>
@@ -455,35 +455,53 @@ export default function Home() {
           </div>
 
           {/* Rechter kolom: laptop met levende mini-app demo */}
-          <div className="relative">
+          <div className="relative w-full max-w-[560px] mx-auto md:mx-0 md:ml-auto">
             {/* Soft glow achter laptop */}
             <div className="absolute inset-0 -z-10 rounded-3xl bg-gradient-to-br from-accent/10 via-transparent to-primary/10 blur-3xl" />
 
-            {/* Laptop-frame met live demo */}
+            {/* 3D-perspective stage */}
             <div
               data-hero-mockup
+              data-laptop-stage
               onMouseEnter={() => setMockupHovered(true)}
               onMouseLeave={() => setMockupHovered(false)}
-              className="relative z-10 cursor-zoom-in transition-transform duration-500 ease-out hover:scale-[1.08] hover:z-30"
+              className="relative z-10 cursor-zoom-in transition-transform duration-500 ease-out hover:scale-[1.06] hover:z-30"
+              style={{ perspective: "1500px", perspectiveOrigin: "center 30%" }}
             >
-              {/* Body / bezel */}
-              <div className="relative rounded-t-xl bg-gradient-to-b from-neutral-200 to-neutral-300 p-2 shadow-2xl ring-1 ring-foreground/10">
-                <div className="absolute top-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-neutral-400" />
-                <div className="relative rounded-md overflow-hidden bg-card">
-                  <AppDemoHero paused={mockupHovered} />
-                  {/* LIVE-indicator binnen scherm */}
-                  <div className="absolute top-3 right-3 flex items-center gap-2 bg-card/90 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-lg border border-border/50 z-30">
-                    <span className="relative flex h-2.5 w-2.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                    </span>
-                    <span className="text-xs font-medium text-foreground">Live analyse</span>
+              {/* LID = klapdeel met scherm */}
+              <div
+                data-laptop-lid
+                className="relative"
+                style={{ transformStyle: "preserve-3d", transformOrigin: "bottom center" }}
+              >
+                <div className="relative bg-gradient-to-b from-[#e8e6e1] via-[#f5f3ee] to-[#e8e6e1] p-2.5 rounded-t-2xl shadow-[0_20px_50px_-15px_rgba(0,0,0,0.3)] ring-1 ring-black/10">
+                  {/* Camera-stip bovenrand */}
+                  <div className="absolute top-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-neutral-500/40" />
+                  {/* Scherm */}
+                  <div className="relative aspect-[16/10] overflow-hidden rounded-lg bg-card shadow-inner">
+                    <AppDemoHero paused={mockupHovered} startDelayMs={2200} />
+                    {/* Glas-reflectie overlay */}
+                    <div className="pointer-events-none absolute inset-0 rounded-lg bg-gradient-to-br from-white/10 via-transparent to-transparent" />
+                    {/* LIVE-indicator binnen scherm */}
+                    <div className="absolute top-3 right-3 flex items-center gap-2 bg-card/90 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-lg border border-border/50 z-30">
+                      <span className="relative flex h-2.5 w-2.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                      </span>
+                      <span className="text-xs font-medium text-foreground">Live analyse</span>
+                    </div>
                   </div>
                 </div>
               </div>
-              {/* Hinge / base */}
-              <div className="h-3 bg-gradient-to-b from-neutral-300 to-neutral-400 rounded-b-2xl shadow-lg" />
-              <div className="h-2 bg-neutral-200 rounded-b-3xl mx-8 -mt-1" />
+
+              {/* BASE = onderdeel laptop */}
+              <div data-laptop-base className="relative -mt-px">
+                <div className="h-2.5 bg-gradient-to-b from-[#d8d5cf] via-[#e8e6e1] to-[#d8d5cf] rounded-b-[18px] shadow-lg ring-1 ring-black/5" />
+                <div className="h-1.5 mx-12 bg-gradient-to-b from-[#e8e6e1] to-[#f5f3ee] rounded-b-3xl -mt-0.5 shadow-md" />
+              </div>
+
+              {/* Gerichte drop-shadow onder laptop */}
+              <div className="pointer-events-none absolute inset-x-8 -bottom-6 h-8 bg-foreground/15 blur-xl rounded-full" />
             </div>
           </div>
         </div>

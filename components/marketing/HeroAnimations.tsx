@@ -34,15 +34,27 @@ export function HeroAnimations() {
         delay: 0.7,
       });
 
-      // Entry: mockup vanuit rechts
-      gsap.from("[data-hero-mockup]", {
-        x: 100,
-        opacity: 0,
-        scale: 0.95,
-        duration: 1.2,
-        ease: "power3.out",
-        delay: 0.4,
-      });
+      // Entry: laptop vliegt in van rechts + lid klapt open (3D)
+      gsap.set("[data-laptop-stage]", { x: 150, opacity: 0 });
+      gsap.set("[data-laptop-lid]", { rotateX: -100 });
+
+      const laptopTl = gsap.timeline({ delay: 0.5 });
+      laptopTl
+        .to("[data-laptop-stage]", {
+          x: 0,
+          opacity: 1,
+          duration: 1,
+          ease: "power3.out",
+        })
+        .to(
+          "[data-laptop-lid]",
+          {
+            rotateX: 0,
+            duration: 1.2,
+            ease: "power2.out",
+          },
+          "-=0.3",
+        );
 
       // Scroll-parallax mockup en achtergrond
       gsap.to("[data-hero-mockup]", {
