@@ -616,7 +616,7 @@ export default function Home() {
             </h2>
             <p className="text-base md:text-lg leading-relaxed text-muted-foreground max-w-2xl mx-auto">
               <SplitWords
-                text="Een eerlijke vraag. ChatGPT en Claude zijn breed bruikbaar, maar voor het toetsen van een zzp-opdracht maken vijf dingen het verschil."
+                text="Een eerlijke vraag. ChatGPT en Claude zijn breed bruikbaar, maar voor het toetsen van een zzp-opdracht verschilt het op een aantal concrete punten."
                 dataAttr="data-chatgpt-word-body"
               />
             </p>
@@ -655,8 +655,18 @@ export default function Home() {
               {[
                 {
                   label: "Werkwijze",
-                  chatbot: "Vereist een goede prompt; het antwoord wisselt per vraag en gesprek.",
+                  chatbot: "Vereist een goede prompt; het antwoord wisselt per vraag.",
                   dba: "Plak je opdracht en krijg direct een gestructureerde analyse, geen prompting nodig.",
+                },
+                {
+                  label: "Bij missende informatie",
+                  chatbot: "Geeft antwoord ook als essentiele informatie ontbreekt; achteraf 'dat verandert de zaak'.",
+                  dba: "Stelt gericht door op de ingevoerde opdracht tot het beeld volledig is.",
+                },
+                {
+                  label: "Eerlijkheid van het oordeel",
+                  chatbot: "Bevestigt suggestieve vragen en geeft het antwoord dat je wilt horen.",
+                  dba: "Geeft eerlijk weer wanneer iets niet kan en levert gerichte feedback.",
                 },
                 {
                   label: "Beoordelingskader",
@@ -665,18 +675,18 @@ export default function Home() {
                 },
                 {
                   label: "Actualiteit wetgeving",
-                  chatbot: "Training-cutoff, weet niets van recente wetswijzigingen of jurisprudentie.",
+                  chatbot: "Weet er wat van, maar je moet zelf expliciet vragen om de nieuwste jurisprudentie mee te nemen.",
                   dba: "Doorlopend bijgewerkt met actuele wetgeving en jurisprudentie.",
                 },
                 {
-                  label: "Toepassing op jouw opdracht",
-                  chatbot: "Antwoord blijft theoretisch, geen koppeling met jouw eerdere analyses.",
-                  dba: "Nieuwe wet- en jurisprudentie wordt direct toegepast op jouw bewaarde opdrachten.",
+                  label: "Op de hoogte gehouden",
+                  chatbot: "Houdt je niet op de hoogte van nieuwe ontwikkelingen in het zzp-landschap.",
+                  dba: "Dagelijkse scan van het internet, push-berichten en mails bij relevante updates.",
                 },
                 {
                   label: "Output",
-                  chatbot: "Tekst in een chatvenster, weg zodra je sluit.",
-                  dba: "Word- en PDF-opdrachtbrief plus alle analyses altijd terugkijkbaar.",
+                  chatbot: "Antwoord in een chat, lastig terug te vinden.",
+                  dba: "Volledige analyse en herschreven opdrachtomschrijving, beschikbaar in PDF of Word in jouw account.",
                 },
               ].map((row, i) => (
                 <div
