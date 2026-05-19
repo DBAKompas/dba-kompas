@@ -79,12 +79,11 @@ export function InzetAnimations() {
         },
       );
 
-      // Scroll-driven parallax + fade-out per decoratie
+      // Y-parallax (sneller dan content) + idle x-floating per decoratie
       [1, 2, 3, 4, 5].forEach((i, idx) => {
         const speed = 1.2 + idx * 0.15;
         gsap.to(`[data-decor-${i}]`, {
           y: () => -(window.innerHeight * 0.4 * speed),
-          opacity: 0,
           ease: "none",
           scrollTrigger: {
             trigger: "[data-inzet-visual]",
@@ -92,6 +91,13 @@ export function InzetAnimations() {
             end: "bottom top",
             scrub: 1.2,
           },
+        });
+        gsap.to(`[data-decor-${i}]`, {
+          x: idx % 2 === 0 ? 8 : -6,
+          duration: 4 + idx * 0.6,
+          ease: "sine.inOut",
+          repeat: -1,
+          yoyo: true,
         });
       });
 
