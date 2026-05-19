@@ -23,17 +23,17 @@ const DOMAINS = [
 ];
 
 const TIMINGS: Record<Phase, number> = {
-  "logo-intro": 800,
-  input: 5000,
-  analyzing: 3000,
-  result: 5000,
+  "logo-intro": 700,
+  input: 3500,
+  analyzing: 2800,
+  result: 3500,
 };
 
 const ANALYZE_STEPS = [
-  { label: "Tekst geanalyseerd", duration: 600 },
-  { label: "DBA-criteria getoetst", duration: 600 },
-  { label: "Risico in kaart", duration: 600 },
-  { label: "Aanbevelingen", duration: 500 },
+  { label: "Tekst geanalyseerd", duration: 450 },
+  { label: "DBA-criteria getoetst", duration: 450 },
+  { label: "Risico in kaart", duration: 450 },
+  { label: "Aanbevelingen", duration: 450 },
   { label: "Rapport afgerond", duration: 400 },
 ];
 
@@ -138,15 +138,16 @@ function InputView() {
   const [showSignals, setShowSignals] = useState(false);
 
   useEffect(() => {
+    const limit = Math.min(SAMPLE_TEXT.length, 145);
     let i = 0;
     const id = setInterval(() => {
       i += 2;
-      setTyped(SAMPLE_TEXT.slice(0, i));
-      if (i >= SAMPLE_TEXT.length) {
+      setTyped(SAMPLE_TEXT.slice(0, Math.min(i, limit)));
+      if (i >= limit) {
         clearInterval(id);
       }
-    }, 30);
-    const t = setTimeout(() => setShowSignals(true), 2800);
+    }, 25);
+    const t = setTimeout(() => setShowSignals(true), 1800);
     return () => {
       clearInterval(id);
       clearTimeout(t);
@@ -202,7 +203,7 @@ function InputView() {
                   key={c}
                   initial={{ opacity: 0, y: 4 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 + i * 0.07, duration: 0.25 }}
+                  transition={{ delay: 0.2 + i * 0.05, duration: 0.2 }}
                   className="px-1.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-[9px] text-emerald-700"
                 >
                   ✓ {c}
@@ -265,10 +266,8 @@ function AnalyzingView() {
   }, []);
 
   return (
-    <div className="bg-primary text-primary-foreground h-full w-full flex flex-col items-center justify-center p-5">
-      <img src="/logo-white-v3.png" alt="DBA Kompas" className="h-5 md:h-6 mb-5" />
-
-      <div className="relative w-20 h-20 md:w-24 md:h-24 mb-4">
+    <div className="bg-primary text-primary-foreground h-full w-full flex flex-col items-center justify-center px-6 py-8">
+      <div className="relative w-20 h-20 md:w-24 md:h-24 mb-6">
         <img
           src="/logo-icon-badge.png"
           alt=""
@@ -281,7 +280,7 @@ function AnalyzingView() {
             r="45"
             fill="none"
             stroke="rgb(212, 120, 42)"
-            strokeWidth="2"
+            strokeWidth="2.5"
             strokeLinecap="round"
             strokeDasharray="283"
             className="animate-circle-breathe"
@@ -289,9 +288,9 @@ function AnalyzingView() {
         </svg>
       </div>
 
-      <h3 className="text-base md:text-lg font-bold mb-3">Analyseren...</h3>
+      <h3 className="text-base md:text-lg font-semibold mb-5 text-primary-foreground/90">Analyseren...</h3>
 
-      <div className="w-full max-w-[280px] space-y-2">
+      <div className="w-full max-w-[280px] space-y-2.5">
         {ANALYZE_STEPS.map((step, i) => (
           <StepRow key={step.label} label={step.label} progress={progress[i]} complete={done[i]} />
         ))}
@@ -313,29 +312,35 @@ function StepRow({
   const ringColor = complete ? "text-emerald-400" : "text-accent";
 
   return (
-    <div className="flex items-center gap-2">
-      <span className="text-[10px] text-primary-foreground/80 w-24 truncate text-right">{label}</span>
-      <div className="flex-1 h-1.5 bg-primary-foreground/15 rounded-full overflow-hidden">
+    <div className="flex items-center gap-2.5">
+      <span className="text-[11px] text-primary-foreground/70 w-[110px] truncate text-right tabular-nums">
+        {label}
+      </span>
+      <div className="flex-1 h-1 bg-primary-foreground/15 rounded-full overflow-hidden">
         <div
-          className={`h-full ${barColor} rounded-full transition-all duration-150 ease-linear`}
+          className={`h-full ${barColor} rounded-full transition-all duration-300 ease-out`}
           style={{ width: `${progress}%` }}
         />
       </div>
       <div className={`relative w-3.5 h-3.5 ${ringColor}`}>
         {complete ? (
-          <svg viewBox="0 0 20 20" className="w-full h-full">
-            <circle cx="10" cy="10" r="8" fill="currentColor" />
-            <path d="M6 10 L9 13 L14 7" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+          <svg viewBox="0 0 20 20" className="w-full h-full" fill="currentColor">
+            <circle cx="10" cy="10" r="8" />
           </svg>
         ) : progress > 0 ? (
-          <svg viewBox="0 0 20 20" fill="none" className="w-full h-full animate-spin">
+          <svg
+            viewBox="0 0 20 20"
+            fill="none"
+            className="w-full h-full animate-spin"
+            style={{ animationDuration: "1.2s" }}
+          >
             <circle
               cx="10"
               cy="10"
               r="7"
               stroke="currentColor"
               strokeWidth="2"
-              strokeDasharray="20 30"
+              strokeDasharray="22 28"
               strokeLinecap="round"
             />
           </svg>
@@ -356,7 +361,7 @@ function ResultView({ reduced }: { reduced: boolean }) {
     if (reduced) return;
     let raf = 0;
     const start = performance.now();
-    const dur = 1800;
+    const dur = 1200;
     const animate = (now: number) => {
       const p = Math.min((now - start) / dur, 1);
       const eased = 1 - Math.pow(1 - p, 3);
@@ -416,7 +421,7 @@ function ResultView({ reduced }: { reduced: boolean }) {
             key={d.label}
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: reduced ? 0 : 0.6 + i * 0.18, duration: 0.3 }}
+            transition={{ delay: reduced ? 0 : 0.4 + i * 0.15, duration: 0.3 }}
             className="rounded-md border border-emerald-200 p-2 bg-white"
           >
             <p className="text-sm font-bold text-emerald-700">{d.score}%</p>

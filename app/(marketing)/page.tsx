@@ -454,76 +454,63 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Rechter kolom: laptop met levende mini-app demo */}
-          <div className="relative w-full max-w-[560px] mx-auto md:mx-0 md:ml-auto">
-            {/* Soft glow achter laptop */}
+          {/* Rechter kolom: dual-sided screen met levende mini-app demo */}
+          <div className="relative w-full max-w-[640px] mx-auto md:mx-0 md:ml-auto">
+            {/* Soft glow achter scherm */}
             <div className="absolute inset-0 -z-10 rounded-3xl bg-gradient-to-br from-accent/10 via-transparent to-primary/10 blur-3xl" />
 
-            {/* 3D-perspective stage */}
+            {/* 3D stage */}
             <div
               data-hero-mockup
               data-laptop-stage
               onMouseEnter={() => setMockupHovered(true)}
               onMouseLeave={() => setMockupHovered(false)}
-              className="relative z-10"
-              style={{ perspective: "1500px", perspectiveOrigin: "center 30%" }}
+              className="relative z-10 w-full"
+              style={{ perspective: "1600px" }}
             >
-              {/* LID = klapdeel met scherm */}
+              {/* Flipper: dual-sided card */}
               <div
-                data-laptop-lid
-                className="relative"
-                style={{ transformStyle: "preserve-3d", transformOrigin: "bottom center" }}
+                data-screen-flipper
+                className="relative aspect-[16/10] w-full"
+                style={{ transformStyle: "preserve-3d" }}
               >
-                <div className="relative bg-gradient-to-b from-[#e8e6e1] via-[#f5f3ee] to-[#e8e6e1] p-2.5 rounded-t-2xl shadow-[0_20px_50px_-15px_rgba(0,0,0,0.3)] ring-1 ring-black/10">
-                  {/* Camera-stip bovenrand */}
-                  <div className="absolute top-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-neutral-500/40" />
-                  {/* Scherm */}
-                  <div className="relative aspect-[16/10] overflow-hidden rounded-lg bg-card shadow-inner">
-                    <AppDemoHero paused={mockupHovered} startDelayMs={1800} />
-                    {/* Glas-reflectie overlay */}
-                    <div className="pointer-events-none absolute inset-0 rounded-lg bg-gradient-to-br from-white/10 via-transparent to-transparent" />
-                    {/* LIVE-indicator binnen scherm */}
-                    <div className="absolute top-3 right-3 flex items-center gap-2 bg-card/90 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-lg border border-border/50 z-30">
-                      <span className="relative flex h-2.5 w-2.5">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                      </span>
-                      <span className="text-xs font-medium text-foreground">Live analyse</span>
-                    </div>
+                {/* VOORKANT: demo */}
+                <div
+                  className="absolute inset-0 rounded-2xl overflow-hidden bg-card shadow-[0_30px_60px_-20px_rgba(0,0,0,0.35)] ring-1 ring-black/10"
+                  style={{ backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden" }}
+                >
+                  <AppDemoHero paused={mockupHovered} startDelayMs={1700} />
+                  {/* Glas-reflectie overlay */}
+                  <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 via-transparent to-transparent" />
+                  {/* LIVE-indicator */}
+                  <div className="absolute top-3 right-3 flex items-center gap-2 bg-card/90 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-lg border border-border/50 z-30">
+                    <span className="relative flex h-2.5 w-2.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                    </span>
+                    <span className="text-xs font-medium text-foreground">Live analyse</span>
                   </div>
+                </div>
+
+                {/* ACHTERKANT: blanco met licht logo */}
+                <div
+                  className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#f5f3ee] via-[#ebe9e3] to-[#dcd9d2] shadow-[0_30px_60px_-20px_rgba(0,0,0,0.35)] ring-1 ring-black/10 flex items-center justify-center"
+                  style={{
+                    backfaceVisibility: "hidden",
+                    WebkitBackfaceVisibility: "hidden",
+                    transform: "rotateY(180deg)",
+                  }}
+                >
+                  <img
+                    src="/logo-dark-v3.png"
+                    alt=""
+                    className="w-1/3 max-w-[180px] opacity-[0.12]"
+                  />
                 </div>
               </div>
 
-              {/* BASE = onderdeel laptop met toetsenbord */}
-              <div data-laptop-base className="relative -mt-1">
-                {/* Hinge-strook bovenaan base */}
-                <div className="h-2 bg-gradient-to-b from-[#d4d2cd] to-[#c8c6c1] mx-4 rounded-t-sm shadow-md" />
-                {/* Keyboard-deck */}
-                <div className="relative bg-gradient-to-b from-[#e8e6e1] via-[#f5f3ee] to-[#dbd9d4] px-3 py-2.5 rounded-b-2xl shadow-[0_15px_30px_-10px_rgba(0,0,0,0.25)] ring-1 ring-black/10">
-                  {/* Keyboard grid: 4 rijen */}
-                  <div className="grid grid-cols-[repeat(14,_minmax(0,1fr))] gap-[3px] mb-[3px]">
-                    {Array.from({ length: 14 * 4 }).map((_, i) => (
-                      <div
-                        key={i}
-                        className="aspect-square bg-neutral-200/70 rounded-[3px] shadow-inner border border-neutral-300/40"
-                      />
-                    ))}
-                  </div>
-                  {/* Spacebar-rij */}
-                  <div className="grid grid-cols-[repeat(14,_minmax(0,1fr))] gap-[3px]">
-                    <div className="aspect-square bg-neutral-200/70 rounded-[3px] shadow-inner border border-neutral-300/40" />
-                    <div className="aspect-square bg-neutral-200/70 rounded-[3px] shadow-inner border border-neutral-300/40" />
-                    <div className="col-span-10 aspect-[10/1] bg-neutral-200/70 rounded-[3px] shadow-inner border border-neutral-300/40" />
-                    <div className="aspect-square bg-neutral-200/70 rounded-[3px] shadow-inner border border-neutral-300/40" />
-                    <div className="aspect-square bg-neutral-200/70 rounded-[3px] shadow-inner border border-neutral-300/40" />
-                  </div>
-                  {/* Trackpad */}
-                  <div className="mx-auto mt-2 h-1 w-24 bg-neutral-300/50 rounded-full" />
-                </div>
-              </div>
-
-              {/* Gerichte drop-shadow onder laptop */}
-              <div className="pointer-events-none absolute inset-x-8 -bottom-6 h-8 bg-foreground/15 blur-xl rounded-full" />
+              {/* Gerichte drop-shadow onder scherm */}
+              <div className="pointer-events-none absolute inset-x-12 -bottom-6 h-8 bg-foreground/15 blur-xl rounded-full" />
             </div>
           </div>
         </div>

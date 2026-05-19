@@ -34,39 +34,37 @@ export function HeroAnimations() {
         delay: 0.7,
       });
 
-      // Entry: laptop komt dicht (lid gevouwen) en roterend binnen,
-      // klapt tijdens binnenvliegen open
+      // Entry: scherm vliegt al draaiend in van rechts, eerst achterkant,
+      // draait naar voorkant tijdens binnenkomst
       gsap.set("[data-laptop-stage]", {
-        x: 180,
-        y: 40,
-        scale: 0.65,
-        rotateY: 35,
-        rotateZ: -8,
+        x: 220,
+        y: 30,
+        scale: 0.75,
         opacity: 0,
+      });
+      gsap.set("[data-screen-flipper]", {
+        rotateY: -200,
         transformOrigin: "center center",
       });
-      gsap.set("[data-laptop-lid]", { rotateX: -100 });
 
-      const laptopTl = gsap.timeline({ delay: 0.4 });
-      laptopTl
+      const flipTl = gsap.timeline({ delay: 0.4 });
+      flipTl
         .to("[data-laptop-stage]", {
           x: 0,
           y: 0,
           scale: 1,
-          rotateY: 0,
-          rotateZ: 0,
           opacity: 1,
-          duration: 1.4,
+          duration: 1.3,
           ease: "power3.out",
         })
         .to(
-          "[data-laptop-lid]",
+          "[data-screen-flipper]",
           {
-            rotateX: 0,
-            duration: 1.1,
+            rotateY: 0,
+            duration: 1.5,
             ease: "power2.out",
           },
-          "-=0.8",
+          "<",
         );
 
       // Scroll-parallax mockup en achtergrond
