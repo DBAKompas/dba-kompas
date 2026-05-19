@@ -19,6 +19,7 @@ import { InzetAnimations } from "@/components/marketing/InzetAnimations";
 import { HowItWorksCarousel } from "@/components/marketing/HowItWorksCarousel";
 import { NieuwsIllustration } from "@/components/marketing/news/NieuwsIllustration";
 import { NieuwsAnimations } from "@/components/marketing/news/NieuwsAnimations";
+import { ChatGptAnimations } from "@/components/marketing/ChatGptAnimations";
 import { CompassDecoration } from "@/components/marketing/CompassDecoration";
 import { AppDemoHero } from "@/components/marketing/AppDemoHero";
 import { useMarketingAuth as useAuth } from "@/components/marketing/useMarketingAuth";
@@ -606,37 +607,29 @@ export default function Home() {
 
       {/* ── CHATGPT BEZWAAR ────────────────────── */}
       <section className="px-4 sm:px-6 py-16 md:py-20 max-w-7xl mx-auto w-full section-divider">
-        <motion.div
-          className="space-y-10"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          viewport={viewportConfig}
-        >
+        <ChatGptAnimations />
+        <div className="space-y-10">
           <div className="text-center space-y-4 max-w-2xl mx-auto">
             <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent text-center mb-3">HET ECHTE VERSCHIL</p>
-            <h2 className="text-3xl md:text-4xl font-bold leading-tight">Kan ChatGPT dit niet ook?</h2>
+            <h2 className="text-3xl md:text-4xl font-bold leading-tight">
+              <SplitWords text="Kan ChatGPT dit niet ook?" dataAttr="data-chatgpt-word" />
+            </h2>
             <p className="text-muted-foreground leading-relaxed">
-              Een eerlijke vraag. ChatGPT of Claude kunnen je inderdaad helpen nadenken over je
-              opdracht, als je precies weet wat je moet vragen en hoe je het antwoord moet wegen.
-              DBA Kompas neemt dat werk uit handen.
+              <SplitWords
+                text="Een eerlijke vraag. ChatGPT of Claude kunnen je inderdaad helpen nadenken over je opdracht, als je precies weet wat je moet vragen en hoe je het antwoord moet wegen. DBA Kompas neemt dat werk uit handen."
+                dataAttr="data-chatgpt-word-body"
+              />
             </p>
             <p className="text-muted-foreground leading-relaxed">
-              Je hoeft het beoordelingskader niet te kennen en geen goede prompt te bedenken. Je
-              plakt je opdrachtomschrijving en krijgt elke keer dezelfde gestructureerde analyse,
-              plus een herschreven opdrachtbrief als werkdocument. Geen lap tekst in een
-              chatvenster, maar iets dat je direct meeneemt naar het gesprek.
+              <SplitWords
+                text="Je hoeft het beoordelingskader niet te kennen en geen goede prompt te bedenken. Je plakt je opdrachtomschrijving en krijgt elke keer dezelfde gestructureerde analyse, plus een herschreven opdrachtbrief als werkdocument. Geen lap tekst in een chatvenster, maar iets dat je direct meeneemt naar het gesprek."
+                dataAttr="data-chatgpt-word-body"
+              />
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-5">
-            <motion.div
-              className="glass-card p-6 space-y-3"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-              viewport={viewportConfig}
-            >
+          <div className="grid md:grid-cols-2 gap-5" data-chatgpt-grid>
+            <div data-chatgpt-col-left className="glass-card p-6 space-y-3">
               <h3 className="font-semibold text-muted-foreground">Met een algemene chatbot</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li className="leading-relaxed">Je bedenkt zelf de juiste vragen.</li>
@@ -644,15 +637,9 @@ export default function Home() {
                 <li className="leading-relaxed">Je houdt tekst in een chatvenster.</li>
                 <li className="leading-relaxed">Je analyse is weg zodra je het gesprek sluit.</li>
               </ul>
-            </motion.div>
+            </div>
 
-            <motion.div
-              className="glass-card p-6 space-y-3"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.1 }}
-              viewport={viewportConfig}
-            >
+            <div data-chatgpt-col-right className="glass-card p-6 space-y-3">
               <span className="block w-6 h-0.5 bg-primary/60" />
               <h3 className="font-semibold text-foreground">Met DBA Kompas</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
@@ -661,9 +648,9 @@ export default function Home() {
                 <li className="leading-relaxed">Een herschreven opdrachtbrief als werkdocument.</li>
                 <li className="leading-relaxed">Je analyses blijven bewaard terwijl je meebeweegt met de wet.</li>
               </ul>
-            </motion.div>
+            </div>
           </div>
-        </motion.div>
+        </div>
       </section>
 
       {/* ── METHODIEK & MAKER ──────────────────── */}

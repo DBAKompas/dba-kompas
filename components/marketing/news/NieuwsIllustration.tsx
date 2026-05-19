@@ -6,21 +6,21 @@ export function NieuwsIllustration() {
       {/* Decoraties achter */}
       <div
         data-nieuws-decor-1
-        className="absolute -top-4 -right-6 w-20 h-20 rounded-full bg-accent/20"
+        className="absolute -top-4 -right-6 w-20 h-20 rounded-full bg-accent/8 z-0"
       />
       <div
         data-nieuws-decor-2
-        className="absolute top-1/3 -left-10 w-28 h-28 rounded-full bg-primary/10 hidden md:block"
+        className="absolute top-1/3 -left-10 w-28 h-28 rounded-full bg-primary/5 hidden md:block z-0"
       />
       <div
         data-nieuws-decor-3
-        className="absolute bottom-8 -right-4 w-16 h-16 rounded-2xl bg-accent/25 rotate-12 hidden md:block"
+        className="absolute bottom-8 -right-4 w-16 h-16 rounded-2xl bg-accent/10 rotate-12 hidden md:block z-0"
       />
 
       {/* SVG hoofd-mockup */}
       <svg
         viewBox="0 0 600 700"
-        className="relative w-full h-full"
+        className="relative w-full h-full z-10"
         preserveAspectRatio="xMidYMid meet"
         xmlns="http://www.w3.org/2000/svg"
         aria-hidden="true"
@@ -94,11 +94,11 @@ export function NieuwsIllustration() {
       {/* Voor-decoraties */}
       <div
         data-nieuws-decor-4
-        className="absolute -bottom-6 left-8 w-10 h-10 rounded-full bg-accent"
+        className="absolute -bottom-6 left-8 w-10 h-10 rounded-full bg-accent/35 z-0"
       />
       <div
         data-nieuws-decor-5
-        className="absolute top-8 left-1/4 w-5 h-5 rounded-md bg-primary/80 rotate-45 hidden md:block"
+        className="absolute top-8 left-1/4 w-5 h-5 rounded-md bg-primary/25 rotate-45 hidden md:block z-0"
       />
     </div>
   );

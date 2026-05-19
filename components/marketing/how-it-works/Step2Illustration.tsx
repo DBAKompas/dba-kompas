@@ -24,11 +24,11 @@ export function Step2Illustration() {
       // Kompas entry
       gsap.from("[data-s2-compass]", { scale: 0.6, opacity: 0, transformOrigin: "400px 250px", duration: 0.8, ease: "power3.out" });
 
-      // Naald continu draaien
+      // Naald continu draaien rond kompas-center (SVG-coordinaten)
       gsap.to("[data-s2-needle]", {
         rotation: 360,
-        transformOrigin: "400px 250px",
-        duration: 9,
+        svgOrigin: "400 250",
+        duration: 12,
         ease: "none",
         repeat: -1,
       });

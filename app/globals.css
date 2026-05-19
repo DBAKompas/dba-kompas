@@ -266,7 +266,9 @@
   [data-nieuws-word], [data-nieuws-word-body],
   [data-nieuws-card-1], [data-nieuws-card-2], [data-nieuws-card-3],
   [data-nieuws-pulse],
-  [data-nieuws-decor-1], [data-nieuws-decor-2], [data-nieuws-decor-3], [data-nieuws-decor-4], [data-nieuws-decor-5] {
+  [data-nieuws-decor-1], [data-nieuws-decor-2], [data-nieuws-decor-3], [data-nieuws-decor-4], [data-nieuws-decor-5],
+  [data-chatgpt-word], [data-chatgpt-word-body],
+  [data-chatgpt-col-left], [data-chatgpt-col-right] {
     opacity: 1 !important;
     transform: none !important;
   }

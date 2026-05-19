@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, type ComponentType } from "react";
+import { useState, useEffect, useRef, type ComponentType } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Step1Illustration } from "./how-it-works/Step1Illustration";
 import { Step2Illustration } from "./how-it-works/Step2Illustration";
@@ -41,14 +41,35 @@ export function HowItWorksCarousel() {
   const [isPaused, setIsPaused] = useState(false);
   const [progress, setProgress] = useState(0);
   const [reduced, setReduced] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
+  const sectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     setReduced(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   }, []);
 
+  // Start autoplay pas wanneer sectie in view komt
   useEffect(() => {
-    if (reduced || isPaused) return;
+    if (hasStarted) return;
+    const node = sectionRef.current;
+    if (!node) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setActiveIndex(0);
+          setProgress(0);
+          setHasStarted(true);
+        }
+      },
+      { threshold: 0.3 },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [hasStarted]);
+
+  useEffect(() => {
+    if (reduced || isPaused || !hasStarted) return;
     let elapsed = 0;
     setProgress(0);
     const id = setInterval(() => {
@@ -61,7 +82,7 @@ export function HowItWorksCarousel() {
       }
     }, TICK_MS);
     return () => clearInterval(id);
-  }, [isPaused, activeIndex, reduced]);
+  }, [isPaused, activeIndex, reduced, hasStarted]);
 
   const handleSelect = (i: number) => {
     setActiveIndex(i);
@@ -72,6 +93,7 @@ export function HowItWorksCarousel() {
 
   return (
     <div
+      ref={sectionRef}
       className="relative"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}

@@ -6,21 +6,22 @@ export function InzetIllustration() {
       {/* Decoraties achter de illustratie */}
       <div
         data-decor-1
-        className="absolute -top-4 -left-8 w-20 h-20 rounded-full bg-accent/20"
+        className="absolute -top-4 -left-8 w-20 h-20 rounded-full bg-accent/8 z-0"
       />
       <div
         data-decor-2
-        className="absolute top-1/2 -right-12 w-32 h-32 rounded-full bg-primary/10 hidden md:block"
+        className="absolute top-1/2 -right-12 w-32 h-32 rounded-full bg-primary/5 hidden md:block z-0"
       />
       <div
         data-decor-3
-        className="absolute bottom-12 -left-4 w-16 h-16 rounded-2xl bg-accent/30 rotate-12 hidden md:block"
+        className="absolute bottom-12 -left-4 w-16 h-16 rounded-2xl bg-accent/12 rotate-12 hidden md:block z-0"
       />
 
       {/* Hoofd-SVG illustratie */}
       <svg
-        viewBox="0 0 400 500"
-        className="relative w-full h-full"
+        viewBox="-30 -30 460 530"
+        overflow="visible"
+        className="relative w-full h-full overflow-visible z-10"
         xmlns="http://www.w3.org/2000/svg"
         data-inzet-svg
       >
@@ -108,14 +109,14 @@ export function InzetIllustration() {
         </g>
       </svg>
 
-      {/* Decoraties vóór de illustratie */}
+      {/* Decoraties achter de illustratie (lager z-index dan SVG) */}
       <div
         data-decor-4
-        className="absolute -bottom-8 right-8 w-12 h-12 rounded-full bg-accent"
+        className="absolute -bottom-8 right-8 w-12 h-12 rounded-full bg-accent/40 z-0"
       />
       <div
         data-decor-5
-        className="absolute top-4 right-1/4 w-6 h-6 rounded-md bg-primary/80 rotate-45 hidden md:block"
+        className="absolute top-4 right-1/4 w-6 h-6 rounded-md bg-primary/25 rotate-45 hidden md:block z-0"
       />
     </div>
   );
