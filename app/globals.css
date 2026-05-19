@@ -205,6 +205,11 @@
     html {
       scroll-behavior: auto;
     }
+    .animate-ping,
+    .animate-spin,
+    .animate-pulse {
+      animation: none !important;
+    }
   }
 }
 

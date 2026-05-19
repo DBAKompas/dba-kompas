@@ -3,22 +3,25 @@ import { useEffect, useRef, useState } from "react";
 
 export function AnswerBlockAnimation({ text }: { text: string }) {
   const [displayed, setDisplayed] = useState("");
+  const [started, setStarted] = useState(false);
   const ref = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) {
       setDisplayed(text);
+      setStarted(true);
       return;
     }
 
-    let started = false;
+    let hasStarted = false;
     let interval: ReturnType<typeof setInterval> | null = null;
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && !started) {
-          started = true;
+        if (entries[0].isIntersecting && !hasStarted) {
+          hasStarted = true;
+          setStarted(true);
           let i = 0;
           interval = setInterval(() => {
             i += 3;
@@ -45,7 +48,10 @@ export function AnswerBlockAnimation({ text }: { text: string }) {
       ref={ref}
       className="mt-6 text-base md:text-lg leading-relaxed text-muted-foreground"
     >
-      {displayed || " "}
+      {displayed || " "}
+      {started && (
+        <span className="inline-block ml-[1px] w-[2px] h-[1em] align-middle bg-accent animate-pulse" />
+      )}
     </p>
   );
 }

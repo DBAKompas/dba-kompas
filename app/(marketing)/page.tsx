@@ -14,6 +14,8 @@ import { EmailCheckoutModal } from "@/components/marketing/EmailCheckoutModal";
 import QuickScanModal from "@/components/marketing/QuickScanModal";
 import { HeroAnimations } from "@/components/marketing/HeroAnimations";
 import { AnswerBlockAnimation } from "@/components/marketing/AnswerBlockAnimation";
+import { CompassDecoration } from "@/components/marketing/CompassDecoration";
+import { CheckCircle2, Shield, FileDown } from "lucide-react";
 import { useMarketingAuth as useAuth } from "@/components/marketing/useMarketingAuth";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
@@ -392,8 +394,10 @@ export default function Home() {
           className="absolute inset-0 -z-10 overflow-hidden pointer-events-none"
           data-hero-bg
         >
-          <div className="absolute -top-1/2 left-1/2 -translate-x-1/2 w-[120%] h-[200%] bg-[radial-gradient(circle_at_center,_rgba(212,120,42,0.08),_transparent_60%)]" />
+          <div className="bg-mesh-a absolute -top-1/2 left-1/2 -translate-x-1/2 w-[120%] h-[200%] bg-[radial-gradient(circle_at_30%_40%,_rgba(212,120,42,0.10),_transparent_60%)]" />
+          <div className="bg-mesh-b absolute top-1/3 left-1/2 -translate-x-1/2 w-[110%] h-[150%] bg-[radial-gradient(circle_at_70%_60%,_rgba(11,29,58,0.07),_transparent_55%)]" />
         </div>
+        <CompassDecoration />
 
         <div className="grid md:grid-cols-[55fr_45fr] gap-12 items-center">
           {/* Linker kolom: tekst + CTA's */}
@@ -457,6 +461,55 @@ export default function Home() {
               alt="DBA Kompas resultaat-pagina met risicoscore"
               className="w-full rounded-2xl shadow-2xl ring-1 ring-foreground/10"
             />
+
+            {/* LIVE-indicator (D) */}
+            <div className="absolute top-4 right-4 flex items-center gap-2 bg-card/90 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-lg border border-border/50 z-20">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+              </span>
+              <span className="text-xs font-medium text-foreground">Live analyse</span>
+            </div>
+
+            {/* Floating notification-cards (A) - alleen desktop */}
+            <div
+              data-hero-notif
+              className="hidden md:flex absolute -left-6 top-1/4 items-center gap-2.5 bg-card/90 backdrop-blur-sm shadow-xl border border-border/50 rounded-xl px-4 py-3 z-20"
+            >
+              <div className="w-8 h-8 rounded-full bg-emerald-500/15 flex items-center justify-center flex-shrink-0">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-foreground leading-tight">Analyse afgerond</p>
+                <p className="text-xs text-muted-foreground">in 23 seconden</p>
+              </div>
+            </div>
+
+            <div
+              data-hero-notif
+              className="hidden md:flex absolute -right-4 top-1/2 -translate-y-1/2 items-center gap-2.5 bg-card/90 backdrop-blur-sm shadow-xl border border-border/50 rounded-xl px-4 py-3 z-20"
+            >
+              <div className="w-8 h-8 rounded-full bg-accent/15 flex items-center justify-center flex-shrink-0">
+                <Shield className="w-4 h-4 text-accent" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-foreground leading-tight">Laag risico</p>
+                <p className="text-xs text-muted-foreground">88% indicatie</p>
+              </div>
+            </div>
+
+            <div
+              data-hero-notif
+              className="hidden md:flex absolute -left-4 bottom-8 items-center gap-2.5 bg-card/90 backdrop-blur-sm shadow-xl border border-border/50 rounded-xl px-4 py-3 z-20"
+            >
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <FileDown className="w-4 h-4 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-foreground leading-tight">PDF gegenereerd</p>
+                <p className="text-xs text-muted-foreground">opdrachtbrief.docx</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
