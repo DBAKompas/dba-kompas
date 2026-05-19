@@ -1,35 +1,35 @@
 "use client";
 import { useState, useEffect, type ComponentType } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { InputView } from "./app-views/InputView";
-import { AnalyzingView } from "./app-views/AnalyzingView";
-import { ResultView } from "./app-views/ResultView";
+import { Step1Illustration } from "./how-it-works/Step1Illustration";
+import { Step2Illustration } from "./how-it-works/Step2Illustration";
+import { Step3Illustration } from "./how-it-works/Step3Illustration";
 
-type ViewComponent = ComponentType<{ active?: boolean }>;
+type IllustrationComponent = ComponentType;
 
 const STEPS: Array<{
   number: string;
   title: string;
   description: string;
-  view: ViewComponent;
+  illustration: IllustrationComponent;
 }> = [
   {
     number: "01",
     title: "Plak of upload je opdracht",
     description: "Je opdrachtomschrijving of het document, direct in de app.",
-    view: InputView,
+    illustration: Step1Illustration,
   },
   {
     number: "02",
     title: "Bekijk je risico-indicatie",
     description: "De analyse laat per kernpunt zien waar aandacht nodig is.",
-    view: AnalyzingView,
+    illustration: Step2Illustration,
   },
   {
     number: "03",
     title: "Ga sterker het gesprek in",
     description: "Gebruik de aandachtspunten en de herschreven opdrachtbrief.",
-    view: ResultView,
+    illustration: Step3Illustration,
   },
 ];
 
@@ -68,7 +68,7 @@ export function HowItWorksCarousel() {
     setProgress(0);
   };
 
-  const ActiveView = STEPS[activeIndex].view;
+  const ActiveIllustration = STEPS[activeIndex].illustration;
 
   return (
     <div
@@ -133,9 +133,9 @@ export function HowItWorksCarousel() {
           })}
         </div>
 
-        {/* RECHTS: live view-component voor active step */}
+        {/* RECHTS: custom SVG-illustratie per stap */}
         <div className="relative">
-          <div className="relative aspect-[16/10] rounded-2xl overflow-hidden bg-card shadow-[0_30px_60px_-20px_rgba(0,0,0,0.25)] ring-1 ring-black/10">
+          <div className="relative aspect-[16/10] rounded-2xl overflow-hidden">
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeIndex}
@@ -145,7 +145,7 @@ export function HowItWorksCarousel() {
                 exit={{ opacity: 0, scale: 0.98 }}
                 transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
               >
-                <ActiveView active />
+                <ActiveIllustration />
               </motion.div>
             </AnimatePresence>
           </div>

@@ -252,9 +252,22 @@
   [data-decor-2],
   [data-decor-3],
   [data-decor-4],
-  [data-decor-5] {
+  [data-decor-5],
+  [data-s1-doc], [data-s1-arrow], [data-s1-line], [data-s1-cursor],
+  [data-s1-decor-1], [data-s1-decor-2], [data-s1-decor-3], [data-s1-decor-4],
+  [data-s2-compass], [data-s2-needle],
+  [data-s2-pulse-1], [data-s2-pulse-2], [data-s2-pulse-3],
+  [data-s2-point-1], [data-s2-point-2], [data-s2-point-3],
+  [data-s2-label-1], [data-s2-label-2], [data-s2-label-3],
+  [data-s2-decor-1], [data-s2-decor-2], [data-s2-decor-3],
+  [data-s3-doc], [data-s3-check], [data-s3-arrow],
+  [data-s3-highlight-1], [data-s3-highlight-2], [data-s3-highlight-3],
+  [data-s3-decor-1], [data-s3-decor-2], [data-s3-decor-3] {
     opacity: 1 !important;
     transform: none !important;
+  }
+  [data-s2-pulse-1], [data-s2-pulse-2], [data-s2-pulse-3] {
+    opacity: 0.25 !important;
   }
 }
 
