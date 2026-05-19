@@ -2,9 +2,7 @@
 
 import { useState, useEffect } from "react";
 import {
-  ArrowRight, LogOut, Zap, AlertTriangle, Edit3, Newspaper,
-  Users, Building2, Network, Shield, Lock, ChevronDown,
-  ClipboardList, Menu, X,
+  ArrowRight, LogOut, Zap, ChevronDown, Menu, X,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import BrandLogo from "@/components/marketing/BrandLogo";
@@ -99,9 +97,6 @@ export default function Home() {
     });
   }
 
-  const featureIcons = [ClipboardList, Edit3, Newspaper];
-  const audienceIcons = [Users, Building2, Network];
-  const trustIcons = [Shield, AlertTriangle, Lock];
 
   return (
     <div className="min-h-screen bg-background relative flex flex-col">
@@ -539,9 +534,10 @@ export default function Home() {
                   transition={{ duration: 0.4, delay: i * 0.1 }}
                   viewport={viewportConfig}
                 >
-                  <span className="block text-6xl md:text-7xl font-bold text-accent leading-none">{item.num}</span>
-                  <h3 className="text-xl font-semibold text-primary-foreground mt-3">{item.title}</h3>
-                  <p className="text-primary-foreground/70 mt-2">{item.desc}</p>
+                  <span className="block text-5xl md:text-6xl font-bold text-accent leading-none">{item.num}</span>
+                  <span className="block w-8 h-0.5 bg-accent/40 mt-1 mb-3 mx-auto md:mx-0" />
+                  <h3 className="text-lg md:text-xl font-semibold text-primary-foreground">{item.title}</h3>
+                  <p className="text-sm text-primary-foreground/70 mt-1">{item.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -620,25 +616,20 @@ export default function Home() {
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-5">
-            {LANDING.values.items.map((item, i) => {
-              const Icon = featureIcons[i];
-              return (
-                <motion.div
-                  key={i}
-                  className="glass-card hover-elevate p-6 space-y-3"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: i * 0.1 }}
-                  viewport={viewportConfig}
-                >
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <Icon className="w-5 h-5 text-primary" />
-                  </div>
-                  <h3 className="font-bold">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
-                </motion.div>
-              );
-            })}
+            {LANDING.values.items.map((item, i) => (
+              <motion.div
+                key={i}
+                className="glass-card hover-elevate p-6"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: i * 0.1 }}
+                viewport={viewportConfig}
+              >
+                <span className="block w-8 h-0.5 bg-accent mb-4" />
+                <h3 className="text-lg md:text-xl font-semibold text-foreground mb-2">{item.title}</h3>
+                <p className="text-base text-muted-foreground leading-relaxed">{item.description}</p>
+              </motion.div>
+            ))}
           </div>
 
         </div>
@@ -660,31 +651,26 @@ export default function Home() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-5">
-            {LANDING.audience.blocks.map((block, i) => {
-              const Icon = audienceIcons[i];
-              return (
-                <motion.div
-                  key={i}
-                  className="glass-card hover-elevate p-6 space-y-3"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: i * 0.1 }}
-                  viewport={viewportConfig}
-                >
-                  <div className="w-10 h-10 rounded-xl bg-secondary/15 flex items-center justify-center">
-                    <Icon className="w-5 h-5 text-secondary" />
-                  </div>
-                  <h3 className="font-bold">{block.heading}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{block.text}</p>
-                </motion.div>
-              );
-            })}
+            {LANDING.audience.blocks.map((block, i) => (
+              <motion.div
+                key={i}
+                className="glass-card hover-elevate p-6"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: i * 0.1 }}
+                viewport={viewportConfig}
+              >
+                <span className="block w-8 h-0.5 bg-accent mb-4" />
+                <h3 className="text-lg md:text-xl font-semibold text-foreground mb-2">{block.heading}</h3>
+                <p className="text-base text-muted-foreground leading-relaxed">{block.text}</p>
+              </motion.div>
+            ))}
           </div>
         </motion.div>
       </section>
 
       {/* ── PRIJS IN VERHOUDING ────────────────── */}
-      <section className="w-full py-16 md:py-20 bg-[#fcf8f4]">
+      <section className="w-full py-16 md:py-20 bg-[#faf0e6]">
         <motion.div
           className="max-w-3xl mx-auto px-4 sm:px-6 text-center"
           initial={{ opacity: 0, y: 20 }}
@@ -810,25 +796,20 @@ export default function Home() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-5">
-            {LANDING.trust.items.map((item, i) => {
-              const Icon = trustIcons[i];
-              return (
-                <motion.div
-                  key={i}
-                  className="glass-card p-6 space-y-3"
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: i * 0.1 }}
-                  viewport={viewportConfig}
-                >
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <Icon className="w-5 h-5 text-primary" />
-                  </div>
-                  <h3 className="font-bold">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
-                </motion.div>
-              );
-            })}
+            {LANDING.trust.items.map((item, i) => (
+              <motion.div
+                key={i}
+                className="glass-card p-6"
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: i * 0.1 }}
+                viewport={viewportConfig}
+              >
+                <span className="block w-8 h-0.5 bg-accent mb-4" />
+                <h3 className="text-lg md:text-xl font-semibold text-foreground mb-2">{item.title}</h3>
+                <p className="text-base text-muted-foreground leading-relaxed">{item.description}</p>
+              </motion.div>
+            ))}
           </div>
         </motion.div>
       </section>
