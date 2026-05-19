@@ -606,48 +606,119 @@ export default function Home() {
       </section>
 
       {/* ── CHATGPT BEZWAAR ────────────────────── */}
-      <section className="px-4 sm:px-6 py-16 md:py-20 max-w-7xl mx-auto w-full section-divider">
+      <section className="relative px-4 sm:px-6 py-16 md:py-20 max-w-7xl mx-auto w-full overflow-hidden section-divider">
         <ChatGptAnimations />
         <div className="space-y-10">
-          <div className="text-center space-y-4 max-w-2xl mx-auto">
+          <div className="text-center space-y-4 max-w-3xl mx-auto">
             <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent text-center mb-3">HET ECHTE VERSCHIL</p>
             <h2 className="text-3xl md:text-4xl font-bold leading-tight">
               <SplitWords text="Kan ChatGPT dit niet ook?" dataAttr="data-chatgpt-word" />
             </h2>
-            <p className="text-muted-foreground leading-relaxed">
+            <p className="text-base md:text-lg leading-relaxed text-muted-foreground max-w-2xl mx-auto">
               <SplitWords
-                text="Een eerlijke vraag. ChatGPT of Claude kunnen je inderdaad helpen nadenken over je opdracht, als je precies weet wat je moet vragen en hoe je het antwoord moet wegen. DBA Kompas neemt dat werk uit handen."
-                dataAttr="data-chatgpt-word-body"
-              />
-            </p>
-            <p className="text-muted-foreground leading-relaxed">
-              <SplitWords
-                text="Je hoeft het beoordelingskader niet te kennen en geen goede prompt te bedenken. Je plakt je opdrachtomschrijving en krijgt elke keer dezelfde gestructureerde analyse, plus een herschreven opdrachtbrief als werkdocument. Geen lap tekst in een chatvenster, maar iets dat je direct meeneemt naar het gesprek."
+                text="Een eerlijke vraag. ChatGPT en Claude zijn breed bruikbaar, maar voor het toetsen van een zzp-opdracht maken vijf dingen het verschil."
                 dataAttr="data-chatgpt-word-body"
               />
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-5" data-chatgpt-grid>
-            <div data-chatgpt-col-left className="glass-card p-6 space-y-3">
-              <h3 className="font-semibold text-muted-foreground">Met een algemene chatbot</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li className="leading-relaxed">Je bedenkt zelf de juiste vragen.</li>
-                <li className="leading-relaxed">Je krijgt per keer een ander antwoord.</li>
-                <li className="leading-relaxed">Je houdt tekst in een chatvenster.</li>
-                <li className="leading-relaxed">Je analyse is weg zodra je het gesprek sluit.</li>
-              </ul>
-            </div>
+          <div className="relative max-w-5xl mx-auto mt-12 md:mt-16" data-chatgpt-table-wrap>
+            {/* Decoraties achter de tabel */}
+            <div data-chatgpt-decor-1 className="absolute -top-6 -left-10 w-24 h-24 rounded-full bg-accent/8 z-0" />
+            <div data-chatgpt-decor-2 className="absolute -bottom-8 -right-6 w-32 h-32 rounded-full bg-primary/5 hidden md:block z-0" />
+            <div data-chatgpt-decor-3 className="absolute top-1/3 -right-8 w-12 h-12 rounded-2xl bg-accent/10 rotate-12 hidden md:block z-0" />
+            <div data-chatgpt-decor-4 className="absolute bottom-1/4 -left-6 w-8 h-8 rounded-full bg-accent/30 z-0" />
 
-            <div data-chatgpt-col-right className="glass-card p-6 space-y-3">
-              <span className="block w-6 h-0.5 bg-primary/60" />
-              <h3 className="font-semibold text-foreground">Met DBA Kompas</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li className="leading-relaxed">Een vast proces dat de juiste vragen al stelt.</li>
-                <li className="leading-relaxed">Elke opdracht op dezelfde manier beoordeeld.</li>
-                <li className="leading-relaxed">Een herschreven opdrachtbrief als werkdocument.</li>
-                <li className="leading-relaxed">Je analyses blijven bewaard terwijl je meebeweegt met de wet.</li>
-              </ul>
+            {/* Subtle accent-glow achter DBA-kolom */}
+            <div
+              data-chatgpt-glow
+              className="absolute top-0 bottom-0 right-0 w-2/5 bg-gradient-to-l from-accent/8 to-transparent rounded-r-2xl pointer-events-none z-0"
+            />
+
+            {/* Tabel */}
+            <div className="relative z-10 rounded-2xl border border-border/40 overflow-hidden bg-card shadow-lg" data-chatgpt-table>
+              {/* Header */}
+              <div
+                data-chatgpt-table-header
+                className="grid grid-cols-[1fr_1.3fr_1.3fr] border-b border-border/40 bg-muted/30"
+              >
+                <div className="px-3 py-3 md:px-5 md:py-4" />
+                <div className="px-3 py-3 md:px-5 md:py-4">
+                  <h3 className="font-semibold text-muted-foreground text-xs md:text-base">Met een algemene chatbot</h3>
+                </div>
+                <div className="px-3 py-3 md:px-5 md:py-4 border-l border-border/40 bg-accent/5">
+                  <h3 className="font-semibold text-foreground text-xs md:text-base">Met DBA Kompas</h3>
+                </div>
+              </div>
+
+              {/* Rijen */}
+              {[
+                {
+                  label: "Werkwijze",
+                  chatbot: "Vereist een goede prompt; het antwoord wisselt per vraag en gesprek.",
+                  dba: "Plak je opdracht en krijg direct een gestructureerde analyse, geen prompting nodig.",
+                },
+                {
+                  label: "Beoordelingskader",
+                  chatbot: "Algemene training, geen specifiek juridisch kader.",
+                  dba: "Negen Deliveroo-gezichtspunten van de Hoge Raad plus Wet DBA.",
+                },
+                {
+                  label: "Actualiteit wetgeving",
+                  chatbot: "Training-cutoff, weet niets van recente wetswijzigingen of jurisprudentie.",
+                  dba: "Doorlopend bijgewerkt met actuele wetgeving en jurisprudentie.",
+                },
+                {
+                  label: "Toepassing op jouw opdracht",
+                  chatbot: "Antwoord blijft theoretisch, geen koppeling met jouw eerdere analyses.",
+                  dba: "Nieuwe wet- en jurisprudentie wordt direct toegepast op jouw bewaarde opdrachten.",
+                },
+                {
+                  label: "Output",
+                  chatbot: "Tekst in een chatvenster, weg zodra je sluit.",
+                  dba: "Word- en PDF-opdrachtbrief plus alle analyses altijd terugkijkbaar.",
+                },
+              ].map((row, i) => (
+                <div
+                  key={i}
+                  data-chatgpt-row
+                  className="grid grid-cols-[1fr_1.3fr_1.3fr] border-b border-border/40 last:border-b-0"
+                >
+                  <div className="px-3 py-4 md:px-5 md:py-5 font-semibold text-foreground text-xs md:text-sm">
+                    <SplitWords text={row.label} dataAttr="data-chatgpt-cell-word" />
+                  </div>
+                  <div className="px-3 py-4 md:px-5 md:py-5 flex gap-2 items-start text-xs md:text-sm text-muted-foreground">
+                    <svg
+                      data-chatgpt-icon-cross
+                      className="w-4 h-4 flex-shrink-0 mt-0.5 text-muted-foreground/50"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      aria-hidden="true"
+                    >
+                      <circle cx="10" cy="10" r="8" stroke="currentColor" strokeWidth="1.5" />
+                      <line x1="6.5" y1="6.5" x2="13.5" y2="13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                      <line x1="13.5" y1="6.5" x2="6.5" y2="13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                    </svg>
+                    <span className="leading-relaxed">
+                      <SplitWords text={row.chatbot} dataAttr="data-chatgpt-cell-word" />
+                    </span>
+                  </div>
+                  <div className="px-3 py-4 md:px-5 md:py-5 flex gap-2 items-start text-xs md:text-sm text-foreground border-l border-border/40 bg-accent/5">
+                    <svg
+                      data-chatgpt-icon-check
+                      className="w-4 h-4 flex-shrink-0 mt-0.5 text-accent"
+                      viewBox="0 0 20 20"
+                      aria-hidden="true"
+                    >
+                      <circle cx="10" cy="10" r="8" fill="currentColor" />
+                      <path d="M6 10 L9 13 L14 7" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    <span className="leading-relaxed">
+                      <SplitWords text={row.dba} dataAttr="data-chatgpt-cell-word" />
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>

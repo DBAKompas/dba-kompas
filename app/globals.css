@@ -268,10 +268,16 @@
   [data-nieuws-pulse],
   [data-nieuws-decor-1], [data-nieuws-decor-2], [data-nieuws-decor-3], [data-nieuws-decor-4], [data-nieuws-decor-5],
   [data-chatgpt-word], [data-chatgpt-word-body],
-  [data-chatgpt-col-left], [data-chatgpt-col-right] {
+  [data-chatgpt-cell-word],
+  [data-chatgpt-icon-check], [data-chatgpt-icon-cross],
+  [data-chatgpt-table-header], [data-chatgpt-row],
+  [data-chatgpt-decor-1], [data-chatgpt-decor-2],
+  [data-chatgpt-decor-3], [data-chatgpt-decor-4],
+  [data-chatgpt-glow] {
     opacity: 1 !important;
     transform: none !important;
   }
+  [data-chatgpt-glow] { opacity: 0.4 !important; }
   [data-nieuws-card-2] { opacity: 0.85 !important; }
   [data-nieuws-card-3] { opacity: 0.7 !important; }
   [data-s2-pulse-1], [data-s2-pulse-2], [data-s2-pulse-3] {
