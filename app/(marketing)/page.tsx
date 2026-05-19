@@ -21,6 +21,76 @@ import { trackFaqOpened } from '@/lib/dba-analytics'
 
 const APP_URL = (process.env.NEXT_PUBLIC_APP_URL as string | undefined)?.replace(/\/+$/, "") || "https://app.dbakompas.nl";
 
+const ANSWER_BLOCK_TEXT =
+  "DBA Kompas is een online hulpmiddel voor zzp'ers in Nederland. Je voert je opdrachtomschrijving in en krijgt binnen ongeveer een minuut een indicatie van mogelijke aandachtspunten rond de Wet DBA, samen met een herschreven opdrachtbrief. De analyse volgt een vaste methodiek die wordt onderhouden op basis van de actuele wetgeving. De uitkomst is indicatief en ondersteunt je eigen beoordeling. Het is geen juridisch advies.";
+
+const SCHEMA_SOFTWARE_APPLICATION = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "DBA Kompas",
+  description:
+    "Online hulpmiddel voor zzp'ers in Nederland om hun opdrachtomschrijving te toetsen op mogelijke aandachtspunten rond de Wet DBA.",
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Web",
+  url: "https://dbakompas.nl",
+  offers: [
+    {
+      "@type": "Offer",
+      name: "Eenmalige check",
+      price: "9.95",
+      priceCurrency: "EUR",
+      description: "Voor één opdracht die nu speelt.",
+    },
+    {
+      "@type": "Offer",
+      name: "Maandelijks abonnement",
+      price: "20.00",
+      priceCurrency: "EUR",
+      description: "Voor wie regelmatig nieuwe opdrachten heeft.",
+      priceSpecification: {
+        "@type": "UnitPriceSpecification",
+        price: "20.00",
+        priceCurrency: "EUR",
+        billingDuration: "P1M",
+      },
+    },
+    {
+      "@type": "Offer",
+      name: "Jaarlijks abonnement",
+      price: "200.00",
+      priceCurrency: "EUR",
+      description: "Voor wie structureel als zelfstandige werkt.",
+      priceSpecification: {
+        "@type": "UnitPriceSpecification",
+        price: "200.00",
+        priceCurrency: "EUR",
+        billingDuration: "P1Y",
+      },
+    },
+  ],
+};
+
+const SCHEMA_ORGANIZATION = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "DBA Kompas",
+  url: "https://dbakompas.nl",
+  logo: "https://dbakompas.nl/logo-dark-v3.png",
+  email: "info@dbakompas.nl",
+  identifier: {
+    "@type": "PropertyValue",
+    propertyID: "KvK",
+    value: "99964538",
+  },
+  contactPoint: {
+    "@type": "ContactPoint",
+    email: "info@dbakompas.nl",
+    contactType: "customer service",
+    areaServed: "NL",
+    availableLanguage: "Dutch",
+  },
+};
+
 // ─────────────────────────────────────────
 // Sub-components
 // ─────────────────────────────────────────
@@ -98,8 +168,37 @@ export default function Home() {
   }
 
 
+  const faqPageSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "Wat is DBA Kompas?",
+        acceptedAnswer: { "@type": "Answer", text: ANSWER_BLOCK_TEXT },
+      },
+      ...LANDING.faq.items.map((item) => ({
+        "@type": "Question",
+        name: item.question,
+        acceptedAnswer: { "@type": "Answer", text: item.answer },
+      })),
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-background relative flex flex-col">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA_SOFTWARE_APPLICATION) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqPageSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA_ORGANIZATION) }}
+      />
 
       {/* ── HEADER ─────────────────────────────── */}
       <header
@@ -348,6 +447,25 @@ export default function Home() {
             {LANDING.hero.supporting}
           </motion.p>
         </div>
+      </section>
+
+      {/* ── ANSWER BLOCK ───────────────────────── */}
+      <section className="px-4 sm:px-6 py-16 md:py-20 max-w-3xl mx-auto w-full">
+        <motion.div
+          className="text-center"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          viewport={viewportConfig}
+        >
+          <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent text-center mb-3">ANTWOORD</p>
+          <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground">
+            Wat is DBA Kompas?
+          </h2>
+          <p className="mt-6 text-base md:text-lg leading-relaxed text-muted-foreground">
+            {ANSWER_BLOCK_TEXT}
+          </p>
+        </motion.div>
       </section>
 
       {/* ── INZET ──────────────────────────────── */}
