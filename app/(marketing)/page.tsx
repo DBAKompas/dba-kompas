@@ -690,41 +690,23 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* ── TRUST ──────────────────────────────── */}
-      <section className="px-4 sm:px-6 py-16 md:py-20 max-w-7xl mx-auto w-full section-divider">
+      {/* ── PRIJS IN VERHOUDING ────────────────── */}
+      <section className="w-full py-16 md:py-20 bg-[#fcf8f4]">
         <motion.div
-          className="space-y-10"
+          className="max-w-3xl mx-auto px-4 sm:px-6 text-center"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           viewport={viewportConfig}
         >
-          <div className="text-center space-y-3 max-w-xl mx-auto">
-            <SectionBadge>{LANDING.trust.badge}</SectionBadge>
-            <p className="text-muted-foreground">{LANDING.trust.subtitle}</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-5">
-            {LANDING.trust.items.map((item, i) => {
-              const Icon = trustIcons[i];
-              return (
-                <motion.div
-                  key={i}
-                  className="glass-card p-6 space-y-3"
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: i * 0.1 }}
-                  viewport={viewportConfig}
-                >
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <Icon className="w-5 h-5 text-primary" />
-                  </div>
-                  <h3 className="font-bold">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
-                </motion.div>
-              );
-            })}
-          </div>
+          <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground">
+            Wat kost een onduidelijke opdracht je echt?
+          </h2>
+          <p className="mt-6 max-w-2xl mx-auto text-base md:text-lg leading-relaxed text-muted-foreground">
+            Een jurist of fiscalist inschakelen kost al snel honderden euro's. Een opdracht die niet
+            wordt verlengd kost een veelvoud daarvan. Een toets met DBA Kompas kost €9,95, minder dan
+            een uur van je eigen tarief.
+          </p>
         </motion.div>
       </section>
 
@@ -817,6 +799,44 @@ export default function Home() {
 
           <p className="text-center text-xs text-muted-foreground/60">{LANDING.pricing.disclaimer}</p>
         </div>
+      </section>
+
+      {/* ── TRUST ──────────────────────────────── */}
+      <section className="px-4 sm:px-6 py-16 md:py-20 max-w-7xl mx-auto w-full section-divider">
+        <motion.div
+          className="space-y-10"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          viewport={viewportConfig}
+        >
+          <div className="text-center space-y-3 max-w-xl mx-auto">
+            <SectionBadge>{LANDING.trust.badge}</SectionBadge>
+            <p className="text-muted-foreground">{LANDING.trust.subtitle}</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-5">
+            {LANDING.trust.items.map((item, i) => {
+              const Icon = trustIcons[i];
+              return (
+                <motion.div
+                  key={i}
+                  className="glass-card p-6 space-y-3"
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: i * 0.1 }}
+                  viewport={viewportConfig}
+                >
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <Icon className="w-5 h-5 text-primary" />
+                  </div>
+                  <h3 className="font-bold">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
+                </motion.div>
+              );
+            })}
+          </div>
+        </motion.div>
       </section>
 
       {/* ── FAQ ────────────────────────────────── */}
