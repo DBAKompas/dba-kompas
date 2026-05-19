@@ -238,6 +238,12 @@
     opacity: 0.6;
     stroke-dashoffset: 70;
   }
+  [data-answer-word],
+  [data-answer-word-body],
+  [data-answer-stats] > div {
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
 
 /* ─────────────────────────────────────────

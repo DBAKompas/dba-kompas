@@ -13,7 +13,8 @@ import { AuthModal } from "@/components/marketing/AuthModals";
 import { EmailCheckoutModal } from "@/components/marketing/EmailCheckoutModal";
 import QuickScanModal from "@/components/marketing/QuickScanModal";
 import { HeroAnimations } from "@/components/marketing/HeroAnimations";
-import { AnswerBlockAnimation } from "@/components/marketing/AnswerBlockAnimation";
+import { SplitWords } from "@/components/marketing/SplitWords";
+import { AnswerBlockAnimations } from "@/components/marketing/AnswerBlockAnimations";
 import { CompassDecoration } from "@/components/marketing/CompassDecoration";
 import { AppDemoHero } from "@/components/marketing/AppDemoHero";
 import { useMarketingAuth as useAuth } from "@/components/marketing/useMarketingAuth";
@@ -517,20 +518,40 @@ export default function Home() {
       </section>
 
       {/* ── ANSWER BLOCK ───────────────────────── */}
-      <section className="px-4 sm:px-6 py-16 md:py-20 max-w-3xl mx-auto w-full">
-        <motion.div
-          className="text-center"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          viewport={viewportConfig}
-        >
-          <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent text-center mb-3">ANTWOORD</p>
-          <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground">
-            Wat is DBA Kompas?
-          </h2>
-          <AnswerBlockAnimation text={ANSWER_BLOCK_TEXT} />
-        </motion.div>
+      <section className="relative px-4 sm:px-6 py-20 md:py-28 max-w-7xl mx-auto w-full">
+        <AnswerBlockAnimations />
+        <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
+          {/* LINKS: tekst */}
+          <div data-answer-text>
+            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">ANTWOORD</p>
+            <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground mb-6">
+              <SplitWords text="Wat is DBA Kompas?" dataAttr="data-answer-word" />
+            </h2>
+            <p className="text-base md:text-lg leading-relaxed text-muted-foreground">
+              <SplitWords text={ANSWER_BLOCK_TEXT} dataAttr="data-answer-word-body" />
+            </p>
+          </div>
+
+          {/* RECHTS: 2x2 stat-grid */}
+          <div className="grid grid-cols-2 gap-4" data-answer-stats>
+            <div className="relative bg-[#faf0e6] rounded-2xl p-6 md:p-8 ring-1 ring-accent/15 overflow-hidden">
+              <p className="text-4xl md:text-5xl font-bold text-accent leading-none mb-3">60 sec</p>
+              <p className="text-sm text-foreground/80 font-medium">Doorlooptijd analyse</p>
+            </div>
+            <div className="relative bg-[#faf0e6] rounded-2xl p-6 md:p-8 ring-1 ring-accent/15 overflow-hidden">
+              <p className="text-4xl md:text-5xl font-bold text-accent leading-none mb-3">9</p>
+              <p className="text-sm text-foreground/80 font-medium">Deliveroo-criteria Hoge Raad</p>
+            </div>
+            <div className="relative bg-[#faf0e6] rounded-2xl p-6 md:p-8 ring-1 ring-accent/15 overflow-hidden">
+              <p className="text-4xl md:text-5xl font-bold text-accent leading-none mb-3">3</p>
+              <p className="text-sm text-foreground/80 font-medium">Kernpunten in elke analyse</p>
+            </div>
+            <div className="relative bg-[#faf0e6] rounded-2xl p-6 md:p-8 ring-1 ring-accent/15 overflow-hidden">
+              <p className="text-3xl md:text-4xl font-bold text-accent leading-none mb-3">Word + PDF</p>
+              <p className="text-sm text-foreground/80 font-medium">Herschreven opdrachtbrief</p>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* ── INZET ──────────────────────────────── */}
