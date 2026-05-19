@@ -16,14 +16,6 @@ const CHIPS = [
   "Resultaatsverbintenis",
 ];
 
-const STEPS = [
-  "Tekst wordt geanalyseerd",
-  "DBA-criteria worden getoetst",
-  "Risico-indicatoren in kaart",
-  "Aanbevelingen worden opgesteld",
-  "Rapport wordt afgerond",
-];
-
 const DOMAINS = [
   { label: "Aansturing & Gezag", score: 88 },
   { label: "Eigen Rekening & Risico", score: 88 },
@@ -31,11 +23,19 @@ const DOMAINS = [
 ];
 
 const TIMINGS: Record<Phase, number> = {
-  "logo-intro": 1800,
+  "logo-intro": 800,
   input: 5000,
   analyzing: 3000,
   result: 5000,
 };
+
+const ANALYZE_STEPS = [
+  { label: "Tekst geanalyseerd", duration: 600 },
+  { label: "DBA-criteria getoetst", duration: 600 },
+  { label: "Risico in kaart", duration: 600 },
+  { label: "Aanbevelingen", duration: 500 },
+  { label: "Rapport afgerond", duration: 400 },
+];
 
 const phaseTransition = {
   initial: { opacity: 0, scale: 1.02 },
@@ -112,19 +112,19 @@ export function AppDemoHero({
 
 function LogoIntroView() {
   return (
-    <div className="h-full w-full bg-card flex flex-col items-center justify-center gap-3 p-6">
+    <div className="h-full w-full bg-card flex flex-col items-center justify-center gap-2 p-6">
       <motion.img
         src="/logo-dark-v3.png"
         alt="DBA Kompas"
         className="h-10 md:h-12 w-auto"
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
       />
       <motion.p
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.3 }}
+        transition={{ duration: 0.2, delay: 0.15 }}
         className="text-xs md:text-sm text-muted-foreground"
       >
         Compliance hulpmiddel voor ZZP&apos;ers
@@ -223,38 +223,128 @@ function InputView() {
 }
 
 function AnalyzingView() {
-  const [done, setDone] = useState(0);
+  const [progress, setProgress] = useState<number[]>(() => ANALYZE_STEPS.map(() => 0));
+  const [done, setDone] = useState<boolean[]>(() => ANALYZE_STEPS.map(() => false));
 
   useEffect(() => {
-    const timings = [600, 1200, 1800, 2400, 2900];
-    const timers = timings.map((t, i) =>
-      setTimeout(() => setDone((d) => Math.max(d, i + 1)), t),
-    );
-    return () => timers.forEach(clearTimeout);
+    let cancelled = false;
+    let stepIndex = 0;
+
+    const runStep = () => {
+      if (cancelled || stepIndex >= ANALYZE_STEPS.length) return;
+      const idx = stepIndex;
+      const dur = ANALYZE_STEPS[idx].duration;
+      const start = performance.now();
+      const tick = (now: number) => {
+        if (cancelled) return;
+        const p = Math.min((now - start) / dur, 1);
+        setProgress((prev) => {
+          const next = [...prev];
+          next[idx] = Math.round(p * 100);
+          return next;
+        });
+        if (p < 1) {
+          requestAnimationFrame(tick);
+        } else {
+          setDone((prev) => {
+            const next = [...prev];
+            next[idx] = true;
+            return next;
+          });
+          stepIndex += 1;
+          runStep();
+        }
+      };
+      requestAnimationFrame(tick);
+    };
+
+    runStep();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return (
-    <div className="h-full w-full bg-primary text-primary-foreground p-4 flex flex-col items-center text-xs">
-      <p className="text-[9px] uppercase tracking-[0.08em] font-semibold text-accent self-start">DBA Kompas</p>
-      <div className="flex flex-col items-center gap-2 mt-3">
-        <div className="size-10 rounded-full border-[3px] border-accent border-t-transparent animate-spin" />
-        <p className="text-sm font-bold">Analyseren...</p>
+    <div className="bg-primary text-primary-foreground h-full w-full flex flex-col items-center justify-center p-5">
+      <img src="/logo-white-v3.png" alt="DBA Kompas" className="h-5 md:h-6 mb-5" />
+
+      <div className="relative w-20 h-20 md:w-24 md:h-24 mb-4">
+        <img
+          src="/logo-icon-badge.png"
+          alt=""
+          className="absolute inset-0 m-auto w-10 h-10 md:w-12 md:h-12 opacity-40"
+        />
+        <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 100 100">
+          <circle
+            cx="50"
+            cy="50"
+            r="45"
+            fill="none"
+            stroke="rgb(212, 120, 42)"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeDasharray="283"
+            className="animate-circle-breathe"
+          />
+        </svg>
       </div>
-      <div className="w-full space-y-1.5 mt-3 flex-1">
-        {STEPS.map((s, i) => (
-          <div key={i} className="flex items-center gap-2 text-[10px]">
-            <span
-              className={`size-3.5 rounded-full flex items-center justify-center text-[7px] font-bold transition-colors duration-300 ${
-                i < done ? "bg-accent text-white" : "border border-primary-foreground/30"
-              }`}
-            >
-              {i < done ? "✓" : ""}
-            </span>
-            <span className={i < done ? "text-primary-foreground" : "text-primary-foreground/60"}>{s}</span>
-          </div>
+
+      <h3 className="text-base md:text-lg font-bold mb-3">Analyseren...</h3>
+
+      <div className="w-full max-w-[280px] space-y-2">
+        {ANALYZE_STEPS.map((step, i) => (
+          <StepRow key={step.label} label={step.label} progress={progress[i]} complete={done[i]} />
         ))}
       </div>
-      <p className="text-[9px] text-primary-foreground/50 self-center">Gemiddeld 15-30 seconden</p>
+    </div>
+  );
+}
+
+function StepRow({
+  label,
+  progress,
+  complete,
+}: {
+  label: string;
+  progress: number;
+  complete: boolean;
+}) {
+  const barColor = complete ? "bg-emerald-400" : "bg-accent";
+  const ringColor = complete ? "text-emerald-400" : "text-accent";
+
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-[10px] text-primary-foreground/80 w-24 truncate text-right">{label}</span>
+      <div className="flex-1 h-1.5 bg-primary-foreground/15 rounded-full overflow-hidden">
+        <div
+          className={`h-full ${barColor} rounded-full transition-all duration-150 ease-linear`}
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+      <div className={`relative w-3.5 h-3.5 ${ringColor}`}>
+        {complete ? (
+          <svg viewBox="0 0 20 20" className="w-full h-full">
+            <circle cx="10" cy="10" r="8" fill="currentColor" />
+            <path d="M6 10 L9 13 L14 7" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        ) : progress > 0 ? (
+          <svg viewBox="0 0 20 20" fill="none" className="w-full h-full animate-spin">
+            <circle
+              cx="10"
+              cy="10"
+              r="7"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeDasharray="20 30"
+              strokeLinecap="round"
+            />
+          </svg>
+        ) : (
+          <svg viewBox="0 0 20 20" fill="none" className="w-full h-full opacity-30">
+            <circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="2" />
+          </svg>
+        )}
+      </div>
     </div>
   );
 }

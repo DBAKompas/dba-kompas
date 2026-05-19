@@ -224,6 +224,22 @@
   animation: soft-pulse 1.5s ease-in-out infinite;
 }
 
+@keyframes circle-breathe {
+  0%   { stroke-dashoffset: 283; opacity: 0.4; }
+  50%  { stroke-dashoffset: 0;   opacity: 1; }
+  100% { stroke-dashoffset: 283; opacity: 0.4; }
+}
+.animate-circle-breathe {
+  animation: circle-breathe 2.5s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-circle-breathe {
+    animation: none;
+    opacity: 0.6;
+    stroke-dashoffset: 70;
+  }
+}
+
 /* ─────────────────────────────────────────
    DBA Kompas — Premium landing classes
 ───────────────────────────────────────── */

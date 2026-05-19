@@ -465,7 +465,7 @@ export default function Home() {
               data-laptop-stage
               onMouseEnter={() => setMockupHovered(true)}
               onMouseLeave={() => setMockupHovered(false)}
-              className="relative z-10 cursor-zoom-in transition-transform duration-500 ease-out hover:scale-[1.06] hover:z-30"
+              className="relative z-10"
               style={{ perspective: "1500px", perspectiveOrigin: "center 30%" }}
             >
               {/* LID = klapdeel met scherm */}
@@ -479,7 +479,7 @@ export default function Home() {
                   <div className="absolute top-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-neutral-500/40" />
                   {/* Scherm */}
                   <div className="relative aspect-[16/10] overflow-hidden rounded-lg bg-card shadow-inner">
-                    <AppDemoHero paused={mockupHovered} startDelayMs={2200} />
+                    <AppDemoHero paused={mockupHovered} startDelayMs={1800} />
                     {/* Glas-reflectie overlay */}
                     <div className="pointer-events-none absolute inset-0 rounded-lg bg-gradient-to-br from-white/10 via-transparent to-transparent" />
                     {/* LIVE-indicator binnen scherm */}
@@ -494,10 +494,32 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* BASE = onderdeel laptop */}
-              <div data-laptop-base className="relative -mt-px">
-                <div className="h-2.5 bg-gradient-to-b from-[#d8d5cf] via-[#e8e6e1] to-[#d8d5cf] rounded-b-[18px] shadow-lg ring-1 ring-black/5" />
-                <div className="h-1.5 mx-12 bg-gradient-to-b from-[#e8e6e1] to-[#f5f3ee] rounded-b-3xl -mt-0.5 shadow-md" />
+              {/* BASE = onderdeel laptop met toetsenbord */}
+              <div data-laptop-base className="relative -mt-1">
+                {/* Hinge-strook bovenaan base */}
+                <div className="h-2 bg-gradient-to-b from-[#d4d2cd] to-[#c8c6c1] mx-4 rounded-t-sm shadow-md" />
+                {/* Keyboard-deck */}
+                <div className="relative bg-gradient-to-b from-[#e8e6e1] via-[#f5f3ee] to-[#dbd9d4] px-3 py-2.5 rounded-b-2xl shadow-[0_15px_30px_-10px_rgba(0,0,0,0.25)] ring-1 ring-black/10">
+                  {/* Keyboard grid: 4 rijen */}
+                  <div className="grid grid-cols-[repeat(14,_minmax(0,1fr))] gap-[3px] mb-[3px]">
+                    {Array.from({ length: 14 * 4 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className="aspect-square bg-neutral-200/70 rounded-[3px] shadow-inner border border-neutral-300/40"
+                      />
+                    ))}
+                  </div>
+                  {/* Spacebar-rij */}
+                  <div className="grid grid-cols-[repeat(14,_minmax(0,1fr))] gap-[3px]">
+                    <div className="aspect-square bg-neutral-200/70 rounded-[3px] shadow-inner border border-neutral-300/40" />
+                    <div className="aspect-square bg-neutral-200/70 rounded-[3px] shadow-inner border border-neutral-300/40" />
+                    <div className="col-span-10 aspect-[10/1] bg-neutral-200/70 rounded-[3px] shadow-inner border border-neutral-300/40" />
+                    <div className="aspect-square bg-neutral-200/70 rounded-[3px] shadow-inner border border-neutral-300/40" />
+                    <div className="aspect-square bg-neutral-200/70 rounded-[3px] shadow-inner border border-neutral-300/40" />
+                  </div>
+                  {/* Trackpad */}
+                  <div className="mx-auto mt-2 h-1 w-24 bg-neutral-300/50 rounded-full" />
+                </div>
               </div>
 
               {/* Gerichte drop-shadow onder laptop */}
