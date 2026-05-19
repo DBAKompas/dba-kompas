@@ -178,7 +178,7 @@ function HeroScreen({ active }: { active: boolean }) {
   useEffect(() => {
     if (!active) { setPhase(0); return; }
     const t1 = setTimeout(() => setPhase(1), 200);
-    const t2 = setTimeout(() => setPhase(2), prefersReduced ? 200 : 1800);
+    const t2 = setTimeout(() => setPhase(2), prefersReduced ? 200 : 600);
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, [active, prefersReduced]);
 
@@ -200,7 +200,7 @@ function HeroScreen({ active }: { active: boolean }) {
       {/* Tagline - altijd in DOM */}
       <motion.p
         animate={{ opacity: phase >= 2 ? 1 : 0 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
+        transition={{ duration: 0.5, delay: 0.05 }}
         className="text-white/80 text-base mb-6 mt-2 max-w-xs"
       >
         AI-analyse van jouw DBA-opdracht in 60 seconden
@@ -216,7 +216,7 @@ function HeroScreen({ active }: { active: boolean }) {
               opacity: phase >= 2 ? 1 : 0,
               y: phase >= 2 ? 0 : 8,
             }}
-            transition={{ delay: phase >= 2 ? 0.15 + 0.1 * i : 0, duration: 0.35 }}
+            transition={{ delay: phase >= 2 ? 0.075 + 0.05 * i : 0, duration: 0.35 }}
             className="text-sm font-medium rounded-full px-3 py-1"
             style={{ background: ORANGE, color: NAVY }}
           >
@@ -799,14 +799,6 @@ function CtaScreen({ active, onSubscribe }: { active: boolean; onSubscribe?: () 
         >
           Start je gratis zelfscan <ArrowRight className="w-4 h-4" />
         </motion.button>
-
-        <button
-          onClick={() => { window.location.href = `${APP_URL}#one-time`; }}
-          className="block w-full text-center text-white/60 text-xs hover:text-white transition-colors cursor-pointer"
-          aria-label="Eenmalige check"
-        >
-          Eenmalige check voor €9,95 - geen abonnement
-        </button>
 
       </motion.div>
     </div>
