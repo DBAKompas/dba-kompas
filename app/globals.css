@@ -240,7 +240,18 @@
   }
   [data-answer-word],
   [data-answer-word-body],
-  [data-answer-stats] > div {
+  [data-answer-stats] > div,
+  [data-inzet-word],
+  [data-inzet-word-body],
+  [data-inzet-svg],
+  [data-svg-loupe],
+  [data-svg-highlight-1],
+  [data-svg-highlight-2],
+  [data-decor-1],
+  [data-decor-2],
+  [data-decor-3],
+  [data-decor-4],
+  [data-decor-5] {
     opacity: 1 !important;
     transform: none !important;
   }

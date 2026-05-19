@@ -15,6 +15,8 @@ import QuickScanModal from "@/components/marketing/QuickScanModal";
 import { HeroAnimations } from "@/components/marketing/HeroAnimations";
 import { SplitWords } from "@/components/marketing/SplitWords";
 import { AnswerBlockAnimations } from "@/components/marketing/AnswerBlockAnimations";
+import { InzetIllustration } from "@/components/marketing/InzetIllustration";
+import { InzetAnimations } from "@/components/marketing/InzetAnimations";
 import { CompassDecoration } from "@/components/marketing/CompassDecoration";
 import { AppDemoHero } from "@/components/marketing/AppDemoHero";
 import { useMarketingAuth as useAuth } from "@/components/marketing/useMarketingAuth";
@@ -555,28 +557,36 @@ export default function Home() {
       </section>
 
       {/* ── INZET ──────────────────────────────── */}
-      <section className="px-4 sm:px-6 py-16 md:py-20 max-w-7xl mx-auto w-full section-divider">
-        <motion.div
-          className="max-w-3xl mx-auto space-y-5 text-center"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          viewport={viewportConfig}
-        >
-          <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent text-center mb-3">WAAROM HET ER NU TOE DOET</p>
-          <h2 className="text-3xl md:text-4xl font-bold leading-tight">Je opdracht is je inkomen</h2>
-          <p className="text-muted-foreground leading-relaxed">
-            Als de manier waarop je opdracht is ingericht vragen oproept over zelfstandigheid, kan dat
-            gevolgen hebben: een opdrachtgever die de opdracht wil herzien, een intermediair die om extra
-            stukken vraagt, of een opdracht die niet wordt verlengd. Sinds 2025 handhaaft de
-            Belastingdienst weer op schijnzelfstandigheid, en opdrachtgevers zijn daardoor voorzichtiger
-            geworden. Dat raakt jou direct.
-          </p>
-          <p className="text-muted-foreground leading-relaxed">
-            DBA Kompas laat je vooraf zien waar je opdrachtomschrijving die vragen oproept, zodat je niet
-            voor verrassingen komt te staan.
-          </p>
-        </motion.div>
+      <section className="relative px-4 sm:px-6 py-20 md:py-28 max-w-7xl mx-auto w-full overflow-hidden section-divider">
+        <InzetAnimations />
+        <div className="grid md:grid-cols-[6fr_5fr] gap-12 md:gap-16 items-center">
+          {/* LINKS: tekst */}
+          <div data-inzet-text>
+            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">WAAROM HET ER NU TOE DOET</p>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-foreground mb-6">
+              <SplitWords text="Je opdracht is je inkomen" dataAttr="data-inzet-word" />
+            </h2>
+            <div className="space-y-4 text-base md:text-lg leading-relaxed text-muted-foreground">
+              <p>
+                <SplitWords
+                  text="Als de manier waarop je opdracht is ingericht vragen oproept over zelfstandigheid, kan dat gevolgen hebben: een opdrachtgever die de opdracht wil herzien, een intermediair die om extra stukken vraagt, of een opdracht die niet wordt verlengd. Sinds 2025 handhaaft de Belastingdienst weer op schijnzelfstandigheid, en opdrachtgevers zijn daardoor voorzichtiger geworden. Dat raakt jou direct."
+                  dataAttr="data-inzet-word-body"
+                />
+              </p>
+              <p>
+                <SplitWords
+                  text="DBA Kompas laat je vooraf zien waar je opdrachtomschrijving die vragen oproept, zodat je niet voor verrassingen komt te staan."
+                  dataAttr="data-inzet-word-body"
+                />
+              </p>
+            </div>
+          </div>
+
+          {/* RECHTS: SVG-illustratie + decoraties */}
+          <div className="relative" data-inzet-visual>
+            <InzetIllustration />
+          </div>
+        </div>
       </section>
 
       {/* ── HOW IT WORKS ───────────────────────── */}
