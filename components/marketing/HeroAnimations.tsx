@@ -87,6 +87,21 @@ export function HeroAnimations() {
         },
       });
 
+      // HOW IT WORKS H2 word-stagger
+      gsap.set("[data-howitworks-word]", { opacity: 0, y: 12 });
+      gsap.to("[data-howitworks-word]", {
+        opacity: 1,
+        y: 0,
+        duration: 0.5,
+        stagger: 0.04,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: "[data-howitworks-word]",
+          start: "top 75%",
+          once: true,
+        },
+      });
+
       // Continu langzaam bewegende achtergrond-mesh
       gsap.to("[data-hero-bg] > div.bg-mesh-a", {
         xPercent: 8,

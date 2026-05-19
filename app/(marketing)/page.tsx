@@ -17,6 +17,7 @@ import { SplitWords } from "@/components/marketing/SplitWords";
 import { AnswerBlockAnimations } from "@/components/marketing/AnswerBlockAnimations";
 import { InzetIllustration } from "@/components/marketing/InzetIllustration";
 import { InzetAnimations } from "@/components/marketing/InzetAnimations";
+import { HowItWorksCarousel } from "@/components/marketing/HowItWorksCarousel";
 import { CompassDecoration } from "@/components/marketing/CompassDecoration";
 import { AppDemoHero } from "@/components/marketing/AppDemoHero";
 import { useMarketingAuth as useAuth } from "@/components/marketing/useMarketingAuth";
@@ -590,42 +591,16 @@ export default function Home() {
       </section>
 
       {/* ── HOW IT WORKS ───────────────────────── */}
-      <section className="px-4 sm:px-6 py-16 md:py-20 max-w-7xl mx-auto w-full section-divider">
-        <motion.div
-          className="space-y-12"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          viewport={viewportConfig}
-        >
-          <div className="text-center space-y-3 max-w-xl mx-auto">
-            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent text-center mb-3">HOE HET WERKT</p>
-            <h2 className="text-3xl md:text-4xl font-bold">{LANDING.steps.title}</h2>
-            <p className="text-muted-foreground">{LANDING.steps.subtitle}</p>
-          </div>
+      <section className="relative px-4 sm:px-6 py-20 md:py-28 max-w-7xl mx-auto w-full section-divider">
+        <div className="text-center mb-12 md:mb-16">
+          <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">HOE HET WERKT</p>
+          <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground mb-4">
+            <SplitWords text={LANDING.steps.title} dataAttr="data-howitworks-word" />
+          </h2>
+          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">{LANDING.steps.subtitle}</p>
+        </div>
 
-          <div className="grid md:grid-cols-3 gap-6 relative">
-            {/* connector line desktop */}
-            <div className="hidden md:block absolute top-9 left-[calc(16.67%+1.5rem)] right-[calc(16.67%+1.5rem)] h-px bg-gradient-to-r from-primary/20 via-primary/40 to-primary/20" />
-
-            {LANDING.steps.items.map((step, i) => (
-              <motion.div
-                key={i}
-                className="relative flex flex-col items-center text-center gap-4 p-6"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: i * 0.12 }}
-                viewport={viewportConfig}
-              >
-                <div className="w-14 h-14 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center text-xl font-extrabold shadow-md z-10">
-                  {step.step}
-                </div>
-                <h3 className="font-bold text-base">{step.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
+        <HowItWorksCarousel />
       </section>
 
       {/* ── DEMO ───────────────────────────────── */}
