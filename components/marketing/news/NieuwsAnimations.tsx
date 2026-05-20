@@ -4,25 +4,36 @@ import { useGsap } from "@/lib/animations/useGsap";
 export function NieuwsAnimations() {
   useGsap((gsap) => {
     const ctx = gsap.context(() => {
-      // Tekst word-stagger
-      gsap.set("[data-nieuws-word]", { opacity: 0, y: 12 });
-      gsap.set("[data-nieuws-word-body]", { opacity: 0, y: 8 });
-      gsap.to("[data-nieuws-word]", {
+      // Tekst word-stagger + bullets slide-in
+      gsap.set("[data-aa-word]", { opacity: 0, y: 12 });
+      gsap.set("[data-aa-word-body]", { opacity: 0, y: 8 });
+      gsap.set("[data-aa-bullet]", { opacity: 0, x: -20 });
+
+      gsap.to("[data-aa-word]", {
         opacity: 1,
         y: 0,
         duration: 0.5,
         stagger: 0.04,
         ease: "power2.out",
-        scrollTrigger: { trigger: "[data-nieuws-text]", start: "top 75%", once: true },
+        scrollTrigger: { trigger: "[data-aa-text]", start: "top 80%", once: true },
       });
-      gsap.to("[data-nieuws-word-body]", {
+      gsap.to("[data-aa-word-body]", {
         opacity: 1,
         y: 0,
         duration: 0.4,
         stagger: 0.012,
         ease: "power2.out",
         delay: 0.3,
-        scrollTrigger: { trigger: "[data-nieuws-text]", start: "top 75%", once: true },
+        scrollTrigger: { trigger: "[data-aa-text]", start: "top 80%", once: true },
+      });
+      gsap.to("[data-aa-bullet]", {
+        opacity: 1,
+        x: 0,
+        duration: 0.5,
+        stagger: 0.1,
+        ease: "power2.out",
+        delay: 0.6,
+        scrollTrigger: { trigger: "[data-aa-bullets]", start: "top 85%", once: true },
       });
 
       // Cards staggered van rechts

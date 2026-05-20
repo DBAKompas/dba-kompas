@@ -7,7 +7,6 @@ export function FeaturesAnimations() {
       gsap.set("[data-features-word]", { opacity: 0, y: 12 });
       gsap.set("[data-features-word-body]", { opacity: 0, y: 8 });
       gsap.set("[data-feature-card]", { opacity: 0, y: 30 });
-      gsap.set("[data-features-abo]", { opacity: 0, y: 30 });
 
       gsap.to("[data-features-word]", {
         opacity: 1,
@@ -35,24 +34,6 @@ export function FeaturesAnimations() {
         ease: "power3.out",
         delay: 0.4,
         scrollTrigger: { trigger: "[data-features-grid]", start: "top 90%", once: true },
-      });
-
-      gsap.to("[data-features-abo]", {
-        opacity: 1,
-        y: 0,
-        duration: 0.7,
-        ease: "power3.out",
-        scrollTrigger: { trigger: "[data-features-abo]", start: "top 90%", once: true },
-      });
-
-      gsap.to("[data-abo-pulse]", {
-        opacity: 0.1,
-        scale: 1.4,
-        transformOrigin: "center",
-        duration: 2,
-        ease: "sine.inOut",
-        repeat: -1,
-        yoyo: true,
       });
 
       // Force trigger evaluation against actual layout positions

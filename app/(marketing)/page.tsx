@@ -23,7 +23,6 @@ import { ChatGptAnimations } from "@/components/marketing/ChatGptAnimations";
 import { RisicoVisual } from "@/components/marketing/features/RisicoVisual";
 import { AandachtspuntenVisual } from "@/components/marketing/features/AandachtspuntenVisual";
 import { OpdrachtbriefVisual } from "@/components/marketing/features/OpdrachtbriefVisual";
-import { AbonnementVisual } from "@/components/marketing/features/AbonnementVisual";
 import { FeaturesAnimations } from "@/components/marketing/features/FeaturesAnimations";
 import { CompassDecoration } from "@/components/marketing/CompassDecoration";
 import { AppDemoHero } from "@/components/marketing/AppDemoHero";
@@ -836,30 +835,58 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── NIEUWS / ALTIJD ACTUEEL ────────────── */}
-      <section className="relative px-4 sm:px-6 py-20 md:py-28 max-w-7xl mx-auto w-full overflow-hidden section-divider">
+      {/* ── ALTIJD ACTUEEL (nieuws + abonnement combo) ── */}
+      <section
+        data-aa-section
+        className="relative px-4 sm:px-6 py-16 md:py-20 max-w-7xl mx-auto w-full overflow-hidden section-divider"
+      >
         <NieuwsAnimations />
-        <div className="grid md:grid-cols-[6fr_5fr] gap-12 md:gap-16 items-center">
-          <div data-nieuws-text>
+        <div className="grid md:grid-cols-[5fr_6fr] gap-10 md:gap-14 items-center">
+          <div data-aa-text>
             <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">ALTIJD ACTUEEL</p>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-foreground mb-6">
-              <SplitWords text="Beweeg mee met de wet" dataAttr="data-nieuws-word" />
+            <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground mb-5">
+              <SplitWords text="Beweeg mee met wet- en beleidsontwikkelingen" dataAttr="data-aa-word" />
             </h2>
-            <div className="space-y-4 text-base md:text-lg leading-relaxed text-muted-foreground">
-              <p>
-                <SplitWords
-                  text="De wetgeving rond zzp-werk verandert snel. Handhaving is hervat sinds 2025, de Zelfstandigenwet is in aantocht, en het rechtsvermoeden van werknemerschap staat op de agenda."
-                  dataAttr="data-nieuws-word-body"
-                />
-              </p>
-              <p>
-                <SplitWords
-                  text="DBA Kompas houdt de ontwikkelingen voor je bij en vertaalt ze naar wat het betekent voor jouw opdrachten. Met een abonnement krijg je relevante updates en blijft je analyse meebewegen met het kader."
-                  dataAttr="data-nieuws-word-body"
-                />
-              </p>
+            <p className="text-base leading-relaxed text-muted-foreground mb-7">
+              <SplitWords
+                text="De wetgeving en het beleid rond zzp-werk veranderen continu. DBA Kompas scant dagelijks het internet en houdt je op de hoogte van wat het betekent voor jouw opdrachten."
+                dataAttr="data-aa-word-body"
+              />
+            </p>
+
+            <div className="space-y-4" data-aa-bullets>
+              <div className="flex items-start gap-3" data-aa-bullet>
+                <span className="block w-6 h-0.5 bg-accent mt-3 flex-shrink-0" />
+                <div>
+                  <h4 className="text-sm md:text-base font-semibold text-foreground mb-1">Push en mail bij relevante updates</h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Direct op de hoogte als er iets verandert in wet, beleid of jurisprudentie.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3" data-aa-bullet>
+                <span className="block w-6 h-0.5 bg-accent mt-3 flex-shrink-0" />
+                <div>
+                  <h4 className="text-sm md:text-base font-semibold text-foreground mb-1">Analyses bewaard, vergelijkbaar in de tijd</h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Alle analyses op één plek, terug te halen in PDF of Word.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3" data-aa-bullet>
+                <span className="block w-6 h-0.5 bg-accent mt-3 flex-shrink-0" />
+                <div>
+                  <h4 className="text-sm md:text-base font-semibold text-foreground mb-1">Wijzigingen toegepast op jouw opdrachten</h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Bij relevante updates zie je automatisch wat het betekent voor opdrachten die je al hebt geanalyseerd.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
+
           <NieuwsIllustration />
         </div>
       </section>
@@ -916,20 +943,6 @@ export default function Home() {
           </div>
         </div>
 
-        <div data-features-abo className="relative bg-primary text-primary-foreground rounded-2xl p-6 md:p-8 overflow-hidden">
-          <div className="grid md:grid-cols-[3fr_2fr] gap-6 items-center">
-            <div>
-              <p className="text-[11px] uppercase tracking-[0.08em] font-semibold text-accent mb-3">MET EEN ABONNEMENT</p>
-              <h3 className="text-xl md:text-2xl font-bold mb-3">Blijf in beweging met de wet</h3>
-              <p className="text-sm md:text-base text-primary-foreground/80 leading-relaxed">
-                Ontvang updates bij relevante wetgevings-ontwikkelingen, bewaar al je analyses op één plek en zie automatisch wat veranderingen betekenen voor je opdrachten.
-              </p>
-            </div>
-            <div className="aspect-[10/3] md:aspect-auto md:h-full flex items-center justify-center">
-              <AbonnementVisual />
-            </div>
-          </div>
-        </div>
       </section>
 
       {/* ── AUDIENCE ───────────────────────────── */}
