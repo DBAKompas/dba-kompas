@@ -283,12 +283,17 @@
   [data-slot-decor-3], [data-slot-decor-4],
   [data-faq-word], [data-faq-item],
   [data-grenzen-word], [data-grenzen-word-body], [data-grenzen-card],
-  [data-indicatief-needle] {
+  [data-indicatief-needle],
+  [data-methodiek-circle], [data-methodiek-line-1], [data-methodiek-line-2],
+  [data-methodiek-block] h3, [data-methodiek-block] p {
     opacity: 1 !important;
     transform: none !important;
   }
   [data-chatgpt-glow] { opacity: 0.4 !important; }
   [data-slot-mesh] { opacity: 0.6 !important; }
+  [data-methodiek-line-1], [data-methodiek-line-2] {
+    stroke-dashoffset: 0 !important;
+  }
 }
 
 /* No-JS / GSAP-fail fallback: feature-cards en abo-card worden na 2s
@@ -302,14 +307,16 @@
 [data-feature-card],
 [data-features-abo],
 [data-faq-item],
-[data-grenzen-card] {
+[data-grenzen-card],
+[data-methodiek-circle] {
   animation: features-fallback-show 0.3s ease-out 2s forwards;
 }
 @media (prefers-reduced-motion: reduce) {
   [data-feature-card],
   [data-features-abo],
   [data-faq-item],
-  [data-grenzen-card] {
+  [data-grenzen-card],
+  [data-methodiek-circle] {
     animation: none;
     opacity: 1 !important;
     transform: none !important;

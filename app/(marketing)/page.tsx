@@ -20,6 +20,7 @@ import { HowItWorksCarousel } from "@/components/marketing/HowItWorksCarousel";
 import { NieuwsIllustration } from "@/components/marketing/news/NieuwsIllustration";
 import { NieuwsAnimations } from "@/components/marketing/news/NieuwsAnimations";
 import { ChatGptAnimations } from "@/components/marketing/ChatGptAnimations";
+import { MethodiekAnimations } from "@/components/marketing/MethodiekAnimations";
 import { SlotAnimations } from "@/components/marketing/SlotAnimations";
 import { FaqAccordion } from "@/components/marketing/faq/FaqAccordion";
 import { FaqAnimations } from "@/components/marketing/faq/FaqAnimations";
@@ -726,26 +727,52 @@ export default function Home() {
               Eén vaste methodiek, die meebeweegt met de wet
             </h2>
 
-            <div className="grid md:grid-cols-3 gap-8 mt-12">
-              {[
-                { num: "1", title: "Aansturing en gezag",      desc: "Wie bepaalt hoe en wanneer je werkt." },
-                { num: "2", title: "Eigen rekening en risico", desc: "Wie draagt het risico en de kosten." },
-                { num: "3", title: "Ondernemerschap",          desc: "Of je je als ondernemer gedraagt." },
-              ].map((item, i) => (
-                <motion.div
-                  key={i}
-                  className="text-center md:text-left"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: i * 0.1 }}
-                  viewport={viewportConfig}
-                >
-                  <span className="block text-5xl md:text-6xl font-bold text-accent leading-none">{item.num}</span>
-                  <span className="block w-8 h-0.5 bg-accent/40 mt-1 mb-3 mx-auto md:mx-0" />
-                  <h3 className="text-lg md:text-xl font-semibold text-primary-foreground">{item.title}</h3>
-                  <p className="text-sm text-primary-foreground/70 mt-1">{item.desc}</p>
-                </motion.div>
-              ))}
+            <div className="relative max-w-4xl mx-auto mt-12" data-methodiek-kernpunten>
+              <MethodiekAnimations />
+
+              {/* Verbindings-SVG: 2 segmenten tussen de 3 cirkels */}
+              <svg
+                className="absolute top-12 left-0 right-0 w-full h-1 pointer-events-none hidden md:block"
+                viewBox="0 0 1000 4"
+                preserveAspectRatio="none"
+                aria-hidden="true"
+              >
+                <line
+                  data-methodiek-line-1
+                  x1="200" y1="2" x2="500" y2="2"
+                  stroke="rgb(212, 120, 42)"
+                  strokeWidth="1.5"
+                  strokeDasharray="5 5"
+                  opacity="0.5"
+                />
+                <line
+                  data-methodiek-line-2
+                  x1="500" y1="2" x2="800" y2="2"
+                  stroke="rgb(212, 120, 42)"
+                  strokeWidth="1.5"
+                  strokeDasharray="5 5"
+                  opacity="0.5"
+                />
+              </svg>
+
+              <div className="grid md:grid-cols-3 gap-8 md:gap-10 relative">
+                {[
+                  { num: "1", title: "Aansturing en gezag", desc: "Wie bepaalt hoe en wanneer je werkt." },
+                  { num: "2", title: "Eigen rekening en risico", desc: "Wie draagt het risico en de kosten." },
+                  { num: "3", title: "Ondernemerschap", desc: "Of je je als ondernemer gedraagt." },
+                ].map((item, i) => (
+                  <div key={i} data-methodiek-block className="text-center group">
+                    <div
+                      data-methodiek-circle
+                      className="relative inline-flex items-center justify-center w-20 h-20 md:w-24 md:h-24 rounded-full bg-primary border-2 border-accent z-10 mx-auto mb-5 transition-transform duration-300 group-hover:scale-105"
+                    >
+                      <span className="text-3xl md:text-4xl font-bold text-accent">{item.num}</span>
+                    </div>
+                    <h3 className="text-lg md:text-xl font-semibold text-primary-foreground mb-2">{item.title}</h3>
+                    <p className="text-sm text-primary-foreground/70 leading-relaxed">{item.desc}</p>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="max-w-3xl mx-auto mt-12">
