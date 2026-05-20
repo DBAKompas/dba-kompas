@@ -275,11 +275,17 @@
   [data-chatgpt-decor-3], [data-chatgpt-decor-4],
   [data-chatgpt-glow],
   [data-features-word], [data-features-word-body],
-  [data-feature-card], [data-features-abo], [data-abo-pulse] {
+  [data-feature-card], [data-features-abo], [data-abo-pulse],
+  [data-slot-word], [data-slot-word-body],
+  [data-slot-cta-wrap], [data-slot-mesh] > div,
+  [data-slot-needle],
+  [data-slot-decor-1], [data-slot-decor-2],
+  [data-slot-decor-3], [data-slot-decor-4] {
     opacity: 1 !important;
     transform: none !important;
   }
   [data-chatgpt-glow] { opacity: 0.4 !important; }
+  [data-slot-mesh] { opacity: 0.6 !important; }
 }
 
 /* No-JS / GSAP-fail fallback: feature-cards en abo-card worden na 2s
