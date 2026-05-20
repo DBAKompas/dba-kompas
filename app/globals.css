@@ -280,7 +280,8 @@
   [data-slot-cta-wrap], [data-slot-mesh] > div,
   [data-slot-needle],
   [data-slot-decor-1], [data-slot-decor-2],
-  [data-slot-decor-3], [data-slot-decor-4] {
+  [data-slot-decor-3], [data-slot-decor-4],
+  [data-faq-word], [data-faq-item] {
     opacity: 1 !important;
     transform: none !important;
   }

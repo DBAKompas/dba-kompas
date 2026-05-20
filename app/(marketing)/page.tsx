@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import {
-  ArrowRight, LogOut, Zap, ChevronDown, Menu, X,
+  ArrowRight, LogOut, Zap, Menu, X,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import BrandLogo from "@/components/marketing/BrandLogo";
@@ -21,6 +21,8 @@ import { NieuwsIllustration } from "@/components/marketing/news/NieuwsIllustrati
 import { NieuwsAnimations } from "@/components/marketing/news/NieuwsAnimations";
 import { ChatGptAnimations } from "@/components/marketing/ChatGptAnimations";
 import { SlotAnimations } from "@/components/marketing/SlotAnimations";
+import { FaqAccordion } from "@/components/marketing/faq/FaqAccordion";
+import { FaqAnimations } from "@/components/marketing/faq/FaqAnimations";
 import { RisicoVisual } from "@/components/marketing/features/RisicoVisual";
 import { AandachtspuntenVisual } from "@/components/marketing/features/AandachtspuntenVisual";
 import { OpdrachtbriefVisual } from "@/components/marketing/features/OpdrachtbriefVisual";
@@ -32,7 +34,6 @@ import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { viewportConfig } from "@/lib/motion";
 import { trackLandingPageView, useScrollTracking } from '@/lib/dba-analytics'
-import { trackFaqOpened } from '@/lib/dba-analytics'
 
 const APP_URL = (process.env.NEXT_PUBLIC_APP_URL as string | undefined)?.replace(/\/+$/, "") || "https://app.dbakompas.nl";
 
@@ -109,40 +110,6 @@ const SCHEMA_ORGANIZATION = {
 // ─────────────────────────────────────────
 // Sub-components
 // ─────────────────────────────────────────
-
-function FaqItem({ question, answer }: { question: string; answer: string }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="border border-border/50 rounded-xl overflow-hidden">
-      <button
-        className="w-full flex items-center justify-between px-6 py-4 text-left font-semibold text-foreground hover:bg-primary/4 transition-colors"
-        onClick={() => {
-          if (!open) trackFaqOpened(question, 'landing')
-          setOpen(!open)
-        }}
-      >
-        <span>{question}</span>
-        <ChevronDown
-          className={`w-5 h-5 text-muted-foreground flex-shrink-0 ml-4 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
-        />
-      </button>
-      <AnimatePresence initial={false}>
-        {open && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <div className="px-6 pb-5 text-muted-foreground leading-relaxed border-t border-border/30 pt-4">
-              {answer}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
 
 // ─────────────────────────────────────────
 // Page
@@ -1126,32 +1093,16 @@ export default function Home() {
       </section>
 
       {/* ── FAQ ────────────────────────────────── */}
-      <section id="faq" className="px-4 sm:px-6 py-16 md:py-20 max-w-4xl mx-auto w-full section-divider">
-        <motion.div
-          className="space-y-8"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          viewport={viewportConfig}
-        >
-          <div className="text-center space-y-3">
-            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent text-center mb-3">VEELGESTELDE VRAGEN</p>
-          </div>
+      <section id="faq" className="relative px-4 sm:px-6 py-20 md:py-28 max-w-7xl mx-auto w-full section-divider">
+        <FaqAnimations />
+        <div className="text-center mb-12 md:mb-16">
+          <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">VEELGESTELDE VRAGEN</p>
+          <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground">
+            <SplitWords text="Heldere antwoorden op de meest gestelde vragen" dataAttr="data-faq-word" />
+          </h2>
+        </div>
 
-          <div className="space-y-3">
-            {LANDING.faq.items.map((item, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: i * 0.05 }}
-                viewport={viewportConfig}
-              >
-                <FaqItem question={item.question} answer={item.answer} />
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
+        <FaqAccordion items={LANDING.faq.items} />
       </section>
 
       {/* ── BOTTOM CTA (SLOT) ──────────────────── */}
