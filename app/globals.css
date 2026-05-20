@@ -298,12 +298,14 @@
   }
 }
 [data-feature-card],
-[data-features-abo] {
+[data-features-abo],
+[data-faq-item] {
   animation: features-fallback-show 0.3s ease-out 2s forwards;
 }
 @media (prefers-reduced-motion: reduce) {
   [data-feature-card],
-  [data-features-abo] {
+  [data-features-abo],
+  [data-faq-item] {
     animation: none;
     opacity: 1 !important;
     transform: none !important;
