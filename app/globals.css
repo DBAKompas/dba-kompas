@@ -281,7 +281,9 @@
   [data-slot-needle],
   [data-slot-decor-1], [data-slot-decor-2],
   [data-slot-decor-3], [data-slot-decor-4],
-  [data-faq-word], [data-faq-item] {
+  [data-faq-word], [data-faq-item],
+  [data-grenzen-word], [data-grenzen-word-body], [data-grenzen-card],
+  [data-indicatief-needle] {
     opacity: 1 !important;
     transform: none !important;
   }
@@ -299,13 +301,15 @@
 }
 [data-feature-card],
 [data-features-abo],
-[data-faq-item] {
+[data-faq-item],
+[data-grenzen-card] {
   animation: features-fallback-show 0.3s ease-out 2s forwards;
 }
 @media (prefers-reduced-motion: reduce) {
   [data-feature-card],
   [data-features-abo],
-  [data-faq-item] {
+  [data-faq-item],
+  [data-grenzen-card] {
     animation: none;
     opacity: 1 !important;
     transform: none !important;

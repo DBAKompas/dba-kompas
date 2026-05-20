@@ -23,6 +23,10 @@ import { ChatGptAnimations } from "@/components/marketing/ChatGptAnimations";
 import { SlotAnimations } from "@/components/marketing/SlotAnimations";
 import { FaqAccordion } from "@/components/marketing/faq/FaqAccordion";
 import { FaqAnimations } from "@/components/marketing/faq/FaqAnimations";
+import { IndicatiefVisual } from "@/components/marketing/grenzen/IndicatiefVisual";
+import { JuridischVisual } from "@/components/marketing/grenzen/JuridischVisual";
+import { PrivacyVisual } from "@/components/marketing/grenzen/PrivacyVisual";
+import { GrenzenAnimations } from "@/components/marketing/grenzen/GrenzenAnimations";
 import { RisicoVisual } from "@/components/marketing/features/RisicoVisual";
 import { AandachtspuntenVisual } from "@/components/marketing/features/AandachtspuntenVisual";
 import { OpdrachtbriefVisual } from "@/components/marketing/features/OpdrachtbriefVisual";
@@ -1059,37 +1063,57 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── TRUST ──────────────────────────────── */}
-      <section className="px-4 sm:px-6 py-16 md:py-20 max-w-7xl mx-auto w-full section-divider">
-        <motion.div
-          className="space-y-10"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          viewport={viewportConfig}
-        >
-          <div className="text-center space-y-3 max-w-xl mx-auto">
-            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent text-center mb-3">HELDERE GRENZEN</p>
-            <p className="text-muted-foreground">{LANDING.trust.subtitle}</p>
+      {/* ── HELDERE GRENZEN ─────────────────────── */}
+      <section className="relative px-4 sm:px-6 py-20 md:py-28 max-w-7xl mx-auto w-full section-divider">
+        <GrenzenAnimations />
+
+        <div className="text-center mb-12 md:mb-16">
+          <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">HELDERE GRENZEN</p>
+          <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground mb-4">
+            <SplitWords text="Helder over wat we wel en niet doen" dataAttr="data-grenzen-word" />
+          </h2>
+          <p className="text-base md:text-lg leading-relaxed text-muted-foreground max-w-2xl mx-auto">
+            <SplitWords
+              text="Geen grote claims, wel duidelijke uitleg over de werking, de grenzen en wat je van DBA Kompas mag verwachten."
+              dataAttr="data-grenzen-word-body"
+            />
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-5" data-grenzen-grid>
+          <div data-grenzen-card className="relative bg-card rounded-2xl p-6 md:p-7 ring-1 ring-foreground/10 hover:ring-accent/40 transition-all duration-300 hover:-translate-y-1">
+            <div className="aspect-[3/2] mb-5 rounded-xl bg-[#faf0e6] flex items-center justify-center p-4">
+              <IndicatiefVisual />
+            </div>
+            <span className="block w-8 h-0.5 bg-accent mb-3" />
+            <h3 className="text-lg md:text-xl font-semibold text-foreground mb-2">Indicatief, geen oordeel</h3>
+            <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+              De uitkomst is bedoeld als ondersteuning bij je eigen beoordeling en hangt af van de informatie die je invoert.
+            </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-5">
-            {LANDING.trust.items.map((item, i) => (
-              <motion.div
-                key={i}
-                className="glass-card p-6"
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: i * 0.1 }}
-                viewport={viewportConfig}
-              >
-                <span className="block w-8 h-0.5 bg-accent mb-4" />
-                <h3 className="text-lg md:text-xl font-semibold text-foreground mb-2">{item.title}</h3>
-                <p className="text-base text-muted-foreground leading-relaxed">{item.description}</p>
-              </motion.div>
-            ))}
+          <div data-grenzen-card className="relative bg-card rounded-2xl p-6 md:p-7 ring-1 ring-foreground/10 hover:ring-accent/40 transition-all duration-300 hover:-translate-y-1">
+            <div className="aspect-[3/2] mb-5 rounded-xl bg-[#faf0e6] flex items-center justify-center p-4">
+              <JuridischVisual />
+            </div>
+            <span className="block w-8 h-0.5 bg-accent mb-3" />
+            <h3 className="text-lg md:text-xl font-semibold text-foreground mb-2">Geen juridisch advies</h3>
+            <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+              DBA Kompas ondersteunt je beoordeling met heldere indicaties, maar vervangt geen jurist of fiscalist.
+            </p>
           </div>
-        </motion.div>
+
+          <div data-grenzen-card className="relative bg-card rounded-2xl p-6 md:p-7 ring-1 ring-foreground/10 hover:ring-accent/40 transition-all duration-300 hover:-translate-y-1">
+            <div className="aspect-[3/2] mb-5 rounded-xl bg-[#faf0e6] flex items-center justify-center p-4">
+              <PrivacyVisual />
+            </div>
+            <span className="block w-8 h-0.5 bg-accent mb-3" />
+            <h3 className="text-lg md:text-xl font-semibold text-foreground mb-2">Zorgvuldig met je gegevens</h3>
+            <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+              We gaan zorgvuldig om met je gegevens, betalingen verlopen via Stripe. Details staan in het privacybeleid.
+            </p>
+          </div>
+        </div>
       </section>
 
       {/* ── FAQ ────────────────────────────────── */}
