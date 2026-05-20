@@ -20,6 +20,11 @@ import { HowItWorksCarousel } from "@/components/marketing/HowItWorksCarousel";
 import { NieuwsIllustration } from "@/components/marketing/news/NieuwsIllustration";
 import { NieuwsAnimations } from "@/components/marketing/news/NieuwsAnimations";
 import { ChatGptAnimations } from "@/components/marketing/ChatGptAnimations";
+import { RisicoVisual } from "@/components/marketing/features/RisicoVisual";
+import { AandachtspuntenVisual } from "@/components/marketing/features/AandachtspuntenVisual";
+import { OpdrachtbriefVisual } from "@/components/marketing/features/OpdrachtbriefVisual";
+import { AbonnementVisual } from "@/components/marketing/features/AbonnementVisual";
+import { FeaturesAnimations } from "@/components/marketing/features/FeaturesAnimations";
 import { CompassDecoration } from "@/components/marketing/CompassDecoration";
 import { AppDemoHero } from "@/components/marketing/AppDemoHero";
 import { useMarketingAuth as useAuth } from "@/components/marketing/useMarketingAuth";
@@ -860,36 +865,70 @@ export default function Home() {
       </section>
 
       {/* ── FEATURES ───────────────────────────── */}
-      <section id="features" className="px-4 sm:px-6 py-16 md:py-24 max-w-7xl mx-auto w-full">
-        <div className="space-y-12">
-          <motion.div
-            className="text-center space-y-3 max-w-2xl mx-auto"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            viewport={viewportConfig}
-          >
-            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent text-center mb-3">WAT JE KRIJGT</p>
-            <p className="text-muted-foreground">{LANDING.values.subtitle}</p>
-          </motion.div>
+      <section id="features" className="relative px-4 sm:px-6 py-20 md:py-28 max-w-7xl mx-auto w-full section-divider overflow-hidden">
+        <FeaturesAnimations />
 
-          <div className="grid md:grid-cols-3 gap-5">
-            {LANDING.values.items.map((item, i) => (
-              <motion.div
-                key={i}
-                className="glass-card hover-elevate p-6"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: i * 0.1 }}
-                viewport={viewportConfig}
-              >
-                <span className="block w-8 h-0.5 bg-accent mb-4" />
-                <h3 className="text-lg md:text-xl font-semibold text-foreground mb-2">{item.title}</h3>
-                <p className="text-base text-muted-foreground leading-relaxed">{item.description}</p>
-              </motion.div>
-            ))}
+        <div className="text-center mb-12 md:mb-16">
+          <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">WAT JE KRIJGT</p>
+          <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground mb-4">
+            <SplitWords text="Direct bruikbaar resultaat na elke analyse" dataAttr="data-features-word" />
+          </h2>
+          <p className="text-base md:text-lg leading-relaxed text-muted-foreground max-w-2xl mx-auto">
+            <SplitWords
+              text="Geen abstract advies, maar concrete output die je direct meeneemt naar het gesprek met opdrachtgever of intermediair."
+              dataAttr="data-features-word-body"
+            />
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-5 mb-5" data-features-grid>
+          <div data-feature-card className="relative bg-card rounded-2xl p-6 md:p-7 ring-1 ring-foreground/10 hover:ring-accent/40 transition-all duration-300 hover:-translate-y-1">
+            <div className="aspect-[3/2] mb-5 rounded-xl bg-[#faf0e6] flex items-center justify-center p-3">
+              <RisicoVisual />
+            </div>
+            <span className="block w-8 h-0.5 bg-accent mb-3" />
+            <h3 className="text-lg md:text-xl font-semibold text-foreground mb-2">Risico-indicatie op drie kernpunten</h3>
+            <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+              Per kernpunt van je opdracht zie je waar aandacht nodig is, met concrete uitleg per domein.
+            </p>
           </div>
 
+          <div data-feature-card className="relative bg-card rounded-2xl p-6 md:p-7 ring-1 ring-foreground/10 hover:ring-accent/40 transition-all duration-300 hover:-translate-y-1">
+            <div className="aspect-[3/2] mb-5 rounded-xl bg-[#faf0e6] flex items-center justify-center p-3">
+              <AandachtspuntenVisual />
+            </div>
+            <span className="block w-8 h-0.5 bg-accent mb-3" />
+            <h3 className="text-lg md:text-xl font-semibold text-foreground mb-2">Concrete aandachtspunten</h3>
+            <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+              Geen vaag advies, maar specifieke punten die je opdracht versterken of verzwakken.
+            </p>
+          </div>
+
+          <div data-feature-card className="relative bg-card rounded-2xl p-6 md:p-7 ring-1 ring-foreground/10 hover:ring-accent/40 transition-all duration-300 hover:-translate-y-1">
+            <div className="aspect-[3/2] mb-5 rounded-xl bg-[#faf0e6] flex items-center justify-center p-3">
+              <OpdrachtbriefVisual />
+            </div>
+            <span className="block w-8 h-0.5 bg-accent mb-3" />
+            <h3 className="text-lg md:text-xl font-semibold text-foreground mb-2">Herschreven opdrachtbrief</h3>
+            <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+              Direct beschikbaar in Word en PDF, klaar voor het gesprek met opdrachtgever of intermediair.
+            </p>
+          </div>
+        </div>
+
+        <div data-features-abo className="relative bg-primary text-primary-foreground rounded-2xl p-6 md:p-8 overflow-hidden">
+          <div className="grid md:grid-cols-[3fr_2fr] gap-6 items-center">
+            <div>
+              <p className="text-[11px] uppercase tracking-[0.08em] font-semibold text-accent mb-3">MET EEN ABONNEMENT</p>
+              <h3 className="text-xl md:text-2xl font-bold mb-3">Blijf in beweging met de wet</h3>
+              <p className="text-sm md:text-base text-primary-foreground/80 leading-relaxed">
+                Ontvang updates bij relevante wetgevings-ontwikkelingen, bewaar al je analyses op één plek en zie automatisch wat veranderingen betekenen voor je opdrachten.
+              </p>
+            </div>
+            <div className="aspect-[10/3] md:aspect-auto md:h-full flex items-center justify-center">
+              <AbonnementVisual />
+            </div>
+          </div>
         </div>
       </section>
 

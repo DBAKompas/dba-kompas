@@ -1,0 +1,59 @@
+"use client";
+import { useGsap } from "@/lib/animations/useGsap";
+
+export function FeaturesAnimations() {
+  useGsap((gsap) => {
+    const ctx = gsap.context(() => {
+      gsap.set("[data-features-word]", { opacity: 0, y: 12 });
+      gsap.set("[data-features-word-body]", { opacity: 0, y: 8 });
+
+      gsap.to("[data-features-word]", {
+        opacity: 1,
+        y: 0,
+        duration: 0.5,
+        stagger: 0.04,
+        ease: "power2.out",
+        scrollTrigger: { trigger: "[data-features-grid]", start: "top 85%", once: true },
+      });
+      gsap.to("[data-features-word-body]", {
+        opacity: 1,
+        y: 0,
+        duration: 0.4,
+        stagger: 0.012,
+        ease: "power2.out",
+        delay: 0.3,
+        scrollTrigger: { trigger: "[data-features-grid]", start: "top 85%", once: true },
+      });
+
+      gsap.from("[data-feature-card]", {
+        opacity: 0,
+        y: 30,
+        duration: 0.7,
+        stagger: 0.15,
+        ease: "power3.out",
+        delay: 0.4,
+        scrollTrigger: { trigger: "[data-features-grid]", start: "top 80%", once: true },
+      });
+
+      gsap.from("[data-features-abo]", {
+        opacity: 0,
+        y: 30,
+        duration: 0.7,
+        ease: "power3.out",
+        scrollTrigger: { trigger: "[data-features-abo]", start: "top 85%", once: true },
+      });
+
+      gsap.to("[data-abo-pulse]", {
+        opacity: 0.1,
+        scale: 1.4,
+        transformOrigin: "center",
+        duration: 2,
+        ease: "sine.inOut",
+        repeat: -1,
+        yoyo: true,
+      });
+    });
+    return () => ctx.revert();
+  });
+  return null;
+}

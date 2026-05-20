@@ -273,7 +273,9 @@
   [data-chatgpt-table-header], [data-chatgpt-row],
   [data-chatgpt-decor-1], [data-chatgpt-decor-2],
   [data-chatgpt-decor-3], [data-chatgpt-decor-4],
-  [data-chatgpt-glow] {
+  [data-chatgpt-glow],
+  [data-features-word], [data-features-word-body],
+  [data-feature-card], [data-features-abo], [data-abo-pulse] {
     opacity: 1 !important;
     transform: none !important;
   }
