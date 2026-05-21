@@ -21,6 +21,7 @@ import { NieuwsIllustration } from "@/components/marketing/news/NieuwsIllustrati
 import { NieuwsAnimations } from "@/components/marketing/news/NieuwsAnimations";
 import { ChatGptAnimations } from "@/components/marketing/ChatGptAnimations";
 import { MethodiekAnimations } from "@/components/marketing/MethodiekAnimations";
+import { PrijsAnimations } from "@/components/marketing/PrijsAnimations";
 import { SlotAnimations } from "@/components/marketing/SlotAnimations";
 import { FaqAccordion } from "@/components/marketing/faq/FaqAccordion";
 import { FaqAnimations } from "@/components/marketing/faq/FaqAnimations";
@@ -622,7 +623,9 @@ export default function Home() {
                 data-chatgpt-table-header
                 className="grid grid-cols-[1fr_1.3fr_1.3fr] border-b border-border/40 bg-muted/30"
               >
-                <div className="px-3 py-3 md:px-5 md:py-4" />
+                <div className="px-3 py-3 md:px-5 md:py-4">
+                  <h3 className="font-semibold text-muted-foreground text-xs md:text-base">Aspect</h3>
+                </div>
                 <div className="px-3 py-3 md:px-5 md:py-4">
                   <h3 className="font-semibold text-muted-foreground text-xs md:text-base">Met een algemene chatbot</h3>
                 </div>
@@ -997,6 +1000,7 @@ export default function Home() {
 
       {/* ── PRIJS IN VERHOUDING ────────────────── */}
       <section className="w-full py-16 md:py-20 bg-[#faf0e6]">
+        <PrijsAnimations />
         <motion.div
           className="max-w-3xl mx-auto px-4 sm:px-6 text-center"
           initial={{ opacity: 0, y: 20 }}
@@ -1014,6 +1018,26 @@ export default function Home() {
             een uur van je eigen tarief.
           </p>
         </motion.div>
+
+        <div className="mt-10 md:mt-12 grid md:grid-cols-3 gap-4 md:gap-6 max-w-4xl mx-auto px-4 sm:px-6" data-prijs-callouts>
+          <div data-prijs-callout className="bg-card rounded-2xl p-6 ring-1 ring-accent/30 text-center">
+            <p className="text-3xl md:text-4xl font-bold text-accent leading-none mb-2">€9,95</p>
+            <p className="text-xs uppercase tracking-wider font-semibold text-accent mb-1.5">DBA Kompas</p>
+            <p className="text-sm text-muted-foreground">Een check, direct beschikbaar.</p>
+          </div>
+
+          <div data-prijs-callout className="bg-card rounded-2xl p-6 ring-1 ring-foreground/15 text-center">
+            <p className="text-3xl md:text-4xl font-bold text-foreground leading-none mb-2">Honderden €</p>
+            <p className="text-xs uppercase tracking-wider font-semibold text-foreground/70 mb-1.5">Jurist of fiscalist</p>
+            <p className="text-sm text-muted-foreground">Een uur professioneel advies.</p>
+          </div>
+
+          <div data-prijs-callout className="bg-primary text-primary-foreground rounded-2xl p-6 text-center">
+            <p className="text-3xl md:text-4xl font-bold text-accent leading-none mb-2">Duizenden €</p>
+            <p className="text-xs uppercase tracking-wider font-semibold text-primary-foreground/80 mb-1.5">Niet-verlengde opdracht</p>
+            <p className="text-sm text-primary-foreground/70">Wat een terugtrekkende opdrachtgever kost.</p>
+          </div>
+        </div>
       </section>
 
       {/* ── PRICING ────────────────────────────── */}

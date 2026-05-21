@@ -286,7 +286,8 @@
   [data-indicatief-needle],
   [data-methodiek-circle], [data-methodiek-line-1], [data-methodiek-line-2],
   [data-methodiek-block] h3, [data-methodiek-block] p,
-  [data-voorwie-word], [data-voorwie-word-body], [data-voorwie-card] {
+  [data-voorwie-word], [data-voorwie-word-body], [data-voorwie-card],
+  [data-prijs-callout] {
     opacity: 1 !important;
     transform: none !important;
   }
@@ -310,7 +311,8 @@
 [data-faq-item],
 [data-grenzen-card],
 [data-methodiek-circle],
-[data-voorwie-card] {
+[data-voorwie-card],
+[data-prijs-callout] {
   animation: features-fallback-show 0.3s ease-out 2s forwards;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -319,7 +321,8 @@
   [data-faq-item],
   [data-grenzen-card],
   [data-methodiek-circle],
-  [data-voorwie-card] {
+  [data-voorwie-card],
+  [data-prijs-callout] {
     animation: none;
     opacity: 1 !important;
     transform: none !important;
