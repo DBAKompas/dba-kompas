@@ -6,7 +6,7 @@ export function NieuwsIllustration() {
       {/* Decoraties achter */}
       <div
         data-nieuws-decor-1
-        className="absolute -top-4 -right-6 w-20 h-20 rounded-full bg-accent/8 z-0"
+        className="absolute -top-4 -right-6 w-20 h-20 rounded-full bg-accent/8 z-0 hidden md:block"
       />
       <div
         data-nieuws-decor-2
@@ -79,7 +79,7 @@ export function NieuwsIllustration() {
       {/* Voor-decoraties */}
       <div
         data-nieuws-decor-4
-        className="absolute -bottom-6 left-8 w-10 h-10 rounded-full bg-accent/35 z-0"
+        className="absolute -bottom-6 left-8 w-10 h-10 rounded-full bg-accent/35 z-0 hidden md:block"
       />
       <div
         data-nieuws-decor-5

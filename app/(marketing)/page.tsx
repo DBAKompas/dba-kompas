@@ -504,7 +504,7 @@ export default function Home() {
       </section>
 
       {/* ── ANSWER BLOCK ───────────────────────── */}
-      <section className="relative px-4 sm:px-6 py-20 md:py-28 max-w-7xl mx-auto w-full">
+      <section className="relative px-4 sm:px-6 py-14 md:py-28 max-w-7xl mx-auto w-full">
         <AnswerBlockAnimations />
         <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
           {/* LINKS: tekst */}
@@ -541,7 +541,7 @@ export default function Home() {
       </section>
 
       {/* ── INZET ──────────────────────────────── */}
-      <section className="relative px-4 sm:px-6 py-20 md:py-28 max-w-7xl mx-auto w-full overflow-hidden section-divider">
+      <section className="relative px-4 sm:px-6 py-14 md:py-28 max-w-7xl mx-auto w-full overflow-hidden section-divider">
         <InzetAnimations />
         <div className="grid md:grid-cols-[6fr_5fr] gap-12 md:gap-16 items-center">
           {/* LINKS: tekst */}
@@ -574,7 +574,7 @@ export default function Home() {
       </section>
 
       {/* ── HOW IT WORKS ───────────────────────── */}
-      <section className="relative px-4 sm:px-6 py-20 md:py-28 max-w-7xl mx-auto w-full section-divider">
+      <section className="relative px-4 sm:px-6 py-14 md:py-28 max-w-7xl mx-auto w-full section-divider">
         <div className="text-center mb-12 md:mb-16">
           <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">HOE HET WERKT</p>
           <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground mb-4">
@@ -587,7 +587,7 @@ export default function Home() {
       </section>
 
       {/* ── CHATGPT BEZWAAR ────────────────────── */}
-      <section className="relative px-4 sm:px-6 py-16 md:py-20 max-w-7xl mx-auto w-full overflow-hidden section-divider">
+      <section className="relative px-4 sm:px-6 py-12 md:py-20 max-w-7xl mx-auto w-full overflow-hidden section-divider">
         <ChatGptAnimations />
         <div className="space-y-10">
           <div className="text-center space-y-4 max-w-3xl mx-auto">
@@ -605,10 +605,10 @@ export default function Home() {
 
           <div className="relative max-w-5xl mx-auto mt-12 md:mt-16" data-chatgpt-table-wrap>
             {/* Decoraties achter de tabel */}
-            <div data-chatgpt-decor-1 className="absolute -top-6 -left-10 w-24 h-24 rounded-full bg-accent/8 z-0" />
+            <div data-chatgpt-decor-1 className="absolute -top-6 -left-10 w-24 h-24 rounded-full bg-accent/8 z-0 hidden md:block" />
             <div data-chatgpt-decor-2 className="absolute -bottom-8 -right-6 w-32 h-32 rounded-full bg-primary/5 hidden md:block z-0" />
             <div data-chatgpt-decor-3 className="absolute top-1/3 -right-8 w-12 h-12 rounded-2xl bg-accent/10 rotate-12 hidden md:block z-0" />
-            <div data-chatgpt-decor-4 className="absolute bottom-1/4 -left-6 w-8 h-8 rounded-full bg-accent/30 z-0" />
+            <div data-chatgpt-decor-4 className="absolute bottom-1/4 -left-6 w-8 h-8 rounded-full bg-accent/30 z-0 hidden md:block" />
 
             {/* Subtle accent-glow achter DBA-kolom */}
             <div
@@ -621,7 +621,7 @@ export default function Home() {
               {/* Header */}
               <div
                 data-chatgpt-table-header
-                className="grid grid-cols-[1fr_1.3fr_1.3fr] border-b border-border/40 bg-muted/30"
+                className="hidden md:grid grid-cols-[1fr_1.3fr_1.3fr] border-b border-border/40 bg-muted/30"
               >
                 <div className="px-3 py-3 md:px-5 md:py-4">
                   <h3 className="font-semibold text-muted-foreground text-xs md:text-base">Aspect</h3>
@@ -675,40 +675,65 @@ export default function Home() {
                 <div
                   key={i}
                   data-chatgpt-row
-                  className="grid grid-cols-[1fr_1.3fr_1.3fr] border-b border-border/40 last:border-b-0"
+                  className="border-b border-border/40 last:border-b-0"
                 >
-                  <div className="px-3 py-4 md:px-5 md:py-5 font-semibold text-foreground text-xs md:text-sm">
-                    <SplitWords text={row.label} dataAttr="data-chatgpt-cell-word" />
+                  {/* Mobile: stack-layout */}
+                  <div className="md:hidden p-5">
+                    <p className="text-xs uppercase tracking-wider font-semibold text-foreground/70 mb-3">
+                      {row.label}
+                    </p>
+                    <div className="flex items-start gap-2.5 mb-3 opacity-80">
+                      <svg className="w-4 h-4 flex-shrink-0 mt-0.5 text-muted-foreground/50" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                        <circle cx="10" cy="10" r="9" stroke="currentColor" strokeWidth="1.5" />
+                        <line x1="6.5" y1="6.5" x2="13.5" y2="13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                        <line x1="13.5" y1="6.5" x2="6.5" y2="13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                      </svg>
+                      <span className="text-sm leading-relaxed text-muted-foreground">{row.chatbot}</span>
+                    </div>
+                    <div className="flex items-start gap-2.5 bg-accent/5 rounded-lg p-3">
+                      <svg className="w-4 h-4 flex-shrink-0 mt-0.5 text-accent" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <circle cx="10" cy="10" r="9" />
+                        <path d="M 6 10 L 9 13 L 14 7" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      <span className="text-sm leading-relaxed font-medium text-foreground">{row.dba}</span>
+                    </div>
                   </div>
-                  <div className="px-3 py-4 md:px-5 md:py-5 flex gap-2 items-start text-xs md:text-sm text-muted-foreground">
-                    <svg
-                      data-chatgpt-icon-cross
-                      className="w-4 h-4 flex-shrink-0 mt-0.5 text-muted-foreground/50"
-                      viewBox="0 0 20 20"
-                      fill="none"
-                      aria-hidden="true"
-                    >
-                      <circle cx="10" cy="10" r="8" stroke="currentColor" strokeWidth="1.5" />
-                      <line x1="6.5" y1="6.5" x2="13.5" y2="13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                      <line x1="13.5" y1="6.5" x2="6.5" y2="13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                    </svg>
-                    <span className="leading-relaxed">
-                      <SplitWords text={row.chatbot} dataAttr="data-chatgpt-cell-word" />
-                    </span>
-                  </div>
-                  <div className="px-3 py-4 md:px-5 md:py-5 flex gap-2 items-start text-xs md:text-sm text-foreground border-l border-border/40 bg-accent/5">
-                    <svg
-                      data-chatgpt-icon-check
-                      className="w-4 h-4 flex-shrink-0 mt-0.5 text-accent"
-                      viewBox="0 0 20 20"
-                      aria-hidden="true"
-                    >
+
+                  {/* Desktop: 3-koloms grid */}
+                  <div className="hidden md:grid md:grid-cols-[1fr_1.3fr_1.3fr]">
+                    <div className="px-3 py-4 md:px-5 md:py-5 font-semibold text-foreground text-xs md:text-sm">
+                      <SplitWords text={row.label} dataAttr="data-chatgpt-cell-word" />
+                    </div>
+                    <div className="px-3 py-4 md:px-5 md:py-5 flex gap-2 items-start text-xs md:text-sm text-muted-foreground">
+                      <svg
+                        data-chatgpt-icon-cross
+                        className="w-4 h-4 flex-shrink-0 mt-0.5 text-muted-foreground/50"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        aria-hidden="true"
+                      >
+                        <circle cx="10" cy="10" r="8" stroke="currentColor" strokeWidth="1.5" />
+                        <line x1="6.5" y1="6.5" x2="13.5" y2="13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                        <line x1="13.5" y1="6.5" x2="6.5" y2="13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                      </svg>
+                      <span className="leading-relaxed">
+                        <SplitWords text={row.chatbot} dataAttr="data-chatgpt-cell-word" />
+                      </span>
+                    </div>
+                    <div className="px-3 py-4 md:px-5 md:py-5 flex gap-2 items-start text-xs md:text-sm text-foreground border-l border-border/40 bg-accent/5">
+                      <svg
+                        data-chatgpt-icon-check
+                        className="w-4 h-4 flex-shrink-0 mt-0.5 text-accent"
+                        viewBox="0 0 20 20"
+                        aria-hidden="true"
+                      >
                       <circle cx="10" cy="10" r="8" fill="currentColor" />
                       <path d="M6 10 L9 13 L14 7" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                     <span className="leading-relaxed">
                       <SplitWords text={row.dba} dataAttr="data-chatgpt-cell-word" />
                     </span>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -718,7 +743,7 @@ export default function Home() {
       </section>
 
       {/* ── METHODIEK & MAKER ──────────────────── */}
-      <section className="w-full py-20 md:py-28 bg-[#0b1d3a]">
+      <section className="w-full py-14 md:py-28 bg-[#0b1d3a]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
           {/* DEEL A: Methodiek */}
@@ -841,7 +866,7 @@ export default function Home() {
       </section>
 
       {/* ── FEATURES ───────────────────────────── */}
-      <section id="features" className="relative px-4 sm:px-6 py-20 md:py-28 max-w-7xl mx-auto w-full section-divider overflow-hidden">
+      <section id="features" className="relative px-4 sm:px-6 py-14 md:py-28 max-w-7xl mx-auto w-full section-divider overflow-hidden">
         <FeaturesAnimations />
 
         <div className="text-center mb-12 md:mb-16">
@@ -895,7 +920,7 @@ export default function Home() {
       </section>
 
       {/* ── VOOR WIE (segmenten) ────────────────── */}
-      <section className="relative px-4 sm:px-6 py-20 md:py-28 max-w-7xl mx-auto w-full section-divider">
+      <section className="relative px-4 sm:px-6 py-14 md:py-28 max-w-7xl mx-auto w-full section-divider">
         <VoorWieAnimations />
 
         <div className="text-center mb-12 md:mb-16">
@@ -945,7 +970,7 @@ export default function Home() {
       {/* ── ALTIJD ACTUEEL (nieuws + abonnement combo) ── */}
       <section
         data-aa-section
-        className="relative px-4 sm:px-6 py-16 md:py-20 max-w-7xl mx-auto w-full overflow-hidden section-divider"
+        className="relative px-4 sm:px-6 py-12 md:py-20 max-w-7xl mx-auto w-full overflow-hidden section-divider"
       >
         <NieuwsAnimations />
         <div className="grid md:grid-cols-[5fr_6fr] gap-10 md:gap-14 items-center">
@@ -999,7 +1024,7 @@ export default function Home() {
       </section>
 
       {/* ── PRIJS IN VERHOUDING ────────────────── */}
-      <section className="w-full py-16 md:py-20 bg-[#faf0e6]">
+      <section className="w-full py-12 md:py-20 bg-[#faf0e6]">
         <PrijsAnimations />
         <motion.div
           className="max-w-3xl mx-auto px-4 sm:px-6 text-center"
@@ -1041,7 +1066,7 @@ export default function Home() {
       </section>
 
       {/* ── PRICING ────────────────────────────── */}
-      <section id="prijzen" className="px-4 sm:px-6 py-16 md:py-24 max-w-7xl mx-auto w-full">
+      <section id="prijzen" className="px-4 sm:px-6 py-12 md:py-24 max-w-7xl mx-auto w-full">
         <div className="space-y-12">
           <motion.div
             className="text-center space-y-3 max-w-xl mx-auto"
@@ -1132,7 +1157,7 @@ export default function Home() {
       </section>
 
       {/* ── HELDERE GRENZEN ─────────────────────── */}
-      <section className="relative px-4 sm:px-6 py-20 md:py-28 max-w-7xl mx-auto w-full section-divider">
+      <section className="relative px-4 sm:px-6 py-14 md:py-28 max-w-7xl mx-auto w-full section-divider">
         <GrenzenAnimations />
 
         <div className="text-center mb-12 md:mb-16">
@@ -1185,7 +1210,7 @@ export default function Home() {
       </section>
 
       {/* ── FAQ ────────────────────────────────── */}
-      <section id="faq" className="relative px-4 sm:px-6 py-20 md:py-28 max-w-7xl mx-auto w-full section-divider">
+      <section id="faq" className="relative px-4 sm:px-6 py-14 md:py-28 max-w-7xl mx-auto w-full section-divider">
         <FaqAnimations />
         <div className="text-center mb-12 md:mb-16">
           <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">VEELGESTELDE VRAGEN</p>
@@ -1198,7 +1223,7 @@ export default function Home() {
       </section>
 
       {/* ── BOTTOM CTA (SLOT) ──────────────────── */}
-      <section className="relative px-4 sm:px-6 py-20 md:py-32 max-w-7xl mx-auto w-full overflow-hidden">
+      <section className="relative px-4 sm:px-6 py-14 md:py-32 max-w-7xl mx-auto w-full overflow-hidden">
         <SlotAnimations />
         <div
           data-slot-bg
@@ -1230,9 +1255,9 @@ export default function Home() {
           </svg>
 
           {/* Decoratieve zwevende dots */}
-          <div data-slot-decor-1 className="absolute top-12 right-12 w-3 h-3 rounded-full bg-accent pointer-events-none" />
-          <div data-slot-decor-2 className="absolute bottom-16 left-16 w-4 h-4 rounded-full bg-accent/60 pointer-events-none" />
-          <div data-slot-decor-3 className="absolute top-1/3 left-1/4 w-2 h-2 rounded-full bg-primary-foreground/40 pointer-events-none" />
+          <div data-slot-decor-1 className="absolute top-12 right-12 w-3 h-3 rounded-full bg-accent pointer-events-none hidden md:block" />
+          <div data-slot-decor-2 className="absolute bottom-16 left-16 w-4 h-4 rounded-full bg-accent/60 pointer-events-none hidden md:block" />
+          <div data-slot-decor-3 className="absolute top-1/3 left-1/4 w-2 h-2 rounded-full bg-primary-foreground/40 pointer-events-none hidden md:block" />
           <div data-slot-decor-4 className="absolute bottom-1/3 right-1/3 w-2.5 h-2.5 rounded-full bg-accent/50 hidden md:block pointer-events-none" />
 
           {/* Content */}

@@ -6,7 +6,7 @@ export function InzetIllustration() {
       {/* Decoraties achter de illustratie */}
       <div
         data-decor-1
-        className="absolute -top-4 -left-8 w-20 h-20 rounded-full bg-accent/8 z-0"
+        className="absolute -top-4 -left-8 w-20 h-20 rounded-full bg-accent/8 z-0 hidden md:block"
       />
       <div
         data-decor-2
@@ -112,7 +112,7 @@ export function InzetIllustration() {
       {/* Decoraties achter de illustratie (lager z-index dan SVG) */}
       <div
         data-decor-4
-        className="absolute -bottom-8 right-8 w-12 h-12 rounded-full bg-accent/40 z-0"
+        className="absolute -bottom-8 right-8 w-12 h-12 rounded-full bg-accent/40 z-0 hidden md:block"
       />
       <div
         data-decor-5
