@@ -28,6 +28,9 @@ import { IndicatiefVisual } from "@/components/marketing/grenzen/IndicatiefVisua
 import { JuridischVisual } from "@/components/marketing/grenzen/JuridischVisual";
 import { PrivacyVisual } from "@/components/marketing/grenzen/PrivacyVisual";
 import { GrenzenAnimations } from "@/components/marketing/grenzen/GrenzenAnimations";
+import { PubliekeSectorVisual } from "@/components/marketing/voor-wie/PubliekeSectorVisual";
+import { PrivateSectorVisual } from "@/components/marketing/voor-wie/PrivateSectorVisual";
+import { VoorWieAnimations } from "@/components/marketing/voor-wie/VoorWieAnimations";
 import { RisicoVisual } from "@/components/marketing/features/RisicoVisual";
 import { AandachtspuntenVisual } from "@/components/marketing/features/AandachtspuntenVisual";
 import { OpdrachtbriefVisual } from "@/components/marketing/features/OpdrachtbriefVisual";
@@ -944,38 +947,52 @@ export default function Home() {
 
       </section>
 
-      {/* ── AUDIENCE ───────────────────────────── */}
-      <section className="px-4 sm:px-6 py-16 md:py-20 max-w-7xl mx-auto w-full section-divider">
-        <motion.div
-          className="space-y-10"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          viewport={viewportConfig}
-        >
-          <div className="text-center space-y-3 max-w-xl mx-auto">
-            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent text-center mb-3">VOOR WIE</p>
-            <h2 className="text-3xl md:text-4xl font-bold">{LANDING.audience.title}</h2>
-            <p className="text-muted-foreground">{LANDING.audience.supporting}</p>
+      {/* ── VOOR WIE (segmenten) ────────────────── */}
+      <section className="relative px-4 sm:px-6 py-20 md:py-28 max-w-7xl mx-auto w-full section-divider">
+        <VoorWieAnimations />
+
+        <div className="text-center mb-12 md:mb-16">
+          <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">VOOR WIE</p>
+          <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground mb-4">
+            <SplitWords text="Voor kenniswerkers in elke werkomgeving" dataAttr="data-voorwie-word" />
+          </h2>
+          <p className="text-base md:text-lg leading-relaxed text-muted-foreground max-w-2xl mx-auto">
+            <SplitWords
+              text="Of je nu via een intermediair voor een ministerie werkt of direct voor een private opdrachtgever: DBA Kompas helpt elke kennis-zzp'er om de opdracht goed te toetsen."
+              dataAttr="data-voorwie-word-body"
+            />
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-5 max-w-5xl mx-auto" data-voorwie-grid>
+          <div data-voorwie-card className="relative bg-card rounded-2xl p-6 md:p-8 ring-1 ring-foreground/10 hover:ring-accent/40 transition-all duration-300 hover:-translate-y-1">
+            <div className="aspect-[3/2] mb-6 rounded-xl bg-[#faf0e6] flex items-center justify-center p-6">
+              <PubliekeSectorVisual />
+            </div>
+            <span className="block w-8 h-0.5 bg-accent mb-3" />
+            <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-3">Publieke sector</h3>
+            <p className="text-sm md:text-base text-muted-foreground leading-relaxed mb-4">
+              Interim-opdrachten via raamovereenkomsten en inkoopkanalen, vaak langlopend en via een intermediair. Specifieke aandacht voor inbedding en aansturing.
+            </p>
+            <p className="text-xs md:text-sm text-foreground/70 font-medium">
+              Ministeries · Gemeenten · GGD · COA · Provincies
+            </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-5">
-            {LANDING.audience.blocks.map((block, i) => (
-              <motion.div
-                key={i}
-                className="glass-card hover-elevate p-6"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: i * 0.1 }}
-                viewport={viewportConfig}
-              >
-                <span className="block w-8 h-0.5 bg-accent mb-4" />
-                <h3 className="text-lg md:text-xl font-semibold text-foreground mb-2">{block.heading}</h3>
-                <p className="text-base text-muted-foreground leading-relaxed">{block.text}</p>
-              </motion.div>
-            ))}
+          <div data-voorwie-card className="relative bg-card rounded-2xl p-6 md:p-8 ring-1 ring-foreground/10 hover:ring-accent/40 transition-all duration-300 hover:-translate-y-1">
+            <div className="aspect-[3/2] mb-6 rounded-xl bg-[#faf0e6] flex items-center justify-center p-6">
+              <PrivateSectorVisual />
+            </div>
+            <span className="block w-8 h-0.5 bg-accent mb-3" />
+            <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-3">Private sector</h3>
+            <p className="text-sm md:text-base text-muted-foreground leading-relaxed mb-4">
+              Directe contracten met opdrachtgevers of via een intermediair. Vaak resultaatgericht en op projectbasis. Eigen werkwijze, eigen middelen en eigen risico tellen.
+            </p>
+            <p className="text-xs md:text-sm text-foreground/70 font-medium">
+              IT-consultancy · Advies · Project-management · Design · Marketing · Content
+            </p>
           </div>
-        </motion.div>
+        </div>
       </section>
 
       {/* ── PRIJS IN VERHOUDING ────────────────── */}
