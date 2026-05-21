@@ -837,62 +837,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── ALTIJD ACTUEEL (nieuws + abonnement combo) ── */}
-      <section
-        data-aa-section
-        className="relative px-4 sm:px-6 py-16 md:py-20 max-w-7xl mx-auto w-full overflow-hidden section-divider"
-      >
-        <NieuwsAnimations />
-        <div className="grid md:grid-cols-[5fr_6fr] gap-10 md:gap-14 items-center">
-          <div data-aa-text>
-            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">ALTIJD ACTUEEL</p>
-            <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground mb-5">
-              <SplitWords text="Beweeg mee met wet- en beleidsontwikkelingen" dataAttr="data-aa-word" />
-            </h2>
-            <p className="text-base leading-relaxed text-muted-foreground mb-7">
-              <SplitWords
-                text="De wetgeving en het beleid rond zzp-werk veranderen continu. DBA Kompas scant dagelijks het internet en houdt je op de hoogte van wat het betekent voor jouw opdrachten."
-                dataAttr="data-aa-word-body"
-              />
-            </p>
-
-            <div className="space-y-4" data-aa-bullets>
-              <div className="flex items-start gap-3" data-aa-bullet>
-                <span className="block w-6 h-0.5 bg-accent mt-3 flex-shrink-0" />
-                <div>
-                  <h4 className="text-sm md:text-base font-semibold text-foreground mb-1">Push en mail bij relevante updates</h4>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Direct op de hoogte als er iets verandert in wet, beleid of jurisprudentie.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3" data-aa-bullet>
-                <span className="block w-6 h-0.5 bg-accent mt-3 flex-shrink-0" />
-                <div>
-                  <h4 className="text-sm md:text-base font-semibold text-foreground mb-1">Analyses bewaard, vergelijkbaar in de tijd</h4>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Alle analyses op één plek, terug te halen in PDF of Word.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3" data-aa-bullet>
-                <span className="block w-6 h-0.5 bg-accent mt-3 flex-shrink-0" />
-                <div>
-                  <h4 className="text-sm md:text-base font-semibold text-foreground mb-1">Wijzigingen toegepast op jouw opdrachten</h4>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Bij relevante updates zie je automatisch wat het betekent voor opdrachten die je al hebt geanalyseerd.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <NieuwsIllustration />
-        </div>
-      </section>
-
       {/* ── FEATURES ───────────────────────────── */}
       <section id="features" className="relative px-4 sm:px-6 py-20 md:py-28 max-w-7xl mx-auto w-full section-divider overflow-hidden">
         <FeaturesAnimations />
@@ -992,6 +936,62 @@ export default function Home() {
               IT-consultancy · Advies · Project-management · Design · Marketing · Content
             </p>
           </div>
+        </div>
+      </section>
+
+      {/* ── ALTIJD ACTUEEL (nieuws + abonnement combo) ── */}
+      <section
+        data-aa-section
+        className="relative px-4 sm:px-6 py-16 md:py-20 max-w-7xl mx-auto w-full overflow-hidden section-divider"
+      >
+        <NieuwsAnimations />
+        <div className="grid md:grid-cols-[5fr_6fr] gap-10 md:gap-14 items-center">
+          <div data-aa-text>
+            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">ALTIJD ACTUEEL</p>
+            <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground mb-5">
+              <SplitWords text="Beweeg mee met wet- en beleidsontwikkelingen" dataAttr="data-aa-word" />
+            </h2>
+            <p className="text-base leading-relaxed text-muted-foreground mb-7">
+              <SplitWords
+                text="De wetgeving en het beleid rond zzp-werk veranderen continu. DBA Kompas scant dagelijks het internet en houdt je op de hoogte van wat het betekent voor jouw opdrachten."
+                dataAttr="data-aa-word-body"
+              />
+            </p>
+
+            <div className="space-y-4" data-aa-bullets>
+              <div className="flex items-start gap-3" data-aa-bullet>
+                <span className="block w-6 h-0.5 bg-accent mt-3 flex-shrink-0" />
+                <div>
+                  <h4 className="text-sm md:text-base font-semibold text-foreground mb-1">Push en mail bij relevante updates</h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Direct op de hoogte als er iets verandert in wet, beleid of jurisprudentie.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3" data-aa-bullet>
+                <span className="block w-6 h-0.5 bg-accent mt-3 flex-shrink-0" />
+                <div>
+                  <h4 className="text-sm md:text-base font-semibold text-foreground mb-1">Analyses bewaard, vergelijkbaar in de tijd</h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Alle analyses op één plek, terug te halen in PDF of Word.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3" data-aa-bullet>
+                <span className="block w-6 h-0.5 bg-accent mt-3 flex-shrink-0" />
+                <div>
+                  <h4 className="text-sm md:text-base font-semibold text-foreground mb-1">Wijzigingen toegepast op jouw opdrachten</h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Bij relevante updates zie je automatisch wat het betekent voor opdrachten die je al hebt geanalyseerd.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <NieuwsIllustration />
         </div>
       </section>
 
