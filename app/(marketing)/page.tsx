@@ -520,20 +520,20 @@ export default function Home() {
           {/* RECHTS: 2x2 stat-grid */}
           <div className="grid grid-cols-2 gap-4" data-answer-stats>
             <div className="relative bg-[#faf0e6] rounded-2xl p-6 md:p-8 ring-1 ring-accent/15 overflow-hidden">
+              <p className="text-4xl md:text-5xl font-bold text-accent leading-none mb-3">Online</p>
+              <p className="text-sm text-foreground/80 font-medium">24/7 toegankelijk via je browser</p>
+            </div>
+            <div className="relative bg-[#faf0e6] rounded-2xl p-6 md:p-8 ring-1 ring-accent/15 overflow-hidden">
               <p className="text-4xl md:text-5xl font-bold text-accent leading-none mb-3">60 sec</p>
-              <p className="text-sm text-foreground/80 font-medium">Doorlooptijd analyse</p>
+              <p className="text-sm text-foreground/80 font-medium">Tot risico-indicatie</p>
             </div>
             <div className="relative bg-[#faf0e6] rounded-2xl p-6 md:p-8 ring-1 ring-accent/15 overflow-hidden">
-              <p className="text-4xl md:text-5xl font-bold text-accent leading-none mb-3">9</p>
-              <p className="text-sm text-foreground/80 font-medium">Deliveroo-criteria Hoge Raad</p>
+              <p className="text-4xl md:text-5xl font-bold text-accent leading-none mb-3">Wet DBA</p>
+              <p className="text-sm text-foreground/80 font-medium">Plus Deliveroo-jurisprudentie</p>
             </div>
             <div className="relative bg-[#faf0e6] rounded-2xl p-6 md:p-8 ring-1 ring-accent/15 overflow-hidden">
-              <p className="text-4xl md:text-5xl font-bold text-accent leading-none mb-3">3</p>
-              <p className="text-sm text-foreground/80 font-medium">Kernpunten in elke analyse</p>
-            </div>
-            <div className="relative bg-[#faf0e6] rounded-2xl p-6 md:p-8 ring-1 ring-accent/15 overflow-hidden">
-              <p className="text-3xl md:text-4xl font-bold text-accent leading-none mb-3">Word + PDF</p>
-              <p className="text-sm text-foreground/80 font-medium">Herschreven opdrachtbrief</p>
+              <p className="text-3xl md:text-4xl font-bold text-accent leading-none mb-3">Vanaf €9,95</p>
+              <p className="text-sm text-foreground/80 font-medium">Direct toegang tot één analyse</p>
             </div>
           </div>
         </div>
