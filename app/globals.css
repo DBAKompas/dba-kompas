@@ -293,7 +293,8 @@
   [data-over-methodiek-word], [data-over-methodiek-body],
   [data-over-circle], [data-over-list-item], [data-over-bron-card],
   [data-segment-word], [data-segment-body],
-  [data-segment-card], [data-segment-step], [data-segment-faq-item] {
+  [data-segment-card], [data-segment-step], [data-segment-faq-item],
+  [data-kennisbank-word], [data-kennisbank-section], [data-kennisbank-related] {
     opacity: 1 !important;
     transform: none !important;
   }

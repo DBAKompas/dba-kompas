@@ -1309,6 +1309,7 @@ export default function Home() {
                 {LANDING.footer.product.links.map((l, i) => (
                   <a key={i} href={l.href} className="block text-sm text-muted-foreground hover:text-foreground transition-colors">{l.label}</a>
                 ))}
+                <Link href="/kennisbank" className="block text-sm text-muted-foreground hover:text-foreground transition-colors">Kennisbank</Link>
                 <Link href="/over-dba-kompas" className="block text-sm text-muted-foreground hover:text-foreground transition-colors">Over DBA Kompas</Link>
               </div>
               <div className="space-y-3">
