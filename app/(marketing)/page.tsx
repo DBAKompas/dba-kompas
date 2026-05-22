@@ -929,7 +929,7 @@ export default function Home() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-5 max-w-5xl mx-auto" data-voorwie-grid>
-          <div data-voorwie-card className="relative bg-card rounded-2xl p-6 md:p-8 ring-1 ring-foreground/10 hover:ring-accent/40 transition-all duration-300 hover:-translate-y-1">
+          <Link href="/voor/publieke-sector" data-voorwie-card className="group relative block bg-card rounded-2xl p-6 md:p-8 ring-1 ring-foreground/10 hover:ring-accent/40 transition-all duration-300 hover:-translate-y-1">
             <div className="aspect-[3/2] mb-6 rounded-xl bg-[#faf0e6] flex items-center justify-center p-6">
               <PubliekeSectorVisual />
             </div>
@@ -938,12 +938,18 @@ export default function Home() {
             <p className="text-sm md:text-base text-muted-foreground leading-relaxed mb-4">
               Interim-opdrachten via raamovereenkomsten en inkoopkanalen, vaak langlopend en via een intermediair. Specifieke aandacht voor inbedding en aansturing.
             </p>
-            <p className="text-xs md:text-sm text-foreground/70 font-medium">
+            <p className="text-xs md:text-sm text-foreground/70 font-medium mb-4">
               Ministeries · Gemeenten · GGD · COA · Provincies
             </p>
-          </div>
+            <span className="inline-flex items-center gap-1.5 text-sm font-medium text-accent">
+              Lees meer
+              <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="M3 10 L17 10 M11 4 L17 10 L11 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
+          </Link>
 
-          <div data-voorwie-card className="relative bg-card rounded-2xl p-6 md:p-8 ring-1 ring-foreground/10 hover:ring-accent/40 transition-all duration-300 hover:-translate-y-1">
+          <Link href="/voor/private-sector" data-voorwie-card className="group relative block bg-card rounded-2xl p-6 md:p-8 ring-1 ring-foreground/10 hover:ring-accent/40 transition-all duration-300 hover:-translate-y-1">
             <div className="aspect-[3/2] mb-6 rounded-xl bg-[#faf0e6] flex items-center justify-center p-6">
               <PrivateSectorVisual />
             </div>
@@ -952,10 +958,16 @@ export default function Home() {
             <p className="text-sm md:text-base text-muted-foreground leading-relaxed mb-4">
               Directe contracten met opdrachtgevers of via een intermediair. Vaak resultaatgericht en op projectbasis. Eigen werkwijze, eigen middelen en eigen risico tellen.
             </p>
-            <p className="text-xs md:text-sm text-foreground/70 font-medium">
+            <p className="text-xs md:text-sm text-foreground/70 font-medium mb-4">
               IT-consultancy · Advies · Project-management · Design · Marketing · Content
             </p>
-          </div>
+            <span className="inline-flex items-center gap-1.5 text-sm font-medium text-accent">
+              Lees meer
+              <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="M3 10 L17 10 M11 4 L17 10 L11 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
+          </Link>
         </div>
       </section>
 

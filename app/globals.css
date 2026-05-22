@@ -291,7 +291,9 @@
   [data-over-hero-word], [data-over-hero-body],
   [data-over-maker-word], [data-over-maker-body],
   [data-over-methodiek-word], [data-over-methodiek-body],
-  [data-over-circle], [data-over-list-item], [data-over-bron-card] {
+  [data-over-circle], [data-over-list-item], [data-over-bron-card],
+  [data-segment-word], [data-segment-body],
+  [data-segment-card], [data-segment-step], [data-segment-faq-item] {
     opacity: 1 !important;
     transform: none !important;
   }
