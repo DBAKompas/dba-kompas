@@ -3,6 +3,7 @@ import Link from "next/link";
 import BrandLogo from "@/components/marketing/BrandLogo";
 import { SplitWords } from "@/components/marketing/SplitWords";
 import { OverAnimations } from "@/components/marketing/over/OverAnimations";
+import { Breadcrumb } from "@/components/marketing/kennisbank/Breadcrumb";
 
 export const metadata: Metadata = {
   title: "Over DBA Kompas — Methodiek, maker en bronnen",
@@ -105,6 +106,9 @@ export default function OverPage() {
 
       {/* ── SECTIE 1: HERO ──────────────────────── */}
       <section className="relative px-4 sm:px-6 py-14 md:py-28 max-w-5xl mx-auto w-full text-center">
+        <div className="text-left">
+          <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Over" }]} />
+        </div>
         <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">OVER DBA KOMPAS</p>
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight text-foreground mb-6">
           <SplitWords text="Een vaste methodiek voor zzp-opdrachten, gemaakt vanuit de praktijk" dataAttr="data-over-hero-word" />

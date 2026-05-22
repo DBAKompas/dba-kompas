@@ -2,7 +2,9 @@ import Link from "next/link";
 import BrandLogo from "@/components/marketing/BrandLogo";
 import { SplitWords } from "@/components/marketing/SplitWords";
 import { FaqAccordion } from "@/components/marketing/faq/FaqAccordion";
+import { Breadcrumb } from "@/components/marketing/kennisbank/Breadcrumb";
 import { LANDING } from "@/content/landing.nl";
+import { KENNISBANK_PAGES } from "@/content/kennisbank";
 import { SegmentAnimations } from "./SegmentAnimations";
 
 type RisicoThema = { title: string; body: string };
@@ -12,6 +14,8 @@ export type SegmentPageProps = {
   eyebrow: string;
   h1: string;
   heroSubtext: string;
+  segmentLabel: string; // "Publieke sector" of "Private sector"
+  verdiepingSlugs: string[]; // 3 kennispagina-slugs
   risicoThemas: RisicoThema[];
   faqItems: FaqItemInput[];
 };
@@ -28,7 +32,11 @@ const FEATURES = [
   { title: "Herschreven opdrachtbrief", body: "Direct beschikbaar in Word en PDF, klaar voor het gesprek met opdrachtgever of intermediair." },
 ];
 
-export function SegmentPage({ eyebrow, h1, heroSubtext, risicoThemas, faqItems }: SegmentPageProps) {
+export function SegmentPage({ eyebrow, h1, heroSubtext, segmentLabel, verdiepingSlugs, risicoThemas, faqItems }: SegmentPageProps) {
+  const verdieping = verdiepingSlugs
+    .map((slug) => KENNISBANK_PAGES.find((p) => p.slug === slug))
+    .filter((p): p is (typeof KENNISBANK_PAGES)[number] => Boolean(p));
+
   return (
     <div className="min-h-screen bg-background relative flex flex-col">
       <SegmentAnimations />
@@ -53,6 +61,15 @@ export function SegmentPage({ eyebrow, h1, heroSubtext, risicoThemas, faqItems }
 
       {/* ── 1. HERO ───── */}
       <section className="relative px-4 sm:px-6 py-14 md:py-28 max-w-5xl mx-auto w-full text-center">
+        <div className="text-left">
+          <Breadcrumb
+            items={[
+              { label: "Home", href: "/" },
+              { label: "Voor wie", href: "/#voor-wie" },
+              { label: segmentLabel },
+            ]}
+          />
+        </div>
         <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">{eyebrow}</p>
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight text-foreground mb-6">
           <SplitWords text={h1} dataAttr="data-segment-word" />
@@ -89,6 +106,35 @@ export function SegmentPage({ eyebrow, h1, heroSubtext, risicoThemas, faqItems }
           ))}
         </div>
       </section>
+
+      {/* ── 2b. VERDIEPING ───── */}
+      {verdieping.length > 0 && (
+        <section className="relative px-4 sm:px-6 py-12 md:py-20 max-w-7xl mx-auto w-full section-divider">
+          <div className="text-center mb-10">
+            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">VERDIEPING</p>
+            <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground">Lees meer over de wetgeving</h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-5 max-w-5xl mx-auto">
+            {verdieping.map((kp) => (
+              <Link
+                key={kp.slug}
+                href={`/kennisbank/${kp.slug}`}
+                className="group block bg-card rounded-2xl p-6 ring-1 ring-foreground/10 hover:ring-accent/40 hover:-translate-y-0.5 transition-all duration-300"
+              >
+                <p className="text-[11px] uppercase tracking-[0.08em] font-semibold text-accent mb-3">KENNISBANK</p>
+                <h3 className="text-base md:text-lg font-semibold text-foreground mb-2">{kp.h1}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-4">{kp.shortDescription}</p>
+                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-accent">
+                  Lees meer
+                  <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                    <path d="M3 10 L17 10 M11 4 L17 10 L11 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ── 3. HOE HET WERKT (compact) ───── */}
       <section className="relative px-4 sm:px-6 py-12 md:py-20 max-w-5xl mx-auto w-full section-divider">

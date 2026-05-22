@@ -32,6 +32,8 @@ export default function PubliekeSectorPage() {
         eyebrow="VOOR DE PUBLIEKE SECTOR"
         h1="Toets je opdracht in de publieke sector"
         heroSubtext="Voor zzp-kenniswerkers die werken voor bijvoorbeeld ministeries, gemeenten, GGD, COA of provincies."
+        segmentLabel="Publieke sector"
+        verdiepingSlugs={["wet-dba", "schijnzelfstandigheid", "handhaving-2026"]}
         risicoThemas={[
           {
             title: "Afgekaderde opdracht of vaste positie?",

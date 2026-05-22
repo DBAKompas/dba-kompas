@@ -123,6 +123,36 @@ export function KennisbankPage({ page }: { page: KennisbankPageType }) {
         </section>
       )}
 
+      {/* Voor wie geldt dit? */}
+      <section className="px-4 sm:px-6 py-10 md:py-14 max-w-5xl mx-auto w-full">
+        <div className="mb-6 text-center">
+          <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-3">VOOR WIE GELDT DIT?</p>
+          <h2 className="text-2xl md:text-3xl font-bold leading-tight text-foreground">Bekijk de risico-thema&apos;s voor jouw sector</h2>
+        </div>
+        <div className="grid md:grid-cols-2 gap-5">
+          <Link href="/voor/publieke-sector" className="group block bg-card rounded-2xl p-6 ring-1 ring-foreground/10 hover:ring-accent/40 hover:-translate-y-0.5 transition-all duration-300">
+            <h3 className="text-base md:text-lg font-semibold text-foreground mb-2">Werk je in de publieke sector?</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed mb-4">Bekijk de risico-thema&apos;s voor zzp-kenniswerkers in ministeries, gemeenten, GGD, COA en provincies.</p>
+            <span className="inline-flex items-center gap-1.5 text-sm font-medium text-accent">
+              Voor publieke sector
+              <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="M3 10 L17 10 M11 4 L17 10 L11 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
+          </Link>
+          <Link href="/voor/private-sector" className="group block bg-card rounded-2xl p-6 ring-1 ring-foreground/10 hover:ring-accent/40 hover:-translate-y-0.5 transition-all duration-300">
+            <h3 className="text-base md:text-lg font-semibold text-foreground mb-2">Werk je in de private sector?</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed mb-4">Bekijk de risico-thema&apos;s voor zzp-kenniswerkers in IT, advies, projectmanagement, design, marketing en content.</p>
+            <span className="inline-flex items-center gap-1.5 text-sm font-medium text-accent">
+              Voor private sector
+              <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="M3 10 L17 10 M11 4 L17 10 L11 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
+          </Link>
+        </div>
+      </section>
+
       {/* Conversie-CTA */}
       <section className="relative px-4 sm:px-6 py-14 md:py-24 max-w-7xl mx-auto w-full overflow-hidden">
         <div className="relative rounded-3xl bg-primary text-primary-foreground p-10 md:p-16 overflow-hidden text-center">

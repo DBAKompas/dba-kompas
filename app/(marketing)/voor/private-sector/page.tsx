@@ -32,6 +32,8 @@ export default function PrivateSectorPage() {
         eyebrow="VOOR DE PRIVATE SECTOR"
         h1="Toets je opdracht in de private sector"
         heroSubtext="Voor zzp-kenniswerkers in bijvoorbeeld IT, advies, projectmanagement, design, marketing en content."
+        segmentLabel="Private sector"
+        verdiepingSlugs={["wet-dba", "deliveroo-criteria", "handhaving-2026"]}
         risicoThemas={[
           {
             title: "Afgekaderde opdracht of doorlopende rol?",

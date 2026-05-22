@@ -249,6 +249,9 @@ export default function Home() {
             <Link href="/over-dba-kompas" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">
               Over
             </Link>
+            <Link href="/kennisbank" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">
+              Kennisbank
+            </Link>
             <a href="#faq" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">
               {LANDING.nav.faq}
             </a>
@@ -321,6 +324,7 @@ export default function Home() {
                   { href: "#features", label: LANDING.nav.features },
                   { href: "#prijzen",  label: LANDING.nav.pricing },
                   { href: "/over-dba-kompas", label: "Over" },
+                  { href: "/kennisbank", label: "Kennisbank" },
                   { href: "#faq",      label: LANDING.nav.faq },
                 ].map(({ href, label }) => (
                   <a
@@ -912,7 +916,7 @@ export default function Home() {
       </section>
 
       {/* ── VOOR WIE (segmenten) ────────────────── */}
-      <section className="relative px-4 sm:px-6 py-14 md:py-28 max-w-7xl mx-auto w-full section-divider">
+      <section id="voor-wie" className="relative px-4 sm:px-6 py-14 md:py-28 max-w-7xl mx-auto w-full section-divider">
         <VoorWieAnimations />
 
         <div className="text-center mb-12 md:mb-16">
