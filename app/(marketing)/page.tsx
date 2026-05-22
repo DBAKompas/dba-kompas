@@ -520,6 +520,17 @@ export default function Home() {
             <p className="text-base md:text-lg leading-relaxed text-muted-foreground">
               <SplitWords text={ANSWER_BLOCK_TEXT} dataAttr="data-answer-word-body" />
             </p>
+            <div className="mt-6">
+              <Link
+                href="/over-dba-kompas"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:text-accent/80 transition-colors group"
+              >
+                <span>Meer weten over de methodiek en de maker</span>
+                <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                  <path d="M3 10 L17 10 M11 4 L17 10 L11 16" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </Link>
+            </div>
           </div>
 
           {/* RECHTS: 2x2 stat-grid */}
@@ -829,40 +840,17 @@ export default function Home() {
             <p className="text-sm text-primary-foreground/60 italic text-center mt-8">
               Gebaseerd op het Deliveroo-arrest van de Hoge Raad en het beoordelingskader van de Belastingdienst.
             </p>
-          </motion.div>
 
-          <hr className="border-primary-foreground/10 my-16" />
-
-          {/* DEEL B: Maker */}
-          <motion.div
-            className="grid md:grid-cols-[320px_1fr] gap-12 items-center"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            viewport={viewportConfig}
-          >
-            <div className="flex justify-center md:justify-start">
-              <img
-                src="/team/marvin-zoetemelk.jpg"
-                alt="Marvin Zoetemelk"
-                className="w-full max-w-[280px] md:max-w-none md:w-[320px] rounded-2xl border border-white/10 object-cover"
-              />
-            </div>
-
-            <div>
-              <h3 className="text-2xl md:text-3xl font-bold text-primary-foreground">Gemaakt vanuit de praktijk</h3>
-              <p className="text-base md:text-lg leading-relaxed text-primary-foreground/80 mt-4">
-                DBA Kompas is ontwikkeld door Marvin Zoetemelk. Hij werkt sinds zes jaar met externe
-                inhuur en heeft zich gespecialiseerd in opdrachtbeoordeling voor onder meer gemeenten,
-                GGD, COA en provincies. De Wet DBA en de gevolgen voor zzp'ers volgt hij dagelijks.
-                Daaruit groeide DBA Kompas: een vaste, herhaalbare manier om opdrachten te toetsen.
-              </p>
-              <p className="text-base md:text-lg text-primary-foreground/80 mt-6">
-                Bereikbaar via{" "}
-                <a href="mailto:info@dbakompas.nl" className="text-accent hover:underline">
-                  info@dbakompas.nl
-                </a>
-              </p>
+            <div className="text-center mt-8">
+              <Link
+                href="/over-dba-kompas"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:text-accent/80 transition-colors group"
+              >
+                <span>Lees meer over de maker en bronnen</span>
+                <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                  <path d="M3 10 L17 10 M11 4 L17 10 L11 16" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </Link>
             </div>
           </motion.div>
 
