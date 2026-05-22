@@ -246,6 +246,9 @@ export default function Home() {
             <a href="#prijzen" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">
               {LANDING.nav.pricing}
             </a>
+            <Link href="/over-dba-kompas" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">
+              Over
+            </Link>
             <a href="#faq" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">
               {LANDING.nav.faq}
             </a>
@@ -317,6 +320,7 @@ export default function Home() {
                 {[
                   { href: "#features", label: LANDING.nav.features },
                   { href: "#prijzen",  label: LANDING.nav.pricing },
+                  { href: "/over-dba-kompas", label: "Over" },
                   { href: "#faq",      label: LANDING.nav.faq },
                 ].map(({ href, label }) => (
                   <a
@@ -1305,6 +1309,7 @@ export default function Home() {
                 {LANDING.footer.product.links.map((l, i) => (
                   <a key={i} href={l.href} className="block text-sm text-muted-foreground hover:text-foreground transition-colors">{l.label}</a>
                 ))}
+                <Link href="/over-dba-kompas" className="block text-sm text-muted-foreground hover:text-foreground transition-colors">Over DBA Kompas</Link>
               </div>
               <div className="space-y-3">
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/60">Juridisch</p>

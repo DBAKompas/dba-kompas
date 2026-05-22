@@ -287,7 +287,11 @@
   [data-methodiek-circle], [data-methodiek-line-1], [data-methodiek-line-2],
   [data-methodiek-block] h3, [data-methodiek-block] p,
   [data-voorwie-word], [data-voorwie-word-body], [data-voorwie-card],
-  [data-prijs-callout] {
+  [data-prijs-callout],
+  [data-over-hero-word], [data-over-hero-body],
+  [data-over-maker-word], [data-over-maker-body],
+  [data-over-methodiek-word], [data-over-methodiek-body],
+  [data-over-circle], [data-over-list-item], [data-over-bron-card] {
     opacity: 1 !important;
     transform: none !important;
   }
