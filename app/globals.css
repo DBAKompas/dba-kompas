@@ -224,6 +224,23 @@
   animation: soft-pulse 1.5s ease-in-out infinite;
 }
 
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+  width: max-content;
+}
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation: none;
+  }
+}
+
 @keyframes circle-breathe {
   0%   { stroke-dashoffset: 283; opacity: 0.4; }
   50%  { stroke-dashoffset: 0;   opacity: 1; }
@@ -296,7 +313,7 @@
   [data-segment-card], [data-segment-step], [data-segment-faq-item],
   [data-kennisbank-word], [data-kennisbank-section], [data-kennisbank-related],
   [data-resultaat-word], [data-resultaat-word-body],
-  [data-resultaat-tile], [data-grenzen-item] {
+  [data-resultaat-tile] {
     opacity: 1 !important;
     transform: none !important;
   }

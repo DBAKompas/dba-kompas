@@ -2,8 +2,21 @@
 import { useState, useEffect, useRef, type ComponentType } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Step1Illustration } from "./how-it-works/Step1Illustration";
-import { Step2Illustration } from "./how-it-works/Step2Illustration";
-import { Step3Illustration } from "./how-it-works/Step3Illustration";
+import { Step3Illustration as Step4Illustration } from "./how-it-works/Step3Illustration";
+import { RisicoTileVisual } from "./resultaat/RisicoTileVisual";
+import { OpdrachtbriefTileVisual } from "./resultaat/OpdrachtbriefTileVisual";
+
+const Step2Illustration: ComponentType = () => (
+  <div className="w-full h-full bg-[#faf0e6]">
+    <RisicoTileVisual />
+  </div>
+);
+
+const Step3Illustration: ComponentType = () => (
+  <div className="w-full h-full bg-[#faf0e6]">
+    <OpdrachtbriefTileVisual />
+  </div>
+);
 
 type IllustrationComponent = ComponentType;
 
@@ -22,14 +35,20 @@ const STEPS: Array<{
   {
     number: "02",
     title: "Bekijk je risico-indicatie",
-    description: "De analyse laat per kernpunt zien waar aandacht nodig is.",
+    description: "Een percentage met uitleg waar de aandachtspunten zitten.",
     illustration: Step2Illustration,
   },
   {
     number: "03",
+    title: "Ontvang je herschreven opdrachtbrief",
+    description: "Direct beschikbaar in PDF en Word, klaar om te delen.",
+    illustration: Step3Illustration,
+  },
+  {
+    number: "04",
     title: "Ga sterker het gesprek in",
     description: "Gebruik de aandachtspunten en de herschreven opdrachtbrief.",
-    illustration: Step3Illustration,
+    illustration: Step4Illustration,
   },
 ];
 

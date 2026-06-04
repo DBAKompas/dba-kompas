@@ -25,10 +25,6 @@ import { PrijsAnimations } from "@/components/marketing/PrijsAnimations";
 import { SlotAnimations } from "@/components/marketing/SlotAnimations";
 import { FaqAccordion } from "@/components/marketing/faq/FaqAccordion";
 import { FaqAnimations } from "@/components/marketing/faq/FaqAnimations";
-import { ResultaatAnimations } from "@/components/marketing/ResultaatAnimations";
-import { RisicoTileVisual } from "@/components/marketing/resultaat/RisicoTileVisual";
-import { AandachtsTileVisual } from "@/components/marketing/resultaat/AandachtsTileVisual";
-import { OpdrachtbriefTileVisual } from "@/components/marketing/resultaat/OpdrachtbriefTileVisual";
 import { PubliekeSectorVisual } from "@/components/marketing/voor-wie/PubliekeSectorVisual";
 import { PrivateSectorVisual } from "@/components/marketing/voor-wie/PrivateSectorVisual";
 import { VoorWieAnimations } from "@/components/marketing/voor-wie/VoorWieAnimations";
@@ -841,6 +837,39 @@ export default function Home() {
               Gebaseerd op het Deliveroo-arrest van de Hoge Raad en het beoordelingskader van de Belastingdienst.
             </p>
 
+            {/* Heldere grenzen marquee */}
+            <div data-grenzen-marquee className="relative mt-12 pt-8 border-t border-primary-foreground/10">
+              <p className="text-center text-xs text-primary-foreground/60 mb-4">
+                Heldere grenzen van wat DBA Kompas wel en niet doet
+              </p>
+              <div data-marquee-track className="relative overflow-hidden">
+                <div data-marquee-content className="flex gap-12 animate-marquee whitespace-nowrap">
+                  {[
+                    "Indicatief, geen juridisch oordeel",
+                    "Vervangt geen jurist of fiscalist",
+                    "Zorgvuldig met je gegevens via Stripe",
+                    "Onderhouden op actuele wetgeving",
+                  ].map((item) => (
+                    <div key={`a-${item}`} className="flex items-center gap-2 text-sm text-primary-foreground/70 flex-shrink-0">
+                      <span className="w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0" />
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                  {[
+                    "Indicatief, geen juridisch oordeel",
+                    "Vervangt geen jurist of fiscalist",
+                    "Zorgvuldig met je gegevens via Stripe",
+                    "Onderhouden op actuele wetgeving",
+                  ].map((item) => (
+                    <div key={`b-${item}`} aria-hidden className="flex items-center gap-2 text-sm text-primary-foreground/70 flex-shrink-0">
+                      <span className="w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0" />
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
             <div className="text-center mt-8">
               <Link
                 href="/over-dba-kompas"
@@ -857,68 +886,59 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── RESULTAAT + GRENZEN ─────────────────── */}
-      <section id="features" className="relative px-4 sm:px-6 py-14 md:py-28 max-w-7xl mx-auto w-full section-divider">
-        <ResultaatAnimations />
-
-        <div className="text-center mb-12 md:mb-16 max-w-3xl mx-auto">
-          <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">RESULTAAT</p>
-          <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground mb-5">
-            <SplitWords text="Een concreet resultaat, direct bruikbaar" dataAttr="data-resultaat-word" />
-          </h2>
-          <p className="text-base md:text-lg leading-relaxed text-muted-foreground">
-            <SplitWords
-              text="Geen abstract advies. Na je analyse heb je drie dingen in handen waarmee je het gesprek aangaat."
-              dataAttr="data-resultaat-word-body"
-            />
-          </p>
-        </div>
-
-        {/* Drie animated tiles */}
-        <div className="grid md:grid-cols-3 gap-5 mb-12" data-resultaat-tiles>
-          {[
-            { title: "Risico-indicatie", body: "Op de drie kernpunten van je opdracht, met concrete uitleg per domein.", Visual: RisicoTileVisual },
-            { title: "Concrete aandachtspunten", body: "Specifieke punten die je opdracht versterken of verzwakken.", Visual: AandachtsTileVisual },
-            { title: "Herschreven opdrachtbrief", body: "Direct beschikbaar in PDF en Word, klaar voor het gesprek.", Visual: OpdrachtbriefTileVisual },
-          ].map(({ title, body, Visual }, i) => (
-            <div
-              key={i}
-              data-resultaat-tile
-              className="relative bg-card rounded-2xl ring-1 ring-foreground/10 overflow-hidden hover:ring-accent/40 hover:-translate-y-1 transition-all duration-300"
-            >
-              <div className="aspect-[4/3] bg-[#faf0e6] relative overflow-hidden">
-                <Visual />
-              </div>
-              <div className="p-5 md:p-6">
-                <span className="block w-8 h-0.5 bg-accent mb-3" />
-                <h3 className="text-base md:text-lg font-semibold text-foreground mb-1.5">{title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{body}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Compacte grenzen-strook */}
-        <div data-grenzen-strook className="border-t border-foreground/10 pt-8">
-          <div className="flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-8 justify-center">
-            <p className="text-[11px] uppercase tracking-[0.08em] font-semibold text-muted-foreground flex-shrink-0">
-              HELDERE GRENZEN
+      {/* ── ALTIJD ACTUEEL (meer dan analyse) ── */}
+      <section
+        data-aa-section
+        className="relative px-4 sm:px-6 py-12 md:py-20 max-w-7xl mx-auto w-full overflow-hidden section-divider"
+      >
+        <NieuwsAnimations />
+        <div className="grid md:grid-cols-[5fr_6fr] gap-10 md:gap-14 items-center">
+          <div data-aa-text>
+            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">ALTIJD ACTUEEL</p>
+            <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground mb-5">
+              <SplitWords text="Meer dan alleen een analyse" dataAttr="data-aa-word" />
+            </h2>
+            <p className="text-base leading-relaxed text-muted-foreground mb-7">
+              <SplitWords
+                text="DBA Kompas is meer dan een eenmalige toets. De wetgeving en het beleid rond zzp-werk veranderen continu. We scannen dagelijks het internet en houden je op de hoogte van wat het betekent voor jouw opdrachten."
+                dataAttr="data-aa-word-body"
+              />
             </p>
-            <div className="grid md:grid-cols-3 gap-3 md:gap-6 flex-1">
-              {[
-                "Indicatief, geen juridisch oordeel",
-                "Vervangt geen jurist of fiscalist",
-                "Zorgvuldig met je gegevens via Stripe",
-              ].map((item, i) => (
-                <div key={i} data-grenzen-item className="flex items-center gap-2 text-sm">
-                  <span className="flex-shrink-0 w-4 h-4 rounded-full ring-1 ring-foreground/20 flex items-center justify-center">
-                    <span className="block w-1.5 h-1.5 rounded-full bg-foreground/40" />
-                  </span>
-                  <span className="text-muted-foreground">{item}</span>
+
+            <div className="space-y-4" data-aa-bullets>
+              <div className="flex items-start gap-3" data-aa-bullet>
+                <span className="block w-6 h-0.5 bg-accent mt-3 flex-shrink-0" />
+                <div>
+                  <h4 className="text-sm md:text-base font-semibold text-foreground mb-1">Push en mail bij relevante updates</h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Direct op de hoogte als er iets verandert in wet, beleid of jurisprudentie.
+                  </p>
                 </div>
-              ))}
+              </div>
+
+              <div className="flex items-start gap-3" data-aa-bullet>
+                <span className="block w-6 h-0.5 bg-accent mt-3 flex-shrink-0" />
+                <div>
+                  <h4 className="text-sm md:text-base font-semibold text-foreground mb-1">Analyses bewaard, vergelijkbaar in de tijd</h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Alle analyses op één plek, terug te halen in PDF of Word.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3" data-aa-bullet>
+                <span className="block w-6 h-0.5 bg-accent mt-3 flex-shrink-0" />
+                <div>
+                  <h4 className="text-sm md:text-base font-semibold text-foreground mb-1">Wijzigingen toegepast op jouw opdrachten</h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Bij relevante updates zie je automatisch wat het betekent voor opdrachten die je al hebt geanalyseerd.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
+
+          <NieuwsIllustration />
         </div>
       </section>
 
@@ -979,62 +999,6 @@ export default function Home() {
               </svg>
             </span>
           </Link>
-        </div>
-      </section>
-
-      {/* ── ALTIJD ACTUEEL (nieuws + abonnement combo) ── */}
-      <section
-        data-aa-section
-        className="relative px-4 sm:px-6 py-12 md:py-20 max-w-7xl mx-auto w-full overflow-hidden section-divider"
-      >
-        <NieuwsAnimations />
-        <div className="grid md:grid-cols-[5fr_6fr] gap-10 md:gap-14 items-center">
-          <div data-aa-text>
-            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">ALTIJD ACTUEEL</p>
-            <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground mb-5">
-              <SplitWords text="Beweeg mee met wet- en beleidsontwikkelingen" dataAttr="data-aa-word" />
-            </h2>
-            <p className="text-base leading-relaxed text-muted-foreground mb-7">
-              <SplitWords
-                text="De wetgeving en het beleid rond zzp-werk veranderen continu. DBA Kompas scant dagelijks het internet en houdt je op de hoogte van wat het betekent voor jouw opdrachten."
-                dataAttr="data-aa-word-body"
-              />
-            </p>
-
-            <div className="space-y-4" data-aa-bullets>
-              <div className="flex items-start gap-3" data-aa-bullet>
-                <span className="block w-6 h-0.5 bg-accent mt-3 flex-shrink-0" />
-                <div>
-                  <h4 className="text-sm md:text-base font-semibold text-foreground mb-1">Push en mail bij relevante updates</h4>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Direct op de hoogte als er iets verandert in wet, beleid of jurisprudentie.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3" data-aa-bullet>
-                <span className="block w-6 h-0.5 bg-accent mt-3 flex-shrink-0" />
-                <div>
-                  <h4 className="text-sm md:text-base font-semibold text-foreground mb-1">Analyses bewaard, vergelijkbaar in de tijd</h4>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Alle analyses op één plek, terug te halen in PDF of Word.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3" data-aa-bullet>
-                <span className="block w-6 h-0.5 bg-accent mt-3 flex-shrink-0" />
-                <div>
-                  <h4 className="text-sm md:text-base font-semibold text-foreground mb-1">Wijzigingen toegepast op jouw opdrachten</h4>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Bij relevante updates zie je automatisch wat het betekent voor opdrachten die je al hebt geanalyseerd.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <NieuwsIllustration />
         </div>
       </section>
 
