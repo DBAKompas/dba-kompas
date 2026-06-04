@@ -7,13 +7,13 @@ import { RisicoTileVisual } from "./resultaat/RisicoTileVisual";
 import { OpdrachtbriefTileVisual } from "./resultaat/OpdrachtbriefTileVisual";
 
 const Step2Illustration: ComponentType = () => (
-  <div className="w-full h-full bg-[#faf0e6]">
+  <div className="w-full h-full bg-card">
     <RisicoTileVisual />
   </div>
 );
 
 const Step3Illustration: ComponentType = () => (
-  <div className="w-full h-full bg-[#faf0e6]">
+  <div className="w-full h-full bg-card">
     <OpdrachtbriefTileVisual />
   </div>
 );
