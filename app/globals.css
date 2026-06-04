@@ -296,7 +296,7 @@
   [data-segment-card], [data-segment-step], [data-segment-faq-item],
   [data-kennisbank-word], [data-kennisbank-section], [data-kennisbank-related],
   [data-resultaat-word], [data-resultaat-word-body],
-  [data-grenzen-word], [data-resultaat-item], [data-grenzen-item] {
+  [data-resultaat-tile], [data-grenzen-item] {
     opacity: 1 !important;
     transform: none !important;
   }
@@ -322,7 +322,7 @@
 [data-methodiek-circle],
 [data-voorwie-card],
 [data-prijs-callout],
-[data-resultaat-item],
+[data-resultaat-tile],
 [data-grenzen-item] {
   animation: features-fallback-show 0.3s ease-out 2s forwards;
 }
@@ -334,7 +334,7 @@
   [data-methodiek-circle],
   [data-voorwie-card],
   [data-prijs-callout],
-  [data-resultaat-item],
+  [data-resultaat-tile],
   [data-grenzen-item] {
     animation: none;
     opacity: 1 !important;

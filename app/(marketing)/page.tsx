@@ -26,6 +26,9 @@ import { SlotAnimations } from "@/components/marketing/SlotAnimations";
 import { FaqAccordion } from "@/components/marketing/faq/FaqAccordion";
 import { FaqAnimations } from "@/components/marketing/faq/FaqAnimations";
 import { ResultaatAnimations } from "@/components/marketing/ResultaatAnimations";
+import { RisicoTileVisual } from "@/components/marketing/resultaat/RisicoTileVisual";
+import { AandachtsTileVisual } from "@/components/marketing/resultaat/AandachtsTileVisual";
+import { OpdrachtbriefTileVisual } from "@/components/marketing/resultaat/OpdrachtbriefTileVisual";
 import { PubliekeSectorVisual } from "@/components/marketing/voor-wie/PubliekeSectorVisual";
 import { PrivateSectorVisual } from "@/components/marketing/voor-wie/PrivateSectorVisual";
 import { VoorWieAnimations } from "@/components/marketing/voor-wie/VoorWieAnimations";
@@ -858,74 +861,63 @@ export default function Home() {
       <section id="features" className="relative px-4 sm:px-6 py-14 md:py-28 max-w-7xl mx-auto w-full section-divider">
         <ResultaatAnimations />
 
-        <div className="grid md:grid-cols-[3fr_2fr] gap-10 md:gap-16 items-start">
-          {/* LINKS: RESULTAAT */}
-          <div data-resultaat-text>
-            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">RESULTAAT</p>
-            <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground mb-5">
-              <SplitWords text="Een concreet resultaat, direct bruikbaar" dataAttr="data-resultaat-word" />
-            </h2>
-            <p className="text-base md:text-lg leading-relaxed text-muted-foreground mb-8 max-w-xl">
-              <SplitWords
-                text="Geen abstract advies. Na je analyse heb je drie dingen in handen waarmee je het gesprek aangaat."
-                dataAttr="data-resultaat-word-body"
-              />
+        <div className="text-center mb-12 md:mb-16 max-w-3xl mx-auto">
+          <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">RESULTAAT</p>
+          <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground mb-5">
+            <SplitWords text="Een concreet resultaat, direct bruikbaar" dataAttr="data-resultaat-word" />
+          </h2>
+          <p className="text-base md:text-lg leading-relaxed text-muted-foreground">
+            <SplitWords
+              text="Geen abstract advies. Na je analyse heb je drie dingen in handen waarmee je het gesprek aangaat."
+              dataAttr="data-resultaat-word-body"
+            />
+          </p>
+        </div>
+
+        {/* Drie animated tiles */}
+        <div className="grid md:grid-cols-3 gap-5 mb-12" data-resultaat-tiles>
+          {[
+            { title: "Risico-indicatie", body: "Op de drie kernpunten van je opdracht, met concrete uitleg per domein.", Visual: RisicoTileVisual },
+            { title: "Concrete aandachtspunten", body: "Specifieke punten die je opdracht versterken of verzwakken.", Visual: AandachtsTileVisual },
+            { title: "Herschreven opdrachtbrief", body: "Direct beschikbaar in PDF en Word, klaar voor het gesprek.", Visual: OpdrachtbriefTileVisual },
+          ].map(({ title, body, Visual }, i) => (
+            <div
+              key={i}
+              data-resultaat-tile
+              className="relative bg-card rounded-2xl ring-1 ring-foreground/10 overflow-hidden hover:ring-accent/40 hover:-translate-y-1 transition-all duration-300"
+            >
+              <div className="aspect-[4/3] bg-[#faf0e6] relative overflow-hidden">
+                <Visual />
+              </div>
+              <div className="p-5 md:p-6">
+                <span className="block w-8 h-0.5 bg-accent mb-3" />
+                <h3 className="text-base md:text-lg font-semibold text-foreground mb-1.5">{title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{body}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Compacte grenzen-strook */}
+        <div data-grenzen-strook className="border-t border-foreground/10 pt-8">
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-8 justify-center">
+            <p className="text-[11px] uppercase tracking-[0.08em] font-semibold text-muted-foreground flex-shrink-0">
+              HELDERE GRENZEN
             </p>
-
-            <ul className="space-y-5">
+            <div className="grid md:grid-cols-3 gap-3 md:gap-6 flex-1">
               {[
-                {
-                  title: "Risico-indicatie op drie kernpunten",
-                  body: "Per kernpunt zie je waar aandacht nodig is, met concrete uitleg per domein.",
-                },
-                {
-                  title: "Concrete aandachtspunten",
-                  body: "Geen vaag advies, maar specifieke punten die je opdracht versterken of verzwakken.",
-                },
-                {
-                  title: "Herschreven opdrachtbrief",
-                  body: "Direct beschikbaar in PDF en Word, klaar voor het gesprek met opdrachtgever of intermediair.",
-                },
+                "Indicatief, geen juridisch oordeel",
+                "Vervangt geen jurist of fiscalist",
+                "Zorgvuldig met je gegevens via Stripe",
               ].map((item, i) => (
-                <li key={i} data-resultaat-item className="flex items-start gap-4">
-                  <span className="flex-shrink-0 mt-0.5 w-7 h-7 rounded-full bg-accent flex items-center justify-center">
-                    <svg className="w-3.5 h-3.5 text-white" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                      <path d="M3 7 L6 10 L11 4" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
+                <div key={i} data-grenzen-item className="flex items-center gap-2 text-sm">
+                  <span className="flex-shrink-0 w-4 h-4 rounded-full ring-1 ring-foreground/20 flex items-center justify-center">
+                    <span className="block w-1.5 h-1.5 rounded-full bg-foreground/40" />
                   </span>
-                  <div>
-                    <h3 className="text-base md:text-lg font-semibold text-foreground mb-1">{item.title}</h3>
-                    <p className="text-sm md:text-base text-muted-foreground leading-relaxed">{item.body}</p>
-                  </div>
-                </li>
+                  <span className="text-muted-foreground">{item}</span>
+                </div>
               ))}
-            </ul>
-          </div>
-
-          {/* RECHTS: GRENZEN */}
-          <div data-grenzen-block className="md:pl-6 md:border-l md:border-foreground/10">
-            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-muted-foreground mb-4">GRENZEN</p>
-            <h3 className="text-xl md:text-2xl font-semibold leading-tight text-foreground mb-5">
-              <SplitWords text="Helder over wat het niet is" dataAttr="data-grenzen-word" />
-            </h3>
-
-            <ul className="space-y-4">
-              {[
-                { title: "Indicatief, geen juridisch oordeel", body: "De uitkomst ondersteunt je eigen beoordeling." },
-                { title: "Vervangt geen jurist of fiscalist", body: "Bij complexe situaties blijft professioneel advies verstandig." },
-                { title: "Zorgvuldig met je gegevens", body: "Betalingen via Stripe. Details in het privacybeleid." },
-              ].map((item, i) => (
-                <li key={i} data-grenzen-item className="flex items-start gap-3">
-                  <span className="flex-shrink-0 mt-1 w-5 h-5 rounded-full ring-1 ring-foreground/20 flex items-center justify-center">
-                    <span className="block w-2 h-2 rounded-full bg-foreground/30" />
-                  </span>
-                  <div>
-                    <p className="text-sm md:text-base font-medium text-foreground mb-0.5">{item.title}</p>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{item.body}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            </div>
           </div>
         </div>
       </section>
