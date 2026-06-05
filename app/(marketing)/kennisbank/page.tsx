@@ -25,7 +25,7 @@ export default function KennisbankIndexPage() {
       <MarketingHeader />
 
       <section className="relative px-4 sm:px-6 py-14 md:py-28 max-w-5xl mx-auto w-full text-center">
-        <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Kennisbank" }]} />
+        <Breadcrumb hideVisible items={[{ label: "Home", href: "/" }, { label: "Kennisbank" }]} />
         <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">KENNISBANK</p>
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight text-foreground mb-6">
           Kennis over Wet DBA en zzp-wetgeving

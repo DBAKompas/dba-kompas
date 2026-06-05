@@ -232,17 +232,17 @@ export default function Home() {
 
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-6">
-            <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">
+            <a href="#functies" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">
               {LANDING.nav.features}
             </a>
             <a href="#prijzen" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">
               {LANDING.nav.pricing}
             </a>
-            <Link href="/over-dba-kompas" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">
-              Over
-            </Link>
             <Link href="/kennisbank" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">
               Kennisbank
+            </Link>
+            <Link href="/over-dba-kompas" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">
+              Over
             </Link>
             <a href="#faq" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">
               {LANDING.nav.faq}
@@ -313,10 +313,10 @@ export default function Home() {
 
                 {/* Nav-links */}
                 {[
-                  { href: "#features", label: LANDING.nav.features },
+                  { href: "#functies", label: LANDING.nav.features },
                   { href: "#prijzen",  label: LANDING.nav.pricing },
-                  { href: "/over-dba-kompas", label: "Over" },
                   { href: "/kennisbank", label: "Kennisbank" },
+                  { href: "/over-dba-kompas", label: "Over" },
                   { href: "#faq",      label: LANDING.nav.faq },
                 ].map(({ href, label }) => (
                   <a
@@ -585,7 +585,7 @@ export default function Home() {
       </section>
 
       {/* ── HOW IT WORKS ───────────────────────── */}
-      <section className="relative px-4 sm:px-6 py-14 md:py-28 max-w-7xl mx-auto w-full section-divider">
+      <section id="functies" className="relative px-4 sm:px-6 py-14 md:py-28 max-w-7xl mx-auto w-full section-divider">
         <div className="text-center mb-12 md:mb-16">
           <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">HOE HET WERKT</p>
           <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground mb-4">

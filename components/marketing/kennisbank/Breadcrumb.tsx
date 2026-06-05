@@ -2,9 +2,10 @@ import Link from "next/link";
 
 type Crumb = { label: string; href?: string };
 
-export function Breadcrumb({ items }: { items: Crumb[] }) {
+export function Breadcrumb({ items, hideVisible = false }: { items: Crumb[]; hideVisible?: boolean }) {
   return (
     <>
+      {!hideVisible && (
       <nav aria-label="Breadcrumb" className="text-sm text-muted-foreground mb-6">
         <ol className="flex flex-wrap items-center gap-1.5">
           {items.map((c, i) => {
@@ -24,6 +25,7 @@ export function Breadcrumb({ items }: { items: Crumb[] }) {
           })}
         </ol>
       </nav>
+      )}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{

@@ -4,6 +4,7 @@ import BrandLogo from "@/components/marketing/BrandLogo";
 import { SplitWords } from "@/components/marketing/SplitWords";
 import { OverAnimations } from "@/components/marketing/over/OverAnimations";
 import { Breadcrumb } from "@/components/marketing/kennisbank/Breadcrumb";
+import { SlotCta } from "@/components/marketing/shared/SlotCta";
 
 export const metadata: Metadata = {
   title: "Over DBA Kompas — Methodiek, maker en bronnen",
@@ -107,7 +108,7 @@ export default function OverPage() {
       {/* ── SECTIE 1: HERO ──────────────────────── */}
       <section className="relative px-4 sm:px-6 py-14 md:py-28 max-w-5xl mx-auto w-full text-center">
         <div className="text-left">
-          <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Over" }]} />
+          <Breadcrumb hideVisible items={[{ label: "Home", href: "/" }, { label: "Over" }]} />
         </div>
         <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">OVER DBA KOMPAS</p>
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight text-foreground mb-6">
@@ -287,30 +288,7 @@ export default function OverPage() {
       </section>
 
       {/* ── SECTIE 7: SLOT-CTA ──────────────────── */}
-      <section className="relative px-4 sm:px-6 py-14 md:py-32 max-w-7xl mx-auto w-full overflow-hidden">
-        <div className="relative rounded-3xl bg-primary text-primary-foreground p-12 md:p-20 overflow-hidden">
-          <div className="absolute inset-0 opacity-60 pointer-events-none">
-            <div className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full bg-accent/20 blur-3xl" />
-            <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] rounded-full bg-primary-foreground/10 blur-3xl" />
-          </div>
-          <div className="relative z-10 max-w-2xl">
-            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-5">STARTEN</p>
-            <h2 className="text-3xl md:text-5xl font-bold leading-tight mb-5">Toets je opdracht voor je het gesprek aangaat</h2>
-            <p className="text-base md:text-lg leading-relaxed text-primary-foreground/80 mb-8 max-w-xl">
-              Plak je opdracht en zie binnen een minuut waar de aandachtspunten zitten, met een herschreven opdrachtbrief als werkdocument.
-            </p>
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2 bg-accent text-white font-semibold px-8 py-4 rounded-full shadow-lg hover:shadow-2xl hover:shadow-accent/40 transition-shadow duration-300"
-            >
-              Start je gratis zelfscan
-              <svg className="w-4 h-4" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                <path d="M3 10 L17 10 M11 4 L17 10 L11 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </Link>
-          </div>
-        </div>
-      </section>
+      <SlotCta />
 
       {/* ── FOOTER ─────────────────────────────── */}
       <footer className="border-t border-border/40 py-12 px-4 sm:px-6">

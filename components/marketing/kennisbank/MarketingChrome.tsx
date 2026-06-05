@@ -1,7 +1,19 @@
+"use client";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import BrandLogo from "@/components/marketing/BrandLogo";
 
+const NAV_ITEMS: Array<{ label: string; href: string; matchPrefix?: string }> = [
+  { label: "Functies", href: "/#functies" },
+  { label: "Prijzen", href: "/#prijzen" },
+  { label: "Kennisbank", href: "/kennisbank", matchPrefix: "/kennisbank" },
+  { label: "Over", href: "/over-dba-kompas", matchPrefix: "/over-dba-kompas" },
+  { label: "FAQ", href: "/#faq" },
+];
+
 export function MarketingHeader() {
+  const pathname = usePathname() || "/";
+
   return (
     <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-border/40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
@@ -9,12 +21,26 @@ export function MarketingHeader() {
           <BrandLogo variant="dark" className="h-9 w-auto" />
         </Link>
         <nav className="hidden md:flex items-center gap-6">
-          <Link href="/#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Functies</Link>
-          <Link href="/#prijzen" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Prijzen</Link>
-          <Link href="/kennisbank" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Kennisbank</Link>
-          <Link href="/over-dba-kompas" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Over</Link>
-          <Link href="/#faq" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">FAQ</Link>
-          <Link href="/" className="inline-flex items-center gap-2 bg-accent text-white font-semibold px-4 py-2 rounded-md text-sm hover:bg-accent/90 transition-colors">
+          {NAV_ITEMS.map((item) => {
+            const isActive = item.matchPrefix
+              ? pathname === item.matchPrefix || pathname.startsWith(`${item.matchPrefix}/`)
+              : false;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`text-sm transition-colors font-medium ${
+                  isActive ? "text-foreground font-semibold" : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 bg-accent text-white font-semibold px-4 py-2 rounded-md text-sm hover:bg-accent/90 transition-colors"
+          >
             Start je gratis zelfscan
           </Link>
         </nav>
@@ -35,7 +61,7 @@ export function MarketingFooter() {
           <div className="flex flex-wrap gap-12">
             <div className="space-y-3">
               <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/60">Product</p>
-              <Link href="/#features" className="block text-sm text-muted-foreground hover:text-foreground transition-colors">Functies</Link>
+              <Link href="/#functies" className="block text-sm text-muted-foreground hover:text-foreground transition-colors">Functies</Link>
               <Link href="/#prijzen" className="block text-sm text-muted-foreground hover:text-foreground transition-colors">Prijzen</Link>
               <Link href="/kennisbank" className="block text-sm text-muted-foreground hover:text-foreground transition-colors">Kennisbank</Link>
               <Link href="/over-dba-kompas" className="block text-sm text-muted-foreground hover:text-foreground transition-colors">Over DBA Kompas</Link>
