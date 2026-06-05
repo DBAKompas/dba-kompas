@@ -66,10 +66,10 @@ export function SegmentPage({ eyebrow, h1, heroSubtext, segmentLabel, verdieping
           <SplitWords text={heroSubtext} dataAttr="data-segment-body" />
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <button type="button" onClick={openZelfscan} className="inline-flex items-center gap-2 bg-accent text-white font-semibold px-6 py-3 rounded-md hover:bg-accent/90 transition-colors min-w-[240px] justify-center">
+          <button type="button" onClick={openZelfscan} className="inline-flex items-center gap-2 bg-accent text-white font-semibold px-6 py-3 rounded-full hover:bg-accent/90 transition-colors min-w-[240px] justify-center">
             Start je gratis zelfscan
           </button>
-          <button type="button" onClick={() => openCheck("one_time_dba")} className="inline-flex items-center gap-2 border border-accent text-accent font-semibold px-6 py-3 rounded-md hover:bg-accent/8 transition-colors">
+          <button type="button" onClick={() => openCheck("one_time_dba")} className="inline-flex items-center gap-2 border border-accent text-accent font-semibold px-6 py-3 rounded-full hover:bg-accent/8 transition-colors">
             Toets je opdracht voor €9,95
           </button>
         </div>
@@ -204,7 +204,7 @@ export function SegmentPage({ eyebrow, h1, heroSubtext, segmentLabel, verdieping
               </ul>
               <Link
                 href="/#prijzen"
-                className={`w-full inline-flex items-center justify-center px-4 py-2.5 rounded-md font-semibold text-sm ${
+                className={`w-full inline-flex items-center justify-center px-6 py-2.5 rounded-full font-semibold text-sm ${
                   plan.popular ? "bg-accent text-white hover:bg-accent/90" : "border border-accent text-accent hover:bg-accent/8"
                 } transition-colors`}
               >

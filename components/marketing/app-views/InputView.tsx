@@ -102,7 +102,7 @@ export function InputView({ active = true }: { active?: boolean }) {
 
       <div className="flex-1" />
 
-      <button className="self-end px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-[10px] font-semibold pointer-events-none">
+      <button className="self-end px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-[10px] font-semibold pointer-events-none">
         Volgende: controleren →
       </button>
     </div>

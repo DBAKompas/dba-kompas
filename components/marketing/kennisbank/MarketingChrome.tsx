@@ -45,14 +45,14 @@ export function MarketingHeader() {
           })}
           <a
             href={`${APP_URL}/login`}
-            className="inline-flex items-center gap-2 border border-border text-foreground font-medium px-3 py-2 rounded-md text-sm hover:bg-foreground/5 transition-colors"
+            className="inline-flex items-center gap-2 border border-border text-foreground font-medium px-4 py-2 rounded-full text-sm hover:bg-foreground/5 transition-colors"
           >
             Ga naar de app
           </a>
           <button
             type="button"
             onClick={openZelfscan}
-            className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-4 py-2 rounded-md text-sm hover:bg-primary/90 transition-colors"
+            className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-6 py-2 rounded-full text-sm hover:bg-primary/90 transition-colors"
           >
             Start je gratis zelfscan
           </button>
