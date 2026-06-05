@@ -5,7 +5,7 @@ import { Breadcrumb } from "@/components/marketing/kennisbank/Breadcrumb";
 import { MarketingHeader, MarketingFooter } from "@/components/marketing/kennisbank/MarketingChrome";
 
 export const metadata: Metadata = {
-  title: "Kennisbank — Wet DBA en zzp-wetgeving | DBA Kompas",
+  title: "Kennisbank — Wet DBA en zzp-wetgeving",
   description:
     "Korte, gevalideerde uitleg over de regels rond zzp-werk: Wet DBA, schijnzelfstandigheid, Deliveroo-criteria, Zelfstandigenwet en handhaving in 2026.",
 };

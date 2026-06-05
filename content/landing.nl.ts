@@ -26,7 +26,7 @@ export const LANDING = {
   },
 
   steps: {
-    title: "In drie stappen naar meer duidelijkheid",
+    title: "In vier stappen naar meer duidelijkheid",
     subtitle: "Van invoer naar inzicht, zonder onnodige complexiteit.",
     items: [
       {

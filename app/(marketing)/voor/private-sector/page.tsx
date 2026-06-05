@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { SegmentPage } from "@/components/marketing/segment/SegmentPage";
 
 export const metadata: Metadata = {
-  title: "Voor de private sector | DBA Kompas",
+  title: "Voor de private sector",
   description:
     "Toets je zzp-opdracht in de private sector. Voor kenniswerkers in IT, advies, projectmanagement, design, marketing en content.",
 };

@@ -6,7 +6,7 @@ const SLUG = "zelfstandigenwet";
 const page = findKennisbankPage(SLUG)!;
 
 export const metadata: Metadata = {
-  title: `${page.title} | Kennisbank | DBA Kompas`,
+  title: `${page.title} — Kennisbank`,
   description: page.answerBlock.slice(0, 160),
 };
 

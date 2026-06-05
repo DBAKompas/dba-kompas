@@ -109,16 +109,16 @@ export function HowItWorksHorizontal() {
           return (
             <div
               key={i}
-              className="flex-shrink-0 h-full flex items-center justify-center px-12"
+              className="flex-shrink-0 h-full flex items-center justify-center px-8 lg:px-20"
               style={{ width: "100vw" }}
             >
-              <div className="grid grid-cols-2 gap-12 items-center max-w-6xl mx-auto w-full">
-                <div>
-                  <div className="text-6xl font-bold text-accent">{stap.number}</div>
-                  <h3 className="text-3xl font-bold mt-4 text-foreground">{stap.title}</h3>
-                  <p className="text-lg text-muted-foreground mt-3 leading-relaxed">{stap.description}</p>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center max-w-6xl mx-auto w-full">
+                <div className="min-w-0">
+                  <div className="text-5xl lg:text-6xl font-bold text-accent">{stap.number}</div>
+                  <h3 className="text-2xl lg:text-3xl font-bold mt-4 text-foreground">{stap.title}</h3>
+                  <p className="text-base lg:text-lg text-muted-foreground mt-3 leading-relaxed">{stap.description}</p>
                 </div>
-                <div className="aspect-[3/2] bg-[#faf0e6] rounded-2xl overflow-hidden flex items-center justify-center">
+                <div className="aspect-[3/2] bg-[#faf0e6] rounded-2xl overflow-hidden flex items-center justify-center w-full">
                   <Illustration />
                 </div>
               </div>

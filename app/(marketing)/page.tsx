@@ -24,7 +24,6 @@ import { ChatGptAnimations } from "@/components/marketing/ChatGptAnimations";
 import { MethodiekAnimations } from "@/components/marketing/MethodiekAnimations";
 import { PrijsAnimations } from "@/components/marketing/PrijsAnimations";
 import { SlotAnimations } from "@/components/marketing/SlotAnimations";
-import { MarketingTOC } from "@/components/marketing/MarketingTOC";
 import { FaqAccordion } from "@/components/marketing/faq/FaqAccordion";
 import { FaqAnimations } from "@/components/marketing/faq/FaqAnimations";
 import { PubliekeSectorVisual } from "@/components/marketing/voor-wie/PubliekeSectorVisual";
@@ -185,8 +184,6 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA_ORGANIZATION) }}
       />
-
-      <MarketingTOC />
 
       {/* ── HEADER ─────────────────────────────── */}
       <header

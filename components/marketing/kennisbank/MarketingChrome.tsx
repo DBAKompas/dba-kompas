@@ -3,6 +3,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import BrandLogo from "@/components/marketing/BrandLogo";
 
+const APP_URL =
+  (process.env.NEXT_PUBLIC_APP_URL as string | undefined)?.replace(/\/+$/, "") ||
+  "https://app.dbakompas.nl";
+
 const NAV_ITEMS: Array<{ label: string; href: string; matchPrefix?: string }> = [
   { label: "Functies", href: "/#functies" },
   { label: "Prijzen", href: "/#prijzen" },
@@ -20,7 +24,7 @@ export function MarketingHeader() {
         <Link href="/" className="flex items-center gap-2">
           <BrandLogo variant="dark" className="h-9 w-auto" />
         </Link>
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden md:flex items-center gap-5">
           {NAV_ITEMS.map((item) => {
             const isActive = item.matchPrefix
               ? pathname === item.matchPrefix || pathname.startsWith(`${item.matchPrefix}/`)
@@ -37,9 +41,15 @@ export function MarketingHeader() {
               </Link>
             );
           })}
+          <a
+            href={`${APP_URL}/login`}
+            className="inline-flex items-center gap-2 border border-border text-foreground font-medium px-3 py-2 rounded-md text-sm hover:bg-foreground/5 transition-colors"
+          >
+            Ga naar de app
+          </a>
           <Link
             href="/"
-            className="inline-flex items-center gap-2 bg-accent text-white font-semibold px-4 py-2 rounded-md text-sm hover:bg-accent/90 transition-colors"
+            className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-4 py-2 rounded-md text-sm hover:bg-primary/90 transition-colors"
           >
             Start je gratis zelfscan
           </Link>
