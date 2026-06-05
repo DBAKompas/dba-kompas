@@ -205,6 +205,162 @@
     html {
       scroll-behavior: auto;
     }
+    .animate-ping,
+    .animate-spin,
+    .animate-pulse {
+      animation: none !important;
+    }
+    .group-hover-pulse:hover {
+      animation: none !important;
+    }
+  }
+}
+
+@keyframes soft-pulse {
+  0%, 100% { transform: scale(1.04); }
+  50% { transform: scale(1.06); }
+}
+.group-hover-pulse:hover {
+  animation: soft-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+  width: max-content;
+}
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation: none;
+  }
+}
+
+@keyframes circle-breathe {
+  0%   { stroke-dashoffset: 283; opacity: 0.4; }
+  50%  { stroke-dashoffset: 0;   opacity: 1; }
+  100% { stroke-dashoffset: 283; opacity: 0.4; }
+}
+.animate-circle-breathe {
+  animation: circle-breathe 2.5s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-circle-breathe {
+    animation: none;
+    opacity: 0.6;
+    stroke-dashoffset: 70;
+  }
+  [data-answer-word],
+  [data-answer-word-body],
+  [data-answer-stats] > div,
+  [data-howitworks-word],
+  [data-inzet-word],
+  [data-inzet-word-body],
+  [data-inzet-svg],
+  [data-svg-loupe],
+  [data-svg-highlight-1],
+  [data-svg-highlight-2],
+  [data-decor-1],
+  [data-decor-2],
+  [data-decor-3],
+  [data-decor-4],
+  [data-decor-5],
+  [data-s1-doc], [data-s1-arrow], [data-s1-line], [data-s1-cursor],
+  [data-s1-decor-1], [data-s1-decor-2], [data-s1-decor-3], [data-s1-decor-4],
+  [data-s2-compass], [data-s2-needle],
+  [data-s2-pulse-1], [data-s2-pulse-2], [data-s2-pulse-3],
+  [data-s2-point-1], [data-s2-point-2], [data-s2-point-3],
+  [data-s2-label-1], [data-s2-label-2], [data-s2-label-3],
+  [data-s2-decor-1], [data-s2-decor-2], [data-s2-decor-3],
+  [data-s3-doc], [data-s3-check], [data-s3-arrow],
+  [data-s3-highlight-1], [data-s3-highlight-2], [data-s3-highlight-3],
+  [data-s3-decor-1], [data-s3-decor-2], [data-s3-decor-3],
+  [data-aa-word], [data-aa-word-body], [data-aa-bullet],
+  [data-nieuws-card-1], [data-nieuws-card-2], [data-nieuws-card-3],
+  [data-nieuws-pulse],
+  [data-nieuws-decor-1], [data-nieuws-decor-2], [data-nieuws-decor-3], [data-nieuws-decor-4], [data-nieuws-decor-5],
+  [data-chatgpt-word], [data-chatgpt-word-body],
+  [data-chatgpt-cell-word],
+  [data-chatgpt-icon-check], [data-chatgpt-icon-cross],
+  [data-chatgpt-table-header], [data-chatgpt-row],
+  [data-chatgpt-decor-1], [data-chatgpt-decor-2],
+  [data-chatgpt-decor-3], [data-chatgpt-decor-4],
+  [data-chatgpt-glow],
+  [data-features-word], [data-features-word-body],
+  [data-feature-card], [data-features-abo], [data-abo-pulse],
+  [data-slot-word], [data-slot-word-body],
+  [data-slot-cta-wrap], [data-slot-mesh] > div,
+  [data-slot-needle],
+  [data-slot-decor-1], [data-slot-decor-2],
+  [data-slot-decor-3], [data-slot-decor-4],
+  [data-faq-word], [data-faq-item],
+  [data-grenzen-word], [data-grenzen-word-body], [data-grenzen-card],
+  [data-indicatief-needle],
+  [data-methodiek-circle], [data-methodiek-line-1], [data-methodiek-line-2],
+  [data-methodiek-block] h3, [data-methodiek-block] p,
+  [data-voorwie-word], [data-voorwie-word-body], [data-voorwie-card],
+  [data-prijs-callout],
+  [data-over-hero-word], [data-over-hero-body],
+  [data-over-maker-word], [data-over-maker-body],
+  [data-over-methodiek-word], [data-over-methodiek-body],
+  [data-over-circle], [data-over-list-item], [data-over-bron-card],
+  [data-segment-word], [data-segment-body],
+  [data-segment-card], [data-segment-step], [data-segment-faq-item],
+  [data-kennisbank-word], [data-kennisbank-section], [data-kennisbank-related],
+  [data-resultaat-word], [data-resultaat-word-body],
+  [data-resultaat-tile] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  [data-chatgpt-glow] { opacity: 0.4 !important; }
+  [data-slot-mesh] { opacity: 0.6 !important; }
+  [data-methodiek-line-1], [data-methodiek-line-2] {
+    stroke-dashoffset: 0 !important;
+  }
+}
+
+/* No-JS / GSAP-fail fallback: feature-cards en abo-card worden na 2s
+   alsnog zichtbaar als geen animatie ze al heeft opgepakt. */
+@keyframes features-fallback-show {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+[data-feature-card],
+[data-features-abo],
+[data-faq-item],
+[data-grenzen-card],
+[data-methodiek-circle],
+[data-voorwie-card],
+[data-prijs-callout],
+[data-resultaat-tile],
+[data-grenzen-item] {
+  animation: features-fallback-show 0.3s ease-out 2s forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-feature-card],
+  [data-features-abo],
+  [data-faq-item],
+  [data-grenzen-card],
+  [data-methodiek-circle],
+  [data-voorwie-card],
+  [data-prijs-callout],
+  [data-resultaat-tile],
+  [data-grenzen-item] {
+    animation: none;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  [data-nieuws-card-2] { opacity: 0.85 !important; }
+  [data-nieuws-card-3] { opacity: 0.7 !important; }
+  [data-s2-pulse-1], [data-s2-pulse-2], [data-s2-pulse-3] {
+    opacity: 0.25 !important;
   }
 }
 

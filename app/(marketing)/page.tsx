@@ -2,88 +2,115 @@
 
 import { useState, useEffect } from "react";
 import {
-  ArrowRight, LogOut, CheckCircle, Zap, Target, MessageSquare,
-  AlertTriangle, FileText, Edit3, Newspaper, Users, Building2, Network,
-  Clock, Shield, PenTool, Bell, Lock, ChevronDown, Check,
-  ClipboardList, TrendingUp, BarChart3, Menu, X,
+  ArrowRight, LogOut, Zap, Menu, X,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import BrandLogo from "@/components/marketing/BrandLogo";
 import { Button } from "@/components/ui/button";
 import { LANDING } from "@/content/landing.nl";
-import AppDemoShowcase from "@/components/marketing/AppDemoShowcase";
-import QuickScan from "@/components/marketing/QuickScan";
 import { AuthModal } from "@/components/marketing/AuthModals";
-import { EmailCheckoutModal } from "@/components/marketing/EmailCheckoutModal";
-import QuickScanModal from "@/components/marketing/QuickScanModal";
+import { useMarketingModals } from "@/lib/store/marketingModals";
+import { HeroAnimations } from "@/components/marketing/HeroAnimations";
+import { SplitWords } from "@/components/marketing/SplitWords";
+import { AnswerBlockAnimations } from "@/components/marketing/AnswerBlockAnimations";
+import { InzetIllustration } from "@/components/marketing/InzetIllustration";
+import { InzetAnimations } from "@/components/marketing/InzetAnimations";
+import { HowItWorksCarousel } from "@/components/marketing/HowItWorksCarousel";
+import { HowItWorksHorizontal } from "@/components/marketing/HowItWorksHorizontal";
+import { NieuwsIllustration } from "@/components/marketing/news/NieuwsIllustration";
+import { NieuwsAnimations } from "@/components/marketing/news/NieuwsAnimations";
+import { ChatGptAnimations } from "@/components/marketing/ChatGptAnimations";
+import { MethodiekAnimations } from "@/components/marketing/MethodiekAnimations";
+import { PrijsAnimations } from "@/components/marketing/PrijsAnimations";
+import { SlotAnimations } from "@/components/marketing/SlotAnimations";
+import { FaqAccordion } from "@/components/marketing/faq/FaqAccordion";
+import { FaqAnimations } from "@/components/marketing/faq/FaqAnimations";
+import { PubliekeSectorVisual } from "@/components/marketing/voor-wie/PubliekeSectorVisual";
+import { PrivateSectorVisual } from "@/components/marketing/voor-wie/PrivateSectorVisual";
+import { VoorWieAnimations } from "@/components/marketing/voor-wie/VoorWieAnimations";
+import { CompassDecoration } from "@/components/marketing/CompassDecoration";
+import { AppDemoHero } from "@/components/marketing/AppDemoHero";
 import { useMarketingAuth as useAuth } from "@/components/marketing/useMarketingAuth";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { viewportConfig } from "@/lib/motion";
 import { trackLandingPageView, useScrollTracking } from '@/lib/dba-analytics'
-import { trackFaqOpened } from '@/lib/dba-analytics'
 
 const APP_URL = (process.env.NEXT_PUBLIC_APP_URL as string | undefined)?.replace(/\/+$/, "") || "https://app.dbakompas.nl";
+
+const ANSWER_BLOCK_TEXT =
+  "DBA Kompas is een online hulpmiddel voor zzp'ers in Nederland. Je voert je opdrachtomschrijving in en krijgt binnen ongeveer een minuut een indicatie van mogelijke aandachtspunten rond de Wet DBA, samen met een herschreven opdrachtbrief. De analyse volgt een vaste methodiek die wordt onderhouden op basis van de actuele wetgeving. De uitkomst is indicatief en ondersteunt je eigen beoordeling. Het is geen juridisch advies.";
+
+const SCHEMA_SOFTWARE_APPLICATION = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "DBA Kompas",
+  description:
+    "Online hulpmiddel voor zzp'ers in Nederland om hun opdrachtomschrijving te toetsen op mogelijke aandachtspunten rond de Wet DBA.",
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Web",
+  url: "https://dbakompas.nl",
+  offers: [
+    {
+      "@type": "Offer",
+      name: "Eenmalige check",
+      price: "9.95",
+      priceCurrency: "EUR",
+      description: "Voor één opdracht die nu speelt.",
+    },
+    {
+      "@type": "Offer",
+      name: "Maandelijks abonnement",
+      price: "20.00",
+      priceCurrency: "EUR",
+      description: "Voor wie regelmatig nieuwe opdrachten heeft.",
+      priceSpecification: {
+        "@type": "UnitPriceSpecification",
+        price: "20.00",
+        priceCurrency: "EUR",
+        billingDuration: "P1M",
+      },
+    },
+    {
+      "@type": "Offer",
+      name: "Jaarlijks abonnement",
+      price: "200.00",
+      priceCurrency: "EUR",
+      description: "Voor wie structureel als zelfstandige werkt.",
+      priceSpecification: {
+        "@type": "UnitPriceSpecification",
+        price: "200.00",
+        priceCurrency: "EUR",
+        billingDuration: "P1Y",
+      },
+    },
+  ],
+};
+
+const SCHEMA_ORGANIZATION = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "DBA Kompas",
+  url: "https://dbakompas.nl",
+  logo: "https://dbakompas.nl/logo-dark-v3.png",
+  email: "info@dbakompas.nl",
+  identifier: {
+    "@type": "PropertyValue",
+    propertyID: "KvK",
+    value: "99964538",
+  },
+  contactPoint: {
+    "@type": "ContactPoint",
+    email: "info@dbakompas.nl",
+    contactType: "customer service",
+    areaServed: "NL",
+    availableLanguage: "Dutch",
+  },
+};
 
 // ─────────────────────────────────────────
 // Sub-components
 // ─────────────────────────────────────────
-
-function SectionBadge({ children, withIcon }: { children: string; withIcon?: boolean }) {
-  return (
-    <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/8 text-primary text-sm font-semibold border border-primary/12">
-      {withIcon && (
-        <img src="/logo-icon-badge.png" alt="" className="h-4 w-auto object-contain" />
-      )}
-      {children}
-    </span>
-  );
-}
-
-/** Kompas-icoon als subtiele bullet voor opsommingen */
-function BulletIcon() {
-  return (
-    <img
-      src="/logo-bullet.png"
-      alt=""
-      className="h-3.5 w-auto object-contain flex-shrink-0 opacity-55 mt-0.5"
-    />
-  );
-}
-
-function FaqItem({ question, answer }: { question: string; answer: string }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="border border-border/50 rounded-xl overflow-hidden">
-      <button
-        className="w-full flex items-center justify-between px-6 py-4 text-left font-semibold text-foreground hover:bg-primary/4 transition-colors"
-        onClick={() => {
-          if (!open) trackFaqOpened(question, 'landing')
-          setOpen(!open)
-        }}
-      >
-        <span>{question}</span>
-        <ChevronDown
-          className={`w-5 h-5 text-muted-foreground flex-shrink-0 ml-4 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
-        />
-      </button>
-      <AnimatePresence initial={false}>
-        {open && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <div className="px-6 pb-5 text-muted-foreground leading-relaxed border-t border-border/30 pt-4">
-              {answer}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
 
 // ─────────────────────────────────────────
 // Page
@@ -93,8 +120,14 @@ export default function Home() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [authModal, setAuthModal] = useState<"login" | null>(null);
-  const [emailCheckoutPlan, setEmailCheckoutPlan] = useState<"monthly" | "yearly" | "one_time_dba" | null>(null);
-  const [quickScanOpen, setQuickScanOpen] = useState(false);
+  const { openZelfscan, openCheck } = useMarketingModals();
+  const setQuickScanOpen = (open: boolean) => {
+    if (open) openZelfscan();
+  };
+  const setEmailCheckoutPlan = (plan: "monthly" | "yearly" | "one_time_dba" | null) => {
+    if (plan) openCheck(plan);
+  };
+  const [mockupHovered, setMockupHovered] = useState(false);
 
   function scrollToPricing() {
     trackPricingViewed('landing')
@@ -123,15 +156,38 @@ export default function Home() {
     });
   }
 
-  const valueIcons = [Zap, Target, CheckCircle, MessageSquare];
-  const problemIcons = [AlertTriangle, TrendingUp, BarChart3];
-  const featureIcons = [ClipboardList, Edit3, Newspaper];
-  const audienceIcons = [Users, Building2, Network];
-  const benefitIcons = [Clock, Shield, PenTool, Bell];
-  const trustIcons = [Shield, AlertTriangle, Lock];
+
+  const faqPageSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "Wat is DBA Kompas?",
+        acceptedAnswer: { "@type": "Answer", text: ANSWER_BLOCK_TEXT },
+      },
+      ...LANDING.faq.items.map((item) => ({
+        "@type": "Question",
+        name: item.question,
+        acceptedAnswer: { "@type": "Answer", text: item.answer },
+      })),
+    ],
+  };
 
   return (
     <div className="min-h-screen bg-background relative flex flex-col">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA_SOFTWARE_APPLICATION) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqPageSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA_ORGANIZATION) }}
+      />
 
       {/* ── HEADER ─────────────────────────────── */}
       <header
@@ -181,12 +237,18 @@ export default function Home() {
 
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-6">
-            <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">
+            <a href="#functies" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">
               {LANDING.nav.features}
             </a>
             <a href="#prijzen" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">
               {LANDING.nav.pricing}
             </a>
+            <Link href="/kennisbank" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">
+              Kennisbank
+            </Link>
+            <Link href="/over-dba-kompas" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">
+              Over
+            </Link>
             <a href="#faq" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">
               {LANDING.nav.faq}
             </a>
@@ -216,7 +278,7 @@ export default function Home() {
                 </Button>
                 <Button
                   size="sm"
-                  onClick={() => setEmailCheckoutPlan("yearly")}
+                  onClick={() => setQuickScanOpen(true)}
                   className="btn-magnetic"
                 >
                   {LANDING.nav.tryNow}
@@ -256,8 +318,10 @@ export default function Home() {
 
                 {/* Nav-links */}
                 {[
-                  { href: "#features", label: LANDING.nav.features },
+                  { href: "#functies", label: LANDING.nav.features },
                   { href: "#prijzen",  label: LANDING.nav.pricing },
+                  { href: "/kennisbank", label: "Kennisbank" },
+                  { href: "/over-dba-kompas", label: "Over" },
                   { href: "#faq",      label: LANDING.nav.faq },
                 ].map(({ href, label }) => (
                   <a
@@ -296,7 +360,7 @@ export default function Home() {
                   <>
                     <Button
                       className="w-full justify-center text-base py-5 btn-magnetic"
-                      onClick={() => { setMenuOpen(false); setEmailCheckoutPlan("yearly"); }}
+                      onClick={() => { setMenuOpen(false); setQuickScanOpen(true); }}
                     >
                       {LANDING.nav.tryNow}
                       <ArrowRight className="w-4 h-4 ml-2" />
@@ -317,322 +381,667 @@ export default function Home() {
       </AnimatePresence>
 
       {/* ── HERO ───────────────────────────────── */}
-      <section className="hero-gradient hero-shimmer px-4 sm:px-6 pt-20 pb-16 md:pt-28 md:pb-24 max-w-7xl mx-auto w-full">
-        <div className="text-center space-y-6 max-w-3xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <SectionBadge withIcon>{LANDING.hero.badge}</SectionBadge>
-          </motion.div>
-
-          <motion.h1
-            className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight text-foreground"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
-            {LANDING.hero.title}{" "}
-            <span className="text-primary">{LANDING.hero.titleHighlight}</span>
-          </motion.h1>
-
-          <motion.p
-            className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            {LANDING.hero.subtitle}
-          </motion.p>
-
-          <motion.div
-            className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.35 }}
-          >
-            <Button size="lg" onClick={() => setQuickScanOpen(true)} className="btn-magnetic min-w-[240px]">
-              <Zap className="w-4 h-4 mr-2 flex-shrink-0" />
-              {LANDING.hero.ctaPrimary}
-            </Button>
-            <Button size="lg" variant="outline" onClick={scrollToPricing}>
-              {LANDING.hero.ctaSecondary}
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-          </motion.div>
-
-          <motion.p
-            className="text-sm text-muted-foreground/70 pt-1"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-          >
-            {LANDING.hero.supporting}
-          </motion.p>
-        </div>
-      </section>
-
-      {/* ── VALUE STRIP ────────────────────────── */}
-      <section className="px-4 sm:px-6 py-6 max-w-7xl mx-auto w-full section-divider">
-        <motion.div
-          className="grid grid-cols-2 md:grid-cols-4 gap-3"
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          viewport={viewportConfig}
+      <section id="hero" className="relative overflow-x-hidden hero-gradient hero-shimmer px-4 sm:px-6 pt-20 pb-10 md:pt-28 md:pb-14 max-w-7xl mx-auto w-full">
+        <HeroAnimations />
+        <div
+          className="absolute inset-0 -z-10 overflow-hidden pointer-events-none"
+          data-hero-bg
         >
-          {LANDING.valueStrip.map((item, i) => {
-            const Icon = valueIcons[i];
-            return (
-              <div
-                key={i}
-                className="glass-card hover-elevate flex items-center gap-3 px-4 py-3.5 cursor-default"
-              >
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <Icon className="w-4 h-4 text-primary" />
-                </div>
-                <span className="text-sm font-semibold text-foreground leading-tight">{item.label}</span>
-              </div>
-            );
-          })}
-        </motion.div>
-      </section>
+          <div className="bg-mesh-a absolute -top-1/2 left-1/2 -translate-x-1/2 w-[120%] h-[200%] bg-[radial-gradient(circle_at_30%_40%,_rgba(212,120,42,0.10),_transparent_60%)]" />
+          <div className="bg-mesh-b absolute top-1/3 left-1/2 -translate-x-1/2 w-[110%] h-[150%] bg-[radial-gradient(circle_at_70%_60%,_rgba(11,29,58,0.07),_transparent_55%)]" />
+        </div>
+        <CompassDecoration />
 
-      {/* ── QUICK SCAN ─────────────────────────── */}
-      <section id="quick-scan" className="px-4 sm:px-6 py-16 md:py-20 max-w-7xl mx-auto w-full">
-        <div className="space-y-10">
-          <motion.div
-            className="text-center space-y-3 max-w-xl mx-auto"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            viewport={viewportConfig}
-          >
-            <SectionBadge>Gratis zelfscan</SectionBadge>
-            <h2 className="text-3xl md:text-4xl font-bold">Hoe staat jouw opdracht ervoor?</h2>
-            <p className="text-muted-foreground">
-              Beantwoord 5 vragen over je opdracht en ontdek direct of er aandachtspunten zijn.
+        <div className="grid md:grid-cols-[55fr_45fr] gap-8 lg:gap-12 items-center">
+          {/* Linker kolom: tekst + CTA's */}
+          <div className="text-center md:text-left space-y-6">
+            <p data-hero-eyebrow className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-3">VOOR ZZP&apos;ERS</p>
+
+            <h1
+              data-hero-h1
+              className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight text-foreground"
+            >
+              {LANDING.hero.title.split(" ").map((w, i) => (
+                <span key={`t${i}`} className="inline-block">{w}&nbsp;</span>
+              ))}
+              {LANDING.hero.titleHighlight.split(" ").map((w, i, arr) => (
+                <span key={`h${i}`} className="inline-block text-primary">
+                  {w}{i < arr.length - 1 ? " " : ""}
+                </span>
+              ))}
+            </h1>
+
+            <p
+              data-hero-subhead
+              className="text-lg md:text-xl text-muted-foreground max-w-2xl md:mx-0 mx-auto leading-relaxed"
+            >
+              {LANDING.hero.subtitle}
             </p>
-          </motion.div>
 
-          <motion.div
-            data-testid="quickscan-container"
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={viewportConfig}
-          >
-            <QuickScan />
-          </motion.div>
+            <div
+              data-hero-cta
+              className="flex flex-col sm:flex-row items-center md:justify-start justify-center gap-3 pt-2"
+            >
+              <Button
+                size="lg"
+                onClick={() => setQuickScanOpen(true)}
+                className="btn-magnetic min-w-[240px] bg-accent text-white hover:bg-accent/90 border-0"
+              >
+                <Zap className="w-4 h-4 mr-2 flex-shrink-0" />
+                {LANDING.hero.ctaPrimary}
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={() => setEmailCheckoutPlan("one_time_dba")}
+                className="border-accent text-accent hover:bg-accent/8 hover:text-accent"
+              >
+                {LANDING.hero.ctaSecondary}
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
+
+            <p className="text-sm text-muted-foreground/70 pt-1">
+              {LANDING.hero.supporting}
+            </p>
+          </div>
+
+          {/* Rechter kolom: dual-sided screen met levende mini-app demo */}
+          <div className="relative w-full max-w-[640px] mx-auto md:mx-0 md:ml-auto">
+            {/* Soft glow achter scherm */}
+            <div className="absolute inset-0 -z-10 rounded-3xl bg-gradient-to-br from-accent/10 via-transparent to-primary/10 blur-3xl" />
+
+            {/* 3D stage */}
+            <div
+              data-hero-mockup
+              data-laptop-stage
+              onMouseEnter={() => setMockupHovered(true)}
+              onMouseLeave={() => setMockupHovered(false)}
+              className="relative z-10 w-full"
+              style={{ perspective: "1600px" }}
+            >
+              {/* Flipper: dual-sided card */}
+              <div
+                data-screen-flipper
+                className="relative aspect-[16/10] w-full"
+                style={{ transformStyle: "preserve-3d" }}
+              >
+                {/* VOORKANT: demo */}
+                <div
+                  className="absolute inset-0 rounded-2xl overflow-hidden bg-card shadow-[0_30px_60px_-20px_rgba(0,0,0,0.35)] ring-1 ring-black/10"
+                  style={{ backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden" }}
+                >
+                  <AppDemoHero paused={mockupHovered} startDelayMs={1700} />
+                  {/* Glas-reflectie overlay */}
+                  <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 via-transparent to-transparent" />
+                  {/* LIVE-indicator */}
+                  <div className="absolute top-3 right-3 flex items-center gap-2 bg-card/90 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-lg border border-border/50 z-30">
+                    <span className="relative flex h-2.5 w-2.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                    </span>
+                    <span className="text-xs font-medium text-foreground">Live analyse</span>
+                  </div>
+                </div>
+
+                {/* ACHTERKANT: blanco met licht logo */}
+                <div
+                  className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#f5f3ee] via-[#ebe9e3] to-[#dcd9d2] shadow-[0_30px_60px_-20px_rgba(0,0,0,0.35)] ring-1 ring-black/10 flex items-center justify-center"
+                  style={{
+                    backfaceVisibility: "hidden",
+                    WebkitBackfaceVisibility: "hidden",
+                    transform: "rotateY(180deg)",
+                  }}
+                >
+                  <img
+                    src="/logo-dark-v3.png"
+                    alt=""
+                    className="w-1/3 max-w-[180px] opacity-[0.12]"
+                  />
+                </div>
+              </div>
+
+              {/* Gerichte drop-shadow onder scherm */}
+              <div className="pointer-events-none absolute inset-x-12 -bottom-6 h-8 bg-foreground/15 blur-xl rounded-full" />
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* ── PROBLEM ────────────────────────────── */}
-      <section className="px-4 sm:px-6 py-16 md:py-20 max-w-7xl mx-auto w-full section-divider">
-        <motion.div
-          className="space-y-10"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          viewport={viewportConfig}
-        >
-          <div className="text-center space-y-3 max-w-2xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold leading-tight">{LANDING.problem.title}</h2>
-            <p className="text-muted-foreground">{LANDING.problem.intro}</p>
+      {/* ── ANSWER BLOCK ───────────────────────── */}
+      <section id="antwoord" className="relative px-4 sm:px-6 py-14 md:py-28 max-w-7xl mx-auto w-full" style={{ scrollMarginTop: "5rem" }}>
+        <AnswerBlockAnimations />
+        <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
+          {/* LINKS: tekst */}
+          <div data-answer-text>
+            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">ANTWOORD</p>
+            <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground mb-6">
+              <SplitWords text="Wat is DBA Kompas?" dataAttr="data-answer-word" />
+            </h2>
+            <p className="text-base md:text-lg leading-relaxed text-muted-foreground">
+              <SplitWords text={ANSWER_BLOCK_TEXT} dataAttr="data-answer-word-body" />
+            </p>
+            <div className="mt-6">
+              <Link
+                href="/over-dba-kompas"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:text-accent/80 transition-colors group"
+              >
+                <span>Meer weten over de methodiek en de maker</span>
+                <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                  <path d="M3 10 L17 10 M11 4 L17 10 L11 16" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </Link>
+            </div>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-5">
-            {LANDING.problem.points.map((pt, i) => {
-              const Icon = problemIcons[i];
-              return (
-                <motion.div
-                  key={i}
-                  className="glass-card hover-elevate p-6 space-y-3"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: i * 0.1 }}
-                  viewport={viewportConfig}
-                >
-                  <div className="w-10 h-10 rounded-xl bg-accent/15 flex items-center justify-center">
-                    <Icon className="w-5 h-5 text-accent" />
-                  </div>
-                  <h3 className="font-bold text-base">{pt.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{pt.desc}</p>
-                </motion.div>
-              );
-            })}
+          {/* RECHTS: 2x2 stat-grid */}
+          <div className="grid grid-cols-2 gap-4" data-answer-stats>
+            <div className="relative bg-[#faf0e6] rounded-2xl p-6 md:p-8 ring-1 ring-accent/15 overflow-hidden">
+              <p className="text-4xl md:text-5xl font-bold text-accent leading-none mb-3">Online</p>
+              <p className="text-sm text-foreground/80 font-medium">24/7 toegankelijk via je browser</p>
+            </div>
+            <div className="relative bg-[#faf0e6] rounded-2xl p-6 md:p-8 ring-1 ring-accent/15 overflow-hidden">
+              <p className="text-4xl md:text-5xl font-bold text-accent leading-none mb-3">60 sec</p>
+              <p className="text-sm text-foreground/80 font-medium">Tot risico-indicatie</p>
+            </div>
+            <div className="relative bg-[#faf0e6] rounded-2xl p-6 md:p-8 ring-1 ring-accent/15 overflow-hidden">
+              <p className="text-4xl md:text-5xl font-bold text-accent leading-none mb-3">Wet DBA</p>
+              <p className="text-sm text-foreground/80 font-medium">Plus Deliveroo-jurisprudentie</p>
+            </div>
+            <div className="relative bg-[#faf0e6] rounded-2xl p-6 md:p-8 ring-1 ring-accent/15 overflow-hidden">
+              <p className="text-3xl md:text-4xl font-bold text-accent leading-none mb-3">Vanaf €9,95</p>
+              <p className="text-sm text-foreground/80 font-medium">Direct toegang tot één analyse</p>
+            </div>
           </div>
-        </motion.div>
+        </div>
       </section>
 
-      {/* ── DEMO ───────────────────────────────── */}
-      <section className="px-4 sm:px-6 py-16 md:py-24 max-w-7xl mx-auto w-full">
-        <div className="space-y-12">
-          <motion.div
-            className="text-center space-y-4 max-w-2xl mx-auto"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            viewport={viewportConfig}
-          >
-            <SectionBadge>{LANDING.appDemo.badge}</SectionBadge>
-            <h2 className="text-3xl md:text-4xl font-bold">{LANDING.appDemo.title}</h2>
-            <p className="text-muted-foreground">{LANDING.appDemo.subtitle}</p>
-          </motion.div>
+      {/* ── INZET ──────────────────────────────── */}
+      <section id="inzet" className="relative px-4 sm:px-6 py-14 md:py-28 max-w-7xl mx-auto w-full overflow-hidden section-divider" style={{ scrollMarginTop: "5rem" }}>
+        <InzetAnimations />
+        <div className="grid md:grid-cols-[6fr_5fr] gap-12 md:gap-16 items-center">
+          {/* LINKS: tekst */}
+          <div data-inzet-text>
+            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">WAAROM HET ER NU TOE DOET</p>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-foreground mb-6">
+              <SplitWords text="Je opdracht is je inkomen" dataAttr="data-inzet-word" />
+            </h2>
+            <div className="space-y-4 text-base md:text-lg leading-relaxed text-muted-foreground">
+              <p>
+                <SplitWords
+                  text="Als de manier waarop je opdracht is ingericht vragen oproept over zelfstandigheid, kan dat gevolgen hebben: een opdrachtgever die de opdracht wil herzien, een intermediair die om extra stukken vraagt, of een opdracht die niet wordt verlengd. Sinds 2025 handhaaft de Belastingdienst weer op schijnzelfstandigheid, en opdrachtgevers zijn daardoor voorzichtiger geworden. Dat raakt jou direct."
+                  dataAttr="data-inzet-word-body"
+                />
+              </p>
+              <p>
+                <SplitWords
+                  text="DBA Kompas laat je vooraf zien waar je opdrachtomschrijving die vragen oproept, zodat je niet voor verrassingen komt te staan."
+                  dataAttr="data-inzet-word-body"
+                />
+              </p>
+            </div>
+          </div>
 
-          <motion.div
-            className="demo-glow-wrapper rounded-2xl overflow-hidden"
-            style={{ boxShadow: "0 0 0 1px hsl(217 44% 20% / 0.1), 0 16px 48px hsl(217 44% 20% / 0.12)" }}
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={viewportConfig}
-          >
-            <AppDemoShowcase onSubscribe={() => setEmailCheckoutPlan("yearly")} />
-          </motion.div>
+          {/* RECHTS: SVG-illustratie + decoraties */}
+          <div className="relative" data-inzet-visual>
+            <InzetIllustration />
+          </div>
         </div>
       </section>
 
       {/* ── HOW IT WORKS ───────────────────────── */}
-      <section className="px-4 sm:px-6 py-16 md:py-20 max-w-7xl mx-auto w-full section-divider">
-        <motion.div
-          className="space-y-12"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          viewport={viewportConfig}
-        >
-          <div className="text-center space-y-3 max-w-xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold">{LANDING.steps.title}</h2>
-            <p className="text-muted-foreground">{LANDING.steps.subtitle}</p>
+      <section id="functies" className="relative w-full section-divider" style={{ scrollMarginTop: "5rem" }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-14 md:pt-28 pb-10 md:pb-12">
+          <div className="text-center">
+            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">HOE HET WERKT</p>
+            <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground mb-4">
+              <SplitWords text={LANDING.steps.title} dataAttr="data-howitworks-word" />
+            </h2>
+            <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">{LANDING.steps.subtitle}</p>
+          </div>
+        </div>
+
+        {/* Desktop: horizontale pinned scroll. Mobile/tablet: verticale carousel */}
+        <div className="hidden lg:block">
+          <HowItWorksHorizontal />
+        </div>
+        <div className="lg:hidden max-w-7xl mx-auto px-4 sm:px-6 pb-14 md:pb-20">
+          <HowItWorksCarousel />
+        </div>
+      </section>
+
+      {/* ── CHATGPT BEZWAAR ────────────────────── */}
+      <section id="chatgpt" className="relative px-4 sm:px-6 py-12 md:py-20 max-w-7xl mx-auto w-full overflow-hidden section-divider" style={{ scrollMarginTop: "5rem" }}>
+        <ChatGptAnimations />
+        <div className="space-y-10">
+          <div className="text-center space-y-4 max-w-3xl mx-auto">
+            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent text-center mb-3">HET ECHTE VERSCHIL</p>
+            <h2 className="text-3xl md:text-4xl font-bold leading-tight">
+              <SplitWords text="Kan ChatGPT dit niet ook?" dataAttr="data-chatgpt-word" />
+            </h2>
+            <p className="text-base md:text-lg leading-relaxed text-muted-foreground max-w-2xl mx-auto">
+              <SplitWords
+                text="Een eerlijke vraag. ChatGPT en Claude zijn breed bruikbaar, maar voor het toetsen van een zzp-opdracht verschilt het op een aantal concrete punten."
+                dataAttr="data-chatgpt-word-body"
+              />
+            </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6 relative">
-            {/* connector line desktop */}
-            <div className="hidden md:block absolute top-9 left-[calc(16.67%+1.5rem)] right-[calc(16.67%+1.5rem)] h-px bg-gradient-to-r from-primary/20 via-primary/40 to-primary/20" />
+          <div className="relative max-w-5xl mx-auto mt-12 md:mt-16" data-chatgpt-table-wrap>
+            {/* Decoraties achter de tabel */}
+            <div data-chatgpt-decor-1 className="absolute -top-6 -left-10 w-24 h-24 rounded-full bg-accent/8 z-0 hidden md:block" />
+            <div data-chatgpt-decor-2 className="absolute -bottom-8 -right-6 w-32 h-32 rounded-full bg-primary/5 hidden md:block z-0" />
+            <div data-chatgpt-decor-3 className="absolute top-1/3 -right-8 w-12 h-12 rounded-2xl bg-accent/10 rotate-12 hidden md:block z-0" />
+            <div data-chatgpt-decor-4 className="absolute bottom-1/4 -left-6 w-8 h-8 rounded-full bg-accent/30 z-0 hidden md:block" />
 
-            {LANDING.steps.items.map((step, i) => (
-              <motion.div
-                key={i}
-                className="relative flex flex-col items-center text-center gap-4 p-6"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: i * 0.12 }}
-                viewport={viewportConfig}
+            {/* Subtle accent-glow achter DBA-kolom */}
+            <div
+              data-chatgpt-glow
+              className="absolute top-0 bottom-0 right-0 w-2/5 bg-gradient-to-l from-accent/8 to-transparent rounded-r-2xl pointer-events-none z-0"
+            />
+
+            {/* Tabel */}
+            <div className="relative z-10 rounded-2xl border border-border/40 overflow-hidden bg-card shadow-lg" data-chatgpt-table>
+              {/* Header */}
+              <div
+                data-chatgpt-table-header
+                className="hidden md:grid grid-cols-[1fr_1.3fr_1.3fr] border-b border-border/40 bg-muted/30"
               >
-                <div className="w-14 h-14 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center text-xl font-extrabold shadow-md z-10">
-                  {step.step}
+                <div className="px-3 py-3 md:px-5 md:py-4">
+                  <h3 className="font-semibold text-muted-foreground text-xs md:text-base">Aspect</h3>
                 </div>
-                <h3 className="font-bold text-base">{step.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-      </section>
+                <div className="px-3 py-3 md:px-5 md:py-4">
+                  <h3 className="font-semibold text-muted-foreground text-xs md:text-base">Met een algemene chatbot</h3>
+                </div>
+                <div className="px-3 py-3 md:px-5 md:py-4 border-l border-border/40 bg-accent/5">
+                  <h3 className="font-semibold text-foreground text-xs md:text-base">Met DBA Kompas</h3>
+                </div>
+              </div>
 
-      {/* ── FEATURES ───────────────────────────── */}
-      <section id="features" className="px-4 sm:px-6 py-16 md:py-24 max-w-7xl mx-auto w-full">
-        <div className="space-y-12">
-          <motion.div
-            className="text-center space-y-3 max-w-2xl mx-auto"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            viewport={viewportConfig}
-          >
-            <SectionBadge>{LANDING.values.badge}</SectionBadge>
-            <p className="text-muted-foreground">{LANDING.values.subtitle}</p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-5">
-            {LANDING.values.items.map((item, i) => {
-              const Icon = featureIcons[i];
-              return (
-                <motion.div
+              {/* Rijen */}
+              {[
+                {
+                  label: "Werkwijze",
+                  chatbot: "Vereist een goede prompt; het antwoord wisselt per vraag.",
+                  dba: "Plak je opdracht en krijg direct een gestructureerde analyse, geen prompting nodig.",
+                },
+                {
+                  label: "Bij missende informatie",
+                  chatbot: "Geeft antwoord ook als essentiele informatie ontbreekt; achteraf 'dat verandert de zaak'.",
+                  dba: "Stelt gericht door op de ingevoerde opdracht tot het beeld volledig is.",
+                },
+                {
+                  label: "Eerlijkheid van het oordeel",
+                  chatbot: "Bevestigt suggestieve vragen en geeft het antwoord dat je wilt horen.",
+                  dba: "Geeft eerlijk weer wanneer iets niet kan en levert gerichte feedback.",
+                },
+                {
+                  label: "Beoordelingskader",
+                  chatbot: "Algemene training, geen specifiek juridisch kader.",
+                  dba: "Negen Deliveroo-gezichtspunten van de Hoge Raad plus Wet DBA.",
+                },
+                {
+                  label: "Actualiteit wetgeving",
+                  chatbot: "Weet er wat van, maar je moet zelf expliciet vragen om de nieuwste jurisprudentie mee te nemen.",
+                  dba: "Doorlopend bijgewerkt met actuele wetgeving en jurisprudentie.",
+                },
+                {
+                  label: "Op de hoogte gehouden",
+                  chatbot: "Houdt je niet op de hoogte van nieuwe ontwikkelingen in het zzp-landschap.",
+                  dba: "Dagelijkse scan van het internet, push-berichten en mails bij relevante updates.",
+                },
+                {
+                  label: "Output",
+                  chatbot: "Antwoord in een chat, lastig terug te vinden.",
+                  dba: "Volledige analyse en herschreven opdrachtomschrijving, beschikbaar in PDF of Word in jouw account.",
+                },
+              ].map((row, i) => (
+                <div
                   key={i}
-                  className="glass-card hover-elevate p-6 space-y-3"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: i * 0.1 }}
-                  viewport={viewportConfig}
+                  data-chatgpt-row
+                  className="border-b border-border/40 last:border-b-0"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <Icon className="w-5 h-5 text-primary" />
+                  {/* Mobile: stack-layout */}
+                  <div className="md:hidden p-5">
+                    <p className="text-xs uppercase tracking-wider font-semibold text-foreground/70 mb-3">
+                      {row.label}
+                    </p>
+                    <div className="flex items-start gap-2.5 mb-3 opacity-80">
+                      <svg className="w-4 h-4 flex-shrink-0 mt-0.5 text-muted-foreground/50" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                        <circle cx="10" cy="10" r="9" stroke="currentColor" strokeWidth="1.5" />
+                        <line x1="6.5" y1="6.5" x2="13.5" y2="13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                        <line x1="13.5" y1="6.5" x2="6.5" y2="13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                      </svg>
+                      <span className="text-sm leading-relaxed text-muted-foreground">{row.chatbot}</span>
+                    </div>
+                    <div className="flex items-start gap-2.5 bg-accent/5 rounded-lg p-3">
+                      <svg className="w-4 h-4 flex-shrink-0 mt-0.5 text-accent" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <circle cx="10" cy="10" r="9" />
+                        <path d="M 6 10 L 9 13 L 14 7" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      <span className="text-sm leading-relaxed font-medium text-foreground">{row.dba}</span>
+                    </div>
                   </div>
-                  <h3 className="font-bold">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
-                </motion.div>
-              );
-            })}
-          </div>
 
-          {/* Continuing value block */}
-          <motion.div
-            className="glass-card p-8 md:p-10 flex flex-col md:flex-row gap-8 items-start"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            viewport={viewportConfig}
-          >
-            <div className="flex-1 space-y-3">
-              <h3 className="text-xl font-bold">{LANDING.continuingValue.title}</h3>
-              <p className="text-muted-foreground leading-relaxed">{LANDING.continuingValue.body}</p>
-            </div>
-            <div className="flex-1 space-y-1">
-              {LANDING.continuingValue.bullets.map((b, i) => (
-                <div key={i} className="checklist-row">
-                  <BulletIcon />
-                  <span className="text-sm font-medium">{b}</span>
+                  {/* Desktop: 3-koloms grid */}
+                  <div className="hidden md:grid md:grid-cols-[1fr_1.3fr_1.3fr]">
+                    <div className="px-3 py-4 md:px-5 md:py-5 font-semibold text-foreground text-xs md:text-sm">
+                      <SplitWords text={row.label} dataAttr="data-chatgpt-cell-word" />
+                    </div>
+                    <div className="px-3 py-4 md:px-5 md:py-5 flex gap-2 items-start text-xs md:text-sm text-muted-foreground">
+                      <svg
+                        data-chatgpt-icon-cross
+                        className="w-4 h-4 flex-shrink-0 mt-0.5 text-muted-foreground/50"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        aria-hidden="true"
+                      >
+                        <circle cx="10" cy="10" r="8" stroke="currentColor" strokeWidth="1.5" />
+                        <line x1="6.5" y1="6.5" x2="13.5" y2="13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                        <line x1="13.5" y1="6.5" x2="6.5" y2="13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                      </svg>
+                      <span className="leading-relaxed">
+                        <SplitWords text={row.chatbot} dataAttr="data-chatgpt-cell-word" />
+                      </span>
+                    </div>
+                    <div className="px-3 py-4 md:px-5 md:py-5 flex gap-2 items-start text-xs md:text-sm text-foreground border-l border-border/40 bg-accent/5">
+                      <svg
+                        data-chatgpt-icon-check
+                        className="w-4 h-4 flex-shrink-0 mt-0.5 text-accent"
+                        viewBox="0 0 20 20"
+                        aria-hidden="true"
+                      >
+                      <circle cx="10" cy="10" r="8" fill="currentColor" />
+                      <path d="M6 10 L9 13 L14 7" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    <span className="leading-relaxed">
+                      <SplitWords text={row.dba} dataAttr="data-chatgpt-cell-word" />
+                    </span>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* ── AUDIENCE ───────────────────────────── */}
-      <section className="px-4 sm:px-6 py-16 md:py-20 max-w-7xl mx-auto w-full section-divider">
-        <motion.div
-          className="space-y-10"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          viewport={viewportConfig}
-        >
-          <div className="text-center space-y-3 max-w-xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold">{LANDING.audience.title}</h2>
-            <p className="text-muted-foreground">{LANDING.audience.supporting}</p>
-          </div>
+      {/* ── METHODIEK & MAKER ──────────────────── */}
+      <section id="methodiek" className="w-full py-14 md:py-28 bg-[#0b1d3a]" style={{ scrollMarginTop: "5rem" }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
-          <div className="grid md:grid-cols-3 gap-5">
-            {LANDING.audience.blocks.map((block, i) => {
-              const Icon = audienceIcons[i];
-              return (
-                <motion.div
-                  key={i}
-                  className="glass-card hover-elevate p-6 space-y-3"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: i * 0.1 }}
-                  viewport={viewportConfig}
-                >
-                  <div className="w-10 h-10 rounded-xl bg-secondary/15 flex items-center justify-center">
-                    <Icon className="w-5 h-5 text-secondary" />
+          {/* DEEL A: Methodiek */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={viewportConfig}
+          >
+            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent text-center">Methodiek</p>
+            <h2 className="text-3xl md:text-4xl font-bold leading-tight text-primary-foreground text-center max-w-3xl mx-auto mt-4">
+              Eén vaste methodiek, die meebeweegt met de wet
+            </h2>
+
+            <div className="relative max-w-4xl mx-auto mt-12" data-methodiek-kernpunten>
+              <MethodiekAnimations />
+
+              {/* Verbindings-SVG: 2 segmenten tussen de 3 cirkels */}
+              <svg
+                className="absolute top-12 left-0 right-0 w-full h-1 pointer-events-none hidden md:block"
+                viewBox="0 0 1000 4"
+                preserveAspectRatio="none"
+                aria-hidden="true"
+              >
+                <line
+                  data-methodiek-line-1
+                  x1="200" y1="2" x2="500" y2="2"
+                  stroke="rgb(212, 120, 42)"
+                  strokeWidth="1.5"
+                  strokeDasharray="5 5"
+                  opacity="0.5"
+                />
+                <line
+                  data-methodiek-line-2
+                  x1="500" y1="2" x2="800" y2="2"
+                  stroke="rgb(212, 120, 42)"
+                  strokeWidth="1.5"
+                  strokeDasharray="5 5"
+                  opacity="0.5"
+                />
+              </svg>
+
+              <div className="grid md:grid-cols-3 gap-8 md:gap-10 relative">
+                {[
+                  { num: "1", title: "Aansturing en gezag", desc: "Wie bepaalt hoe en wanneer je werkt." },
+                  { num: "2", title: "Eigen rekening en risico", desc: "Wie draagt het risico en de kosten." },
+                  { num: "3", title: "Ondernemerschap", desc: "Of je je als ondernemer gedraagt." },
+                ].map((item, i) => (
+                  <div key={i} data-methodiek-block className="text-center group">
+                    <div
+                      data-methodiek-circle
+                      className="relative inline-flex items-center justify-center w-20 h-20 md:w-24 md:h-24 rounded-full bg-primary border-2 border-accent z-10 mx-auto mb-5 transition-transform duration-300 group-hover:scale-105"
+                    >
+                      <span className="text-3xl md:text-4xl font-bold text-accent">{item.num}</span>
+                    </div>
+                    <h3 className="text-lg md:text-xl font-semibold text-primary-foreground mb-2">{item.title}</h3>
+                    <p className="text-sm text-primary-foreground/70 leading-relaxed">{item.desc}</p>
                   </div>
-                  <h3 className="font-bold">{block.heading}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{block.text}</p>
-                </motion.div>
-              );
-            })}
-          </div>
-        </motion.div>
+                ))}
+              </div>
+            </div>
+
+            <div className="max-w-3xl mx-auto mt-12">
+              <p className="text-base md:text-lg leading-relaxed text-primary-foreground/80 mb-4">
+                DBA Kompas werkt niet op onderbuik. Elke opdracht wordt beoordeeld via hetzelfde kader, op
+                de drie kernpunten waarop arbeidsrelaties worden getoetst: aansturing en gezag, eigen
+                rekening en risico, en ondernemerschap. Die kernpunten zijn de vertaling van de negen
+                gezichtspunten die de Hoge Raad in het Deliveroo-arrest heeft benoemd en die de
+                Belastingdienst gebruikt.
+              </p>
+              <p className="text-base md:text-lg leading-relaxed text-primary-foreground/80">
+                De wetgeving rond zzp-werk staat niet stil. De handhaving is hervat, en er wordt gewerkt
+                aan nieuwe regels rond zelfstandigen. DBA Kompas wordt op die ontwikkelingen onderhouden.
+                Verandert het kader, dan beweegt de analyse mee. Jij hoeft die ontwikkelingen niet zelf
+                bij te houden.
+              </p>
+            </div>
+
+            <p className="text-sm text-primary-foreground/60 italic text-center mt-8">
+              Gebaseerd op het Deliveroo-arrest van de Hoge Raad en het beoordelingskader van de Belastingdienst.
+            </p>
+
+            {/* Heldere grenzen marquee */}
+            <div data-grenzen-marquee className="relative mt-12 pt-8 border-t border-primary-foreground/10">
+              <p className="text-center text-xs text-primary-foreground/60 mb-4">
+                Heldere grenzen van wat DBA Kompas wel en niet doet
+              </p>
+              <div data-marquee-track className="relative overflow-hidden">
+                <div data-marquee-content className="flex gap-12 animate-marquee whitespace-nowrap">
+                  {[
+                    "Indicatief, geen juridisch oordeel",
+                    "Vervangt geen jurist of fiscalist",
+                    "Zorgvuldig met je gegevens via Stripe",
+                    "Onderhouden op actuele wetgeving",
+                  ].map((item) => (
+                    <div key={`a-${item}`} className="flex items-center gap-2 text-sm text-primary-foreground/70 flex-shrink-0">
+                      <span className="w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0" />
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                  {[
+                    "Indicatief, geen juridisch oordeel",
+                    "Vervangt geen jurist of fiscalist",
+                    "Zorgvuldig met je gegevens via Stripe",
+                    "Onderhouden op actuele wetgeving",
+                  ].map((item) => (
+                    <div key={`b-${item}`} aria-hidden className="flex items-center gap-2 text-sm text-primary-foreground/70 flex-shrink-0">
+                      <span className="w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0" />
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="text-center mt-8">
+              <Link
+                href="/over-dba-kompas"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:text-accent/80 transition-colors group"
+              >
+                <span>Lees meer over de maker en bronnen</span>
+                <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                  <path d="M3 10 L17 10 M11 4 L17 10 L11 16" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </Link>
+            </div>
+          </motion.div>
+
+        </div>
       </section>
 
-      {/* ── BENEFITS ───────────────────────────── */}
-      <section className="px-4 sm:px-6 py-16 md:py-24 max-w-7xl mx-auto w-full">
+      {/* ── ALTIJD ACTUEEL (meer dan analyse) ── */}
+      <section
+        id="altijd-actueel"
+        data-aa-section
+        className="relative px-4 sm:px-6 py-12 md:py-20 max-w-7xl mx-auto w-full overflow-hidden section-divider"
+        style={{ scrollMarginTop: "5rem" }}
+      >
+        <NieuwsAnimations />
+        <div className="grid md:grid-cols-[5fr_6fr] gap-10 md:gap-14 items-center">
+          <div data-aa-text>
+            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">ALTIJD ACTUEEL</p>
+            <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground mb-5">
+              <SplitWords text="Meer dan alleen een analyse" dataAttr="data-aa-word" />
+            </h2>
+            <p className="text-base leading-relaxed text-muted-foreground mb-7">
+              <SplitWords
+                text="DBA Kompas is meer dan een eenmalige toets. De wetgeving en het beleid rond zzp-werk veranderen continu. We scannen dagelijks het internet en houden je op de hoogte van wat het betekent voor jouw opdrachten."
+                dataAttr="data-aa-word-body"
+              />
+            </p>
+
+            <div className="space-y-4" data-aa-bullets>
+              <div className="flex items-start gap-3" data-aa-bullet>
+                <span className="block w-6 h-0.5 bg-accent mt-3 flex-shrink-0" />
+                <div>
+                  <h4 className="text-sm md:text-base font-semibold text-foreground mb-1">Push en mail bij relevante updates</h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Direct op de hoogte als er iets verandert in wet, beleid of jurisprudentie.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3" data-aa-bullet>
+                <span className="block w-6 h-0.5 bg-accent mt-3 flex-shrink-0" />
+                <div>
+                  <h4 className="text-sm md:text-base font-semibold text-foreground mb-1">Analyses bewaard, vergelijkbaar in de tijd</h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Alle analyses op één plek, terug te halen in PDF of Word.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3" data-aa-bullet>
+                <span className="block w-6 h-0.5 bg-accent mt-3 flex-shrink-0" />
+                <div>
+                  <h4 className="text-sm md:text-base font-semibold text-foreground mb-1">Wijzigingen toegepast op jouw opdrachten</h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Bij relevante updates zie je automatisch wat het betekent voor opdrachten die je al hebt geanalyseerd.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <NieuwsIllustration />
+        </div>
+      </section>
+
+      {/* ── VOOR WIE (segmenten) ────────────────── */}
+      <section id="voor-wie" className="relative px-4 sm:px-6 py-14 md:py-28 max-w-7xl mx-auto w-full section-divider" style={{ scrollMarginTop: "5rem" }}>
+        <VoorWieAnimations />
+
+        <div className="text-center mb-12 md:mb-16">
+          <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">VOOR WIE</p>
+          <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground mb-4">
+            <SplitWords text="Voor kenniswerkers in elke werkomgeving" dataAttr="data-voorwie-word" />
+          </h2>
+          <p className="text-base md:text-lg leading-relaxed text-muted-foreground max-w-2xl mx-auto">
+            <SplitWords
+              text="Of je nu via een intermediair voor een ministerie werkt of direct voor een private opdrachtgever: DBA Kompas helpt elke kennis-zzp'er om de opdracht goed te toetsen."
+              dataAttr="data-voorwie-word-body"
+            />
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-5 max-w-5xl mx-auto" data-voorwie-grid>
+          <Link href="/voor/publieke-sector" data-voorwie-card className="group relative block bg-card rounded-2xl p-6 md:p-8 ring-1 ring-foreground/10 hover:ring-accent/40 transition-all duration-300 hover:-translate-y-1">
+            <div className="aspect-[3/2] mb-6 rounded-xl bg-[#faf0e6] flex items-center justify-center p-6">
+              <PubliekeSectorVisual />
+            </div>
+            <span className="block w-8 h-0.5 bg-accent mb-3" />
+            <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-3">Publieke sector</h3>
+            <p className="text-sm md:text-base text-muted-foreground leading-relaxed mb-4">
+              Interim-opdrachten via raamovereenkomsten en inkoopkanalen, vaak langlopend en via een intermediair. Specifieke aandacht voor inbedding en aansturing.
+            </p>
+            <p className="text-xs md:text-sm text-foreground/70 font-medium mb-4">
+              Ministeries · Gemeenten · GGD · COA · Provincies
+            </p>
+            <span className="inline-flex items-center gap-1.5 text-sm font-medium text-accent">
+              Lees meer
+              <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="M3 10 L17 10 M11 4 L17 10 L11 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
+          </Link>
+
+          <Link href="/voor/private-sector" data-voorwie-card className="group relative block bg-card rounded-2xl p-6 md:p-8 ring-1 ring-foreground/10 hover:ring-accent/40 transition-all duration-300 hover:-translate-y-1">
+            <div className="aspect-[3/2] mb-6 rounded-xl bg-[#faf0e6] flex items-center justify-center p-6">
+              <PrivateSectorVisual />
+            </div>
+            <span className="block w-8 h-0.5 bg-accent mb-3" />
+            <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-3">Private sector</h3>
+            <p className="text-sm md:text-base text-muted-foreground leading-relaxed mb-4">
+              Directe contracten met opdrachtgevers of via een intermediair. Vaak resultaatgericht en op projectbasis. Eigen werkwijze, eigen middelen en eigen risico tellen.
+            </p>
+            <p className="text-xs md:text-sm text-foreground/70 font-medium mb-4">
+              IT-consultancy · Advies · Project-management · Design · Marketing · Content
+            </p>
+            <span className="inline-flex items-center gap-1.5 text-sm font-medium text-accent">
+              Lees meer
+              <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="M3 10 L17 10 M11 4 L17 10 L11 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
+          </Link>
+        </div>
+      </section>
+
+      {/* ── PRICING (incl. rekensom-callouts) ───── */}
+      <section id="prijzen" className="px-4 sm:px-6 py-12 md:py-24 max-w-7xl mx-auto w-full" style={{ scrollMarginTop: "5rem" }}>
         <div className="space-y-12">
+          {/* Rekensom-callouts boven prijscards */}
+          <div className="max-w-5xl mx-auto">
+            <p className="text-center text-sm text-muted-foreground mb-6">
+              Wat kost een toets normaal en wat kost het bij DBA Kompas?
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4" data-prijs-callouts>
+              <div data-prijs-callout className="px-5 py-4 rounded-xl bg-accent/10 ring-1 ring-accent/30 text-center">
+                <p className="text-2xl font-bold text-accent leading-none">Vanaf €9,95</p>
+                <p className="text-xs text-muted-foreground mt-1.5">Eenmalig met DBA Kompas</p>
+              </div>
+              <div data-prijs-callout className="px-5 py-4 rounded-xl bg-primary/5 ring-1 ring-primary/15 text-center">
+                <p className="text-2xl font-bold text-foreground leading-none">€150 tot €300</p>
+                <p className="text-xs text-muted-foreground mt-1.5">Eenmalige check bij een adviseur</p>
+              </div>
+              <div data-prijs-callout className="px-5 py-4 rounded-xl bg-primary text-primary-foreground text-center">
+                <p className="text-2xl font-bold text-accent leading-none">Honderden euro&apos;s</p>
+                <p className="text-xs text-primary-foreground/80 mt-1.5">Volledige juridische beoordeling</p>
+              </div>
+            </div>
+          </div>
+
+          <PrijsAnimations />
           <motion.div
             className="text-center space-y-3 max-w-xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
@@ -640,120 +1049,20 @@ export default function Home() {
             transition={{ duration: 0.5 }}
             viewport={viewportConfig}
           >
-            <SectionBadge>{LANDING.benefits.badge}</SectionBadge>
-            <h2 className="text-3xl md:text-4xl font-bold">{LANDING.benefits.title}</h2>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 gap-5">
-            {LANDING.benefits.items.map((item, i) => {
-              const Icon = benefitIcons[i];
-              return (
-                <motion.div
-                  key={i}
-                  className="glass-card hover-elevate p-5 flex items-start gap-4"
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: i * 0.08 }}
-                  viewport={viewportConfig}
-                >
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <Icon className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold mb-1">{item.title}</h3>
-                    <p className="text-sm text-muted-foreground">{item.description}</p>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
-
-          {/* Showcase / checklist block */}
-          <motion.div
-            className="glass-card pricing-glow p-8 md:p-10 grid md:grid-cols-2 gap-8 items-center"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={viewportConfig}
-          >
-            <div className="space-y-3">
-              <h3 className="text-2xl font-bold">{LANDING.benefits.showcase.title}</h3>
-              <p className="text-muted-foreground">{LANDING.benefits.showcase.subtitle}</p>
-              <Button className="btn-magnetic mt-2" onClick={() => setEmailCheckoutPlan("yearly")}>
-                Start je analyse
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </div>
-            <div className="space-y-1">
-              {LANDING.benefits.checklist.map((item, i) => (
-                <div key={i} className="checklist-row">
-                  <BulletIcon />
-                  <span className="text-sm font-medium">{item}</span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ── TRUST ──────────────────────────────── */}
-      <section className="px-4 sm:px-6 py-16 md:py-20 max-w-7xl mx-auto w-full section-divider">
-        <motion.div
-          className="space-y-10"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          viewport={viewportConfig}
-        >
-          <div className="text-center space-y-3 max-w-xl mx-auto">
-            <SectionBadge>{LANDING.trust.badge}</SectionBadge>
-            <p className="text-muted-foreground">{LANDING.trust.subtitle}</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-5">
-            {LANDING.trust.items.map((item, i) => {
-              const Icon = trustIcons[i];
-              return (
-                <motion.div
-                  key={i}
-                  className="glass-card p-6 space-y-3"
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: i * 0.1 }}
-                  viewport={viewportConfig}
-                >
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <Icon className="w-5 h-5 text-primary" />
-                  </div>
-                  <h3 className="font-bold">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
-                </motion.div>
-              );
-            })}
-          </div>
-        </motion.div>
-      </section>
-
-      {/* ── PRICING ────────────────────────────── */}
-      <section id="prijzen" className="px-4 sm:px-6 py-16 md:py-24 max-w-7xl mx-auto w-full">
-        <div className="space-y-12">
-          <motion.div
-            className="text-center space-y-3 max-w-xl mx-auto"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            viewport={viewportConfig}
-          >
-            <SectionBadge>{LANDING.pricing.badge}</SectionBadge>
+            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent">{LANDING.pricing.badge}</p>
             <h2 className="text-3xl md:text-4xl font-bold">{LANDING.pricing.title}</h2>
             <p className="text-muted-foreground">{LANDING.pricing.subtitle}</p>
           </motion.div>
+
+          <p className="text-center text-sm text-muted-foreground max-w-xl mx-auto">
+            {LANDING.pricing.steeringText}
+          </p>
 
           <div className="grid md:grid-cols-3 gap-5 items-stretch">
             {LANDING.pricing.plans.map((plan, i) => (
               <motion.div
                 key={i}
-                className={`relative flex flex-col rounded-2xl p-7 border transition-all duration-200 ${
+                className={`relative flex flex-col rounded-2xl p-7 md:p-10 border transition-all duration-200 ${
                   plan.popular
                     ? "pricing-popular pricing-glow border-primary/30"
                     : "glass-card border-border/50 hover-elevate"
@@ -764,8 +1073,8 @@ export default function Home() {
                 viewport={viewportConfig}
               >
                 {plan.popular && plan.popularBadge && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                    <span className="px-4 py-1 rounded-full bg-accent text-xs font-bold text-white shadow-sm">
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 flex justify-center">
+                    <span className="whitespace-nowrap px-4 py-1 rounded-full bg-accent text-xs font-bold text-white shadow-sm">
                       {plan.popularBadge}
                     </span>
                   </div>
@@ -782,7 +1091,7 @@ export default function Home() {
                   )}
                 </div>
 
-                <div className="flex items-baseline gap-1 mb-6">
+                <div className={`flex items-baseline gap-1 ${plan.planKey === "yearly" ? "mb-2" : "mb-6"}`}>
                   <span className={`text-4xl font-extrabold ${plan.popular ? "text-primary-foreground" : "text-foreground"}`}>
                     {plan.price}
                   </span>
@@ -791,13 +1100,14 @@ export default function Home() {
                   </span>
                 </div>
 
+                {plan.planKey === "yearly" && (
+                  <p className="text-sm text-primary-foreground/60 mb-4">Bespaar €40 ten opzichte van maandelijks</p>
+                )}
+
                 <ul className="space-y-2.5 mb-8 flex-1">
                   {plan.features.map((feat, fi) => (
                     <li key={fi} className="flex items-start gap-2.5 text-sm">
-                      {plan.popular
-                        ? <img src="/logo-flat-white.png" alt="" className="h-4 w-auto object-contain flex-shrink-0 opacity-80 mt-0.5" />
-                        : <BulletIcon />
-                      }
+                      <span className="flex-shrink-0 mt-px opacity-40 leading-[1.4rem] select-none" aria-hidden="true">·</span>
                       <span className={plan.popular ? "text-primary-foreground/85" : "text-muted-foreground"}>
                         {feat}
                       </span>
@@ -821,60 +1131,85 @@ export default function Home() {
       </section>
 
       {/* ── FAQ ────────────────────────────────── */}
-      <section id="faq" className="px-4 sm:px-6 py-16 md:py-20 max-w-4xl mx-auto w-full section-divider">
-        <motion.div
-          className="space-y-8"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          viewport={viewportConfig}
-        >
-          <div className="text-center space-y-3">
-            <SectionBadge>{LANDING.faq.badge}</SectionBadge>
-          </div>
+      <section id="faq" className="relative px-4 sm:px-6 py-14 md:py-28 max-w-7xl mx-auto w-full section-divider" style={{ scrollMarginTop: "5rem" }}>
+        <FaqAnimations />
+        <div className="text-center mb-12 md:mb-16">
+          <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">VEELGESTELDE VRAGEN</p>
+          <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground">
+            <SplitWords text="Heldere antwoorden op de meest gestelde vragen" dataAttr="data-faq-word" />
+          </h2>
+        </div>
 
-          <div className="space-y-3">
-            {LANDING.faq.items.map((item, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: i * 0.05 }}
-                viewport={viewportConfig}
-              >
-                <FaqItem question={item.question} answer={item.answer} />
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
+        <FaqAccordion items={LANDING.faq.items} />
       </section>
 
-      {/* ── BOTTOM CTA ─────────────────────────── */}
-      <section className="px-4 sm:px-6 py-20 md:py-28 max-w-7xl mx-auto w-full">
-        <motion.div
-          className="cta-gradient-block text-center space-y-6 max-w-2xl mx-auto p-10 md:p-14 rounded-3xl relative overflow-hidden"
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={viewportConfig}
+      {/* ── BOTTOM CTA (SLOT) ──────────────────── */}
+      <section className="relative px-4 sm:px-6 py-14 md:py-32 max-w-7xl mx-auto w-full overflow-hidden">
+        <SlotAnimations />
+        <div
+          data-slot-bg
+          className="relative rounded-3xl bg-primary text-primary-foreground p-12 md:p-20 overflow-hidden"
         >
-          {/* shimmer overlay */}
-          <div className="pointer-events-none absolute inset-0 cta-shimmer" />
-          <img src="/logo-white-v3.png" alt="DBA Kompas" className="h-10 w-auto mx-auto relative z-10" />
-          <h2 className="text-3xl md:text-4xl font-bold text-white relative z-10">{LANDING.cta.title}</h2>
-          <p className="text-white/70 relative z-10">{LANDING.cta.subtitle}</p>
-          <div className="flex justify-center pt-2 relative z-10">
-            <Button
-              size="lg"
-              onClick={() => setEmailCheckoutPlan("yearly")}
-              className="btn-magnetic w-full sm:w-auto sm:min-w-[260px] bg-white text-primary border-0 hover:bg-accent hover:text-white transition-colors"
-            >
-              {LANDING.cta.primary}
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
+          {/* Bewegende mesh-blobs */}
+          <div className="absolute inset-0 opacity-60 pointer-events-none" data-slot-mesh>
+            <div className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full bg-accent/20 blur-3xl" />
+            <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] rounded-full bg-primary-foreground/10 blur-3xl" />
           </div>
-          <p className="text-xs text-white/40 relative z-10">{LANDING.disclaimer}</p>
-        </motion.div>
+
+          {/* Decoratief kompas op achtergrond */}
+          <svg
+            viewBox="0 0 200 200"
+            className="absolute top-1/2 right-[-50px] -translate-y-1/2 w-[400px] h-[400px] md:w-[500px] md:h-[500px] opacity-[0.07] text-accent pointer-events-none hidden md:block"
+            aria-hidden="true"
+          >
+            <circle cx="100" cy="100" r="95" fill="none" stroke="currentColor" strokeWidth="1.5" />
+            <circle cx="100" cy="100" r="78" fill="none" stroke="currentColor" strokeWidth="0.8" opacity="0.6" />
+            <line x1="100" y1="5" x2="100" y2="20" stroke="currentColor" strokeWidth="2" />
+            <line x1="100" y1="180" x2="100" y2="195" stroke="currentColor" strokeWidth="1" />
+            <line x1="5" y1="100" x2="20" y2="100" stroke="currentColor" strokeWidth="1" />
+            <line x1="180" y1="100" x2="195" y2="100" stroke="currentColor" strokeWidth="1" />
+            <g data-slot-needle>
+              <polygon points="100,25 108,100 100,108 92,100" fill="currentColor" />
+              <polygon points="100,175 108,100 100,92 92,100" fill="currentColor" opacity="0.5" />
+              <circle cx="100" cy="100" r="5" fill="currentColor" />
+            </g>
+          </svg>
+
+          {/* Decoratieve zwevende dots */}
+          <div data-slot-decor-1 className="absolute top-12 right-12 w-3 h-3 rounded-full bg-accent pointer-events-none hidden md:block" />
+          <div data-slot-decor-2 className="absolute bottom-16 left-16 w-4 h-4 rounded-full bg-accent/60 pointer-events-none hidden md:block" />
+          <div data-slot-decor-3 className="absolute top-1/3 left-1/4 w-2 h-2 rounded-full bg-primary-foreground/40 pointer-events-none hidden md:block" />
+          <div data-slot-decor-4 className="absolute bottom-1/3 right-1/3 w-2.5 h-2.5 rounded-full bg-accent/50 hidden md:block pointer-events-none" />
+
+          {/* Content */}
+          <div className="relative z-10 max-w-2xl">
+            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-5">STARTEN</p>
+            <h2 className="text-3xl md:text-5xl font-bold leading-tight mb-5">
+              <SplitWords text="Toets je opdracht voor je het gesprek aangaat" dataAttr="data-slot-word" />
+            </h2>
+            <p className="text-base md:text-lg leading-relaxed text-primary-foreground/80 mb-8 max-w-xl">
+              <SplitWords
+                text="Plak je opdracht en zie binnen een minuut waar de aandachtspunten zitten, met een herschreven opdrachtbrief als werkdocument."
+                dataAttr="data-slot-word-body"
+              />
+            </p>
+
+            <div className="inline-block" data-slot-cta-wrap>
+              <button
+                data-slot-cta
+                onClick={() => setQuickScanOpen(true)}
+                className="group relative inline-flex items-center gap-2 bg-accent text-white font-semibold px-8 py-4 rounded-full shadow-lg transition-shadow duration-300 hover:shadow-2xl hover:shadow-accent/40"
+              >
+                <span>Start je gratis zelfscan</span>
+                <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                  <path d="M3 10 L17 10 M11 4 L17 10 L11 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            </div>
+
+            <p className="text-xs text-primary-foreground/50 mt-6">{LANDING.disclaimer}</p>
+          </div>
+        </div>
       </section>
 
       {/* ── FOOTER ─────────────────────────────── */}
@@ -891,6 +1226,8 @@ export default function Home() {
                 {LANDING.footer.product.links.map((l, i) => (
                   <a key={i} href={l.href} className="block text-sm text-muted-foreground hover:text-foreground transition-colors">{l.label}</a>
                 ))}
+                <Link href="/kennisbank" className="block text-sm text-muted-foreground hover:text-foreground transition-colors">Kennisbank</Link>
+                <Link href="/over-dba-kompas" className="block text-sm text-muted-foreground hover:text-foreground transition-colors">Over DBA Kompas</Link>
               </div>
               <div className="space-y-3">
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/60">Juridisch</p>
@@ -912,21 +1249,12 @@ export default function Home() {
         </div>
       </footer>
 
-      {/* ── MODALS ─────────────────────────────── */}
-      <QuickScanModal open={quickScanOpen} onOpenChange={setQuickScanOpen} />
-
+      {/* ── MODALS (zelfscan + email-checkout in layout via MarketingModalsRoot) ── */}
       {authModal && (
         <AuthModal
           mode={authModal}
           onClose={() => setAuthModal(null)}
           onSwitch={() => setAuthModal(null)}
-        />
-      )}
-
-      {emailCheckoutPlan && (
-        <EmailCheckoutModal
-          preselectedPlan={emailCheckoutPlan}
-          onClose={() => setEmailCheckoutPlan(null)}
         />
       )}
     </div>

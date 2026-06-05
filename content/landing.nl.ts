@@ -5,57 +5,28 @@ export const LANDING = {
     features: "Functies",
     faq: "FAQ",
     login: "Ga naar de app",
-    tryNow: "Probeer nu",
+    tryNow: "Start je gratis zelfscan",
     goToApp: "Ga naar app",
   },
 
   hero: {
-    badge: "Voor zzp'ers die sterker het gesprek in willen",
     title: "Toets je zzp-opdracht",
     titleHighlight: "voordat je het gesprek aangaat",
     subtitle:
-      "DBA Kompas helpt je om sneller te zien waar je opdracht vragen oproept. Je plakt je opdrachtomschrijving of uploadt een document en ontvangt een risico-indicatie, aandachtspunten en een herschreven opdrachtbrief.",
+      "Plak je opdracht of upload een document. Binnen een minuut zie je waar je opdracht vragen oproept, met concrete aandachtspunten en een herschreven opdrachtbrief.",
     supporting: "Ontdek in 1 minuut of jouw opdracht op belangrijke punten vragen oproept.",
-    ctaPrimary: "Start DBA Quick Scan (1 minuut)",
-    ctaSecondary: "Start met DBA Kompas",
+    ctaPrimary: "Start je gratis zelfscan",
+    ctaSecondary: "Toets je opdracht voor €9,95",
     trustLine: "Van opdrachtomschrijving naar duidelijke aandachtspunten en gerichte vervolgstappen.",
   },
 
-  valueStrip: [
-    { label: "Sneller duidelijkheid" },
-    { label: "Minder losse interpretatie" },
-    { label: "Direct bruikbaar" },
-    { label: "Meer houvast in het gesprek" },
-  ],
-
-  problem: {
-    title: "Een onduidelijke opdrachtomschrijving kost tijd, vertrouwen en onderhandelingskracht",
-    intro: "Veel zzp'ers weten niet precies waar hun opdrachtomschrijving vragen oproept - totdat het te laat is.",
-    points: [
-      {
-        title: "Vertraging en extra uitleg",
-        desc: "Onduidelijkheid leidt tot onnodige herstelrondes en extra verduidelijkingen richting opdrachtgever of intermediair.",
-      },
-      {
-        title: "Zwakke onderhandelingspositie",
-        desc: "Zonder concreet houvast is het moeilijker om sterk en gericht het gesprek in te gaan.",
-      },
-      {
-        title: "Meer beoordeling, minder zekerheid",
-        desc: "Vage opdrachtomschrijvingen roepen vragen op en leiden tot extra discussie over de inrichting van de opdracht.",
-      },
-    ],
-  },
-
   appDemo: {
-    badge: "Live demo",
     title: "Bekijk de app in actie",
-    subtitle:
-      "Van opdrachtomschrijving naar risico-indicatie, aandachtspunten en een herschreven opdrachtbrief - overzichtelijk in één dashboard.",
+    subtitle: "Zo werkt het in de app.",
   },
 
   steps: {
-    title: "In drie stappen naar meer duidelijkheid",
+    title: "In vier stappen naar meer duidelijkheid",
     subtitle: "Van invoer naar inzicht, zonder onnodige complexiteit.",
     items: [
       {
@@ -80,7 +51,6 @@ export const LANDING = {
   },
 
   values: {
-    badge: "Dit levert DBA Kompas je direct op",
     subtitle: "Drie functies die direct helpen bij het beoordelen en verbeteren van je zzp-opdracht.",
     items: [
       {
@@ -98,16 +68,6 @@ export const LANDING = {
         description:
           "Volg relevante ontwikkelingen rond zzp-wetgeving, beleid en rechtspraak, zodat je sneller ziet wat invloed kan hebben op opdrachten.",
       },
-    ],
-  },
-
-  continuingValue: {
-    title: "Meer dan een eenmalige check",
-    body: "Een opdracht beoordelen is vaak niet het eindpunt. Daarom helpt DBA Kompas je ook om ontwikkelingen te volgen en eerdere analyses terug te zien.",
-    bullets: [
-      "Eerdere analyses terugzien",
-      "Relevante updates volgen",
-      "Meer context voor vervolggesprekken",
     ],
   },
 
@@ -130,46 +90,7 @@ export const LANDING = {
     ],
   },
 
-  benefits: {
-    badge: "Voordelen",
-    title: "Waarom DBA Kompas werkt in de praktijk",
-    items: [
-      {
-        title: "Bespaar tijd",
-        description:
-          "Je hoeft niet zelf alles uit je opdrachtomschrijving te halen.",
-      },
-      {
-        title: "Werk met meer houvast",
-        description:
-          "De analyse maakt sneller duidelijk waar aandacht nodig is.",
-      },
-      {
-        title: "Verbeter direct je tekst",
-        description:
-          "Niet alleen signalen, maar ook concrete vervolgstappen.",
-      },
-      {
-        title: "Blijf up-to-date",
-        description:
-          "Volg relevante ontwikkelingen op één centrale plek.",
-      },
-    ],
-    showcase: {
-      title: "Van twijfel naar duidelijker vertrekpunt",
-      subtitle: "Gebruik de uitkomst om scherper en beter voorbereid het gesprek in te gaan.",
-    },
-    checklist: [
-      "Risico-indicatie op je opdrachtomschrijving",
-      "Overzicht van aandachtspunten",
-      "Concrete verbeterpunten",
-      "Herschreven opdrachtbrief",
-      "Relevante zzp-updates",
-    ],
-  },
-
   trust: {
-    badge: "Heldere grenzen, duidelijke output",
     subtitle:
       "Geen grote claims, wel duidelijke uitleg over de werking en de grenzen van de dienst.",
     items: [
@@ -196,11 +117,12 @@ export const LANDING = {
     title: "Één check of doorlopend toegang",
     subtitle: "Voor één opdracht of voor structureel gebruik van DBA Kompas.",
     disclaimer: "Prijzen excl. btw. Betaling verloopt via Stripe. Abonnementen worden automatisch verlengd en zijn opzegbaar via je account.",
+    steeringText: "Twijfel je? Begin met de eenmalige check. Verwacht je dit jaar meer dan twee opdrachten te toetsen, dan ben je met een abonnement voordeliger uit en beweeg je automatisch mee met de wetgeving.",
     plans: [
       {
         name: "Eenmalige check",
         planKey: "one_time_dba",
-        supporting: "Voor één specifieke opdrachtomschrijving",
+        supporting: "Voor één opdracht die nu speelt.",
         price: "€9,95",
         period: "eenmalig",
         popular: false,
@@ -211,43 +133,44 @@ export const LANDING = {
           "Heranalyse binnen dezelfde check",
           "Risico-indicatie en aandachtspunten",
           "Herschreven opdrachtbrief (Word-download)",
-          "Geen toegang tot volledige app",
+          "Toegang tot één analyse, niet tot de volledige app",
         ],
       },
       {
         name: "Maandelijks",
         planKey: "monthly",
+        supporting: "Voor wie regelmatig nieuwe opdrachten heeft.",
         price: "€20",
         period: "/maand",
         popular: false,
         cta: "Kies maandelijks",
         features: [
-          "Tot 20 DBA-checks per maand",
-          "Nieuws & updates",
-          "Aandachtspunten en suggesties",
+          "Toegang tot alle DBA-checks die je nodig hebt",
+          "Nieuws en updates rond zzp-wetgeving",
+          "Eerdere analyses terugzien",
           "Maandelijks opzegbaar",
         ],
       },
       {
         name: "Jaarlijks",
         planKey: "yearly",
+        supporting: "Voor wie structureel als zelfstandige werkt.",
         price: "€200",
         period: "/jaar",
         popular: true,
-        popularBadge: "Meest gekozen",
+        popularBadge: "Voordeligst per maand",
         cta: "Kies jaarlijks",
         features: [
-          "Tot 25 DBA-checks per maand",
           "Alles uit maandelijks",
+          "Beweegt automatisch mee met wijzigingen in de wetgeving",
           "Lager bedrag per maand omgerekend",
-          "Geschikt voor structureel gebruik",
+          "Geschikt voor structureel gebruik als zelfstandige",
         ],
       },
     ],
   },
 
   faq: {
-    badge: "Veelgestelde vragen",
     items: [
       {
         question: "Wat is DBA Kompas?",
@@ -296,7 +219,7 @@ export const LANDING = {
     title: "Klaar om te starten?",
     subtitle:
       "Ontdek binnen enkele minuten de mogelijke aandachtspunten in je opdrachtomschrijving.",
-    primary: "Start je analyse",
+    primary: "Start je gratis zelfscan",
     secondary: "Bekijk voorbeeld",
   },
 
