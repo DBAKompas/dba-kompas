@@ -17,12 +17,14 @@ import { AnswerBlockAnimations } from "@/components/marketing/AnswerBlockAnimati
 import { InzetIllustration } from "@/components/marketing/InzetIllustration";
 import { InzetAnimations } from "@/components/marketing/InzetAnimations";
 import { HowItWorksCarousel } from "@/components/marketing/HowItWorksCarousel";
+import { HowItWorksHorizontal } from "@/components/marketing/HowItWorksHorizontal";
 import { NieuwsIllustration } from "@/components/marketing/news/NieuwsIllustration";
 import { NieuwsAnimations } from "@/components/marketing/news/NieuwsAnimations";
 import { ChatGptAnimations } from "@/components/marketing/ChatGptAnimations";
 import { MethodiekAnimations } from "@/components/marketing/MethodiekAnimations";
 import { PrijsAnimations } from "@/components/marketing/PrijsAnimations";
 import { SlotAnimations } from "@/components/marketing/SlotAnimations";
+import { MarketingTOC } from "@/components/marketing/MarketingTOC";
 import { FaqAccordion } from "@/components/marketing/faq/FaqAccordion";
 import { FaqAnimations } from "@/components/marketing/faq/FaqAnimations";
 import { PubliekeSectorVisual } from "@/components/marketing/voor-wie/PubliekeSectorVisual";
@@ -183,6 +185,8 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA_ORGANIZATION) }}
       />
+
+      <MarketingTOC />
 
       {/* ── HEADER ─────────────────────────────── */}
       <header
@@ -376,7 +380,7 @@ export default function Home() {
       </AnimatePresence>
 
       {/* ── HERO ───────────────────────────────── */}
-      <section className="relative overflow-x-hidden hero-gradient hero-shimmer px-4 sm:px-6 pt-20 pb-10 md:pt-28 md:pb-14 max-w-7xl mx-auto w-full">
+      <section id="hero" className="relative overflow-x-hidden hero-gradient hero-shimmer px-4 sm:px-6 pt-20 pb-10 md:pt-28 md:pb-14 max-w-7xl mx-auto w-full">
         <HeroAnimations />
         <div
           className="absolute inset-0 -z-10 overflow-hidden pointer-events-none"
@@ -504,7 +508,7 @@ export default function Home() {
       </section>
 
       {/* ── ANSWER BLOCK ───────────────────────── */}
-      <section className="relative px-4 sm:px-6 py-14 md:py-28 max-w-7xl mx-auto w-full">
+      <section id="antwoord" className="relative px-4 sm:px-6 py-14 md:py-28 max-w-7xl mx-auto w-full" style={{ scrollMarginTop: "5rem" }}>
         <AnswerBlockAnimations />
         <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
           {/* LINKS: tekst */}
@@ -552,7 +556,7 @@ export default function Home() {
       </section>
 
       {/* ── INZET ──────────────────────────────── */}
-      <section className="relative px-4 sm:px-6 py-14 md:py-28 max-w-7xl mx-auto w-full overflow-hidden section-divider">
+      <section id="inzet" className="relative px-4 sm:px-6 py-14 md:py-28 max-w-7xl mx-auto w-full overflow-hidden section-divider" style={{ scrollMarginTop: "5rem" }}>
         <InzetAnimations />
         <div className="grid md:grid-cols-[6fr_5fr] gap-12 md:gap-16 items-center">
           {/* LINKS: tekst */}
@@ -585,20 +589,28 @@ export default function Home() {
       </section>
 
       {/* ── HOW IT WORKS ───────────────────────── */}
-      <section id="functies" className="relative px-4 sm:px-6 py-14 md:py-28 max-w-7xl mx-auto w-full section-divider">
-        <div className="text-center mb-12 md:mb-16">
-          <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">HOE HET WERKT</p>
-          <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground mb-4">
-            <SplitWords text={LANDING.steps.title} dataAttr="data-howitworks-word" />
-          </h2>
-          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">{LANDING.steps.subtitle}</p>
+      <section id="functies" className="relative w-full section-divider" style={{ scrollMarginTop: "5rem" }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-14 md:pt-28 pb-10 md:pb-12">
+          <div className="text-center">
+            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">HOE HET WERKT</p>
+            <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground mb-4">
+              <SplitWords text={LANDING.steps.title} dataAttr="data-howitworks-word" />
+            </h2>
+            <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">{LANDING.steps.subtitle}</p>
+          </div>
         </div>
 
-        <HowItWorksCarousel />
+        {/* Desktop: horizontale pinned scroll. Mobile/tablet: verticale carousel */}
+        <div className="hidden lg:block">
+          <HowItWorksHorizontal />
+        </div>
+        <div className="lg:hidden max-w-7xl mx-auto px-4 sm:px-6 pb-14 md:pb-20">
+          <HowItWorksCarousel />
+        </div>
       </section>
 
       {/* ── CHATGPT BEZWAAR ────────────────────── */}
-      <section className="relative px-4 sm:px-6 py-12 md:py-20 max-w-7xl mx-auto w-full overflow-hidden section-divider">
+      <section id="chatgpt" className="relative px-4 sm:px-6 py-12 md:py-20 max-w-7xl mx-auto w-full overflow-hidden section-divider" style={{ scrollMarginTop: "5rem" }}>
         <ChatGptAnimations />
         <div className="space-y-10">
           <div className="text-center space-y-4 max-w-3xl mx-auto">
@@ -754,7 +766,7 @@ export default function Home() {
       </section>
 
       {/* ── METHODIEK & MAKER ──────────────────── */}
-      <section className="w-full py-14 md:py-28 bg-[#0b1d3a]">
+      <section id="methodiek" className="w-full py-14 md:py-28 bg-[#0b1d3a]" style={{ scrollMarginTop: "5rem" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
           {/* DEEL A: Methodiek */}
@@ -888,8 +900,10 @@ export default function Home() {
 
       {/* ── ALTIJD ACTUEEL (meer dan analyse) ── */}
       <section
+        id="altijd-actueel"
         data-aa-section
         className="relative px-4 sm:px-6 py-12 md:py-20 max-w-7xl mx-auto w-full overflow-hidden section-divider"
+        style={{ scrollMarginTop: "5rem" }}
       >
         <NieuwsAnimations />
         <div className="grid md:grid-cols-[5fr_6fr] gap-10 md:gap-14 items-center">
@@ -943,7 +957,7 @@ export default function Home() {
       </section>
 
       {/* ── VOOR WIE (segmenten) ────────────────── */}
-      <section id="voor-wie" className="relative px-4 sm:px-6 py-14 md:py-28 max-w-7xl mx-auto w-full section-divider">
+      <section id="voor-wie" className="relative px-4 sm:px-6 py-14 md:py-28 max-w-7xl mx-auto w-full section-divider" style={{ scrollMarginTop: "5rem" }}>
         <VoorWieAnimations />
 
         <div className="text-center mb-12 md:mb-16">
@@ -1002,51 +1016,31 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── PRIJS IN VERHOUDING ────────────────── */}
-      <section className="w-full py-12 md:py-20 bg-[#faf0e6]">
-        <PrijsAnimations />
-        <motion.div
-          className="max-w-3xl mx-auto px-4 sm:px-6 text-center"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          viewport={viewportConfig}
-        >
-          <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent text-center mb-3">DE REKENSOM</p>
-          <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground">
-            Wat kost een onduidelijke opdracht je echt?
-          </h2>
-          <p className="mt-6 max-w-2xl mx-auto text-base md:text-lg leading-relaxed text-muted-foreground">
-            Een jurist of fiscalist inschakelen kost al snel honderden euro's. Een opdracht die niet
-            wordt verlengd kost een veelvoud daarvan. Een toets met DBA Kompas kost €9,95, minder dan
-            een uur van je eigen tarief.
-          </p>
-        </motion.div>
-
-        <div className="mt-10 md:mt-12 grid md:grid-cols-3 gap-4 md:gap-6 max-w-4xl mx-auto px-4 sm:px-6" data-prijs-callouts>
-          <div data-prijs-callout className="bg-card rounded-2xl p-6 ring-1 ring-accent/30 text-center">
-            <p className="text-3xl md:text-4xl font-bold text-accent leading-none mb-2">€9,95</p>
-            <p className="text-xs uppercase tracking-wider font-semibold text-accent mb-1.5">DBA Kompas</p>
-            <p className="text-sm text-muted-foreground">Een check, direct beschikbaar.</p>
-          </div>
-
-          <div data-prijs-callout className="bg-card rounded-2xl p-6 ring-1 ring-foreground/15 text-center">
-            <p className="text-3xl md:text-4xl font-bold text-foreground leading-none mb-2">Honderden €</p>
-            <p className="text-xs uppercase tracking-wider font-semibold text-foreground/70 mb-1.5">Jurist of fiscalist</p>
-            <p className="text-sm text-muted-foreground">Een uur professioneel advies.</p>
-          </div>
-
-          <div data-prijs-callout className="bg-primary text-primary-foreground rounded-2xl p-6 text-center">
-            <p className="text-3xl md:text-4xl font-bold text-accent leading-none mb-2">Duizenden €</p>
-            <p className="text-xs uppercase tracking-wider font-semibold text-primary-foreground/80 mb-1.5">Niet-verlengde opdracht</p>
-            <p className="text-sm text-primary-foreground/70">Wat een terugtrekkende opdrachtgever kost.</p>
-          </div>
-        </div>
-      </section>
-
-      {/* ── PRICING ────────────────────────────── */}
-      <section id="prijzen" className="px-4 sm:px-6 py-12 md:py-24 max-w-7xl mx-auto w-full">
+      {/* ── PRICING (incl. rekensom-callouts) ───── */}
+      <section id="prijzen" className="px-4 sm:px-6 py-12 md:py-24 max-w-7xl mx-auto w-full" style={{ scrollMarginTop: "5rem" }}>
         <div className="space-y-12">
+          {/* Rekensom-callouts boven prijscards */}
+          <div className="max-w-5xl mx-auto">
+            <p className="text-center text-sm text-muted-foreground mb-6">
+              Wat kost een toets normaal en wat kost het bij DBA Kompas?
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4" data-prijs-callouts>
+              <div data-prijs-callout className="px-5 py-4 rounded-xl bg-accent/10 ring-1 ring-accent/30 text-center">
+                <p className="text-2xl font-bold text-accent leading-none">Vanaf €9,95</p>
+                <p className="text-xs text-muted-foreground mt-1.5">Eenmalig met DBA Kompas</p>
+              </div>
+              <div data-prijs-callout className="px-5 py-4 rounded-xl bg-primary/5 ring-1 ring-primary/15 text-center">
+                <p className="text-2xl font-bold text-foreground leading-none">€150 tot €300</p>
+                <p className="text-xs text-muted-foreground mt-1.5">Eenmalige check bij een adviseur</p>
+              </div>
+              <div data-prijs-callout className="px-5 py-4 rounded-xl bg-primary text-primary-foreground text-center">
+                <p className="text-2xl font-bold text-accent leading-none">Honderden euro&apos;s</p>
+                <p className="text-xs text-primary-foreground/80 mt-1.5">Volledige juridische beoordeling</p>
+              </div>
+            </div>
+          </div>
+
+          <PrijsAnimations />
           <motion.div
             className="text-center space-y-3 max-w-xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
@@ -1136,7 +1130,7 @@ export default function Home() {
       </section>
 
       {/* ── FAQ ────────────────────────────────── */}
-      <section id="faq" className="relative px-4 sm:px-6 py-14 md:py-28 max-w-7xl mx-auto w-full section-divider">
+      <section id="faq" className="relative px-4 sm:px-6 py-14 md:py-28 max-w-7xl mx-auto w-full section-divider" style={{ scrollMarginTop: "5rem" }}>
         <FaqAnimations />
         <div className="text-center mb-12 md:mb-16">
           <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">VEELGESTELDE VRAGEN</p>
