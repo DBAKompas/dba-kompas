@@ -2,7 +2,7 @@ import Link from "next/link";
 import { SplitWords } from "@/components/marketing/SplitWords";
 import { SlotAnimations } from "@/components/marketing/SlotAnimations";
 
-export function SlotCta({ href = "/" }: { href?: string }) {
+export function SlotCta({ href = "/?action=zelfscan" }: { href?: string }) {
   return (
     <section className="relative px-4 sm:px-6 py-14 md:py-32 max-w-7xl mx-auto w-full overflow-hidden">
       <SlotAnimations />

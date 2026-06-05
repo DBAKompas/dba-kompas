@@ -48,7 +48,7 @@ export function MarketingHeader() {
             Ga naar de app
           </a>
           <Link
-            href="/"
+            href={pathname === "/" ? "/" : "/?action=zelfscan"}
             className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-4 py-2 rounded-md text-sm hover:bg-primary/90 transition-colors"
           >
             Start je gratis zelfscan

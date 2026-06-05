@@ -165,7 +165,7 @@ export function KennisbankPage({ page }: { page: KennisbankPageType }) {
             <p className="text-base md:text-lg text-primary-foreground/80 mb-8">
               Met DBA Kompas toets je je opdracht in 60 seconden. Direct een indicatie en concrete aandachtspunten.
             </p>
-            <Link href="/" className="inline-flex items-center gap-2 bg-accent text-white font-semibold px-7 py-3.5 rounded-full shadow-lg hover:shadow-2xl hover:shadow-accent/40 transition-shadow duration-300">
+            <Link href="/?action=zelfscan" className="inline-flex items-center gap-2 bg-accent text-white font-semibold px-7 py-3.5 rounded-full shadow-lg hover:shadow-2xl hover:shadow-accent/40 transition-shadow duration-300">
               Start je gratis zelfscan
               <svg className="w-4 h-4" viewBox="0 0 20 20" fill="none" aria-hidden="true">
                 <path d="M3 10 L17 10 M11 4 L17 10 L11 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />

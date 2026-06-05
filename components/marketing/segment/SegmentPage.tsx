@@ -47,6 +47,7 @@ export function SegmentPage({ eyebrow, h1, heroSubtext, segmentLabel, verdieping
       <section className="relative px-4 sm:px-6 py-14 md:py-28 max-w-5xl mx-auto w-full text-center">
         <div className="text-left">
           <Breadcrumb
+            hideVisible
             items={[
               { label: "Home", href: "/" },
               { label: "Voor wie", href: "/#voor-wie" },
@@ -62,10 +63,10 @@ export function SegmentPage({ eyebrow, h1, heroSubtext, segmentLabel, verdieping
           <SplitWords text={heroSubtext} dataAttr="data-segment-body" />
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Link href="/" className="inline-flex items-center gap-2 bg-accent text-white font-semibold px-6 py-3 rounded-md hover:bg-accent/90 transition-colors min-w-[240px] justify-center">
+          <Link href="/?action=zelfscan" className="inline-flex items-center gap-2 bg-accent text-white font-semibold px-6 py-3 rounded-md hover:bg-accent/90 transition-colors min-w-[240px] justify-center">
             Start je gratis zelfscan
           </Link>
-          <Link href="/#prijzen" className="inline-flex items-center gap-2 border border-accent text-accent font-semibold px-6 py-3 rounded-md hover:bg-accent/8 transition-colors">
+          <Link href="/?action=check" className="inline-flex items-center gap-2 border border-accent text-accent font-semibold px-6 py-3 rounded-md hover:bg-accent/8 transition-colors">
             Toets je opdracht voor €9,95
           </Link>
         </div>
@@ -234,7 +235,7 @@ export function SegmentPage({ eyebrow, h1, heroSubtext, segmentLabel, verdieping
             <p className="text-base md:text-lg leading-relaxed text-primary-foreground/80 mb-8 max-w-xl">
               Plak je opdracht en zie binnen een minuut waar de aandachtspunten zitten, met een herschreven opdrachtbrief als werkdocument.
             </p>
-            <Link href="/" className="inline-flex items-center gap-2 bg-accent text-white font-semibold px-8 py-4 rounded-full shadow-lg hover:shadow-2xl hover:shadow-accent/40 transition-shadow duration-300">
+            <Link href="/?action=zelfscan" className="inline-flex items-center gap-2 bg-accent text-white font-semibold px-8 py-4 rounded-full shadow-lg hover:shadow-2xl hover:shadow-accent/40 transition-shadow duration-300">
               Start je gratis zelfscan
               <svg className="w-4 h-4" viewBox="0 0 20 20" fill="none" aria-hidden="true">
                 <path d="M3 10 L17 10 M11 4 L17 10 L11 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />

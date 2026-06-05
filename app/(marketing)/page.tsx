@@ -11,6 +11,7 @@ import { LANDING } from "@/content/landing.nl";
 import { AuthModal } from "@/components/marketing/AuthModals";
 import { EmailCheckoutModal } from "@/components/marketing/EmailCheckoutModal";
 import QuickScanModal from "@/components/marketing/QuickScanModal";
+import { OpenModalFromQuery } from "@/components/marketing/OpenModalFromQuery";
 import { HeroAnimations } from "@/components/marketing/HeroAnimations";
 import { SplitWords } from "@/components/marketing/SplitWords";
 import { AnswerBlockAnimations } from "@/components/marketing/AnswerBlockAnimations";
@@ -1246,6 +1247,10 @@ export default function Home() {
       </footer>
 
       {/* ── MODALS ─────────────────────────────── */}
+      <OpenModalFromQuery
+        openZelfscan={() => setQuickScanOpen(true)}
+        openCheck={() => setEmailCheckoutPlan("one_time_dba")}
+      />
       <QuickScanModal open={quickScanOpen} onOpenChange={setQuickScanOpen} />
 
       {authModal && (
