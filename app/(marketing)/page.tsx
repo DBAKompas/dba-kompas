@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import {
   ArrowRight, LogOut, Zap, Menu, X,
 } from "lucide-react";
@@ -1247,10 +1247,12 @@ export default function Home() {
       </footer>
 
       {/* ── MODALS ─────────────────────────────── */}
-      <OpenModalFromQuery
-        openZelfscan={() => setQuickScanOpen(true)}
-        openCheck={() => setEmailCheckoutPlan("one_time_dba")}
-      />
+      <Suspense fallback={null}>
+        <OpenModalFromQuery
+          openZelfscan={() => setQuickScanOpen(true)}
+          openCheck={() => setEmailCheckoutPlan("one_time_dba")}
+        />
+      </Suspense>
       <QuickScanModal open={quickScanOpen} onOpenChange={setQuickScanOpen} />
 
       {authModal && (
