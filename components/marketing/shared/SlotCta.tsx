@@ -1,8 +1,11 @@
-import Link from "next/link";
+"use client";
 import { SplitWords } from "@/components/marketing/SplitWords";
 import { SlotAnimations } from "@/components/marketing/SlotAnimations";
+import { useMarketingModals } from "@/lib/store/marketingModals";
 
-export function SlotCta({ href = "/?action=zelfscan" }: { href?: string }) {
+export function SlotCta() {
+  const { openZelfscan } = useMarketingModals();
+
   return (
     <section className="relative px-4 sm:px-6 py-14 md:py-32 max-w-7xl mx-auto w-full overflow-hidden">
       <SlotAnimations />
@@ -51,16 +54,17 @@ export function SlotCta({ href = "/?action=zelfscan" }: { href?: string }) {
           </p>
 
           <div className="inline-block" data-slot-cta-wrap>
-            <Link
-              href={href}
+            <button
+              type="button"
               data-slot-cta
+              onClick={openZelfscan}
               className="group relative inline-flex items-center gap-2 bg-accent text-white font-semibold px-8 py-4 rounded-full shadow-lg transition-shadow duration-300 hover:shadow-2xl hover:shadow-accent/40"
             >
               <span>Start je gratis zelfscan</span>
               <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 20 20" fill="none" aria-hidden="true">
                 <path d="M3 10 L17 10 M11 4 L17 10 L11 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-            </Link>
+            </button>
           </div>
         </div>
       </div>

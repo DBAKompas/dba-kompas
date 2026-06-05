@@ -1,5 +1,7 @@
+"use client";
 import Link from "next/link";
 import { SplitWords } from "@/components/marketing/SplitWords";
+import { useMarketingModals } from "@/lib/store/marketingModals";
 import { FaqAccordion } from "@/components/marketing/faq/FaqAccordion";
 import { KennisbankAnimations } from "./KennisbankAnimations";
 import { Breadcrumb } from "./Breadcrumb";
@@ -7,6 +9,7 @@ import { MarketingHeader, MarketingFooter } from "./MarketingChrome";
 import { KENNISBANK_PAGES, type KennisbankPage as KennisbankPageType } from "@/content/kennisbank";
 
 export function KennisbankPage({ page }: { page: KennisbankPageType }) {
+  const { openZelfscan } = useMarketingModals();
   const related = page.relatedSlugs
     .map((slug) => KENNISBANK_PAGES.find((p) => p.slug === slug))
     .filter((p): p is KennisbankPageType => Boolean(p));
@@ -165,12 +168,12 @@ export function KennisbankPage({ page }: { page: KennisbankPageType }) {
             <p className="text-base md:text-lg text-primary-foreground/80 mb-8">
               Met DBA Kompas toets je je opdracht in 60 seconden. Direct een indicatie en concrete aandachtspunten.
             </p>
-            <Link href="/?action=zelfscan" className="inline-flex items-center gap-2 bg-accent text-white font-semibold px-7 py-3.5 rounded-full shadow-lg hover:shadow-2xl hover:shadow-accent/40 transition-shadow duration-300">
+            <button type="button" onClick={openZelfscan} className="inline-flex items-center gap-2 bg-accent text-white font-semibold px-7 py-3.5 rounded-full shadow-lg hover:shadow-2xl hover:shadow-accent/40 transition-shadow duration-300">
               Start je gratis zelfscan
               <svg className="w-4 h-4" viewBox="0 0 20 20" fill="none" aria-hidden="true">
                 <path d="M3 10 L17 10 M11 4 L17 10 L11 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-            </Link>
+            </button>
           </div>
         </div>
       </section>

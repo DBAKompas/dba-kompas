@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import BrandLogo from "@/components/marketing/BrandLogo";
+import { useMarketingModals } from "@/lib/store/marketingModals";
 
 const APP_URL =
   (process.env.NEXT_PUBLIC_APP_URL as string | undefined)?.replace(/\/+$/, "") ||
@@ -17,6 +18,7 @@ const NAV_ITEMS: Array<{ label: string; href: string; matchPrefix?: string }> = 
 
 export function MarketingHeader() {
   const pathname = usePathname() || "/";
+  const { openZelfscan } = useMarketingModals();
 
   return (
     <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-border/40">
@@ -47,12 +49,13 @@ export function MarketingHeader() {
           >
             Ga naar de app
           </a>
-          <Link
-            href={pathname === "/" ? "/" : "/?action=zelfscan"}
+          <button
+            type="button"
+            onClick={openZelfscan}
             className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-4 py-2 rounded-md text-sm hover:bg-primary/90 transition-colors"
           >
             Start je gratis zelfscan
-          </Link>
+          </button>
         </nav>
       </div>
     </header>

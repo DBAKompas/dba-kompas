@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   ArrowRight, LogOut, Zap, Menu, X,
 } from "lucide-react";
@@ -9,9 +9,7 @@ import BrandLogo from "@/components/marketing/BrandLogo";
 import { Button } from "@/components/ui/button";
 import { LANDING } from "@/content/landing.nl";
 import { AuthModal } from "@/components/marketing/AuthModals";
-import { EmailCheckoutModal } from "@/components/marketing/EmailCheckoutModal";
-import QuickScanModal from "@/components/marketing/QuickScanModal";
-import { OpenModalFromQuery } from "@/components/marketing/OpenModalFromQuery";
+import { useMarketingModals } from "@/lib/store/marketingModals";
 import { HeroAnimations } from "@/components/marketing/HeroAnimations";
 import { SplitWords } from "@/components/marketing/SplitWords";
 import { AnswerBlockAnimations } from "@/components/marketing/AnswerBlockAnimations";
@@ -122,8 +120,13 @@ export default function Home() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [authModal, setAuthModal] = useState<"login" | null>(null);
-  const [emailCheckoutPlan, setEmailCheckoutPlan] = useState<"monthly" | "yearly" | "one_time_dba" | null>(null);
-  const [quickScanOpen, setQuickScanOpen] = useState(false);
+  const { openZelfscan, openCheck } = useMarketingModals();
+  const setQuickScanOpen = (open: boolean) => {
+    if (open) openZelfscan();
+  };
+  const setEmailCheckoutPlan = (plan: "monthly" | "yearly" | "one_time_dba" | null) => {
+    if (plan) openCheck(plan);
+  };
   const [mockupHovered, setMockupHovered] = useState(false);
 
   function scrollToPricing() {
@@ -1246,27 +1249,12 @@ export default function Home() {
         </div>
       </footer>
 
-      {/* ── MODALS ─────────────────────────────── */}
-      <Suspense fallback={null}>
-        <OpenModalFromQuery
-          openZelfscan={() => setQuickScanOpen(true)}
-          openCheck={() => setEmailCheckoutPlan("one_time_dba")}
-        />
-      </Suspense>
-      <QuickScanModal open={quickScanOpen} onOpenChange={setQuickScanOpen} />
-
+      {/* ── MODALS (zelfscan + email-checkout in layout via MarketingModalsRoot) ── */}
       {authModal && (
         <AuthModal
           mode={authModal}
           onClose={() => setAuthModal(null)}
           onSwitch={() => setAuthModal(null)}
-        />
-      )}
-
-      {emailCheckoutPlan && (
-        <EmailCheckoutModal
-          preselectedPlan={emailCheckoutPlan}
-          onClose={() => setEmailCheckoutPlan(null)}
         />
       )}
     </div>

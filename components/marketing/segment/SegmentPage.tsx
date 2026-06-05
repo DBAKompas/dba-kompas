@@ -1,5 +1,7 @@
+"use client";
 import Link from "next/link";
 import { SplitWords } from "@/components/marketing/SplitWords";
+import { useMarketingModals } from "@/lib/store/marketingModals";
 import { FaqAccordion } from "@/components/marketing/faq/FaqAccordion";
 import { Breadcrumb } from "@/components/marketing/kennisbank/Breadcrumb";
 import { MarketingHeader, MarketingFooter } from "@/components/marketing/kennisbank/MarketingChrome";
@@ -33,6 +35,7 @@ const FEATURES = [
 ];
 
 export function SegmentPage({ eyebrow, h1, heroSubtext, segmentLabel, verdiepingSlugs, risicoThemas, faqItems }: SegmentPageProps) {
+  const { openZelfscan, openCheck } = useMarketingModals();
   const verdieping = verdiepingSlugs
     .map((slug) => KENNISBANK_PAGES.find((p) => p.slug === slug))
     .filter((p): p is (typeof KENNISBANK_PAGES)[number] => Boolean(p));
@@ -63,12 +66,12 @@ export function SegmentPage({ eyebrow, h1, heroSubtext, segmentLabel, verdieping
           <SplitWords text={heroSubtext} dataAttr="data-segment-body" />
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Link href="/?action=zelfscan" className="inline-flex items-center gap-2 bg-accent text-white font-semibold px-6 py-3 rounded-md hover:bg-accent/90 transition-colors min-w-[240px] justify-center">
+          <button type="button" onClick={openZelfscan} className="inline-flex items-center gap-2 bg-accent text-white font-semibold px-6 py-3 rounded-md hover:bg-accent/90 transition-colors min-w-[240px] justify-center">
             Start je gratis zelfscan
-          </Link>
-          <Link href="/?action=check" className="inline-flex items-center gap-2 border border-accent text-accent font-semibold px-6 py-3 rounded-md hover:bg-accent/8 transition-colors">
+          </button>
+          <button type="button" onClick={() => openCheck("one_time_dba")} className="inline-flex items-center gap-2 border border-accent text-accent font-semibold px-6 py-3 rounded-md hover:bg-accent/8 transition-colors">
             Toets je opdracht voor €9,95
-          </Link>
+          </button>
         </div>
       </section>
 
@@ -235,12 +238,12 @@ export function SegmentPage({ eyebrow, h1, heroSubtext, segmentLabel, verdieping
             <p className="text-base md:text-lg leading-relaxed text-primary-foreground/80 mb-8 max-w-xl">
               Plak je opdracht en zie binnen een minuut waar de aandachtspunten zitten, met een herschreven opdrachtbrief als werkdocument.
             </p>
-            <Link href="/?action=zelfscan" className="inline-flex items-center gap-2 bg-accent text-white font-semibold px-8 py-4 rounded-full shadow-lg hover:shadow-2xl hover:shadow-accent/40 transition-shadow duration-300">
+            <button type="button" onClick={openZelfscan} className="inline-flex items-center gap-2 bg-accent text-white font-semibold px-8 py-4 rounded-full shadow-lg hover:shadow-2xl hover:shadow-accent/40 transition-shadow duration-300">
               Start je gratis zelfscan
               <svg className="w-4 h-4" viewBox="0 0 20 20" fill="none" aria-hidden="true">
                 <path d="M3 10 L17 10 M11 4 L17 10 L11 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-            </Link>
+            </button>
           </div>
         </div>
       </section>
