@@ -76,7 +76,7 @@ export function OpdrachtbriefTileVisual() {
 
   return (
     <div className="relative w-full h-full flex items-center justify-center p-6">
-      <div className="w-full max-w-md bg-card rounded-lg ring-1 ring-foreground/10 p-5 md:p-6 shadow-sm">
+      <div className="w-full max-w-md bg-card rounded-lg ring-1 ring-foreground/10 p-5 md:p-6">
         {SECTIES.map((sectie, i) => {
           const isActive = sectieIndex === i;
           const isVisible = sectieIndex >= i;
