@@ -18,7 +18,7 @@ export default function GidsenPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Gidsen</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Kennis</h1>
         <p className="text-sm text-muted-foreground mt-1">
           Kennisbronnen over de Wet DBA, fiscale verplichtingen en ondernemerschap.
         </p>

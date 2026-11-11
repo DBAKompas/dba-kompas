@@ -85,6 +85,14 @@ export interface AssessmentForPDF {
   optimizedBrief?: string | null;
   domains?: any[] | null;
   engagementDurationModule?: any | null;
+  v3?: {
+    dossierDatum?: string;
+    weging?: string;
+    vragenVoorGesprek?: string[];
+    jurisprudentie?: Array<{ titel: string; ecli?: string; url?: string; relevantie: string }>;
+    actualiteit?: string;
+    beperkingen?: string;
+  } | null;
   createdAt: string | Date;
 }
 
@@ -349,7 +357,44 @@ export function generateAssessmentPDF(assessment: AssessmentForPDF): PDFKit.PDFD
   const draftLEnd = renderDraftCol(compactRaw, !!compactOk, LX, topY, false);
   const draftREnd = renderDraftCol(extendedRaw, !!extendedOk, RX, topY, true);
 
-  const contentEnd = Math.max(draftLEnd, draftREnd) + 16;
+  let contentEnd = Math.max(draftLEnd, draftREnd) + 16;
+
+  // ── EXTRA PAGINA: weging, gespreksvragen en bronnen (engine v3) ─────────────
+  const v3 = assessment.v3;
+  if (v3 && (v3.weging || v3.vragenVoorGesprek?.length || v3.jurisprudentie?.length)) {
+    addPage(false);
+    let y = 44;
+    const full = { width: FULL_W, size: 8, lineGap: 2 };
+    if (v3.weging) {
+      y = sectionLabel("De weging", LX, y, FULL_W);
+      y = bodyText(v3.weging, LX, y, full) + 14;
+    }
+    if (v3.vragenVoorGesprek?.length) {
+      y = sectionLabel("Vragen voor het gesprek", LX, y, FULL_W);
+      v3.vragenVoorGesprek.forEach((vraag, i) => {
+        y = bodyText(`${i + 1}.  ${vraag}`, LX, y, full) + 4;
+      });
+      y += 10;
+    }
+    if (v3.jurisprudentie?.length) {
+      y = sectionLabel("Bronnen", LX, y, FULL_W);
+      v3.jurisprudentie.forEach((bron) => {
+        y = bodyText(bron.ecli ? `${bron.titel} (${bron.ecli})` : bron.titel, LX, y, { ...full, bold: true, color: DARK });
+        y = bodyText(bron.relevantie, LX, y + 1, full);
+        if (bron.url) y = bodyText(bron.url, LX, y + 1, { width: FULL_W, size: FS_SMALL, color: GREY });
+        y += 7;
+      });
+      y += 7;
+    }
+    if (v3.actualiteit) {
+      y = sectionLabel("Handhaving en wetgeving nu", LX, y, FULL_W);
+      y = bodyText(v3.actualiteit, LX, y, full) + 10;
+    }
+    if (v3.beperkingen) {
+      y = bodyText(`Wat deze analyse niet kan beoordelen: ${v3.beperkingen}`, LX, y, { width: FULL_W, size: FS_SMALL, color: GREY });
+    }
+    contentEnd = y + 16;
+  }
 
   // ── FOOTER ───────────────────────────────────────────────────────────────
   // Plaats footer na content, maar minimaal 56px van de pagina-onderkant

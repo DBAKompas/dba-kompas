@@ -145,7 +145,7 @@ export const KENNISBANK_PAGES: KennisbankPage[] = [
       "Wat verandert er rond de Wet VBAR, het rechtsvermoeden bij laag uurtarief en de aankomende Zelfstandigenwet?",
     answerBlock:
       "De wetgeving rond zzp-werk verandert. Het kabinet heeft besloten het verduidelijkingsdeel van de Wet VBAR te schrappen en te vervangen door een afzonderlijke Zelfstandigenwet, waarin het ondernemerschap van de werkende centraal staat. Het onderdeel rechtsvermoeden van de VBAR, voor zelfstandigen met een laag uurtarief, blijft wel bestaan. Tot de nieuwe wetgeving is aangenomen, blijft het huidige kader gelden.",
-    laatstBijgewerkt: "mei 2026",
+    laatstBijgewerkt: "november 2026",
     sections: [
       {
         h2: "Wat is de Wet VBAR?",
@@ -157,7 +157,7 @@ export const KENNISBANK_PAGES: KennisbankPage[] = [
       },
       {
         h2: "Wat wordt de Zelfstandigenwet?",
-        body: "De Zelfstandigenwet kiest een ander vertrekpunt dan de VBAR: niet het gezag, maar het ondernemerschap van de werkende staat centraal. De wet werkt met een zelfstandigentoets en een werkrelatietoets, en legt de nadruk op vooraf duidelijkheid geven in plaats van achteraf beoordelen. De Zelfstandigenwet is op het moment van schrijven nog niet als wetsvoorstel ingediend en moet het volledige wetgevingsproces nog doorlopen.",
+        body: "De Zelfstandigenwet kiest een ander vertrekpunt dan de VBAR: niet het gezag, maar het ondernemerschap van de werkende staat centraal. De wet werkt met een zelfstandigentoets en een werkrelatietoets, en legt de nadruk op vooraf duidelijkheid geven in plaats van achteraf beoordelen. Wie aan beide toetsen voldoet en in de praktijk ook zo werkt, komt volgens het voorstel in een veilige haven en weet vooraf dat hij als zelfstandige kan werken. Het voorstel was van 1 tot en met 29 oktober 2026 in internetconsultatie. Het kabinet noemt januari 2028 als beoogde datum van inwerkingtreding. Het voorstel moet het wetgevingsproces nog doorlopen en kan dus nog veranderen.",
       },
       {
         h2: "Wat geldt er totdat de nieuwe wetgeving is aangenomen?",
@@ -168,7 +168,7 @@ export const KENNISBANK_PAGES: KennisbankPage[] = [
       {
         question: "Wanneer treedt de Zelfstandigenwet in werking?",
         answer:
-          "Geen vaste datum bekend. Invoering wordt gefaseerd voorzien zodra de wet het wetgevingsproces heeft doorlopen.",
+          "Het kabinet noemt januari 2028 als beoogde datum. Dat is geen vaststaande datum: het voorstel was in oktober 2026 in internetconsultatie en moet het wetgevingsproces nog doorlopen.",
       },
       {
         question: "Wat verandert het rechtsvermoeden voor mij?",
@@ -186,7 +186,7 @@ export const KENNISBANK_PAGES: KennisbankPage[] = [
       "Zachte landing sinds 2025: bedrijfsbezoeken, boekenonderzoeken, naheffingen en boetes. Wat geldt in 2026?",
     answerBlock:
       "Sinds 1 januari 2025 handhaaft de Belastingdienst weer op schijnzelfstandigheid. De handhaving verloopt met een zachte landing: bij een vermoeden start in beginsel een bedrijfsbezoek, en in 2026 worden geen verzuimboetes opgelegd. Naheffingen loonheffingen blijven mogelijk na een boekenonderzoek, en vergrijpboetes kunnen bij opzet of grove schuld worden opgelegd.",
-    laatstBijgewerkt: "mei 2026",
+    laatstBijgewerkt: "november 2026",
     sections: [
       {
         h2: "Wat is de zachte landing?",
@@ -198,7 +198,7 @@ export const KENNISBANK_PAGES: KennisbankPage[] = [
       },
       {
         h2: "Hoe ver kan een naheffing terugwerken?",
-        body: "Naheffen kan met terugwerkende kracht, maar niet verder terug dan 1 januari 2025, tenzij sprake is van kwaadwillendheid of het niet opvolgen van een eerdere aanwijzing. Goedgekeurde lopende modelovereenkomsten worden geëerbiedigd tot eind 2029.",
+        body: "Naheffen kan met terugwerkende kracht, maar niet verder terug dan 1 januari 2025. Is er sprake van kwaadwillendheid, of is een eerdere aanwijzing niet opgevolgd, dan kan de Belastingdienst tot vijf jaar terug naheffen. Goedgekeurde lopende modelovereenkomsten worden geëerbiedigd tot eind 2029.",
       },
       {
         h2: "Wat betekent dit voor zzp'ers?",

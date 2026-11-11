@@ -315,7 +315,7 @@ export default function BeloningenPage() {
   if (!stats) {
     return (
       <div className="space-y-4">
-        <h1 className="text-3xl font-bold tracking-tight">Gratis toegang en beloningen</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Beloningen</h1>
         <p className="text-sm text-muted-foreground">Kon de beloningsdata niet laden. Probeer de pagina te vernieuwen.</p>
       </div>
     )
@@ -331,7 +331,7 @@ export default function BeloningenPage() {
       <div>
         <div className="flex items-center gap-2.5 mb-1">
           <Gift className="size-6 text-orange-500 shrink-0" />
-          <h1 className="text-3xl font-bold tracking-tight">Gratis toegang en beloningen</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Beloningen</h1>
         </div>
         <p className="text-sm text-muted-foreground mt-1">
           Verwijs collega's en ZZP'ers door. Voor elke succesvolle doorverwijzing bouw je mee aan gratis toegang.

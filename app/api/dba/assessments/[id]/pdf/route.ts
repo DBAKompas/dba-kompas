@@ -39,6 +39,7 @@ export async function GET(
         : JSON.stringify(assessment.optimized_brief),
       domains: assessment.domains,
       engagementDurationModule: assessment.engagement_duration_module,
+      v3: assessment.ai_analysis?.v3 ?? null,
       createdAt: assessment.created_at,
     }
 

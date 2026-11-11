@@ -44,11 +44,11 @@ const DISCLAIMER_KEY = 'dba_disclaimer_v1'
 
 // ── Laadstappen animatie teksten ─────────────────────────────────────────────
 const LOADING_STEPS = [
-  'Tekst wordt geanalyseerd...',
-  'DBA-criteria worden getoetst...',
-  'Risico-indicatoren in kaart...',
-  'Aanbevelingen worden opgesteld...',
-  'Rapport wordt afgerond...',
+  'Je tekst wordt gelezen',
+  'De omstandigheden worden gewogen',
+  'De onderdelen worden uitgewerkt',
+  'Verbeteringen en gespreksvragen',
+  'De uitkomst wordt afgerond',
 ]
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -437,7 +437,7 @@ export default function AnalysePage() {
     <div className="space-y-6 max-w-3xl">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Analyse</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Analyses</h1>
         <p className="text-sm text-muted-foreground mt-1">
           Toets je opdracht op aandachtspunten rond de Wet DBA
           <InfoTooltip explanation={DBA_GLOSSARY.wetDba} />
@@ -747,11 +747,11 @@ export default function AnalysePage() {
                 <h2 className="text-base font-semibold">Wat je krijgt na de analyse</h2>
                 <div className="space-y-2.5">
                   {[
-                    'Volledig DBA-risicooordeel (laag / gemiddeld / hoog)',
-                    'Analyse per domein: gezag, eigen risico en persoonlijke arbeid',
-                    'Concrete verbeterpunten voor je opdracht',
-                    'Professionele opdrachtomschrijving op maat',
-                    'Mogelijkheid tot verfijning met aanvullende informatie',
+                    'Een risico-indicatie: laag, gemiddeld of hoog',
+                    'Een toelichting per onderdeel: gezag, eigen rekening en risico, en ondernemerschap',
+                    'De weging, met wat de tekst niet zegt en vragen voor het gesprek',
+                    'Bronnen: recente rechtspraak en de stand van handhaving en wetgeving',
+                    'Een herschreven opdrachtomschrijving, wanneer je daarom vraagt',
                   ].map((item, i) => (
                     <div key={i} className="flex items-start gap-2.5">
                       <CheckCircle2 className="size-4 shrink-0 mt-0.5 text-emerald-500" />

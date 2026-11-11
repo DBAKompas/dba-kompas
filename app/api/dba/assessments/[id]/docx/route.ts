@@ -30,6 +30,7 @@ export async function GET(
       input_text:               assessment.input_text,
       overall_risk_label:       assessment.overall_risk_label,
       overall_summary:          assessment.overall_summary,
+      v3:                       assessment.ai_analysis?.v3 ?? null,
       compact_assignment_draft: typeof assessment.compact_assignment_draft === 'string'
         ? assessment.compact_assignment_draft
         : JSON.stringify(assessment.compact_assignment_draft ?? null),

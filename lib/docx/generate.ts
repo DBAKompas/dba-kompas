@@ -219,6 +219,14 @@ export interface AssessmentForDocx {
   domains?:            any[] | null;
   top_improvements?:   string[] | null;
   engagement_duration_module?: any | null;
+  v3?: {
+    dossierDatum?: string;
+    weging?: string;
+    vragenVoorGesprek?: string[];
+    jurisprudentie?: Array<{ titel: string; ecli?: string; url?: string; relevantie: string }>;
+    actualiteit?: string;
+    beperkingen?: string;
+  } | null;
   created_at: string | Date;
 }
 
@@ -449,6 +457,37 @@ export async function generateAssessmentDocx(assessment: AssessmentForDocx): Pro
     improvements.forEach((imp, i) => {
       children.push(bodyPara(`${i + 1}.  ${imp}`));
     });
+  }
+
+  // ── 4b. WEGING, GESPREKSVRAGEN EN BRONNEN (engine v3) ────────────────────
+  const v3 = assessment.v3;
+  if (v3?.weging) {
+    children.push(hrLine());
+    children.push(sectionHeading("De weging"));
+    children.push(bodyPara(v3.weging));
+  }
+  if (v3?.vragenVoorGesprek?.length) {
+    children.push(hrLine());
+    children.push(sectionHeading("Vragen voor het gesprek"));
+    v3.vragenVoorGesprek.forEach((vraag, i) => {
+      children.push(bodyPara(`${i + 1}.  ${vraag}`));
+    });
+  }
+  if (v3?.jurisprudentie?.length || v3?.actualiteit) {
+    children.push(hrLine());
+    children.push(sectionHeading("Bronnen en actuele stand"));
+    (v3.jurisprudentie ?? []).forEach((bron) => {
+      children.push(subHeading(bron.ecli ? `${bron.titel} (${bron.ecli})` : bron.titel));
+      children.push(bodyPara(bron.relevantie));
+      if (bron.url) children.push(bodyPara(bron.url, { italic: true }));
+    });
+    if (v3.actualiteit) {
+      children.push(subHeading("Handhaving en wetgeving nu"));
+      children.push(bodyPara(v3.actualiteit));
+    }
+    if (v3.beperkingen) {
+      children.push(bodyPara(`Wat deze analyse niet kan beoordelen: ${v3.beperkingen}`, { italic: true }));
+    }
   }
 
   // ── 5. DUUR & INTENSITEIT ────────────────────────────────────────────────

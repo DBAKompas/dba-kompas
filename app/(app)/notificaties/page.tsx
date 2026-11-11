@@ -78,7 +78,7 @@ export default function NotificatiesPage() {
     <div className="space-y-8">
       <div>
         <div className="flex items-center gap-3">
-          <h1 className="text-3xl font-bold tracking-tight">Notificaties</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Meldingen</h1>
           {unreadCount > 0 && (
             <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-red-500 px-1.5 text-xs font-medium text-white">
               {unreadCount}

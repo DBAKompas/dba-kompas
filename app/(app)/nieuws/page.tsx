@@ -281,7 +281,7 @@ export default function NieuwsPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Nieuws Feed</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Nieuws</h1>
           <p className="mt-1 text-sm text-muted-foreground">DBA- en ZZP-nieuws</p>
         </div>
         <div className="rounded-xl border border-border bg-card p-12 flex flex-col items-center text-center gap-4">
@@ -312,7 +312,7 @@ export default function NieuwsPage() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Nieuws Feed</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Nieuws</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             DBA- en ZZP-nieuws · {items.length} berichten
           </p>

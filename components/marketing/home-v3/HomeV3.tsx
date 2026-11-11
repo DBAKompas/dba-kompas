@@ -375,13 +375,13 @@ export function HomeV3({ onZelfscan, onCheck }: { onZelfscan: () => void; onChec
               <i />
               <time>2026, nu</time>
               <h3>Vergrijpboetes mogelijk</h3>
-              <p>Geen verzuimboetes, wel boetes bij opzet of grove schuld. Naheffen kan terug tot 1 januari 2025.</p>
+              <p>Geen verzuimboetes, wel vergrijpboetes. Naheffen kan in beginsel terug tot 1 januari 2025.</p>
             </div>
             <div>
               <i />
               <time>Daarna</time>
               <h3>Nieuwe regels in de maak</h3>
-              <p>Er wordt gewerkt aan nieuwe wetgeving voor zelfstandigen. DBA Kompas wordt daarop onderhouden.</p>
+              <p>De Zelfstandigenwet was in oktober 2026 in consultatie, met januari 2028 als beoogde invoering. DBA Kompas wordt daarop onderhouden.</p>
             </div>
           </div>
           <Link href="/kennisbank/handhaving-2026" className={s.whyLink}>
