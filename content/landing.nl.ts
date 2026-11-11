@@ -1,4 +1,7 @@
 export const LANDING = {
+  answerBlock:
+    "DBA Kompas is een online check voor zzp'ers in Nederland. Je voert je opdrachtomschrijving in en ziet binnen ongeveer een minuut waar die vragen kan oproepen rond de Wet DBA. Je krijgt een indicatie per onderdeel, concrete aandachtspunten en een herschreven opdrachtbrief. De analyse volgt een vaste methodiek die wordt onderhouden op basis van de actuele wetgeving. De uitkomst is indicatief en geen juridisch advies.",
+
   nav: {
     brand: "DBA Kompas",
     pricing: "Prijzen",
@@ -114,7 +117,7 @@ export const LANDING = {
 
   pricing: {
     badge: "Prijzen",
-    title: "Één check of doorlopend toegang",
+    title: "Eén check of doorlopend toegang",
     subtitle: "Voor één opdracht of voor structureel gebruik van DBA Kompas.",
     disclaimer: "Prijzen excl. btw. Betaling verloopt via Stripe. Abonnementen worden automatisch verlengd en zijn opzegbaar via je account.",
     steeringText: "Twijfel je? Begin met de eenmalige check. Verwacht je dit jaar meer dan twee opdrachten te toetsen, dan ben je met een abonnement voordeliger uit en beweeg je automatisch mee met de wetgeving.",
@@ -173,19 +176,29 @@ export const LANDING = {
   faq: {
     items: [
       {
-        question: "Wat is DBA Kompas?",
+        question: "Is DBA Kompas juridisch advies?",
         answer:
-          "DBA Kompas is een AI-ondersteunde analysetool voor zzp'ers, freelancers, ondernemers en opdrachtgevers. Het toetst je opdrachtomschrijving aan bekende gezichtspunten, signaleert mogelijke risico's en geeft concrete verbeterpunten en tekstvoorstellen.",
+          "Nee. Je krijgt een indicatie op basis van een vaste methodiek, bedoeld om je eigen beoordeling te ondersteunen. DBA Kompas vervangt geen jurist of fiscalist en geeft geen garantie over hoe de Belastingdienst jouw situatie beoordeelt. Voor een bindende conclusie raden we aan een gespecialiseerde jurist te raadplegen.",
       },
       {
-        question: "Is DBA Kompas een juridisch advieskanaal?",
+        question: "Hoe betrouwbaar is de uitkomst?",
         answer:
-          "Nee. DBA Kompas is een ondersteunend hulpmiddel en biedt geen juridisch of fiscaal advies. De uitkomsten zijn indicatief en ondersteunend - je beoordeelt en verifieert output altijd zelf. Voor bindende conclusies raden we aan een gespecialiseerde jurist te raadplegen.",
+          "Elke opdracht doorloopt dezelfde toets op dezelfde drie onderdelen, dus de uitkomst hangt niet af van hoe je iets vraagt. De analyse geeft aan wanneer informatie ontbreekt of elkaar tegenspreekt. Houd er wel rekening mee dat bij een beoordeling niet alleen de tekst telt, maar ook hoe je in de praktijk werkt.",
       },
       {
-        question: "Hoe werkt de AI-analyse?",
+        question: "Wat als mijn opdracht hoog scoort?",
         answer:
-          "Je voert je opdrachtomschrijving in of uploadt een document. De AI toetst je tekst aan de bekende gezichtspunten voor de beoordeling van arbeidsrelaties en geeft per punt een indicatie met aandachtspunten, suggesties en conceptteksten.",
+          "Dan weet je waar het aan ligt en wat je kunt bespreken. Je krijgt per onderdeel de zinnen die het risico verhogen, actiepunten voor het gesprek en een herschreven opdrachtbrief. Soms is een andere formulering genoeg, soms moet de afspraak zelf anders.",
+      },
+      {
+        question: "Werkt het ook als ik via een intermediair werk?",
+        answer:
+          "Ja. Je toetst de opdrachtomschrijving zoals jij die hebt gekregen. Juist bij opdrachten via een intermediair helpt het om vooraf te weten welke vragen er kunnen komen.",
+      },
+      {
+        question: "Wat is het verschil tussen de zelfscan en de check?",
+        answer:
+          "De gratis zelfscan geeft op basis van vijf vragen een eerste indruk. De check analyseert je volledige opdrachtomschrijving en levert de aandachtspunten per onderdeel en de herschreven opdrachtbrief op.",
       },
       {
         question: "Voor wie is DBA Kompas bedoeld?",
