@@ -29,6 +29,7 @@ import {
   retrieveRelevantContext,
   formatContextForPrompt
 } from "./corpus";
+import { runDbaEngineV3, type OnPartial } from "./dbaEngineV3";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY || "default_key"
@@ -84,10 +85,10 @@ DRIE ANALYSEGEBIEDEN (gelijkwaardig gewicht):
   Vraag: Draagt de opdrachtnemer financieel risico en investeert hij/zij eigen middelen?
   Risico-indicatoren: geen eigen materiaal, vaste vergoeding ongeacht resultaat, geen aansprakelijkheid
   Onafhankelijkheidsindicatoren: vaste prijs per project, eigen materialen, aansprakelijk voor fouten
-  BELANGRIJK: Een uurtarief is GEEN risicofactor zolang dat boven €36 ligt. Beoordeel alleen of er sprake is van eigen risico en aansprakelijkheid, niet het tarieftype.
+  Een uurtarief is op zichzelf niet doorslaggevend. Weeg de wijze van beloning, de hoogte ervan en het eigen risico en de aansprakelijkheid samen. Noem geen tariefgrens als vaststaand recht.
 
-- Domein 3: Extern ondernemerschap - bewustwording (geen directe beoordelingsfactor voor de opdracht zelf)
-  Context: Dit domein gaat over de ondernemer als persoon, niet over de opdracht. Gebruik het als aanvullende opmerking voor de ondernemer. Vermeld in het summary-veld altijd expliciet dat dit een bewustwordingspunt is voor de ondernemer zelf, niet een direct aandachtspunt in de opdracht.
+- Domein 3: Extern ondernemerschap
+  Context: Dit domein gaat over de ondernemer als persoon. Sinds het Uber-arrest (HR 21 februari 2025) weegt het volwaardig mee in de beoordeling, zonder rangorde tussen de gezichtspunten.
   Signalen voor de ondernemer: exclusieve beschikbaarheid bij één opdrachtgever, geen andere opdrachtgevers, geen eigen acquisitie
   Positieve signalen: meerdere opdrachtgevers, eigen acquisitie, BTW-registratie, eigen website en profilering
 
@@ -116,7 +117,7 @@ Extraheer uit de tekst:
 VERBETERPUNTEN:
 - Maximaal 5 top-verbeterpunten (meest impactvol eerst)
 - Elk verbeterpunt: concreet herschrijfbaar, gebruik conditionele taal
-  Voorbeeld: "ALS de aansturing wordt gewijzigd van dagelijkse rapportage naar wekelijkse resultaatbespreking, KAN het risico op domein 1 dalen"
+  Voorbeeld: "Als de aansturing verandert van dagelijkse rapportage naar een wekelijkse bespreking van resultaten, kan het risico op domein 1 dalen"
 
 ${userContext}
 
@@ -467,7 +468,8 @@ function postProcessDbaOutput(output: DbaEngineOutput): DbaEngineOutput {
 export async function analyzeDbaText(
   inputText: string,
   userBedrijfstak?: string | null,
-  userSpecialisatie?: string | null
+  userSpecialisatie?: string | null,
+  onPartial?: OnPartial
 ): Promise<DbaAnalysisResult> {
   const validation = validateDbaInput(inputText);
 
@@ -484,6 +486,23 @@ export async function analyzeDbaText(
   const userContext = userBedrijfstak && userSpecialisatie
     ? `\nACHTERGROND (optioneel):\n- Bedrijfstak: ${sanitizeUserInput(userBedrijfstak)}\n- Specialisatie: ${sanitizeUserInput(userSpecialisatie)}`
     : '';
+
+  // v3: Opus 5.5 met dagdossier. Bij elke fout valt de analyse terug op de vorige engine.
+  if (process.env.DBA_ENGINE !== 'v2') {
+    const v3 = await runDbaEngineV3(sanitizedInput, userContext, onPartial);
+    if (v3) {
+      return {
+        ...postProcessDbaOutput(v3),
+        v3: v3.v3,
+        followUpQuestions: followUpQuestions.map(q => ({
+          key: q.key,
+          label: q.label,
+          question: q.question,
+          hint: q.hint,
+        })),
+      } as unknown as DbaEngineOutput;
+    }
+  }
 
   const corpusContext = formatContextForPrompt(retrieveRelevantContext(inputText));
   const enginePrompt = buildDbaFastAnalysisPrompt(sanitizedInput, userContext, corpusContext);

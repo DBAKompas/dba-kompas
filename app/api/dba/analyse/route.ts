@@ -8,6 +8,7 @@ import { updateLoopsContact } from '@/lib/loops'
 import { captureServerEvent } from '@/lib/posthog'
 import { recordQuotaDenial, recordAnalysisError } from '@/lib/admin/alerts'
 import { createNotification } from '@/lib/notifications'
+import type { OnPartial } from '@/lib/ai/dbaEngineV3'
 
 export const maxDuration = 120
 
@@ -20,10 +21,12 @@ export async function POST(request: Request) {
   // Dit is nodig om de quota-check correct te doen voor eenmalige checks.
   let inputText: string
   let parentAssessmentId: string | undefined
+  let wantStream = false
   try {
     const body = await request.json()
     inputText = body.inputText
     parentAssessmentId = body.parentAssessmentId
+    wantStream = body.stream === true
   } catch {
     return NextResponse.json({ error: 'Ongeldig verzoek' }, { status: 400 })
   }
@@ -76,6 +79,8 @@ export async function POST(request: Request) {
     )
   }
 
+  // De analyse zelf. Met onPartial worden afgeronde onderdelen tussentijds doorgegeven.
+  const run = async (onPartial?: OnPartial): Promise<Response> => {
   try {
 
     // PostHog: analyse gestart
@@ -100,7 +105,8 @@ export async function POST(request: Request) {
     const result: DbaAnalysisResult = await analyzeDbaText(
       inputText,
       profile?.bedrijfstak,
-      profile?.specialisatie
+      profile?.specialisatie,
+      onPartial
     )
 
     // If the input was insufficient or needs more info, return directly (geen DB opslag).
@@ -138,6 +144,7 @@ export async function POST(request: Request) {
         ai_analysis: {
           simulationFactState: analysisResult.simulationFactState ?? null,
           disclaimerShort: analysisResult.disclaimerShort,
+          v3: analysisResult.v3 ?? null,
         },
         parent_assessment_id: parentAssessmentId || null,
       })
@@ -172,8 +179,8 @@ export async function POST(request: Request) {
     // Fire-and-forget: in-app notificatie "analyse klaar" (PROD-003)
     createNotification({
       userId: user.id,
-      title: 'Uw analyse is klaar',
-      message: 'Bekijk de resultaten van uw DBA-analyse.',
+      title: 'Je analyse is klaar',
+      message: 'Bekijk de uitkomst en de punten om te bespreken.',
       type: 'success',
       relatedItemId: assessment.id,
       relatedItemType: 'assessment',
@@ -207,4 +214,40 @@ export async function POST(request: Request) {
     }).catch(err => console.error('[alerts] recordAnalysisError failed:', err))
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
+  }
+
+  if (!wantStream) return run()
+
+  // Streaming: elke regel is één JSON-object (NDJSON).
+  //   {type:'section', key, value}  afgerond onderdeel, terwijl de rest nog loopt
+  //   {type:'final', status, body}  eindresultaat, zelfde inhoud als het gewone antwoord
+  const encoder = new TextEncoder()
+  const stream = new ReadableStream<Uint8Array>({
+    async start(controller) {
+      const send = (event: Record<string, unknown>) => {
+        try {
+          controller.enqueue(encoder.encode(JSON.stringify(event) + '\n'))
+        } catch {
+          // verbinding gesloten: de analyse loopt door en wordt gewoon opgeslagen
+        }
+      }
+      send({ type: 'started' })
+      const response = await run((section) => send({ type: 'section', ...section }))
+      const body = await response.json().catch(() => ({}))
+      send({ type: 'final', status: response.status, body })
+      try {
+        controller.close()
+      } catch {
+        // al gesloten
+      }
+    },
+  })
+
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'application/x-ndjson; charset=utf-8',
+      'Cache-Control': 'no-cache, no-transform',
+      'X-Accel-Buffering': 'no',
+    },
+  })
 }

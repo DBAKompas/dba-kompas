@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import { LiveAnalysis, type LiveState, type LiveDomain } from '@/components/analyse/LiveAnalysis'
 import { Button } from '@/components/ui/button'
 import { InfoTooltip, DBA_GLOSSARY } from '@/components/ui/info-tooltip'
 import BrandLogo from '@/components/marketing/BrandLogo'
@@ -225,6 +226,7 @@ export default function AnalysePage() {
   // Loading / error
   const [loading, setLoading] = useState(false)
   const [loadingStepIdx, setLoadingStepIdx] = useState(0)
+  const [live, setLive] = useState<LiveState | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   // Eerdere analyses
@@ -331,8 +333,77 @@ export default function AnalysePage() {
         response = await fetch('/api/dba/analyse', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ inputText: text }),
+          body: JSON.stringify({ inputText: text, stream: true }),
         })
+
+        // Live weergave: de server stuurt afgeronde onderdelen terwijl de rest nog loopt.
+        const isStream = (response.headers.get('content-type') ?? '').includes('ndjson')
+        if (response.ok && isStream && response.body) {
+          setLive({ domains: [] })
+          setLoading(false)
+          window.scrollTo({ top: 0 })
+          const reader = response.body.getReader()
+          const decoder = new TextDecoder()
+          let buffer = ''
+          let finished = false
+          const handle = (line: string) => {
+            if (!line.trim()) return
+            let event: { type?: string; key?: string; value?: unknown; status?: number; body?: Record<string, unknown> }
+            try { event = JSON.parse(line) } catch { return }
+            if (event.type === 'section') {
+              setLive((prev) => {
+                if (!prev) return prev
+                switch (event.key) {
+                  case 'overall': return { ...prev, overall: event.value as LiveState['overall'] }
+                  case 'weging': return { ...prev, weging: event.value as string }
+                  case 'domain': return { ...prev, domains: [...prev.domains, event.value as LiveDomain] }
+                  case 'topImprovements': return { ...prev, topImprovements: event.value as string[] }
+                  case 'vragenVoorGesprek': return { ...prev, vragenVoorGesprek: event.value as string[] }
+                  default: return prev
+                }
+              })
+            } else if (event.type === 'final') {
+              finished = true
+              const body = event.body ?? {}
+              if (event.status === 200 && typeof body.id === 'string') {
+                // Het eindresultaat is gecontroleerd en leidend: vervang de tussentijdse onderdelen.
+                const v3 = (body.v3 ?? {}) as { weging?: string; vragenVoorGesprek?: string[]; jurisprudentie?: LiveState['bronnen'] }
+                setLive({
+                  overall: { overallRiskLabel: String(body.overallRiskLabel ?? 'midden'), overallSummary: String(body.overallSummary ?? '') },
+                  domains: Array.isArray(body.domains) ? (body.domains as LiveDomain[]) : [],
+                  weging: v3.weging || 'Zie de toelichting per onderdeel in de volledige analyse.',
+                  topImprovements: Array.isArray(body.topImprovements) ? (body.topImprovements as string[]) : [],
+                  vragenVoorGesprek: v3.vragenVoorGesprek ?? [],
+                  bronnen: v3.jurisprudentie ?? [],
+                  doneId: body.id,
+                })
+                document.title = 'Je analyse is klaar | DBA Kompas'
+                window.scrollTo({ top: 0, behavior: 'smooth' })
+              } else {
+                setLive(null)
+                setError(
+                  event.status === 422
+                    ? String(body.summary ?? 'De tekst is te kort of mist informatie. Voeg meer context toe en probeer opnieuw.')
+                    : String(body.error ?? 'Er is een fout opgetreden. Probeer het opnieuw.')
+                )
+              }
+            }
+          }
+          for (;;) {
+            const { value, done } = await reader.read()
+            if (done) break
+            buffer += decoder.decode(value, { stream: true })
+            const lines = buffer.split('\n')
+            buffer = lines.pop() ?? ''
+            lines.forEach(handle)
+          }
+          handle(buffer)
+          if (!finished) {
+            setLive(null)
+            setError('De verbinding is verbroken. Kijk bij Eerdere analyses of je analyse is opgeslagen, of probeer het opnieuw.')
+          }
+          return
+        }
       }
       if (!response.ok) {
         const data = await response.json().catch(() => ({}))
@@ -352,12 +423,14 @@ export default function AnalysePage() {
       }
       router.push(`/analyse/${data.id}`)
     } catch (err) {
+      setLive(null)
       setError(err instanceof Error ? err.message : 'Er is een fout opgetreden')
       setLoading(false)
     }
   }
 
   // ── Render ─────────────────────────────────────────────────────────────────
+  if (live) return <LiveAnalysis state={live} />
   if (loading) return <LoadingScreen stepIdx={loadingStepIdx} />
 
   return (

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { V3Weging, V3Gesprek, V3Bronnen, type V3Data } from '@/components/analyse/V3Insights'
 import ReferralWidget from '@/components/referral/ReferralWidget'
 import { InfoTooltip, DBA_GLOSSARY } from '@/components/ui/info-tooltip'
 import {
@@ -40,6 +41,8 @@ interface Domain {
   indicatorsForRisk: string[]
   indicatorsForIndependence: string[]
   suggestedImprovements: string[]
+  score?: number
+  ontbreekt?: string[]
 }
 
 interface CompactDraft {
@@ -80,6 +83,7 @@ interface Assessment {
   input_text: string
   created_at: string
   parent_assessment_id: string | null
+  ai_analysis?: { v3?: V3Data | null } | null
 }
 
 interface ParentAssessment {
@@ -641,7 +645,7 @@ export default function AssessmentDetailPage() {
               const dr = riskConfig(domain.scoreLabel)
               const DomainIcon = dr.icon
               const expanded = expandedDomains.has(index)
-              const dScore = domainScore(domain.scoreLabel)
+              const dScore = typeof domain.score === 'number' ? domain.score : domainScore(domain.scoreLabel)
 
               return (
                 <div
@@ -729,6 +733,20 @@ export default function AssessmentDetailPage() {
                           </ul>
                         </div>
                       )}
+                      {(domain.ontbreekt?.length ?? 0) > 0 && (
+                        <div>
+                          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">
+                            Wat de tekst niet zegt
+                          </p>
+                          <ul className="space-y-1">
+                            {domain.ontbreekt!.map((item, i) => (
+                              <li key={i} className="text-sm text-muted-foreground">
+                                {item}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -736,6 +754,8 @@ export default function AssessmentDetailPage() {
             })}
           </div>
         </section>
+
+        <V3Weging v3={assessment.ai_analysis?.v3} />
 
         {/* ── Actiepunten ──────────────────────────────────────────────────── */}
         {improvements.length > 0 && (
@@ -756,6 +776,10 @@ export default function AssessmentDetailPage() {
             </div>
           </section>
         )}
+
+        <V3Gesprek v3={assessment.ai_analysis?.v3} />
+
+        <V3Bronnen v3={assessment.ai_analysis?.v3} />
 
         {/* ── Referral widget (GROWTH-002) ──────────────────────────────────── */}
         <ReferralWidget />

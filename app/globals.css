@@ -53,7 +53,7 @@
   --background: hsl(60, 33.33%, 95.29%);
   --foreground: hsl(31.76, 17.53%, 19.02%);
 
-  --card: hsl(60, 20%, 98.5%);
+  --card: #ffffff;
   --card-foreground: hsl(31.76, 17.53%, 19.02%);
   --card-border: hsl(210, 12.5%, 87.45%);
 
