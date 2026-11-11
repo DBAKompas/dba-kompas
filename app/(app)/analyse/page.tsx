@@ -112,7 +112,7 @@ function LoadingScreen({ stepIdx }: { stepIdx: number }) {
         </div>
 
         <p className="text-xs text-muted-foreground">
-          Gemiddeld 15–30 seconden
+          Meestal binnen een minuut
         </p>
       </div>
     </div>
@@ -170,10 +170,10 @@ function EerdereAnalyses({
             href={`/analyse/${a.id}`}
             className="group flex items-center justify-between gap-4 px-5 py-4 hover:bg-muted/40 transition-colors"
           >
-            <div className="flex items-center gap-3 min-w-0">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
               <Icon className="size-4 shrink-0 text-muted-foreground/50" />
               <div className="min-w-0">
-                <p className="text-sm font-medium truncate">
+                <p className="text-sm font-medium line-clamp-1 break-words">
                   {a.overall_summary
                     ? a.overall_summary.slice(0, 60) + (a.overall_summary.length > 60 ? '…' : '')
                     : 'DBA analyse'}
@@ -366,7 +366,7 @@ export default function AnalysePage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Analyse</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Controleer uw overeenkomst op DBA-compliance
+          Toets je opdracht op aandachtspunten rond de Wet DBA
           <InfoTooltip explanation={DBA_GLOSSARY.wetDba} />
         </p>
       </div>
@@ -433,7 +433,7 @@ export default function AnalysePage() {
                     <FileText className="size-8 text-muted-foreground group-hover:text-primary transition-colors mb-3" />
                     <p className="font-semibold text-foreground">Plak tekst</p>
                     <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
-                      Kopieer de tekst van uw overeenkomst en plak die hier in
+                      Kopieer de tekst van je opdracht of overeenkomst en plak die hier
                     </p>
                   </button>
                   <button
@@ -443,7 +443,7 @@ export default function AnalysePage() {
                     <Upload className="size-8 text-muted-foreground group-hover:text-primary transition-colors mb-3" />
                     <p className="font-semibold text-foreground">Upload bestand</p>
                     <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
-                      Upload een PDF of DOCX bestand van uw overeenkomst
+                      Upload je opdracht of overeenkomst als PDF of Word-bestand
                     </p>
                   </button>
                   <input
@@ -476,7 +476,7 @@ export default function AnalysePage() {
                         ? 'border-orange-400 ring-2 ring-orange-400/20'
                         : 'border-border focus:border-primary focus:ring-2 focus:ring-primary/20'
                     }`}
-                    placeholder="Plak hier de tekst van uw overeenkomst of opdrachtbeschrijving…"
+                    placeholder="Plak hier de tekst van je opdracht of overeenkomst…"
                     value={text}
                     onChange={(e) => {
                       setText(e.target.value)
@@ -628,7 +628,7 @@ export default function AnalysePage() {
                   <div>
                     <p className="text-xs font-medium text-muted-foreground">Bescherm je privacy</p>
                     <p className="text-xs text-muted-foreground/70 mt-0.5 leading-relaxed">
-                      Uw tekst wordt verwerkt via beveiligde servers en uitsluitend gebruikt voor deze analyse.
+                      Je tekst wordt verwerkt via beveiligde servers en uitsluitend gebruikt voor deze analyse.
                       Gegevens worden na 14 dagen automatisch verwijderd.
                     </p>
                   </div>
@@ -671,12 +671,12 @@ export default function AnalysePage() {
 
               {/* Samenvatting */}
               <div className="rounded-xl border border-border bg-card p-5 space-y-3">
-                <h2 className="text-base font-semibold">Wat u krijgt na de analyse</h2>
+                <h2 className="text-base font-semibold">Wat je krijgt na de analyse</h2>
                 <div className="space-y-2.5">
                   {[
                     'Volledig DBA-risicooordeel (laag / gemiddeld / hoog)',
                     'Analyse per domein: gezag, eigen risico en persoonlijke arbeid',
-                    'Concrete verbeterpunten voor uw overeenkomst',
+                    'Concrete verbeterpunten voor je opdracht',
                     'Professionele opdrachtomschrijving op maat',
                     'Mogelijkheid tot verfijning met aanvullende informatie',
                   ].map((item, i) => (
@@ -691,7 +691,7 @@ export default function AnalysePage() {
               {/* Invoer samenvatting */}
               {inputMode === 'text' && (
                 <div className="rounded-xl border border-border bg-muted/30 px-5 py-3">
-                  <p className="text-xs text-muted-foreground font-medium mb-1">Uw invoer</p>
+                  <p className="text-xs text-muted-foreground font-medium mb-1">Je invoer</p>
                   <p className="text-sm text-foreground line-clamp-2">{text.slice(0, 120)}{text.length > 120 ? '…' : ''}</p>
                   <p className="text-xs text-muted-foreground mt-1">{charCount} tekens · {wordCount} woorden · {foundCount} kernsignalen</p>
                 </div>
@@ -711,7 +711,7 @@ export default function AnalysePage() {
                 <div className="rounded-xl border border-amber-200 bg-amber-50 p-5 space-y-4">
                   <div className="flex items-center gap-2">
                     <AlertTriangle className="size-4 text-amber-600 shrink-0" />
-                    <p className="text-sm font-semibold text-amber-800">Bevestig voordat u start</p>
+                    <p className="text-sm font-semibold text-amber-800">Bevestig voordat je start</p>
                   </div>
                   {[
                     'Ik begrijp dat deze analyse indicatief is en geen juridisch advies vervangt. Voor definitieve beoordeling raadpleeg ik altijd een specialist.',
@@ -758,7 +758,7 @@ export default function AnalysePage() {
 
               {hasAcceptedBefore && (
                 <p className="text-center text-xs text-muted-foreground">
-                  U heeft eerder de gebruiksvoorwaarden geaccepteerd.
+                  Je hebt de gebruiksvoorwaarden eerder geaccepteerd.
                 </p>
               )}
             </div>

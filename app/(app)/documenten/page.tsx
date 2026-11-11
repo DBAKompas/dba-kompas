@@ -80,7 +80,7 @@ export default function DocumentenPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Documenten</h1>
-          <p className="text-sm text-muted-foreground mt-1">Uw geüploade documenten en analyses</p>
+          <p className="text-sm text-muted-foreground mt-1">Je geüploade documenten en analyses</p>
         </div>
         <Button asChild>
           <Link href="/analyse">
@@ -95,7 +95,7 @@ export default function DocumentenPage() {
           <FolderOpen className="mx-auto size-12 text-muted-foreground mb-3" />
           <p className="text-lg font-semibold">Geen documenten</p>
           <p className="mt-1 text-sm text-muted-foreground">
-            Upload uw eerste document om een DBA-analyse te starten
+            Upload je eerste document om een analyse te starten
           </p>
           <Button className="mt-6" asChild>
             <Link href="/analyse">

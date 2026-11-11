@@ -274,7 +274,7 @@ export const GUIDES: GuideEntry[] = [
     slug: 'opdrachtomschrijving-handleiding',
     title: 'De perfecte opdrachtomschrijving',
     subtitle: 'Stap-voor-stap handleiding met voor/na-voorbeelden',
-    description: 'Alles wat je moet weten over het schrijven van een opdrachtomschrijving die DBA-proof is: structuur, formuleringen, valkuilen en praktijkvoorbeelden per sector.',
+    description: 'Alles wat je moet weten over het schrijven van een opdrachtomschrijving die minder vragen oproept: structuur, formuleringen, valkuilen en praktijkvoorbeelden per sector.',
     category: 'DBA & Arbeidsrelaties',
     readingTime: 14,
     difficulty: 'basis',

@@ -191,7 +191,7 @@ export default function ProfielPage() {
     <div className="mx-auto max-w-2xl space-y-8">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Profiel</h1>
-        <p className="text-sm text-muted-foreground mt-1">Beheer uw accountinstellingen</p>
+        <p className="text-sm text-muted-foreground mt-1">Beheer je accountinstellingen</p>
       </div>
 
       {/* Persoonlijke gegevens */}
@@ -254,7 +254,7 @@ export default function ProfielPage() {
         <div>
           <h2 className="text-lg font-semibold">Nieuws voorkeuren</h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Kies welke nieuwscategorieën u wilt ontvangen
+            Kies welke nieuwscategorieën je wilt ontvangen
           </p>
         </div>
         <div className="space-y-2">
@@ -283,7 +283,7 @@ export default function ProfielPage() {
         <div>
           <h2 className="text-lg font-semibold">Notificatie instellingen</h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Beheer hoe u notificaties ontvangt
+            Beheer hoe je meldingen ontvangt
           </p>
         </div>
         <div className="space-y-2">

@@ -61,7 +61,7 @@
   --popover-foreground: hsl(31.76, 17.53%, 19.02%);
   --popover-border: hsl(210, 12.5%, 87.45%);
 
-  --primary: hsl(217.33, 44.55%, 19.8%);
+  --primary: #0b1d3a;
   --primary-foreground: hsl(0, 0%, 100%);
 
   --secondary: hsl(206.67, 44.44%, 31.76%);
@@ -70,7 +70,7 @@
   --muted: hsl(210, 12.5%, 87.45%);
   --muted-foreground: hsl(210, 10.39%, 38%);
 
-  --accent: hsl(33.3, 100%, 64.31%);
+  --accent: #d4782a;
   --accent-foreground: hsl(0, 0%, 100%);
 
   --destructive: hsl(0.49, 54.19%, 55.49%);
@@ -78,7 +78,7 @@
 
   --border: hsl(210, 12.5%, 87.45%);
   --input: hsl(60, 20%, 98.5%);
-  --ring: hsl(33.3, 100%, 64.31%);
+  --ring: #d4782a;
 
   --radius: 0.875rem;
 
@@ -86,16 +86,16 @@
   --sidebar: hsl(60, 33.33%, 95.29%);
   --sidebar-foreground: hsl(31.76, 17.53%, 19.02%);
   --sidebar-border: hsl(210, 12.5%, 87.45%);
-  --sidebar-primary: hsl(217.33, 44.55%, 19.8%);
+  --sidebar-primary: #0b1d3a;
   --sidebar-primary-foreground: hsl(0, 0%, 100%);
-  --sidebar-accent: hsl(33.3, 100%, 64.31%);
+  --sidebar-accent: #d4782a;
   --sidebar-accent-foreground: hsl(0, 0%, 100%);
-  --sidebar-ring: hsl(33.3, 100%, 64.31%);
+  --sidebar-ring: #d4782a;
 
   /* Charts */
-  --chart-1: hsl(217.33, 44.55%, 19.8%);
+  --chart-1: #0b1d3a;
   --chart-2: hsl(206.67, 44.44%, 31.76%);
-  --chart-3: hsl(33.3, 100%, 64.31%);
+  --chart-3: #d4782a;
   --chart-4: hsl(210, 12.5%, 87.45%);
   --chart-5: hsl(0.49, 54.19%, 55.49%);
 
@@ -103,9 +103,9 @@
   --button-outline: rgba(0, 0, 0, 0.10);
   --badge-outline: rgba(0, 0, 0, 0.05);
   --opaque-button-border-intensity: -8;
-  --primary-border: hsl(217.33, 44.55%, 12%);
+  --primary-border: #071428;
   --secondary-border: hsl(206.67, 44.44%, 24%);
-  --accent-border: hsl(33.3, 100%, 56%);
+  --accent-border: #b96520;
   --muted-border: hsl(210, 12.5%, 80%);
   --destructive-border: hsl(0.49, 54.19%, 48%);
 
@@ -116,7 +116,7 @@
   /* Icon tints */
   --icon-primary: hsl(214, 38.46%, 19.61%);
   --icon-secondary: hsl(203, 44.86%, 33.53%);
-  --icon-accent: hsl(31, 90.84%, 62.94%);
+  --icon-accent: #d4782a;
   --icon-neutral: hsl(211, 11.54%, 58.82%);
   --icon-surface: hsl(210, 14.29%, 92.55%);
 

@@ -368,7 +368,7 @@ export default function NieuwsPage() {
           <Eye className="size-3.5" />
           Ongelezen
           {unreadCount > 0 && (
-            <span className={`flex size-5 items-center justify-center rounded-full text-xs font-bold ${unreadOnly ? 'bg-white/20' : 'bg-primary text-primary-foreground'}`}>
+            <span className={`flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-bold ${unreadOnly ? 'bg-white/20' : 'bg-primary text-primary-foreground'}`}>
               {unreadCount}
             </span>
           )}

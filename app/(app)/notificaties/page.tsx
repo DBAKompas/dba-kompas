@@ -86,7 +86,7 @@ export default function NotificatiesPage() {
           )}
         </div>
         <p className="text-sm text-muted-foreground mt-1">
-          Meldingen over uw analyses en DBA-updates
+          Meldingen over je analyses en nieuws over de Wet DBA
         </p>
       </div>
 
@@ -95,7 +95,7 @@ export default function NotificatiesPage() {
           <BellOff className="mx-auto size-12 text-muted-foreground mb-3" />
           <p className="text-lg font-semibold">Geen notificaties</p>
           <p className="mt-1 text-sm text-muted-foreground">
-            U ontvangt hier meldingen over uw analyses en belangrijke updates
+            Hier zie je meldingen over je analyses en belangrijke updates
           </p>
         </div>
       ) : (
