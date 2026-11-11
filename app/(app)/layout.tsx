@@ -23,12 +23,12 @@ import { createClient } from '@/lib/supabase/client'
 import BrandLogo from '@/components/marketing/BrandLogo'
 
 const navItems = [
-  { href: '/dashboard',    label: 'Dashboard',                    icon: LayoutDashboard },
-  { href: '/analyse',      label: 'Analyse',                      icon: FileSearch },
+  { href: '/dashboard',    label: 'Overzicht',                    icon: LayoutDashboard },
+  { href: '/analyse',      label: 'Analyses',                     icon: FileSearch },
   { href: '/nieuws',       label: 'Nieuws',                       icon: Newspaper },
-  { href: '/gidsen',       label: 'Gidsen',                       icon: BookOpen },
-  { href: '/beloningen',   label: 'Gratis toegang en beloningen', icon: Gift },
-  { href: '/notificaties', label: 'Notificaties',                 icon: Bell },
+  { href: '/gidsen',       label: 'Kennis',                       icon: BookOpen },
+  { href: '/beloningen',   label: 'Beloningen',                   icon: Gift },
+  { href: '/notificaties', label: 'Meldingen',                    icon: Bell },
   { href: '/profiel',      label: 'Profiel',                      icon: User },
 ]
 
@@ -49,6 +49,22 @@ function NavContent({
   handleLogout: () => void
   userEmail?: string
 }) {
+  const [usage, setUsage] = useState<{ plan: string; used: number; limit: number; percentage: number } | null>(null)
+  const [badges, setBadges] = useState<Record<string, number>>({})
+
+  useEffect(() => {
+    fetch('/api/usage')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (d && typeof d.used === 'number') setUsage(d) })
+      .catch(() => {})
+    fetch('/api/stats')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (d) setBadges({ '/nieuws': d.newUpdates ?? 0, '/notificaties': d.unreadNotifications ?? 0 })
+      })
+      .catch(() => {})
+  }, [])
+
   return (
     <>
       <nav className="flex flex-1 flex-col gap-0.5 px-3 py-4 overflow-y-auto">
@@ -62,26 +78,31 @@ function NavContent({
               onClick={onNavClick}
               className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
                 isActive
-                  ? 'bg-primary text-primary-foreground shadow-sm'
-                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                  ? 'bg-white/10 text-white'
+                  : 'text-[#c9d4e6] hover:bg-white/5 hover:text-white'
               }`}
             >
               <Icon className="size-4 shrink-0" />
-              {item.label}
+              <span className="flex-1">{item.label}</span>
+              {badges[item.href] ? (
+                <span className="rounded-full bg-accent px-1.5 text-[11px] font-semibold leading-5 text-white">
+                  {badges[item.href] > 99 ? '99+' : badges[item.href]}
+                </span>
+              ) : null}
             </Link>
           )
         })}
 
         {isAdmin && (
           <>
-            <div className="mx-2 my-3 border-t border-border/40" />
+            <div className="mx-2 my-3 border-t border-white/10" />
             <Link
               href="/admin"
               onClick={onNavClick}
               className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
                 pathname.startsWith('/admin')
-                  ? 'bg-primary text-primary-foreground shadow-sm'
-                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                  ? 'bg-white/10 text-white'
+                  : 'text-[#c9d4e6] hover:bg-white/5 hover:text-white'
               }`}
             >
               <Settings2 className="size-4 shrink-0" />
@@ -91,25 +112,37 @@ function NavContent({
         )}
       </nav>
 
-      <div className="shrink-0 border-t border-border/40 px-3 py-3 space-y-0.5">
+      {usage && usage.plan !== 'free' && (
+        <div className="mx-3 mb-3 shrink-0 rounded-xl bg-white/[0.06] p-3.5 text-xs text-[#c9d4e6]">
+          Deze maand:{' '}
+          <b className="text-white">
+            {usage.plan === 'admin' ? `${usage.used} checks` : `${usage.used} van ${usage.limit} checks`}
+          </b>
+          <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/10">
+            <div className="h-full rounded-full bg-accent" style={{ width: `${Math.min(100, Math.max(0, usage.percentage))}%` }} />
+          </div>
+        </div>
+      )}
+
+      <div className="shrink-0 border-t border-white/10 px-3 py-3 space-y-0.5">
         <a
           href="https://dbakompas.nl"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-3 rounded-lg px-3 py-2 text-xs text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+          className="flex items-center gap-3 rounded-lg px-3 py-2 text-xs text-white/45 hover:text-white transition-colors"
         >
           <ExternalLink className="size-3.5 shrink-0" />
           Terug naar website
         </a>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+          className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-[#c9d4e6] hover:bg-white/10 hover:text-white transition-colors"
         >
           <LogOut className="size-4 shrink-0" />
           Uitloggen
         </button>
         {userEmail && (
-          <p className="px-3 pt-1 pb-0.5 text-[11px] text-muted-foreground/40 truncate">{userEmail}</p>
+          <p className="px-3 pt-1 pb-0.5 text-[11px] text-white/35 truncate">{userEmail}</p>
         )}
       </div>
     </>
@@ -178,10 +211,10 @@ function AppShell({ children }: { children: React.ReactNode }) {
     <div className="flex min-h-screen bg-background">
 
       {/* ── Desktop sidebar (verborgen op mobiel) ─────────────── */}
-      <aside className="hidden md:fixed md:inset-y-0 md:left-0 md:z-30 md:flex md:w-56 md:flex-col bg-card border-r border-border/50">
-        <div className="flex h-16 shrink-0 items-center px-5 border-b border-border/40">
+      <aside className="hidden md:fixed md:inset-y-0 md:left-0 md:z-30 md:flex md:w-60 md:flex-col bg-[#0b1d3a]">
+        <div className="flex h-16 shrink-0 items-center px-5">
           <Link href="/dashboard">
-            <BrandLogo variant="dark" className="h-7 w-auto" />
+            <BrandLogo variant="white" className="h-7 w-auto" />
           </Link>
         </div>
         <NavContent
@@ -193,13 +226,13 @@ function AppShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* ── Mobiele topbar (alleen zichtbaar op mobiel) ────────── */}
-      <div className="fixed top-0 left-0 right-0 z-40 flex h-14 items-center justify-between border-b border-border/50 bg-card px-4 md:hidden">
+      <div className="fixed top-0 left-0 right-0 z-40 flex h-14 items-center justify-between bg-[#0b1d3a] px-4 md:hidden">
         <Link href="/dashboard">
-          <BrandLogo variant="dark" className="h-6 w-auto" />
+          <BrandLogo variant="white" className="h-6 w-auto" />
         </Link>
         <button
           onClick={() => setDrawerOpen(true)}
-          className="flex items-center justify-center size-9 rounded-lg text-muted-foreground hover:bg-muted transition-colors"
+          className="flex items-center justify-center size-9 rounded-lg text-white hover:bg-white/10 transition-colors"
           aria-label="Menu openen"
         >
           <Menu className="size-5" />
@@ -215,14 +248,14 @@ function AppShell({ children }: { children: React.ReactNode }) {
             onClick={() => setDrawerOpen(false)}
           />
           {/* Drawer panel */}
-          <aside className="absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col bg-card shadow-xl">
-            <div className="flex h-14 shrink-0 items-center justify-between px-5 border-b border-border/40">
+          <aside className="absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col bg-[#0b1d3a] shadow-xl">
+            <div className="flex h-14 shrink-0 items-center justify-between px-5">
               <Link href="/dashboard" onClick={() => setDrawerOpen(false)}>
-                <BrandLogo variant="dark" className="h-6 w-auto" />
+                <BrandLogo variant="white" className="h-6 w-auto" />
               </Link>
               <button
                 onClick={() => setDrawerOpen(false)}
-                className="flex items-center justify-center size-8 rounded-lg text-muted-foreground hover:bg-muted transition-colors"
+                className="flex items-center justify-center size-8 rounded-lg text-white hover:bg-white/10 transition-colors"
                 aria-label="Menu sluiten"
               >
                 <X className="size-5" />
@@ -240,8 +273,8 @@ function AppShell({ children }: { children: React.ReactNode }) {
       )}
 
       {/* ── Main content ──────────────────────────────────────── */}
-      <main className="flex-1 min-h-screen pt-14 md:pt-0 md:ml-56">
-        <div className="px-4 py-6 md:px-8 md:py-8 max-w-5xl">
+      <main className="flex-1 min-w-0 min-h-screen pt-14 md:pt-0 md:ml-60">
+        <div className="px-4 py-6 md:px-9 md:py-9 max-w-6xl">
           {children}
         </div>
       </main>

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { LANDING } from "@/content/landing.nl";
-import { FaqAccordion } from "@/components/marketing/faq/FaqAccordion";
+import { trackFaqOpened } from "@/lib/dba-analytics";
 import s from "./home-v3.module.css";
 
 type Plan = "monthly" | "yearly" | "one_time_dba";
@@ -425,13 +425,15 @@ export function HomeV3({ onZelfscan, onCheck }: { onZelfscan: () => void; onChec
       <section id="methodiek" className={`${s.sec} ${s.maker}`}>
         <div className={`${s.wrap} ${s.splitRev}`}>
           <div>
-            <h2>Gebouwd vanuit de praktijk van externe inhuur.</h2>
+            <blockquote className={s.quote}>
+              “Ik zag dagelijks opdrachten stranden op formuleringen die makkelijk beter hadden gekund. Daar is DBA Kompas voor gebouwd.”
+            </blockquote>
             <p>
               <b>Marvin Zoetemelk</b> bouwde DBA Kompas vanuit de praktijk van externe inhuur, waar hij dagelijks ziet hoe opdrachtgevers en
               intermediairs naar zzp-opdrachten kijken. Die kennis zit in één vaste methodiek die je zelf kunt gebruiken.
             </p>
             <Link href="/over-dba-kompas" className={s.btnD} style={{ marginTop: 22 }}>
-              Lees over de maker en de methodiek
+              Lees over de methodiek
             </Link>
           </div>
           <figure className={s.portrait}>
@@ -511,9 +513,22 @@ export function HomeV3({ onZelfscan, onCheck }: { onZelfscan: () => void; onChec
 
       {/* FAQ */}
       <section id="faq" className={s.sec}>
-        <div className={s.wrap}>
-          <h2 style={{ textAlign: "center", marginBottom: 40 }}>Veelgestelde vragen</h2>
-          <FaqAccordion items={LANDING.faq.items} />
+        <div className={`${s.wrap} ${s.splitTop}`}>
+          <h2>Veelgestelde vragen</h2>
+          <div className={s.faq}>
+            {LANDING.faq.items.map((item, i) => (
+              <details
+                key={item.question}
+                open={i === 0}
+                onToggle={(e) => {
+                  if ((e.currentTarget as HTMLDetailsElement).open) trackFaqOpened(item.question, "landing");
+                }}
+              >
+                <summary>{item.question}</summary>
+                <p>{item.answer}</p>
+              </details>
+            ))}
+          </div>
         </div>
       </section>
 

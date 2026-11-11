@@ -3,10 +3,9 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
 import { UsageMeter } from '@/components/dashboard/UsageMeter'
 import { NoAccessView } from './NoAccessView'
-import { FileSearch, Loader2, CheckCircle, X } from 'lucide-react'
+import { Loader2, CheckCircle, X } from 'lucide-react'
 
 interface Stats {
   totalAssessments: number
@@ -32,16 +31,27 @@ interface NewsPreview {
 
 type AccessStatus = 'loading' | 'has_access' | 'no_access'
 
+// Zelfde scores en kleuren als op de analysepagina (app/(app)/analyse/[id]).
 function riskStyle(label: string | null) {
   switch (label?.toLowerCase()) {
     case 'laag':
-      return { text: 'Laag risico', cls: 'bg-emerald-100 text-emerald-700' }
+      return { text: 'Laag risico', short: 'laag', score: 88, color: '#1f9d6b' }
     case 'hoog':
-      return { text: 'Hoog risico', cls: 'bg-red-100 text-red-700' }
+      return { text: 'Hoog risico', short: 'hoog', score: 25, color: '#d2493a' }
     default:
-      return { text: 'Gemiddeld risico', cls: 'bg-amber-100 text-amber-700' }
+      return { text: 'Gemiddeld risico', short: 'gemiddeld', score: 55, color: '#d99a1c' }
   }
 }
+
+function greeting() {
+  const h = new Date().getHours()
+  if (h < 6) return 'Goedenacht'
+  if (h < 12) return 'Goedemorgen'
+  if (h < 18) return 'Goedemiddag'
+  return 'Goedenavond'
+}
+
+const cardLabel = 'text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground mb-3.5'
 
 function shortDate(iso: string) {
   return new Date(iso).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' })
@@ -58,6 +68,8 @@ export default function DashboardPage() {
   const [plan, setPlan] = useState<string | null>(null)
   const [latest, setLatest] = useState<LatestAssessment | null>(null)
   const [news, setNews] = useState<NewsPreview[]>([])
+  const [qualified, setQualified] = useState(0)
+  const [firstName, setFirstName] = useState('')
 
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -98,6 +110,7 @@ export default function DashboardPage() {
         setPlan(plan)
         setAccessStatus(hasAccess ? 'has_access' : 'no_access')
 
+        if (typeof refResp?.qualifiedCount === 'number') setQualified(refResp.qualifiedCount)
         if (refResp?.codes && Array.isArray(refResp.codes)) {
           setAvailableCodes(
             refResp.codes.filter((c: { isUsed: boolean }) => !c.isUsed).length
@@ -121,6 +134,17 @@ export default function DashboardPage() {
         setLoading(false)
       })
       .catch(() => setLoading(false))
+
+    // Voornaam voor de begroeting. Best-effort.
+    fetch('/api/profile')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        const name: unknown = d?.name ?? d?.profile?.name
+        if (typeof name === 'string' && name.trim() && !name.includes('@') && !name.includes('.')) {
+          setFirstName(name.trim().split(/\s+/)[0])
+        }
+      })
+      .catch(() => {})
 
     // Laatste analyse. Best-effort: bij een fout blijft het blok leeg.
     fetch('/api/dba/assessments')
@@ -160,13 +184,24 @@ export default function DashboardPage() {
   // Heeft toegang: overzicht dat begint met de volgende stap
   const risk = latest ? riskStyle(latest.overall_risk_label) : null
   const actions = (latest?.top_improvements ?? []).slice(0, 2)
+  const nextMilestone = [1, 3, 5].find((m) => m > qualified) ?? null
+  const ring = 2 * Math.PI * 55
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Overzicht</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Toets een nieuwe opdracht of ga verder met je laatste analyse.
+        <h1 className="text-3xl font-bold tracking-tight">
+          {greeting()}
+          {firstName ? `, ${firstName}` : ''}
+        </h1>
+        <p className="mt-1 text-muted-foreground">
+          {latest && risk
+            ? `Je laatste opdracht scoort ${risk.short}.${
+                actions.length > 0
+                  ? ` Er ${actions.length === 1 ? 'staat één actiepunt' : `staan ${actions.length === 2 ? 'twee' : actions.length} actiepunten`} open.`
+                  : ''
+              }`
+            : 'Toets je eerste opdracht en zie binnen een minuut waar die vragen oproept.'}
         </p>
       </div>
 
@@ -181,7 +216,7 @@ export default function DashboardPage() {
             <p className="mt-0.5 text-sm text-green-700">
               {successType === 'one_time'
                 ? 'Je kunt nu je opdracht toetsen.'
-                : 'Hieronder zie je hoeveel checks je deze maand nog kunt doen.'}
+                : 'In het menu zie je hoeveel checks je deze maand hebt gedaan.'}
             </p>
           </div>
           <button
@@ -194,73 +229,107 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Eerste actie: nieuwe opdracht toetsen */}
-      <div className="rounded-xl bg-primary p-6 sm:p-8 text-primary-foreground">
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-y-1.5">
-            <h2 className="text-2xl font-bold leading-tight">Nieuwe opdracht toetsen</h2>
-            <p className="text-sm text-primary-foreground/80 max-w-md">
-              Plak je opdrachtomschrijving of upload een PDF of Word-bestand. De uitkomst is er meestal binnen een minuut.
-            </p>
-          </div>
-          <Button asChild size="lg" className="shrink-0 rounded-full bg-accent text-accent-foreground hover:bg-accent/90">
-            <Link href="/analyse">
-              <FileSearch className="size-4" />
-              Start een analyse
-            </Link>
-          </Button>
-        </div>
+      {/* Verbruik: op desktop staat dit in het menu */}
+      <div className="md:hidden">
+        <UsageMeter />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-5">
+      {/* Eerste actie: nieuwe opdracht toetsen */}
+      <div
+        className="grid items-center gap-6 rounded-[18px] p-6 text-white sm:grid-cols-[1fr_auto]"
+        style={{
+          backgroundColor: '#0b1d3a',
+          backgroundImage: 'radial-gradient(500px 240px at 100% 0, rgba(212,120,42,.35), transparent 70%)',
+        }}
+      >
+        <div className="min-w-0">
+          <h2 className="text-[26px] font-bold leading-tight tracking-tight">Nieuwe opdracht toetsen</h2>
+          <p className="mt-1.5 text-[15px] text-[#b9c6da]">
+            Plak je tekst of upload een PDF of Word-bestand. Uitkomst binnen een minuut.
+          </p>
+          <Link
+            href="/analyse"
+            className="mt-4 block rounded-[14px] border-[1.5px] border-dashed border-white/30 bg-white/[0.04] p-[18px] text-[14.5px] text-[#93a4bf] transition-colors hover:border-white/50 hover:text-white"
+          >
+            Plak hier je opdrachtomschrijving…
+          </Link>
+        </div>
+        <Link
+          href="/analyse"
+          className="inline-flex items-center justify-center rounded-full bg-accent px-[26px] py-3.5 text-base font-bold text-white shadow-[0_10px_30px_-8px_rgba(212,120,42,.65)] transition-transform hover:-translate-y-0.5"
+        >
+          Analyseer
+        </Link>
+      </div>
+
+      <div className="grid gap-[18px] lg:grid-cols-[1.25fr_1fr]">
         {/* Laatste analyse */}
-        <div className="rounded-xl border border-border bg-card p-6 lg:col-span-3 min-w-0">
-          <div className="flex items-center justify-between gap-3">
-            <h2 className="text-lg font-semibold">Je laatste analyse</h2>
-            {latest && (
-              <span className="text-xs text-muted-foreground">
-                {new Date(latest.created_at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })}
-              </span>
-            )}
-          </div>
+        <div className="min-w-0 rounded-[18px] border border-border bg-white p-6">
+          <h4 className={cardLabel}>Laatste analyse</h4>
 
           {loading && !latest ? (
             <div className="flex justify-center py-10">
               <Loader2 className="size-5 animate-spin text-muted-foreground" />
             </div>
           ) : latest && risk ? (
-            <div className="mt-4 space-y-4">
-              <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${risk.cls}`}>
-                {risk.text}
-              </span>
-              {latest.overall_summary && (
-                <p className="text-sm text-foreground/80 line-clamp-4">{latest.overall_summary}</p>
-              )}
+            <>
+              <div className="grid items-center gap-5 sm:grid-cols-[110px_1fr]">
+                <div className="relative size-[110px]">
+                  <svg width="110" height="110" viewBox="0 0 132 132" className="-rotate-90" aria-hidden="true">
+                    <circle cx="66" cy="66" r="55" fill="none" strokeWidth="11" stroke="#efe9de" />
+                    <circle
+                      cx="66"
+                      cy="66"
+                      r="55"
+                      fill="none"
+                      strokeWidth="11"
+                      strokeLinecap="round"
+                      stroke={risk.color}
+                      strokeDasharray={ring}
+                      strokeDashoffset={ring - (ring * risk.score) / 100}
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <strong className="text-[25px] leading-none tracking-tight">{risk.score}%</strong>
+                    <small className="mt-[3px] text-[11px] font-semibold text-muted-foreground">{risk.short}</small>
+                  </div>
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-lg font-bold">{risk.text}</h3>
+                  <p className="mt-1 text-sm text-muted-foreground line-clamp-3">
+                    {latest.overall_summary ?? 'Open de analyse voor de uitkomst per onderdeel.'}
+                  </p>
+                  <p className="mt-1.5 text-xs text-muted-foreground/70">
+                    {new Date(latest.created_at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })}
+                  </p>
+                </div>
+              </div>
+
               {actions.length > 0 && (
-                <div className="space-y-2">
-                  <p className="text-xs font-medium text-muted-foreground">Om te bespreken</p>
+                <div className="mt-4 grid gap-2">
                   {actions.map((action, i) => (
-                    <p key={i} className="rounded-lg border border-border bg-muted/40 px-3 py-2 text-sm line-clamp-3">
-                      {action}
-                    </p>
+                    <div key={i} className="rounded-[10px] border border-[#f4dcc0] bg-[#fff7ee] px-3 py-2.5 text-sm">
+                      <b className="text-accent">{i + 1}.</b> <span className="line-clamp-3 inline">{action}</span>
+                    </div>
                   ))}
                 </div>
               )}
-              <div className="flex flex-wrap gap-x-5 gap-y-2 pt-1 text-sm font-medium">
-                <Link href={`/analyse/${latest.id}`} className="text-primary underline underline-offset-4">
-                  Open analyse en opdrachtbrief
+
+              <div className="mt-3.5 flex flex-wrap gap-x-5 gap-y-1">
+                <Link href={`/analyse/${latest.id}`} className="text-[13.5px] font-bold text-accent hover:underline">
+                  Open analyse en herschreven opdrachtbrief
                 </Link>
-                <Link href="/analyse?tab=eerder" className="text-muted-foreground underline underline-offset-4">
+                <Link href="/analyse?tab=eerder" className="text-[13.5px] font-bold text-muted-foreground hover:underline">
                   Alle analyses{stats ? ` (${stats.totalAssessments})` : ''}
                 </Link>
               </div>
-            </div>
+            </>
           ) : (
-            <div className="mt-4 space-y-3">
+            <div className="space-y-3">
               <p className="text-sm text-muted-foreground">
                 Je hebt nog geen opdracht getoetst. Na je eerste analyse zie je hier de uitkomst en de punten om te bespreken.
               </p>
-              <Link href="/analyse" className="text-sm font-medium text-primary underline underline-offset-4">
+              <Link href="/analyse" className="text-[13.5px] font-bold text-accent hover:underline">
                 Toets je eerste opdracht
               </Link>
             </div>
@@ -268,61 +337,73 @@ export default function DashboardPage() {
         </div>
 
         {/* Rechterkolom */}
-        <div className="space-y-6 lg:col-span-2 min-w-0">
-          <UsageMeter />
-
+        <div className="grid min-w-0 content-start gap-[18px]">
           {showNews && news.length > 0 && (
-            <div className="rounded-xl border border-border bg-card p-6">
-              <div className="flex items-center justify-between gap-3">
-                <h2 className="text-lg font-semibold">Laatste nieuws</h2>
-                {stats && stats.newUpdates > 0 && (
-                  <span className="rounded-full bg-accent/15 px-2 py-0.5 text-xs font-medium text-foreground">
-                    {stats.newUpdates} nieuw
-                  </span>
-                )}
-              </div>
-              <ul className="mt-3 divide-y divide-border">
+            <div className="rounded-[18px] border border-border bg-white p-6">
+              <h4 className={cardLabel}>Laatste nieuws</h4>
+              <div className="grid gap-2">
                 {news.map((item) => (
-                  <li key={item.id} className="py-2.5">
-                    <Link href="/nieuws" className="block text-sm font-medium hover:underline line-clamp-2">
-                      {item.title}
-                    </Link>
-                    <p className="mt-0.5 text-xs text-muted-foreground">
+                  <Link
+                    key={item.id}
+                    href="/nieuws"
+                    className="flex items-baseline gap-2.5 rounded-[10px] bg-[#f7f3ec] px-3 py-2.5 text-[13.5px] hover:bg-[#f1ebe0]"
+                  >
+                    <time className="shrink-0 whitespace-nowrap text-[11.5px] font-bold text-accent">
                       {shortDate(item.published_at)}
-                      {item.source ? `, ${item.source}` : ''}
-                    </p>
-                  </li>
+                    </time>
+                    <span className="line-clamp-2">{item.title}</span>
+                  </Link>
                 ))}
-              </ul>
-              <Link href="/nieuws" className="mt-2 inline-block text-sm font-medium text-primary underline underline-offset-4">
-                Al het nieuws
+              </div>
+              <Link href="/nieuws" className="mt-3.5 inline-block text-[13.5px] font-bold text-accent hover:underline">
+                Alle updates
               </Link>
             </div>
           )}
 
-          {stats && stats.unreadNotifications > 0 && (
-            <Link
-              href="/notificaties"
-              className="block rounded-xl border border-border bg-card p-5 text-sm hover:bg-muted/40 transition-colors"
+          <div className="rounded-[18px] border border-border bg-white p-6">
+            <h4 className={cardLabel}>Stand van de regels</h4>
+            <div className="grid gap-2.5 text-sm">
+              <div className="flex items-start gap-3">
+                <i className="mt-[7px] size-[9px] shrink-0 rounded-full bg-[#1f9d6b]" />
+                Handhaving actief sinds 1 januari 2025
+              </div>
+              <div className="flex items-start gap-3">
+                <i className="mt-[7px] size-[9px] shrink-0 rounded-full bg-[#d99a1c]" />
+                2026: vergrijpboetes mogelijk, geen verzuimboetes
+              </div>
+            </div>
+            <a
+              href="https://dbakompas.nl/kennisbank/handhaving-2026"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3.5 inline-block text-[13.5px] font-bold text-accent hover:underline"
             >
-              <span className="font-semibold">
-                {stats.unreadNotifications} ongelezen {stats.unreadNotifications === 1 ? 'melding' : 'meldingen'}
-              </span>
-              <span className="block text-muted-foreground mt-0.5">Bekijk wat er nieuw is voor jouw analyses.</span>
-            </Link>
-          )}
+              Lees hoe er nu gehandhaafd wordt
+            </a>
+          </div>
 
-          {availableCodes > 0 && (
-            <Link
-              href="/beloningen"
-              className="block rounded-xl border border-border bg-card p-5 text-sm hover:bg-muted/40 transition-colors"
-            >
-              <span className="font-semibold">Deel DBA Kompas en verdien een gratis analyse</span>
-              <span className="block text-muted-foreground mt-0.5">
-                Je hebt nog {availableCodes} {availableCodes === 1 ? 'code' : 'codes'} om te delen. Wie jouw code gebruikt krijgt 20% korting.
-              </span>
+          <div className="rounded-[18px] border border-border bg-white p-6">
+            <h4 className={cardLabel}>Deel en verdien</h4>
+            <p className="text-[14.5px]">
+              {nextMilestone ? (
+                <>
+                  Nog <b>{nextMilestone - qualified} {nextMilestone - qualified === 1 ? 'doorverwijzing' : 'doorverwijzingen'}</b> voor{' '}
+                  {nextMilestone === 1 ? 'een gratis analyse' : 'je volgende beloning'}.
+                </>
+              ) : (
+                <>Je hebt alle mijlpalen gehaald.</>
+              )}
+            </p>
+            <div className="mt-2 flex items-center gap-2.5">
+              {[1, 2, 3, 4, 5].map((n) => (
+                <span key={n} className={`h-2 flex-1 rounded-full ${n <= qualified ? 'bg-accent' : 'bg-[#efe9de]'}`} />
+              ))}
+            </div>
+            <Link href="/beloningen" className="mt-3.5 inline-block text-[13.5px] font-bold text-accent hover:underline">
+              {availableCodes > 0 ? `Bekijk je ${availableCodes} ${availableCodes === 1 ? 'code' : 'codes'}` : 'Bekijk je beloningen'}
             </Link>
-          )}
+          </div>
         </div>
       </div>
     </div>

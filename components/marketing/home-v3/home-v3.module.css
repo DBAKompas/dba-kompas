@@ -106,7 +106,7 @@
   position: relative;
   background: var(--navy);
   color: #fff;
-  padding: 96px 0 104px;
+  padding: 150px 0 110px;
   overflow: hidden;
   isolation: isolate;
 }
@@ -624,6 +624,51 @@
   max-width: 560px;
 }
 
+.quote {
+  font-size: clamp(24px, 2.8vw, 34px);
+  line-height: 1.28;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+  margin: 0 0 22px;
+  color: var(--ink);
+}
+
+/* FAQ */
+.faq details {
+  border-bottom: 1px solid var(--line);
+  padding: 20px 0;
+}
+.faq summary {
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+.faq summary::-webkit-details-marker {
+  display: none;
+}
+.faq summary::after {
+  content: "+";
+  color: var(--or);
+  font-size: 24px;
+  line-height: 1;
+  transition: transform 0.2s;
+}
+.faq details[open] summary::after {
+  transform: rotate(45deg);
+}
+.faq summary:focus-visible {
+  outline: 3px solid var(--or2);
+  outline-offset: 3px;
+}
+.faq p {
+  color: var(--mut);
+  margin-top: 10px;
+}
+
 /* Prijzen */
 .pg {
   display: grid;
@@ -767,7 +812,7 @@
     gap: 36px;
   }
   .hero {
-    padding: 64px 0 70px;
+    padding: 110px 0 70px;
   }
   .bgv {
     display: none;

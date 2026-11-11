@@ -163,20 +163,20 @@ export default function HomeClient() {
 
       {/* ── HEADER ─────────────────────────────── */}
       <header
-        className={`sticky top-0 z-40 transition-all duration-300 ${
+        className={`fixed top-0 inset-x-0 z-40 transition-all duration-300 ${
           scrolled
-            ? "bg-background/95 backdrop-blur-md border-b border-border/40 shadow-sm"
+            ? "bg-[#0b1d3a]/95 backdrop-blur-md shadow-sm"
             : "bg-transparent"
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <BrandLogo variant="dark" className="h-9 w-auto" />
+            <BrandLogo variant="white" className="h-8 w-auto" />
           </Link>
 
           {/* Hamburger - alleen mobiel */}
           <button
-            className="md:hidden flex items-center justify-center w-9 h-9 rounded-lg text-foreground hover:bg-primary/8 transition-colors"
+            className="md:hidden flex items-center justify-center w-9 h-9 rounded-lg text-white hover:bg-white/10 transition-colors"
             onClick={() => setMenuOpen(o => !o)}
             aria-label={menuOpen ? "Menu sluiten" : "Menu openen"}
           >
@@ -209,32 +209,24 @@ export default function HomeClient() {
 
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-6">
-            <a href="#functies" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">
-              {LANDING.nav.features}
-            </a>
-            <a href="#prijzen" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">
-              {LANDING.nav.pricing}
-            </a>
-            <Link href="/kennisbank" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">
-              Kennisbank
-            </Link>
-            <Link href="/over-dba-kompas" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">
-              Over
-            </Link>
-            <a href="#faq" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">
-              {LANDING.nav.faq}
-            </a>
+            <a href="#functies" className="text-sm text-white/75 hover:text-white transition-colors font-medium">Wat je krijgt</a>
+            <a href="#voor-wie" className="text-sm text-white/75 hover:text-white transition-colors font-medium">Voor wie</a>
+            <a href="#waarom" className="text-sm text-white/75 hover:text-white transition-colors font-medium">Waarom nu</a>
+            <a href="#prijzen" className="text-sm text-white/75 hover:text-white transition-colors font-medium">{LANDING.nav.pricing}</a>
+            <Link href="/kennisbank" className="text-sm text-white/75 hover:text-white transition-colors font-medium">Kennisbank</Link>
+            <Link href="/over-dba-kompas" className="text-sm text-white/75 hover:text-white transition-colors font-medium">Over</Link>
             {user ? (
               <>
-                <span className="hidden sm:block text-sm text-muted-foreground">{user.email}</span>
+                <span className="hidden lg:block text-sm text-white/60">{user.email}</span>
                 <Button
                   variant="outline"
                   size="sm"
+                  className="rounded-full bg-transparent border-white/30 text-white hover:bg-white/10 hover:text-white"
                   onClick={() => window.location.href = `${APP_URL}/dashboard`}
                 >
                   Ga naar de app
                 </Button>
-                <Button onClick={handleLogout} variant="ghost" size="sm">
+                <Button onClick={handleLogout} variant="ghost" size="sm" className="text-white hover:bg-white/10 hover:text-white" aria-label="Uitloggen">
                   <LogOut className="w-4 h-4" />
                 </Button>
               </>
@@ -243,6 +235,7 @@ export default function HomeClient() {
                 <Button
                   variant="outline"
                   size="sm"
+                  className="rounded-full bg-transparent border-white/30 text-white hover:bg-white/10 hover:text-white"
                   onClick={() => window.location.href = `${APP_URL}/login`}
                   title="Heb je al een account? Log hier in."
                 >
@@ -251,10 +244,9 @@ export default function HomeClient() {
                 <Button
                   size="sm"
                   onClick={() => setQuickScanOpen(true)}
-                  className="btn-magnetic"
+                  className="rounded-full bg-accent text-white hover:bg-accent/90"
                 >
                   {LANDING.nav.tryNow}
-                  <ArrowRight className="w-4 h-4 ml-1.5" />
                 </Button>
               </>
             )}
@@ -355,36 +347,36 @@ export default function HomeClient() {
       <HomeV3 onZelfscan={() => setQuickScanOpen(true)} onCheck={(plan) => setEmailCheckoutPlan(plan)} />
 
       {/* ── FOOTER ─────────────────────────────── */}
-      <footer className="border-t border-border/40 py-12 px-4 sm:px-6">
+      <footer className="bg-[#081629] py-12 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row items-start justify-between gap-8 mb-8">
             <div className="space-y-2">
-              <BrandLogo variant="dark" className="h-7 w-auto" />
-              <p className="text-sm text-muted-foreground max-w-xs">{LANDING.footer.tagline}</p>
+              <BrandLogo variant="white" className="h-7 w-auto" />
+              <p className="text-sm text-[#a9b7cd] max-w-xs">{LANDING.footer.tagline}</p>
             </div>
             <div className="flex flex-wrap gap-12">
               <div className="space-y-3">
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/60">{LANDING.footer.product.title}</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-white/45">{LANDING.footer.product.title}</p>
                 {LANDING.footer.product.links.map((l, i) => (
-                  <a key={i} href={l.href} className="block text-sm text-muted-foreground hover:text-foreground transition-colors">{l.label}</a>
+                  <a key={i} href={l.href} className="block text-sm text-[#a9b7cd] hover:text-white transition-colors">{l.label}</a>
                 ))}
-                <Link href="/kennisbank" className="block text-sm text-muted-foreground hover:text-foreground transition-colors">Kennisbank</Link>
-                <Link href="/over-dba-kompas" className="block text-sm text-muted-foreground hover:text-foreground transition-colors">Over DBA Kompas</Link>
+                <Link href="/kennisbank" className="block text-sm text-[#a9b7cd] hover:text-white transition-colors">Kennisbank</Link>
+                <Link href="/over-dba-kompas" className="block text-sm text-[#a9b7cd] hover:text-white transition-colors">Over DBA Kompas</Link>
               </div>
               <div className="space-y-3">
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/60">Juridisch</p>
-                <Link href="/algemene-voorwaarden" className="block text-sm text-muted-foreground hover:text-accent transition-colors">Algemene Voorwaarden</Link>
-                <Link href="/privacy-en-cookiebeleid" className="block text-sm text-muted-foreground hover:text-accent transition-colors">Privacy & Cookies</Link>
-                <Link href="/ai-data-use-notice" className="block text-sm text-muted-foreground hover:text-accent transition-colors">AI & Gegevensverwerking</Link>
+                <p className="text-xs font-semibold uppercase tracking-wider text-white/45">Juridisch</p>
+                <Link href="/algemene-voorwaarden" className="block text-sm text-[#a9b7cd] hover:text-white transition-colors">Algemene Voorwaarden</Link>
+                <Link href="/privacy-en-cookiebeleid" className="block text-sm text-[#a9b7cd] hover:text-white transition-colors">Privacy & Cookies</Link>
+                <Link href="/ai-data-use-notice" className="block text-sm text-[#a9b7cd] hover:text-white transition-colors">AI & Gegevensverwerking</Link>
               </div>
               <div className="space-y-3">
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/60">{LANDING.footer.contact.title}</p>
-                <a href="mailto:info@dbakompas.nl" className="block text-sm text-muted-foreground hover:text-foreground transition-colors">{LANDING.footer.contact.email}</a>
-                <p className="text-sm text-muted-foreground/60">KvK: 99964538</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-white/45">{LANDING.footer.contact.title}</p>
+                <a href="mailto:info@dbakompas.nl" className="block text-sm text-[#a9b7cd] hover:text-white transition-colors">{LANDING.footer.contact.email}</a>
+                <p className="text-sm text-white/45">KvK: 99964538</p>
               </div>
             </div>
           </div>
-          <div className="border-t border-border/30 pt-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-muted-foreground/50">
+          <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-white/45">
             <span>{LANDING.footer.copyright}</span>
             <span>{LANDING.disclaimer}</span>
           </div>
