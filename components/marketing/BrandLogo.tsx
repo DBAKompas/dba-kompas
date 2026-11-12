@@ -30,7 +30,7 @@ interface BrandLogoProps {
 const srcMap: Record<BrandLogoVariant, string> = {
   // Actuele varianten
   dark:      "/logo-dark-v3.png",        // volledig wordmark (kompas + DBAKompas tekst) - lichte achtergrond
-  white:     "/logo-white.png",          // volledig logo - donkere achtergrond
+  white:     "/logo-white-full.png",          // volledig logo - donkere achtergrond
   iconDark:  "/logo-flat-dark.png",      // icoon only - lichte achtergrond
   iconWhite: "/logo-flat-white.png",     // icoon only - donkere achtergrond
   // Backwards-compat aliassen

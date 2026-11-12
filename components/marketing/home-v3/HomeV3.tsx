@@ -130,6 +130,7 @@ const LEVEL_RING: Record<Level, number> = { laag: 88, midden: 55, hoog: 25 };
 function Demo() {
   const [idx, setIdx] = useState(0);
   const [done, setDone] = useState(false);
+  const [view, setView] = useState<"zwaarst" | "vraag" | "bron">("zwaarst");
   const ex = EXAMPLES[idx];
 
   useEffect(() => {
@@ -197,39 +198,31 @@ function Demo() {
               </div>
             </div>
           ))}
-          <p className={s.barNote}>100 wijst sterk op zelfstandigheid</p>
-        </div>
+                  </div>
       </div>
-      {done && (
-        <div key={`ins-${idx}`} className={s.insights}>
-          <div className={s.ins}>
-            <b>Wat het zwaarst weegt</b>
-            <p>{ex.zwaarst}</p>
-          </div>
-          <div className={s.ins}>
-            <b>Vraag voor je opdrachtgever</b>
-            <p>{ex.vraag}</p>
-          </div>
-          <div className={s.ins}>
-            <b>Bron</b>
-            <p>
-              <a href={`https://uitspraken.rechtspraak.nl/details?id=${encodeURIComponent(ex.bron.ecli)}`} target="_blank" rel="noopener noreferrer">
-                {ex.bron.titel}
-              </a>
-              . {ex.bron.relevantie}
-            </p>
-          </div>
-        </div>
-      )}
-      {done && (
-        <div className={s.more2}>
-          <b>Dit is een fragment.</b> De volledige analyse geeft per onderdeel de zinnen die tellen, wat de tekst niet zegt, drie
-          verbeteringen, de weging, drie gespreksvragen, alle bronnen met de actuele stand van handhaving en wetgeving, en een
-          herschreven opdrachtomschrijving wanneer je daarom vraagt.
-        </div>
-      )}
+      <div className={s.insTabs}>
+        {(["zwaarst", "vraag", "bron"] as const).map((k) => (
+          <button key={k} type="button" className={view === k ? s.insTabOn : s.insTab} onClick={() => setView(k)} aria-pressed={view === k}>
+            {k === "zwaarst" ? "Wat het zwaarst weegt" : k === "vraag" ? "Vraag voor het gesprek" : "Bron"}
+          </button>
+        ))}
+      </div>
+      <div className={s.insPanel}>
+        {!done ? null : view === "zwaarst" ? (
+          <p key={`z${idx}`}>{ex.zwaarst}</p>
+        ) : view === "vraag" ? (
+          <p key={`v${idx}`}>{ex.vraag}</p>
+        ) : (
+          <p key={`b${idx}`}>
+            <a href={`https://uitspraken.rechtspraak.nl/details?id=${encodeURIComponent(ex.bron.ecli)}`} target="_blank" rel="noopener noreferrer">
+              {ex.bron.titel}
+            </a>
+            . {ex.bron.relevantie}
+          </p>
+        )}
+      </div>
       <div className={s.demoFoot}>
-        Uitkomst van DBA Kompas op een fictieve opdracht, hier ingekort weergegeven. Een indicatie, geen juridisch oordeel.
+        Een fragment uit een analyse van een fictieve opdracht. De volledige analyse gaat veel verder. Indicatie, geen juridisch oordeel.
       </div>
     </div>
   );
@@ -258,10 +251,10 @@ export function HomeV3({ onZelfscan, onCheck }: { onZelfscan: () => void; onChec
         <HeroVideo />
         <div className={`${s.wrap} ${s.heroGrid}`}>
           <div>
-            <h1>Weet waar je opdracht vragen oproept, voordat je opdrachtgever het vraagt.</h1>
+            <h1>Sta sterker in elk gesprek over je opdracht.</h1>
             <p className={s.sub}>
-              Plak je opdrachtomschrijving. Binnen een minuut zie je per onderdeel waar het schuurt met de Wet DBA, wat juist voor je
-              zelfstandigheid pleit en hoe je de tekst sterker maakt.
+              DBA Kompas laat je in ongeveer een minuut zien waar je opdracht vragen oproept rond de Wet DBA, wat juist voor je
+              zelfstandigheid pleit en wat je met je opdrachtgever kunt bespreken.
             </p>
             <div className={s.cta}>
               <button type="button" className={s.btnP} onClick={onZelfscan}>
@@ -277,42 +270,88 @@ export function HomeV3({ onZelfscan, onCheck }: { onZelfscan: () => void; onChec
         </div>
       </section>
 
-      {/* ANTWOORD */}
-      <section id="antwoord" className={s.ans}>
-        <div className={`${s.wrap} ${s.splitTop}`}>
-          <div>
-            <h2>Wat is DBA Kompas?</h2>
-            <p className={s.lead}>{LANDING.answerBlock}</p>
-            <p className={s.basis}>
-              De toets volgt de gezichtspunten uit het Deliveroo-arrest van de Hoge Raad en het beoordelingskader van de Belastingdienst.{" "}
-              <Link href="/over-dba-kompas" className="underline underline-offset-4">
-                Lees over de methodiek
-              </Link>
-            </p>
+      {/* MISSIE */}
+      <section id="antwoord" className={s.mission}>
+        <div className={s.wrap}>
+          <p className={s.kicker}>Waar we voor staan</p>
+          <blockquote>
+            Wij helpen zzp&apos;ers hun opdracht op orde te hebben voordat iemand ernaar vraagt. Zodat je met vertrouwen het gesprek voert
+            met je opdrachtgever of intermediair, en weet waar je staat.
+          </blockquote>
+          <h2 className={s.srOnlyish}>Wat is DBA Kompas?</h2>
+          <p className={s.answer}>{LANDING.answerBlock}</p>
+        </div>
+      </section>
+
+      {/* WAT JIJ ERUIT HAALT */}
+      <section id="functies" className={s.sec}>
+        <div className={s.wrap}>
+          <h2 className={s.narrow}>Wat jij eruit haalt</h2>
+          <div className={s.wins}>
+            <div className={s.win}>
+              <span className={s.num}>01</span>
+              <h3>Je weet waar je staat</h3>
+              <p>
+                Een indicatie per onderdeel, met de zinnen uit jouw opdracht waar het om draait. Je ziet wat vragen oproept en wat juist
+                voor je zelfstandigheid pleit.
+              </p>
+            </div>
+            <div className={s.win}>
+              <span className={s.num}>02</span>
+              <h3>Je weet wat je moet zeggen</h3>
+              <p>
+                De weging in gewone taal, drie vragen voor het gesprek en de bronnen erbij: recente rechtspraak en de actuele stand van
+                handhaving en wetgeving.
+              </p>
+            </div>
+            <div className={s.win}>
+              <span className={s.num}>03</span>
+              <h3>Je hebt iets om voor te leggen</h3>
+              <p>
+                Concrete verbeteringen en, als je dat wilt, een herschreven opdrachtomschrijving. Te downloaden als PDF en Word, klaar om
+                te delen.
+              </p>
+            </div>
           </div>
-          <ol className={s.how}>
-            <li>
-              <b>Plak of upload je opdracht.</b> De tekst zoals je die van je opdrachtgever of intermediair kreeg, als PDF, Word of platte
-              tekst.
-            </li>
-            <li>
-              <b>Lees waar het schuurt.</b> Per onderdeel zie je welke zinnen vragen oproepen en welke juist voor je pleiten.
-            </li>
-            <li>
-              <b>Ga voorbereid het gesprek in.</b> Met actiepunten en een herschreven opdrachtbrief die je kunt voorleggen.
-            </li>
-          </ol>
+        </div>
+      </section>
+
+      {/* DE TRAP */}
+      <section className={`${s.sec} ${s.tint}`}>
+        <div className={s.wrap}>
+          <h2 className={s.narrow}>In drie stappen naar een sterker gesprek</h2>
+          <p className={s.lead}>Elke stap brengt je dichter bij een opdracht die klopt met hoe je werkt.</p>
+          <div className={s.stairs}>
+            <div className={s.stair}>
+              <span className={s.num}>01</span>
+              <h3>Toets</h3>
+              <b>Zie waar het schuurt</b>
+              <p>Plak je opdracht of upload een PDF of Word-bestand. De eerste uitkomst staat er snel, de rest volgt terwijl je meeleest.</p>
+            </div>
+            <div className={s.stair}>
+              <span className={s.num}>02</span>
+              <h3>Verbeter</h3>
+              <b>Maak je opdracht sterker</b>
+              <p>Pas de tekst of de afspraak aan met de verbeterpunten. Toets opnieuw en zie naast elkaar wat er veranderd is.</p>
+            </div>
+            <div className={s.stair}>
+              <span className={s.num}>03</span>
+              <h3>Bespreek</h3>
+              <b>Ga voorbereid het gesprek in</b>
+              <p>Met gespreksvragen, bronnen en een opdrachtomschrijving die je kunt voorleggen aan je opdrachtgever of intermediair.</p>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* WAT KRIJG JE */}
-      <section id="functies" className={s.sec}>
+      <section className={s.sec}>
         <div className={`${s.wrap} ${s.split}`}>
           <figure className={s.tall}>
             <Image src="/home/werken.jpg" alt="Zzp'er werkt aan een opdrachtomschrijving op een laptop" fill sizes="(max-width: 920px) 100vw, 480px" />
           </figure>
           <div>
-            <h2>Wat krijg je na een check?</h2>
+            <h2>Van een zin die vragen oproept naar een zin die klopt</h2>
             <p className={s.lead}>
               Geen los cijfer, maar een werkdocument. Zinnen die vragen oproepen worden herschreven naar resultaat, eigen werkwijze en eigen
               risico. Jij bepaalt wat klopt met hoe je in de praktijk werkt.
@@ -328,26 +367,7 @@ export function HomeV3({ onZelfscan, onCheck }: { onZelfscan: () => void; onChec
                 plaatsvindt.
               </div>
             </div>
-            <ul className={s.plain}>
-              <li>
-                <b>Een indicatie per onderdeel.</b> Gezag, eigen rekening en risico, en ondernemerschap. Bij elk onderdeel staan de zinnen
-                waar het om draait.
-              </li>
-              <li>
-                <b>Ook wat vóór je pleit.</b> Je ziet niet alleen de risico&apos;s, maar ook de signalen van zelfstandigheid die je kunt
-                benadrukken.
-              </li>
-              <li>
-                <b>Actiepunten voor het gesprek.</b> Wat je met je opdrachtgever of intermediair kunt bespreken of laten vastleggen.
-              </li>
-              <li>
-                <b>Heranalyse met vergelijking.</b> Pas je opdracht aan en zie naast elkaar wat er veranderd is.
-              </li>
-              <li>
-                <b>Download als PDF en Word.</b> Deel de analyse of werk verder in je eigen document.
-              </li>
-            </ul>
-          </div>
+                      </div>
         </div>
       </section>
 
@@ -431,37 +451,6 @@ export function HomeV3({ onZelfscan, onCheck }: { onZelfscan: () => void; onChec
         </div>
       </section>
 
-      {/* CHATGPT */}
-      <section id="chatgpt" className={`${s.sec} ${s.tint}`}>
-        <div className={s.wrap}>
-          <h2 className={s.narrow}>Kan ChatGPT dit niet ook?</h2>
-          <p className={s.lead}>
-            Je kunt een eind komen, als je weet welke vragen je moet stellen. DBA Kompas neemt je dat werk uit handen en doet elke keer
-            dezelfde toets.
-          </p>
-          <div className={s.vsg}>
-            <div className={s.vsA}>
-              <h3>Een algemene chatbot</h3>
-              <ul>
-                <li>De uitkomst hangt af van hoe je de vraag stelt</li>
-                <li>Gaat snel mee in het antwoord dat je hoopt te horen</li>
-                <li>Je moet zelf vragen naar het juiste kader en recente uitspraken</li>
-                <li>Het antwoord staat ergens in een chatgeschiedenis</li>
-              </ul>
-            </div>
-            <div className={s.vsB}>
-              <h3>DBA Kompas</h3>
-              <ul>
-                <li>Eén vaste methodiek, dus opdrachten zijn onderling vergelijkbaar</li>
-                <li>Benoemt ook wat niet klopt en wijst op tegenstrijdigheden in je tekst</li>
-                <li>Getoetst aan het Deliveroo-kader en de Wet DBA, zonder dat je erom vraagt</li>
-                <li>Analyse en herschreven opdracht als PDF en Word in je account</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* MAKER */}
       <section id="methodiek" className={`${s.sec} ${s.maker}`}>
         <div className={`${s.wrap} ${s.splitRev}`}>
@@ -483,8 +472,45 @@ export function HomeV3({ onZelfscan, onCheck }: { onZelfscan: () => void; onChec
         </div>
       </section>
 
+      {/* FEITEN */}
+      <section className={s.facts}>
+        <div className={s.wrap}>
+          <h2 className={s.narrow}>Gebouwd om op te vertrouwen</h2>
+          <div className={s.factGrid}>
+            <div><strong>9</strong><span>gezichtspunten van de Hoge Raad waarop elke opdracht wordt getoetst</span></div>
+            <div><strong>3</strong><span>onderdelen met elk een eigen score en toelichting</span></div>
+            <div><strong>Elke dag</strong><span>wordt het overzicht van rechtspraak, handhaving en wetgeving bijgewerkt</span></div>
+            <div><strong>± 1 min</strong><span>van opdracht naar volledige uitkomst, terwijl je al meeleest</span></div>
+          </div>
+        </div>
+      </section>
+
+      {/* KENNISBANK */}
+      <section className={`${s.sec} ${s.tint}`}>
+        <div className={s.wrap}>
+          <h2 className={s.narrow}>Uit de kennisbank</h2>
+          <div className={s.news}>
+            <Link href="/kennisbank/handhaving-2026" className={s.newsItem}>
+              <span>Bijgewerkt november 2026</span>
+              <h3>Hoe handhaaft de Belastingdienst nu?</h3>
+              <p>Vergrijpboetes zijn mogelijk, verzuimboetes nog niet. Wat dat betekent voor jou en je opdrachtgever.</p>
+            </Link>
+            <Link href="/kennisbank/zelfstandigenwet" className={s.newsItem}>
+              <span>Bijgewerkt november 2026</span>
+              <h3>De nieuwe wetgeving rond zelfstandigen</h3>
+              <p>De Zelfstandigenwet was in consultatie, met januari 2028 als beoogde invoering. Wat er nu geldt.</p>
+            </Link>
+            <Link href="/kennisbank/deliveroo-criteria" className={s.newsItem}>
+              <span>Achtergrond</span>
+              <h3>De gezichtspunten uit het Deliveroo-arrest</h3>
+              <p>Het kader waarmee rechters en de Belastingdienst naar je opdracht kijken, uitgelegd.</p>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* PRIJZEN */}
-      <section id="prijzen" className={`${s.sec} ${s.tint}`}>
+      <section id="prijzen" className={s.sec}>
         <div className={s.wrap}>
           <h2 className={s.narrow}>Wat kost DBA Kompas?</h2>
           <p className={s.lead}>

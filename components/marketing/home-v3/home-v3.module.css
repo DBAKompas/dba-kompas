@@ -197,7 +197,9 @@
   border-radius: 12px;
   font-size: 14px;
   line-height: 1.75;
-  min-height: 150px;
+  min-height: 118px;
+  font-size: 13px;
+  line-height: 1.65;
   background: #fdfcfa;
   overflow: hidden;
 }
@@ -932,5 +934,228 @@
   .ins,
   .more2 {
     opacity: 1;
+  }
+}
+
+/* ── Compacte demo: één inzicht tegelijk ── */
+.insTabs {
+  display: flex;
+  gap: 6px;
+  padding: 0 16px;
+  flex-wrap: wrap;
+}
+.insTab {
+  padding: 6px 11px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #f3efe8;
+  color: var(--mut);
+  border: 0;
+  cursor: pointer;
+}
+.insTabOn {
+  composes: insTab;
+  background: var(--or);
+  color: #fff;
+}
+.insPanel {
+  margin: 8px 16px 14px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #f6f2ea;
+  font-size: 13px;
+  line-height: 1.5;
+  height: 104px;
+  overflow: hidden;
+}
+.insPanel p {
+  animation: insIn 0.4s ease;
+}
+.insPanel a {
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.heroGrid {
+  align-items: center;
+}
+
+/* ── Missie ── */
+.mission {
+  padding: 96px 0 0;
+}
+.kicker {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--or);
+  margin-bottom: 14px;
+}
+.mission blockquote {
+  font-size: clamp(24px, 3.2vw, 40px);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+  max-width: 960px;
+  margin: 0;
+  color: var(--ink);
+}
+.srOnlyish {
+  font-size: 15px !important;
+  font-weight: 700;
+  color: var(--mut);
+  margin: 36px 0 8px !important;
+  letter-spacing: 0 !important;
+}
+.answer {
+  font-size: 16.5px;
+  color: var(--mut);
+  max-width: 760px;
+}
+
+/* ── Wat jij eruit haalt ── */
+.wins {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+  margin-top: 44px;
+}
+.win {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 30px;
+}
+.num {
+  display: block;
+  font-size: 44px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--or);
+  line-height: 1;
+  margin-bottom: 16px;
+}
+.win h3,
+.stair h3 {
+  font-size: 21px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.win p,
+.stair p {
+  color: var(--mut);
+  font-size: 15.5px;
+}
+
+/* ── De trap ── */
+.stairs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-top: 48px;
+  align-items: end;
+}
+.stair {
+  background: var(--navy);
+  color: #fff;
+  border-radius: 10px;
+  padding: 30px;
+}
+.stair:nth-child(1) {
+  min-height: 250px;
+}
+.stair:nth-child(2) {
+  min-height: 300px;
+}
+.stair:nth-child(3) {
+  min-height: 350px;
+}
+.stair .num {
+  color: var(--or2);
+}
+.stair b {
+  display: block;
+  color: var(--or2);
+  font-size: 15px;
+  margin-bottom: 8px;
+}
+.stair p {
+  color: #b9c6da;
+}
+
+/* ── Feiten ── */
+.facts {
+  background: var(--navy);
+  color: #fff;
+  padding: 96px 0;
+}
+.factGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 28px;
+  margin-top: 40px;
+}
+.factGrid strong {
+  display: block;
+  font-size: clamp(30px, 3.6vw, 46px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: var(--or2);
+}
+.factGrid span {
+  display: block;
+  margin-top: 10px;
+  font-size: 15px;
+  color: #b9c6da;
+}
+
+/* ── Kennisbank ── */
+.news {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+  margin-top: 40px;
+}
+.newsItem {
+  display: block;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 28px;
+  background: #faf6f0;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.newsItem:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 40px -24px rgba(11, 29, 58, 0.35);
+}
+.newsItem span {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--or);
+}
+.newsItem h3 {
+  font-size: 19px;
+  font-weight: 700;
+  margin: 8px 0;
+}
+.newsItem p {
+  font-size: 15px;
+  color: var(--mut);
+}
+@media (max-width: 920px) {
+  .wins,
+  .stairs,
+  .news {
+    grid-template-columns: 1fr;
+  }
+  .factGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .stair:nth-child(n) {
+    min-height: 0;
+  }
+  .mission {
+    padding-top: 64px;
   }
 }

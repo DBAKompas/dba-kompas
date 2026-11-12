@@ -80,7 +80,7 @@ export default function OverPage() {
       <MarketingHeader />
 
       {/* ── SECTIE 1: HERO ──────────────────────── */}
-      <section className="relative px-4 sm:px-6 py-14 md:py-28 max-w-5xl mx-auto w-full text-center">
+      <section className="page-hero-dark relative px-4 sm:px-6 py-14 md:py-24 max-w-5xl mx-auto w-full text-center">
         <div className="text-left">
           <Breadcrumb hideVisible items={[{ label: "Home", href: "/" }, { label: "Over" }]} />
         </div>

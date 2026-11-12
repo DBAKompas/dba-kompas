@@ -51,7 +51,7 @@ export function KennisbankPage({ page }: { page: KennisbankPageType }) {
       <MarketingHeader />
 
       {/* Hero */}
-      <section className="px-4 sm:px-6 py-12 md:py-16 max-w-3xl mx-auto w-full">
+      <section className="page-hero-dark px-4 sm:px-6 py-12 md:py-16 max-w-3xl mx-auto w-full mb-10">
         <Breadcrumb
           items={[
             { label: "Home", href: "/" },

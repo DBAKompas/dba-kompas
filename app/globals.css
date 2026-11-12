@@ -458,3 +458,20 @@
   background: linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.06) 50%, transparent 70%);
   pointer-events: none;
 }
+
+/* Donkere paginakop voor kennisbank, over en sectorpagina's: zelfde blauw als de homepage-hero. */
+.page-hero-dark {
+  background: #0b1d3a;
+  box-shadow: 0 0 0 100vmax #0b1d3a;
+  clip-path: inset(0 -100vmax);
+}
+.page-hero-dark h1 {
+  color: #fff !important;
+}
+.page-hero-dark p,
+.page-hero-dark nav,
+.page-hero-dark nav a,
+.page-hero-dark nav li,
+.page-hero-dark nav span {
+  color: #d3dcea !important;
+}
