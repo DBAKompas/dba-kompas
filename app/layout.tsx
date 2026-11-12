@@ -29,6 +29,7 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
+      { url: "/icon-48.png", sizes: "48x48", type: "image/png" },
       { url: "/icon.png", media: "(prefers-color-scheme: light)" },
       { url: "/icon-dark.png", media: "(prefers-color-scheme: dark)" },
     ],
