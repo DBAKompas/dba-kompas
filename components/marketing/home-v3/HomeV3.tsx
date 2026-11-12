@@ -13,80 +13,108 @@ type Part = { t: string; m?: "r" | "g" };
 
 type Example = {
   name: string;
-  score: number;
   level: Level;
   parts: Part[];
-  bars: { label: string; pct: number; level: Level }[];
-  tip: string;
+  /** Score per onderdeel: 0 tot 100, waarbij 100 sterk op zelfstandigheid wijst. */
+  bars: { label: string; score: number; level: Level }[];
+  zwaarst: string;
+  vraag: string;
+  bron: { titel: string; ecli: string; relevantie: string };
 };
 
-// Fictieve voorbeeldopdrachten voor de demo in de hero. Geen echte gebruikersdata.
+// Voorbeelden voor de demo in de hero. De opdrachten zijn fictief. De uitkomsten
+// (indicatie, scores, weging, vraag en bron) zijn letterlijk overgenomen uit de
+// analyse die DBA Kompas op deze opdrachten gaf (proefdraai 11 november 2026).
+// De opdrachttekst is hier ingekort; de gemarkeerde zinsneden staan in de volledige tekst.
 const EXAMPLES: Example[] = [
   {
     name: "Interim projectleider",
-    score: 58,
-    level: "midden",
-    parts: [
-      { t: "Je " },
-      { t: "werkt onder aansturing van de teammanager", m: "r" },
-      { t: " en bent " },
-      { t: "vier dagen per week op kantoor aanwezig", m: "r" },
-      { t: ". Je " },
-      { t: "levert een implementatieplan op tegen een vaste prijs", m: "g" },
-      { t: " en " },
-      { t: "mag je laten vervangen", m: "g" },
-      { t: " door een gelijkwaardige professional." },
-    ],
-    bars: [
-      { label: "Aansturing en gezag", pct: 72, level: "hoog" },
-      { label: "Eigen rekening en risico", pct: 34, level: "laag" },
-      { label: "Ondernemerschap", pct: 48, level: "midden" },
-    ],
-    tip: "Beschrijf het resultaat en aan wie je daarover rapporteert, in plaats van wie je aanstuurt.",
-  },
-  {
-    name: "IT-consultant",
-    score: 24,
-    level: "laag",
-    parts: [
-      { t: "Je " },
-      { t: "bepaalt zelf de technische aanpak en planning", m: "g" },
-      { t: ", werkt " },
-      { t: "met eigen apparatuur", m: "g" },
-      { t: " en " },
-      { t: "factureert per opgeleverde mijlpaal", m: "g" },
-      { t: ". Wekelijks is er een " },
-      { t: "verplicht teamoverleg", m: "r" },
-      { t: " op locatie." },
-    ],
-    bars: [
-      { label: "Aansturing en gezag", pct: 31, level: "laag" },
-      { label: "Eigen rekening en risico", pct: 18, level: "laag" },
-      { label: "Ondernemerschap", pct: 22, level: "laag" },
-    ],
-    tip: "Maak van het wekelijkse overleg een afstemming over voortgang, zonder aanwezigheidsplicht.",
-  },
-  {
-    name: "Beleidsadviseur",
-    score: 81,
     level: "hoog",
     parts: [
-      { t: "Je " },
-      { t: "vervangt een zieke medewerker", m: "r" },
-      { t: ", " },
-      { t: "werkt 36 uur per week volgens het rooster van de afdeling", m: "r" },
-      { t: " en " },
-      { t: "gebruikt een laptop van de opdrachtgever", m: "r" },
-      { t: ". De opdracht loopt " },
-      { t: "tot nader order", m: "r" },
-      { t: " op uurbasis." },
+      { t: "Inzet: 36 uur per week, een jaar. De projectleider " },
+      { t: "maakt deel uit van het team Dienstverlening en rapporteert wekelijks aan de teammanager", m: "r" },
+      { t: ", stuurt vier medewerkers van de gemeente aan en werkt " },
+      { t: "minimaal drie dagen per week op het gemeentehuis", m: "r" },
+      { t: ". Tarief: € 105 per uur, op basis van " },
+      { t: "door de opdrachtgever goedgekeurde urenstaten", m: "r" },
+      { t: ". De opdrachtnemer mag zich laten vervangen " },
+      { t: "na schriftelijke toestemming van de opdrachtgever", m: "r" },
+      { t: " en is " },
+      { t: "verzekerd voor beroepsaansprakelijkheid", m: "g" },
+      { t: "." },
     ],
     bars: [
-      { label: "Aansturing en gezag", pct: 88, level: "hoog" },
-      { label: "Eigen rekening en risico", pct: 79, level: "hoog" },
-      { label: "Ondernemerschap", pct: 70, level: "hoog" },
+      { label: "Aansturing en gezag", score: 15, level: "hoog" },
+      { label: "Eigen rekening en risico", score: 30, level: "hoog" },
+      { label: "Ondernemerschap", score: 50, level: "midden" },
     ],
-    tip: "Deze opdracht lijkt op een dienstverband. Bespreek met je opdrachtgever of een afgebakend resultaat mogelijk is.",
+    zwaarst:
+      "Je maakt deel uit van het team en rapporteert aan de teammanager, je stuurt medewerkers van de gemeente aan, en je werkt 36 uur per week voor minstens een jaar. Over je ondernemerschap zegt de tekst niets.",
+    vraag: "Is de gemeente bereid tot betaling per mijlpaal en een vrije vervangingsmogelijkheid?",
+    bron: {
+      titel: "Hoge Raad, 21 februari 2025 (Uber)",
+      ecli: "ECLI:NL:HR:2025:319",
+      relevantie:
+        "Er is geen rangorde tussen de gezichtspunten, en je ondernemerschap buiten deze opdracht weegt volwaardig mee. Daarom is het belangrijk dat je dat aantoont.",
+    },
+  },
+  {
+    name: "IT-project, vaste prijs",
+    level: "laag",
+    parts: [
+      { t: "Opdrachtnemer levert uiterlijk 1 maart 2027 een werkende API-koppeling op. " },
+      { t: "Vaste prijs: € 18.500 exclusief btw", m: "g" },
+      { t: ", te factureren na acceptatie van de mijlpalen. Opdrachtnemer " },
+      { t: "bepaalt zelf de technische aanpak, planning en werkplek", m: "g" },
+      { t: " en " },
+      { t: "mag het werk geheel of gedeeltelijk laten uitvoeren door een derde", m: "g" },
+      { t: ". " },
+      { t: "Herstel van gebreken binnen 30 dagen na oplevering is voor rekening van opdrachtnemer", m: "g" },
+      { t: "." },
+    ],
+    bars: [
+      { label: "Aansturing en gezag", score: 85, level: "laag" },
+      { label: "Eigen rekening en risico", score: 85, level: "laag" },
+      { label: "Ondernemerschap", score: 70, level: "laag" },
+    ],
+    zwaarst:
+      "Het zwaarst wegen de vaste prijs per mijlpaal met herstel op eigen kosten, de vrije vervanging door een derde en de eigen regie over aanpak, planning en middelen.",
+    vraag: "Wie beoordeelt de acceptatie van elke mijlpaal, en op basis van welke criteria?",
+    bron: {
+      titel: "Hoge Raad, 24 maart 2023 (Deliveroo)",
+      ecli: "ECLI:NL:HR:2023:443",
+      relevantie:
+        "Dit is het toetsingskader voor de holistische weging. Hier wijzen vooral beloning, commercieel risico en vrije werkwijze op zelfstandigheid.",
+    },
+  },
+  {
+    name: "Contract met bijlage",
+    level: "hoog",
+    parts: [
+      { t: "Partijen beogen uitdrukkelijk geen arbeidsovereenkomst aan te gaan. Opdrachtnemer is geheel vrij in de wijze waarop hij de opdracht uitvoert en is niet gebonden aan aanwijzingen van opdrachtgever. Bijlage werkafspraken: opdrachtnemer is van " },
+      { t: "maandag tot en met donderdag van 8.30 tot 17.00 uur aanwezig op locatie", m: "r" },
+      { t: " en " },
+      { t: "volgt de instructies van de afdelingsmanager op", m: "r" },
+      { t: ". Looptijd: " },
+      { t: "onbepaalde tijd", m: "r" },
+      { t: ". Opdrachtnemer " },
+      { t: "heeft geen andere opdrachtgevers", m: "r" },
+      { t: "." },
+    ],
+    bars: [
+      { label: "Aansturing en gezag", score: 15, level: "hoog" },
+      { label: "Eigen rekening en risico", score: 25, level: "hoog" },
+      { label: "Ondernemerschap", score: 15, level: "hoog" },
+    ],
+    zwaarst:
+      "De hoofdtekst zegt dat je vrij bent en niet gebonden aan aanwijzingen. De bijlage zegt het omgekeerde: je “volgt de instructies van de afdelingsmanager op”. Die tegenspraak weegt in je nadeel.",
+    vraag: "Welk concreet resultaat moet ik opleveren en wanneer eindigt de opdracht?",
+    bron: {
+      titel: "Hoge Raad, 6 november 2020 (X/Gemeente Amsterdam)",
+      ecli: "ECLI:NL:HR:2020:1746",
+      relevantie:
+        "De zin “Partijen beogen uitdrukkelijk geen arbeidsovereenkomst” telt niet mee bij de kwalificatie. Het gaat om de rechten, plichten en uitvoering.",
+    },
   },
 ];
 
@@ -95,46 +123,29 @@ const LEVEL_COLOR: Record<Level, string> = {
   midden: "var(--mid)",
   hoog: "var(--bad)",
 };
-const LEVEL_LABEL: Record<Level, string> = {
-  laag: "laag risico",
-  midden: "gemiddeld risico",
-  hoog: "hoog risico",
-};
+const LEVEL_WORD: Record<Level, string> = { laag: "Laag", midden: "Gemiddeld", hoog: "Hoog" };
+// Vulling van de ring: dezelfde waarden die de app bij de indicatie toont.
+const LEVEL_RING: Record<Level, number> = { laag: 88, midden: 55, hoog: 25 };
 
 function Demo() {
   const [idx, setIdx] = useState(0);
   const [done, setDone] = useState(false);
-  const [shown, setShown] = useState(0);
   const ex = EXAMPLES[idx];
 
   useEffect(() => {
-    let raf = 0;
-    const timer = window.setTimeout(() => {
-      setDone(true);
-      const start = performance.now();
-      const step = (now: number) => {
-        const p = Math.min(1, (now - start) / 900);
-        setShown(Math.round(ex.score * p));
-        if (p < 1) raf = requestAnimationFrame(step);
-      };
-      raf = requestAnimationFrame(step);
-    }, 1300);
-    return () => {
-      window.clearTimeout(timer);
-      cancelAnimationFrame(raf);
-    };
-  }, [idx, ex.score]);
+    const timer = window.setTimeout(() => setDone(true), 1300);
+    return () => window.clearTimeout(timer);
+  }, [idx]);
 
   function pick(i: number) {
     if (i === idx) return;
     setDone(false);
-    setShown(0);
     setIdx(i);
   }
 
   return (
     <div className={s.demo}>
-      <div className={s.demoTop}>Kies een voorbeeldopdracht en kijk wat er gebeurt</div>
+      <div className={s.demoTop}>Zo ziet een analyse eruit. Kies een voorbeeld.</div>
       <div className={s.tabs}>
         {EXAMPLES.map((e, i) => (
           <button key={e.name} type="button" className={i === idx ? s.tabOn : s.tab} onClick={() => pick(i)} aria-pressed={i === idx}>
@@ -165,13 +176,13 @@ function Demo() {
               r="55"
               style={{
                 stroke: LEVEL_COLOR[ex.level],
-                strokeDashoffset: done ? 345 - (345 * ex.score) / 100 : 345,
+                strokeDashoffset: done ? 345 - (345 * LEVEL_RING[ex.level]) / 100 : 345,
               }}
             />
           </svg>
           <div className={s.ringTxt}>
-            <strong>{shown}%</strong>
-            <small>{done ? LEVEL_LABEL[ex.level] : "bezig met toetsen"}</small>
+            <strong className={s.ringWord}>{done ? LEVEL_WORD[ex.level] : "…"}</strong>
+            <small>{done ? "risico" : "bezig met toetsen"}</small>
           </div>
         </div>
         <div className={s.bars}>
@@ -179,17 +190,40 @@ function Demo() {
             <div key={b.label}>
               <div className={s.barLabel}>
                 {b.label}
-                <span>{b.level}</span>
+                <span>{done ? `${b.score} van 100` : ""}</span>
               </div>
               <div className={s.track}>
-                <i style={{ width: done ? `${b.pct}%` : 0, background: LEVEL_COLOR[b.level] }} />
+                <i style={{ width: done ? `${b.score}%` : 0, background: LEVEL_COLOR[b.level] }} />
               </div>
             </div>
           ))}
+          <p className={s.barNote}>100 wijst sterk op zelfstandigheid</p>
         </div>
       </div>
-      <div className={s.tip}>{done ? ex.tip : ""}</div>
-      <div className={s.demoFoot}>Voorbeeld met een fictieve opdracht. Een uitkomst is een indicatie, geen juridisch oordeel.</div>
+      {done && (
+        <div key={`ins-${idx}`} className={s.insights}>
+          <div className={s.ins}>
+            <b>Wat het zwaarst weegt</b>
+            <p>{ex.zwaarst}</p>
+          </div>
+          <div className={s.ins}>
+            <b>Vraag voor je opdrachtgever</b>
+            <p>{ex.vraag}</p>
+          </div>
+          <div className={s.ins}>
+            <b>Bron</b>
+            <p>
+              <a href={`https://uitspraken.rechtspraak.nl/details?id=${encodeURIComponent(ex.bron.ecli)}`} target="_blank" rel="noopener noreferrer">
+                {ex.bron.titel}
+              </a>
+              . {ex.bron.relevantie}
+            </p>
+          </div>
+        </div>
+      )}
+      <div className={s.demoFoot}>
+        Uitkomst van DBA Kompas op een fictieve opdracht, hier ingekort weergegeven. Een indicatie, geen juridisch oordeel.
+      </div>
     </div>
   );
 }
