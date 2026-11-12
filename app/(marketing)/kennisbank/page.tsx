@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import Link from "next/link";
 import { KENNISBANK_INDEX } from "@/content/kennisbank";
 import { Breadcrumb } from "@/components/marketing/kennisbank/Breadcrumb";
 import { MarketingHeader, MarketingFooter } from "@/components/marketing/kennisbank/MarketingChrome";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "Kennisbank — Wet DBA en zzp-wetgeving",
   description:
     "Korte, gevalideerde uitleg over de regels rond zzp-werk: Wet DBA, schijnzelfstandigheid, Deliveroo-criteria, Zelfstandigenwet en handhaving in 2026.",
-};
+  path: "/kennisbank",
+});
 
 const COLLECTION_SCHEMA = {
   "@context": "https://schema.org",

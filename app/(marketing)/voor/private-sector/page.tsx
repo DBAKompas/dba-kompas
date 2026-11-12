@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import { SegmentPage } from "@/components/marketing/segment/SegmentPage";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "Voor de private sector",
   description:
     "Toets je zzp-opdracht in de private sector. Voor kenniswerkers in IT, advies, projectmanagement, design, marketing en content.",
-};
+  path: "/voor/private-sector",
+});
 
 const SERVICE_SCHEMA = {
   "@context": "https://schema.org",

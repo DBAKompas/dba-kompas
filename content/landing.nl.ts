@@ -208,7 +208,7 @@ export const LANDING = {
       {
         question: "Hoe gaat DBA Kompas om met mijn gegevens?",
         answer:
-          "Privacy nemen we serieus. Analysegegevens en geëxtraheerde tekst worden standaard maximaal 14 dagen bewaard. Originele uploads worden niet permanent opgeslagen. Betalingen verlopen via Stripe - wij verwerken zelf geen kaart- of bankgegevens. Meer informatie vind je in ons Privacy- en Cookiebeleid.",
+          "Privacy nemen we serieus. Je opdrachttekst en de analyse worden bewaard in je account, zodat je analyses kunt terugzien en vergelijken. Je kunt ons via info@dbakompas.nl vragen je gegevens te verwijderen. Originele uploads worden niet permanent opgeslagen. Betalingen verlopen via Stripe - wij verwerken zelf geen kaart- of bankgegevens. Meer informatie vind je in ons Privacy- en Cookiebeleid.",
       },
       {
         question: "Wat kost DBA Kompas?",

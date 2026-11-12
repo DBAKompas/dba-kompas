@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import { SplitWords } from "@/components/marketing/SplitWords";
 import { OverAnimations } from "@/components/marketing/over/OverAnimations";
 import { Breadcrumb } from "@/components/marketing/kennisbank/Breadcrumb";
 import { MarketingHeader, MarketingFooter } from "@/components/marketing/kennisbank/MarketingChrome";
 import { SlotCta } from "@/components/marketing/shared/SlotCta";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "Over DBA Kompas — Methodiek, maker en bronnen",
   description:
     "DBA Kompas is een indicatief hulpmiddel voor zzp-kenniswerkers, gemaakt door Marvin Zoetemelk op basis van Wet DBA en Hoge Raad-jurisprudentie. Lees over de methodiek en grenzen.",
-};
+  path: "/over-dba-kompas",
+});
 
 const ABOUT_PAGE_SCHEMA = {
   "@context": "https://schema.org",

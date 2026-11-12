@@ -701,8 +701,8 @@ export default function AnalysePage() {
                   <div>
                     <p className="text-xs font-medium text-muted-foreground">Bescherm je privacy</p>
                     <p className="text-xs text-muted-foreground/70 mt-0.5 leading-relaxed">
-                      Je tekst wordt verwerkt via beveiligde servers en uitsluitend gebruikt voor deze analyse.
-                      Gegevens worden na 14 dagen automatisch verwijderd.
+                      Je tekst wordt verwerkt via beveiligde servers en gebruikt voor deze analyse.
+                      De analyse blijft in je account staan, zodat je haar kunt terugzien en vergelijken.
                     </p>
                   </div>
                 </div>
@@ -788,7 +788,7 @@ export default function AnalysePage() {
                   </div>
                   {[
                     'Ik begrijp dat deze analyse indicatief is en geen juridisch advies vervangt. Voor definitieve beoordeling raadpleeg ik altijd een specialist.',
-                    'Ik ga akkoord met de verwerking van mijn gegevens conform het privacybeleid. Mijn invoer wordt na 14 dagen automatisch verwijderd.',
+                    'Ik ga akkoord met de verwerking van mijn gegevens conform het privacybeleid. Mijn invoer en de analyse blijven in mijn account bewaard tot ik om verwijdering vraag.',
                     'Ik bevestig dat ik bevoegd ben om deze tekst te analyseren en dat er geen gevoelige persoonsgegevens in staan.',
                   ].map((label, i) => (
                     <label key={i} className="flex items-start gap-3 cursor-pointer group">
