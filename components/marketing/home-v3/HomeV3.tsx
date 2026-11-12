@@ -145,7 +145,7 @@ function Demo() {
 
   return (
     <div className={s.demo}>
-      <div className={s.demoTop}>Zo ziet een analyse eruit. Kies een voorbeeld.</div>
+      <div className={s.demoTop}>Een greep uit een analyse. Kies een voorbeeld.</div>
       <div className={s.tabs}>
         {EXAMPLES.map((e, i) => (
           <button key={e.name} type="button" className={i === idx ? s.tabOn : s.tab} onClick={() => pick(i)} aria-pressed={i === idx}>
@@ -219,6 +219,13 @@ function Demo() {
               . {ex.bron.relevantie}
             </p>
           </div>
+        </div>
+      )}
+      {done && (
+        <div className={s.more2}>
+          <b>Dit is een fragment.</b> De volledige analyse geeft per onderdeel de zinnen die tellen, wat de tekst niet zegt, drie
+          verbeteringen, de weging, drie gespreksvragen, alle bronnen met de actuele stand van handhaving en wetgeving, en een
+          herschreven opdrachtomschrijving wanneer je daarom vraagt.
         </div>
       )}
       <div className={s.demoFoot}>
