@@ -1,0 +1,209 @@
+/* Over-pagina: bouwt voort op de homepage-stijl (home-v3.module.css). Alleen wat daar niet in zit. */
+.hero {
+  padding: 96px 0 110px;
+  text-align: center;
+}
+.hero h1 {
+  font-size: clamp(40px, 6.6vw, 104px);
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  line-height: 0.98;
+  margin: 0 auto;
+  max-width: 1100px;
+}
+.hero h1 em {
+  font-style: normal;
+  color: var(--or);
+}
+.hero p {
+  font-size: clamp(17px, 1.5vw, 21px);
+  color: var(--mut);
+  max-width: 640px;
+  margin: 34px auto 0;
+}
+.mail {
+  display: inline-block;
+  margin-top: 22px;
+  font-weight: 600;
+  color: var(--ink);
+  border-bottom: 2px solid var(--or);
+}
+
+/* Van negen gezichtspunten naar drie onderdelen */
+.map {
+  display: grid;
+  grid-template-columns: 4fr 4fr 1.6fr;
+  gap: 18px;
+  margin-top: 64px;
+}
+.grp {
+  background: var(--soft);
+  border-radius: 28px;
+  padding: 26px 26px 30px;
+}
+.grp:nth-child(1) {
+  border-radius: 64px 28px 28px 28px;
+}
+.grp:nth-child(3) {
+  border-radius: 28px 28px 64px 28px;
+  background: var(--navy);
+  color: #fff;
+}
+.dots {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.dots i {
+  font-style: normal;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 15px;
+  background: #fff;
+  color: var(--ink);
+}
+.grp:nth-child(2) .dots i {
+  background: #f6c99f;
+}
+.grp:nth-child(3) .dots i {
+  background: var(--or);
+  color: #fff;
+}
+.grp h3 {
+  font-size: clamp(20px, 1.9vw, 26px);
+  font-weight: 600;
+  margin: 26px 0 8px;
+}
+.grp p {
+  font-size: 15.5px;
+  color: var(--mut);
+  margin: 0;
+}
+.grp:nth-child(3) p {
+  color: #b9c6da;
+}
+.grp ul {
+  list-style: none;
+  padding: 0;
+  margin: 14px 0 0;
+  font-size: 14.5px;
+  color: var(--mut);
+}
+.grp li {
+  padding: 6px 0;
+  border-top: 1px solid var(--line);
+}
+.grp:nth-child(3) li {
+  color: #b9c6da;
+  border-color: rgba(255, 255, 255, 0.14);
+}
+.note {
+  margin-top: 26px;
+  font-size: 16px;
+  color: var(--mut);
+}
+
+/* Wel en niet naast elkaar */
+.vs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-top: 56px;
+}
+.vs > div {
+  background: #fff;
+  border-radius: 28px;
+  padding: 34px 36px;
+}
+.vs > div:first-child {
+  border-radius: 28px 28px 28px 64px;
+}
+.vs > div:last-child {
+  background: transparent;
+  border: 1.5px solid var(--line);
+  border-radius: 28px 64px 28px 28px;
+}
+.vs h3 {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0 0 14px;
+}
+.vs ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.vs li {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  padding: 11px 0;
+  border-top: 1px solid var(--line);
+  font-size: 16.5px;
+}
+.vs li::before {
+  content: "✓";
+  font-weight: 700;
+  color: var(--ok);
+}
+.vs > div:last-child li {
+  color: var(--mut);
+}
+.vs > div:last-child li::before {
+  content: "✕";
+  color: var(--mut);
+}
+
+/* Bronnen */
+.src {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin-top: 56px;
+  border-top: 1px solid var(--line);
+}
+.src > div {
+  padding: 28px 24px 0 0;
+}
+.src > div + div {
+  padding-left: 24px;
+  border-left: 1px solid var(--line);
+}
+.src strong {
+  display: block;
+  font-size: clamp(20px, 2vw, 28px);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+}
+.src span {
+  display: block;
+  margin-top: 8px;
+  font-size: 15px;
+  color: var(--mut);
+}
+
+@media (max-width: 920px) {
+  .hero {
+    padding: 56px 0 72px;
+  }
+  .map,
+  .vs {
+    grid-template-columns: 1fr;
+  }
+  .src {
+    grid-template-columns: 1fr 1fr;
+  }
+  .src > div {
+    padding: 22px 16px 22px 0;
+  }
+  .src > div:nth-child(3) {
+    padding-left: 0;
+    border-left: 0;
+  }
+  .src > div:nth-child(n + 3) {
+    border-top: 1px solid var(--line);
+  }
+}

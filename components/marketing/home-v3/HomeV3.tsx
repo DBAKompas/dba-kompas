@@ -132,7 +132,7 @@ const LEVEL_RING: Record<Level, number> = { laag: 88, midden: 55, hoog: 25 };
 // ── Scroll-effecten ──────────────────────────────────────────────────────────
 
 /** Laat elementen met data-reveal rustig binnenkomen en verschuift data-speed-lagen bij het scrollen. */
-function useScrollEffects(root: React.RefObject<HTMLDivElement | null>) {
+export function useScrollEffects(root: React.RefObject<HTMLDivElement | null>) {
   useEffect(() => {
     const el = root.current;
     if (!el) return;
