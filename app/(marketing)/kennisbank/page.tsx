@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { pageMeta } from "@/lib/seo";
 import Link from "next/link";
-import { KENNISBANK_INDEX } from "@/content/kennisbank";
+import { KENNISBANK_INDEX, KENNISBANK_CATEGORIEEN } from "@/content/kennisbank";
 import { Breadcrumb } from "@/components/marketing/kennisbank/Breadcrumb";
 import { MarketingHeader, MarketingFooter } from "@/components/marketing/kennisbank/MarketingChrome";
 
@@ -37,26 +37,24 @@ export default function KennisbankIndexPage() {
         </p>
       </section>
 
-      <section className="px-4 sm:px-6 pb-16 md:pb-24 max-w-7xl mx-auto w-full">
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {KENNISBANK_INDEX.map((p) => (
-            <Link
-              key={p.slug}
-              href={`/kennisbank/${p.slug}`}
-              className="group relative block bg-card rounded-2xl p-6 md:p-7 ring-1 ring-foreground/10 hover:ring-accent/40 hover:-translate-y-1 transition-all duration-300"
-            >
-              <p className="text-[11px] uppercase tracking-[0.08em] font-semibold text-accent mb-3">KENNISBANK</p>
-              <h3 className="text-lg md:text-xl font-semibold text-foreground mb-3">{p.h1}</h3>
-              <p className="text-sm md:text-base text-muted-foreground leading-relaxed mb-5">{p.shortDescription}</p>
-              <span className="inline-flex items-center gap-1.5 text-sm font-medium text-accent">
-                Lees meer
-                <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                  <path d="M3 10 L17 10 M11 4 L17 10 L11 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </span>
-            </Link>
-          ))}
-        </div>
+      <section className="px-4 sm:px-6 pb-16 md:pb-24 max-w-[1240px] mx-auto w-full space-y-16">
+        {KENNISBANK_CATEGORIEEN.map((cat) => {
+          const items = KENNISBANK_INDEX.filter((p) => p.categorie === cat);
+          if (items.length === 0) return null;
+          return (
+            <div key={cat} id={cat.toLowerCase().replace(/\s+/g, "-")} className="grid gap-8 md:grid-cols-[220px_1fr] scroll-mt-24">
+              <h2 className="text-base font-semibold text-accent pt-2">{cat}</h2>
+              <div className="grid gap-x-10 sm:grid-cols-2">
+                {items.map((p) => (
+                  <Link key={p.slug} href={`/kennisbank/${p.slug}`} className="group block border-t border-foreground py-6 transition-transform hover:-translate-y-1">
+                    <h3 className="text-2xl font-medium text-foreground group-hover:underline underline-offset-4 decoration-accent">{p.h1}</h3>
+                    <p className="mt-2 text-base text-muted-foreground leading-relaxed">{p.shortDescription}</p>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          );
+        })}
       </section>
 
       <MarketingFooter />

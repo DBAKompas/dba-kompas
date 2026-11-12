@@ -156,7 +156,7 @@
 .hero {
   position: relative;
   background: #fff;
-  padding: 170px 0 150px;
+  padding: 110px 0 150px;
   text-align: center;
 }
 .hero h1 {
@@ -1047,7 +1047,7 @@
     padding: 76px 0;
   }
   .hero {
-    padding: 120px 0 110px;
+    padding: 64px 0 110px;
   }
   .label {
     padding-top: 0;

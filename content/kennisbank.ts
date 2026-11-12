@@ -8,8 +8,12 @@ export type KennisbankFaq = {
   answer: string;
 };
 
+export const KENNISBANK_CATEGORIEEN = ["De basis", "Rechtspraak", "Wetgeving", "Handhaving"] as const;
+export type KennisbankCategorie = (typeof KENNISBANK_CATEGORIEEN)[number];
+
 export type KennisbankPage = {
   slug: string;
+  categorie: KennisbankCategorie;
   title: string;
   h1: string;
   shortDescription: string;
@@ -23,6 +27,7 @@ export type KennisbankPage = {
 export const KENNISBANK_PAGES: KennisbankPage[] = [
   {
     slug: "wet-dba",
+    categorie: "De basis",
     title: "Wat is de Wet DBA?",
     h1: "Wat is de Wet DBA?",
     shortDescription:
@@ -65,6 +70,7 @@ export const KENNISBANK_PAGES: KennisbankPage[] = [
   },
   {
     slug: "schijnzelfstandigheid",
+    categorie: "De basis",
     title: "Wat is schijnzelfstandigheid?",
     h1: "Wat is schijnzelfstandigheid?",
     shortDescription:
@@ -102,6 +108,7 @@ export const KENNISBANK_PAGES: KennisbankPage[] = [
   },
   {
     slug: "deliveroo-criteria",
+    categorie: "Rechtspraak",
     title: "De negen Deliveroo-criteria",
     h1: "De negen Deliveroo-criteria",
     shortDescription:
@@ -139,6 +146,7 @@ export const KENNISBANK_PAGES: KennisbankPage[] = [
   },
   {
     slug: "zelfstandigenwet",
+    categorie: "Wetgeving",
     title: "De nieuwe wetgeving rond zelfstandigen",
     h1: "De nieuwe wetgeving rond zelfstandigen",
     shortDescription:
@@ -180,6 +188,7 @@ export const KENNISBANK_PAGES: KennisbankPage[] = [
   },
   {
     slug: "handhaving-2026",
+    categorie: "Handhaving",
     title: "Hoe handhaaft de Belastingdienst nu?",
     h1: "Hoe handhaaft de Belastingdienst nu?",
     shortDescription:
@@ -223,6 +232,7 @@ export const KENNISBANK_PAGES: KennisbankPage[] = [
 
 export const KENNISBANK_INDEX = KENNISBANK_PAGES.map((p) => ({
   slug: p.slug,
+  categorie: p.categorie,
   h1: p.h1,
   shortDescription: p.shortDescription,
 }));

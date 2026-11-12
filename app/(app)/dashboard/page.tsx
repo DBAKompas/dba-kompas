@@ -236,9 +236,10 @@ export default function DashboardPage() {
 
       {/* Eerste actie: nieuwe opdracht toetsen */}
       <div
-        className="grid items-center gap-6 rounded-[18px] p-6 text-white sm:grid-cols-[1fr_auto]"
+        className="grid items-center gap-6 p-7 sm:p-9 text-white sm:grid-cols-[1fr_auto]"
         style={{
           backgroundColor: '#0b1d3a',
+          borderRadius: '40px 40px 40px 10px',
           backgroundImage: 'radial-gradient(500px 240px at 100% 0, rgba(212,120,42,.35), transparent 70%)',
         }}
       >

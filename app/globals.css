@@ -50,15 +50,15 @@
 
 :root {
   /* === DBA Kompas Design System === */
-  --background: hsl(60, 33.33%, 95.29%);
-  --foreground: hsl(31.76, 17.53%, 19.02%);
+  --background: #ffffff;
+  --foreground: #0b1d3a;
 
   --card: #ffffff;
-  --card-foreground: hsl(31.76, 17.53%, 19.02%);
+  --card-foreground: #0b1d3a;
   --card-border: hsl(210, 12.5%, 87.45%);
 
-  --popover: hsl(60, 20%, 98.5%);
-  --popover-foreground: hsl(31.76, 17.53%, 19.02%);
+  --popover: #ffffff;
+  --popover-foreground: #0b1d3a;
   --popover-border: hsl(210, 12.5%, 87.45%);
 
   --primary: #0b1d3a;
@@ -67,8 +67,8 @@
   --secondary: hsl(206.67, 44.44%, 31.76%);
   --secondary-foreground: hsl(0, 0%, 100%);
 
-  --muted: hsl(210, 12.5%, 87.45%);
-  --muted-foreground: hsl(210, 10.39%, 38%);
+  --muted: #efede8;
+  --muted-foreground: #5d6b80;
 
   --accent: #d4782a;
   --accent-foreground: hsl(0, 0%, 100%);
@@ -76,14 +76,14 @@
   --destructive: hsl(0.49, 54.19%, 55.49%);
   --destructive-foreground: hsl(0, 0%, 100%);
 
-  --border: hsl(210, 12.5%, 87.45%);
-  --input: hsl(60, 20%, 98.5%);
+  --border: #e3e1dc;
+  --input: #ffffff;
   --ring: #d4782a;
 
-  --radius: 0.875rem;
+  --radius: 1.125rem;
 
   /* Sidebar */
-  --sidebar: hsl(60, 33.33%, 95.29%);
+  --sidebar: #f4f2ee;
   --sidebar-foreground: hsl(31.76, 17.53%, 19.02%);
   --sidebar-border: hsl(210, 12.5%, 87.45%);
   --sidebar-primary: #0b1d3a;
@@ -474,4 +474,80 @@
 .page-hero-dark nav li,
 .page-hero-dark nav span {
   color: #d3dcea !important;
+}
+
+/* ── Eén stijl voor site en app: licht, grote rustige koppen, ronde vlakken ── */
+.mk,
+.appui {
+  --soft: #f4f2ee;
+}
+.mk h1,
+.appui h1 {
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1.04;
+}
+.mk h2,
+.appui h2 {
+  font-weight: 500;
+  letter-spacing: -0.03em;
+}
+.mk h3,
+.appui h3 {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+/* Labels boven koppen: geen hoofdletters meer, wel oranje */
+.mk p.uppercase,
+.mk span.uppercase,
+.appui p.uppercase,
+.appui h4.uppercase,
+.appui span.uppercase {
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+}
+/* Kaarten en vlakken: grote ronding, zachte rand */
+.mk .rounded-xl,
+.mk .rounded-2xl,
+.mk .rounded-3xl,
+.appui .rounded-xl,
+.appui .rounded-2xl,
+.appui [class*="rounded-[18px]"] {
+  border-radius: 28px;
+}
+.appui .rounded-lg,
+.mk .rounded-lg {
+  border-radius: 16px;
+}
+.mk .section-divider::before,
+.mk .section-divider::after {
+  display: none;
+}
+/* Sitepagina's (niet de homepage, die heeft eigen stijlen): grote kop, zachte banden */
+.mk section.text-center h1 {
+  font-size: clamp(38px, 6vw, 84px);
+}
+.mk .bg-card {
+  background: #fff;
+}
+.mk .bg-primary.rounded-3xl,
+.mk section.bg-primary {
+  border-radius: 48px 48px 48px 12px;
+}
+/* App: werkvlak op zacht grijs, kaarten wit zonder harde rand */
+.appui {
+  background: var(--soft);
+}
+.appui .bg-card {
+  border-color: transparent;
+  box-shadow: 0 1px 0 rgba(11, 29, 58, 0.04);
+}
+.appui main h1 {
+  font-size: clamp(30px, 3.4vw, 44px);
+}
+.appui button,
+.appui a {
+  transition: background-color 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
 }

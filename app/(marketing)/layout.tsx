@@ -7,7 +7,9 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
     <>
       <LinkedInInsightTag />
       <ScrollToTopOnMount />
-      <MarketingModalsRoot>{children}</MarketingModalsRoot>
+      <MarketingModalsRoot>
+        <div className="mk">{children}</div>
+      </MarketingModalsRoot>
     </>
   )
 }
