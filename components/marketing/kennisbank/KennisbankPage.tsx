@@ -59,7 +59,7 @@ export function KennisbankPage({ page }: { page: KennisbankPageType }) {
             { label: page.h1 },
           ]}
         />
-        <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">KENNISBANK</p>
+        <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">Kennisbank</p>
         <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-tight text-foreground mb-4">
           <SplitWords text={page.h1} dataAttr="data-kennisbank-word" />
         </h1>
@@ -91,7 +91,7 @@ export function KennisbankPage({ page }: { page: KennisbankPageType }) {
       {/* FAQ */}
       <section className="px-4 sm:px-6 py-12 md:py-16 max-w-3xl mx-auto w-full">
         <div className="mb-8">
-          <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-3">VEELGESTELDE VRAGEN</p>
+          <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-3">Veelgestelde vragen</p>
           <h2 className="text-2xl md:text-3xl font-bold leading-tight text-foreground">Vragen rond dit onderwerp</h2>
         </div>
         <FaqAccordion items={page.faq} />
@@ -101,7 +101,7 @@ export function KennisbankPage({ page }: { page: KennisbankPageType }) {
       {related.length > 0 && (
         <section className="px-4 sm:px-6 py-12 md:py-16 max-w-5xl mx-auto w-full">
           <div className="mb-8 text-center">
-            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-3">VERDER LEZEN</p>
+            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-3">Verder lezen</p>
             <h2 className="text-2xl md:text-3xl font-bold leading-tight text-foreground">Gerelateerde kennisbank-pagina&apos;s</h2>
           </div>
           <div className="grid md:grid-cols-3 gap-5">
@@ -163,7 +163,7 @@ export function KennisbankPage({ page }: { page: KennisbankPageType }) {
             <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full bg-accent/20 blur-3xl" />
           </div>
           <div className="relative z-10 max-w-2xl mx-auto">
-            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">STARTEN</p>
+            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">Starten</p>
             <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-4">Toets je opdracht zelf</h2>
             <p className="text-base md:text-lg text-primary-foreground/80 mb-8">
               Met DBA Kompas toets je je opdracht in 60 seconden. Direct een indicatie en concrete aandachtspunten.

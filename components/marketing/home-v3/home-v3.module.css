@@ -188,37 +188,59 @@
 .vword {
   position: relative;
   display: inline-block;
-  overflow: hidden;
   isolation: isolate;
-  background: linear-gradient(110deg, var(--or) 0%, #e9a15c 35%, var(--navy2) 100%);
-  background-size: 200% 100%;
-  animation: sheen 6s ease-in-out infinite alternate;
-  line-height: 1.05;
-  vertical-align: bottom;
+  background: linear-gradient(100deg, var(--or) 0%, #eba45f 45%, #b85f1a 100%);
+  background-size: 220% 100%;
+  animation: sheen 5s ease-in-out infinite alternate;
+}
+.vword::before,
+.vword::after,
+.vword video {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+/* Video in grijstinten; de twee lagen erboven kleuren hem in het merkoranje (donker -> diep oranje, licht -> licht oranje). */
+.vword video {
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.25) brightness(1.05);
+}
+.vword video:not([src]) {
+  display: none;
+}
+.vword::before {
+  z-index: 1;
+  background: #b05a14;
+  mix-blend-mode: lighten;
+}
+.vword::after {
+  z-index: 2;
+  background: #f3a860;
+  mix-blend-mode: multiply;
+}
+/* Zwarte tekst op wit met 'screen': alleen de letters laten de video door. De witte rand dekt de kaderlijn af. */
+.vtext {
+  position: relative;
+  z-index: 3;
+  display: block;
+  background: #fff;
+  color: #000;
+  mix-blend-mode: screen;
+  padding: 0.02em 0.05em 0.1em;
+  box-shadow: 0 0 0 4px #fff;
 }
 @keyframes sheen {
   to {
     background-position: 100% 0;
   }
 }
-.vword video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: saturate(1.5) contrast(1.1);
-}
-.vword video:not([src]) {
-  display: none;
-}
-.vtext {
-  position: relative;
-  display: block;
-  background: #fff;
-  color: #000;
-  mix-blend-mode: screen;
-  padding: 0 0.04em;
+@media (prefers-reduced-motion: reduce) {
+  .vword {
+    animation: none;
+  }
 }
 .heroRow {
   display: flex;
@@ -848,11 +870,11 @@
 }
 
 /* ── Prijzen ── */
-.root #prijzen {
+.secPrijzen {
   background: var(--soft);
 }
-.root #prijzen h2,
-.root #faq h2 {
+.secPrijzen h2,
+.secFaq h2 {
   font-size: clamp(30px, 4.2vw, 52px);
   font-weight: 500;
   margin: 0 0 16px;

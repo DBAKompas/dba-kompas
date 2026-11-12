@@ -82,7 +82,7 @@ function HeaderInner({ pathname }: { pathname: string }) {
               type="button"
               className={`${linkCls} inline-flex items-center gap-1.5 ${isVoor ? "!text-[#0b1d3a] font-semibold" : ""}`}
               aria-expanded={menu === "voor"}
-              onClick={() => setMenu(menu === "voor" ? null : "voor")}
+              onClick={() => setMenu("voor")}
             >
               Voor wie <Chevron open={menu === "voor"} />
             </button>
@@ -107,7 +107,7 @@ function HeaderInner({ pathname }: { pathname: string }) {
               type="button"
               className={`${linkCls} inline-flex items-center gap-1.5 ${isKennisbank ? "!text-[#0b1d3a] font-semibold" : ""}`}
               aria-expanded={menu === "kennisbank"}
-              onClick={() => setMenu(menu === "kennisbank" ? null : "kennisbank")}
+              onClick={() => setMenu("kennisbank")}
             >
               Kennisbank <Chevron open={menu === "kennisbank"} />
             </button>

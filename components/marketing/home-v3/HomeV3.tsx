@@ -620,7 +620,7 @@ export function HomeV3({ onZelfscan, onCheck }: { onZelfscan: () => void; onChec
       </section>
 
       {/* PRIJZEN */}
-      <section id="prijzen" className={s.sec}>
+      <section id="prijzen" className={`${s.sec} ${s.secPrijzen}`}>
         <div className={s.wrap}>
           <h2 className={s.narrow}>Wat kost DBA Kompas?</h2>
           <p className={s.lead}>
@@ -690,7 +690,7 @@ export function HomeV3({ onZelfscan, onCheck }: { onZelfscan: () => void; onChec
 
 
       {/* FAQ */}
-      <section id="faq" className={s.sec}>
+      <section id="faq" className={`${s.sec} ${s.secFaq}`}>
         <div className={`${s.wrap} ${s.splitTop}`}>
           <h2>Veelgestelde vragen</h2>
           <div className={s.faq}>

@@ -31,7 +31,7 @@ export default function PrivateSectorPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(SERVICE_SCHEMA) }}
       />
       <SegmentPage
-        eyebrow="VOOR DE PRIVATE SECTOR"
+        eyebrow="Voor de private sector"
         h1="Toets je opdracht in de private sector"
         heroSubtext="Voor zzp-kenniswerkers in bijvoorbeeld IT, advies, projectmanagement, design, marketing en content."
         segmentLabel="Private sector"

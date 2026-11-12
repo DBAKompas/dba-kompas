@@ -485,7 +485,7 @@ export default function AssessmentDetailPage() {
             <Link href="/analyse" className="inline-flex items-center gap-1.5 text-sm text-white/80 hover:text-white transition-colors">
               <ArrowLeft className="size-4" /> Terug
             </Link>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center justify-end gap-2">
               <a
                 href={`/api/dba/assessments/${params.id}/pdf`}
                 download
@@ -499,6 +499,12 @@ export default function AssessmentDetailPage() {
                 className="inline-flex items-center gap-1.5 rounded-lg border border-white/30 bg-white/10 px-3 py-1.5 text-sm text-white hover:bg-white/20 transition-colors"
               >
                 <FileDown className="size-4" /> Word
+              </a>
+              <a
+                href="#verbeter"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-sm font-medium text-primary hover:bg-white/90 transition-colors"
+              >
+                <FileText className="size-4" /> Verbeter opdracht
               </a>
             </div>
           </div>
@@ -537,27 +543,27 @@ export default function AssessmentDetailPage() {
           <section>
             <button
               onClick={() => setDiffOpen((v) => !v)}
-              className="w-full flex items-center justify-between gap-3 rounded-xl border-2 border-violet-200 bg-violet-50 px-5 py-3 text-left hover:bg-violet-100 transition-colors"
+              className="w-full flex items-center justify-between gap-3 rounded-xl border-2 border-accent/30 bg-accent/10 px-5 py-3 text-left hover:bg-accent/15 transition-colors"
             >
               <div className="flex items-center gap-2.5">
-                <GitCompare className="size-5 text-violet-600 shrink-0" />
+                <GitCompare className="size-5 text-accent shrink-0" />
                 <div>
-                  <p className="font-semibold text-sm text-violet-800">Vergelijking met vorige analyse</p>
-                  <p className="text-xs text-violet-600 mt-0.5">
+                  <p className="font-semibold text-sm text-primary">Vergelijking met vorige analyse</p>
+                  <p className="text-xs text-accent mt-0.5">
                     Vorige analyse: {new Date(parentAssessment.created_at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })}
                   </p>
                 </div>
               </div>
               {diffOpen
-                ? <ChevronUp className="size-4 text-violet-500 shrink-0" />
-                : <ChevronDown className="size-4 text-violet-500 shrink-0" />
+                ? <ChevronUp className="size-4 text-accent shrink-0" />
+                : <ChevronDown className="size-4 text-accent shrink-0" />
               }
             </button>
 
             {diffOpen && (
-              <div className="mt-3 rounded-xl border border-violet-200 bg-white overflow-hidden">
+              <div className="mt-3 rounded-xl border border-accent/30 bg-white overflow-hidden">
                 {/* Overall risico vergelijking */}
-                <div className="grid grid-cols-2 divide-x divide-violet-100 border-b border-violet-100">
+                <div className="grid grid-cols-2 divide-x divide-border border-b border-accent/20">
                   <div className="px-5 py-4">
                     <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-2">Vorige analyse</p>
                     <div className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${riskConfig(parentAssessment.overall_risk_label).badge}`}>
@@ -578,7 +584,7 @@ export default function AssessmentDetailPage() {
 
                 {/* Domeinen vergelijking */}
                 {parentAssessment.domains?.length > 0 && domains.length > 0 && (
-                  <div className="divide-y divide-violet-50">
+                  <div className="divide-y divide-border">
                     {domains.map((domain, idx) => {
                       const prev = parentAssessment.domains?.[idx]
                       if (!prev) return null
@@ -624,10 +630,10 @@ export default function AssessmentDetailPage() {
                 )}
 
                 {/* Footer met link naar vorige analyse */}
-                <div className="border-t border-violet-100 px-5 py-3 bg-violet-50/50">
+                <div className="border-t border-accent/20 px-5 py-3 bg-accent/5">
                   <Link
                     href={`/analyse/${parentAssessment.id}`}
-                    className="text-xs text-violet-600 hover:text-violet-800 font-medium hover:underline"
+                    className="text-xs text-accent hover:text-primary font-medium hover:underline"
                   >
                     Bekijk vorige analyse →
                   </Link>
@@ -788,7 +794,7 @@ export default function AssessmentDetailPage() {
         {improvements.length > 0 && (
           <section>
             <div className="flex items-center gap-2 mb-4">
-              <Zap className="size-5 text-violet-500" />
+              <Zap className="size-5 text-accent" />
               <h2 className="text-lg font-semibold">Beschikbare scenario&apos;s</h2>
               <span className={`ml-auto inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold ${scenarioRec.color}`}>
                 {scenarioRec.text}
@@ -805,18 +811,18 @@ export default function AssessmentDetailPage() {
                     key={i}
                     onClick={() => toggleScenario(i)}
                     className={`w-full flex items-start gap-3 px-5 py-4 text-left transition-colors ${
-                      isSelected ? 'bg-violet-50' : 'hover:bg-muted/40'
+                      isSelected ? 'bg-accent/10' : 'hover:bg-muted/40'
                     }`}
                   >
                     <div className={`flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold mt-0.5 transition-colors ${
-                      isSelected ? 'bg-violet-600 text-white' : 'bg-muted text-muted-foreground'
+                      isSelected ? 'bg-primary text-white' : 'bg-muted text-muted-foreground'
                     }`}>
                       {isSelected ? <Check className="size-3" /> : i + 1}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-foreground leading-relaxed">{imp}</p>
                       {isSelected && (
-                        <p className="text-xs text-violet-600 font-medium mt-1">
+                        <p className="text-xs text-accent font-medium mt-1">
                           ✓ Toegevoegd aan heranalyse-veld
                         </p>
                       )}
@@ -865,7 +871,7 @@ export default function AssessmentDetailPage() {
               <textarea
                 className={`w-full rounded-xl border-2 bg-card px-4 py-3 text-sm outline-none resize-none leading-relaxed transition-colors min-h-[100px] ${
                   heranalyseText.trim()
-                    ? 'border-violet-400 focus:ring-2 focus:ring-violet-400/20'
+                    ? 'border-accent focus:ring-2 focus:ring-accent/20'
                     : 'border-border focus:border-ring focus:ring-2 focus:ring-ring/20'
                 }`}
                 placeholder="Beschrijf hier aanpassingen of selecteer een of meer scenario's hierboven..."
@@ -914,19 +920,19 @@ export default function AssessmentDetailPage() {
         )}
 
         {/* ── Opdrachtformulering ───────────────────────────────────────────── */}
-        <section>
+        <section id="verbeter" className="scroll-mt-24">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <FileText className="size-5 text-violet-500" />
-              <h2 className="text-lg font-semibold">Opdrachtformulering</h2>
+              <FileText className="size-5 text-accent" />
+              <h2 className="text-lg font-semibold">Verbeter je opdrachtomschrijving</h2>
             </div>
             {!compactDraft && !longDraft && !draftLoading && (
               <button
                 onClick={handleGenerateDraft}
-                className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700 transition-colors"
+                className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors"
               >
                 <FileText className="size-4" />
-                Genereer
+                Schrijf een sterkere versie
               </button>
             )}
           </div>
@@ -955,7 +961,7 @@ export default function AssessmentDetailPage() {
                       key={key}
                       className={`flex items-center gap-1.5 flex-1 px-3 py-3 text-sm font-medium transition-colors ${
                         draftTab === key
-                          ? 'bg-violet-50 text-violet-700 border-b-2 border-violet-500'
+                          ? 'bg-accent/10 text-primary border-b-2 border-accent'
                           : 'text-muted-foreground hover:text-foreground'
                       }`}
                       onClick={() => handleDraftTabChange(key)}
@@ -990,7 +996,7 @@ export default function AssessmentDetailPage() {
                         <ul className="space-y-1.5">
                           {compactDraft.deliverables.map((d, i) => (
                             <li key={i} className="flex items-start gap-2 text-sm">
-                              <CheckCircle2 className="size-4 shrink-0 mt-0.5 text-violet-400" />
+                              <CheckCircle2 className="size-4 shrink-0 mt-0.5 text-accent/70" />
                               {d}
                             </li>
                           ))}
@@ -1027,7 +1033,7 @@ export default function AssessmentDetailPage() {
                     <p className="text-sm text-muted-foreground">De uitgebreide versie kon niet worden geladen.</p>
                     <button
                       onClick={handleGenerateFullDraft}
-                      className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700 transition-colors"
+                      className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors"
                     >
                       <RefreshCw className="size-4" /> Opnieuw proberen
                     </button>
@@ -1056,7 +1062,7 @@ export default function AssessmentDetailPage() {
                         <ul className="space-y-1.5">
                           {longDraft.deliverables.map((d, i) => (
                             <li key={i} className="flex items-start gap-2 text-sm">
-                              <Circle className="size-4 shrink-0 mt-0.5 text-violet-300" />
+                              <Circle className="size-4 shrink-0 mt-0.5 text-accent/60" />
                               {d}
                             </li>
                           ))}
@@ -1147,7 +1153,7 @@ export default function AssessmentDetailPage() {
               </div>
             ) : (
               <div className="p-6 text-sm text-muted-foreground">
-                Klik op &quot;Genereer&quot; om een professionele opdrachttekst te laten opstellen op basis van deze analyse.
+                Laat op basis van deze analyse een sterkere versie van je opdrachtomschrijving schrijven. Je krijgt een compacte en een uitgebreide tekst, plus losse bouwstenen om met je opdrachtgever te bespreken. De tekst is een voorstel: neem alleen over wat klopt met hoe je in de praktijk werkt.
               </div>
             )}
           </div>

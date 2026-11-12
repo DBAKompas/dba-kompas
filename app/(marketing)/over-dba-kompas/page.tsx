@@ -84,7 +84,7 @@ export default function OverPage() {
         <div className="text-left">
           <Breadcrumb hideVisible items={[{ label: "Home", href: "/" }, { label: "Over" }]} />
         </div>
-        <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">OVER DBA KOMPAS</p>
+        <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">Over DBA Kompas</p>
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight text-foreground mb-6">
           <SplitWords text="Een vaste methodiek voor zzp-opdrachten, gemaakt vanuit de praktijk" dataAttr="data-over-hero-word" />
         </h1>
@@ -107,7 +107,7 @@ export default function OverPage() {
             />
           </div>
           <div>
-            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">DE MAKER</p>
+            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">De maker</p>
             <h2 className="text-3xl md:text-4xl font-bold leading-tight text-primary-foreground mb-6">
               <SplitWords text="Gemaakt vanuit de praktijk" dataAttr="data-over-maker-word" />
             </h2>
@@ -138,7 +138,7 @@ export default function OverPage() {
       {/* ── SECTIE 3: DE METHODIEK ──────────────── */}
       <section className="relative px-4 sm:px-6 py-14 md:py-28 max-w-5xl mx-auto w-full">
         <div className="text-center mb-12">
-          <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">DE METHODIEK</p>
+          <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">De methodiek</p>
           <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground">
             <SplitWords text="Elke opdracht via hetzelfde kader" dataAttr="data-over-methodiek-word" />
           </h2>
@@ -190,7 +190,7 @@ export default function OverPage() {
       <section className="rounded-3xl bg-card py-14 md:py-20 px-6 md:px-12 max-w-7xl my-12 mx-4 sm:mx-6 md:mx-auto ring-1 ring-foreground/5">
         <div className="md:grid md:grid-cols-2 gap-10">
           <div className="mb-8 md:mb-0">
-            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">WAT HET WEL IS</p>
+            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">Wat het wel is</p>
             <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground mb-4">Indicatief en concreet</h2>
             <p className="text-base md:text-lg leading-relaxed text-muted-foreground">
               DBA Kompas levert wat een snelle, herhaalbare toets moet leveren: helder inzicht en concrete output.
@@ -232,7 +232,7 @@ export default function OverPage() {
             ))}
           </ul>
           <div className="md:order-2">
-            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">WAT HET NIET IS</p>
+            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">Wat het niet is</p>
             <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground mb-4">Heldere grenzen</h2>
             <p className="text-base md:text-lg leading-relaxed text-muted-foreground">
               De analyse helpt je je opdracht beter inrichten. Bij een lopend geschil of complexe casus is professioneel advies nodig.
@@ -243,7 +243,7 @@ export default function OverPage() {
 
       {/* ── SECTIE 6: BRONNEN ───────────────────── */}
       <section className="rounded-3xl bg-[#faf0e6] py-14 md:py-20 px-6 md:px-12 max-w-5xl my-12 mx-4 sm:mx-6 md:mx-auto text-center">
-        <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">BRONNEN</p>
+        <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">Bronnen</p>
         <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground mb-4">Onderhouden op actuele wet- en regelgeving</h2>
         <p className="text-base md:text-lg leading-relaxed text-muted-foreground max-w-2xl mx-auto">
           DBA Kompas scant dagelijks publicaties en uitspraken. Dit zijn de bronnen die we volgen, in volgorde van directheid:

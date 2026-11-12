@@ -42,7 +42,7 @@ export function SlotCta() {
         <div data-slot-decor-4 className="absolute bottom-1/3 right-1/3 w-2.5 h-2.5 rounded-full bg-accent/50 hidden md:block pointer-events-none" />
 
         <div className="relative z-10 max-w-2xl">
-          <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-5">STARTEN</p>
+          <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-5">Starten</p>
           <h2 className="text-3xl md:text-5xl font-bold leading-tight mb-5">
             <SplitWords text="Toets je opdracht voor je het gesprek aangaat" dataAttr="data-slot-word" />
           </h2>

@@ -78,7 +78,7 @@ export function SegmentPage({ eyebrow, h1, heroSubtext, segmentLabel, verdieping
       {/* ── 2. RISICO-THEMA'S ───── */}
       <section className="relative px-4 sm:px-6 py-12 md:py-20 max-w-7xl mx-auto w-full section-divider">
         <div className="text-center mb-12 md:mb-14">
-          <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">WAAR JE OP LET</p>
+          <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">Waar je op let</p>
           <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground mb-3">Vier aandachtspunten voor jouw opdracht</h2>
           <p className="text-base text-muted-foreground max-w-2xl mx-auto">
             Wat de Belastingdienst en de Hoge Raad in jouw context vooral meewegen.
@@ -99,7 +99,7 @@ export function SegmentPage({ eyebrow, h1, heroSubtext, segmentLabel, verdieping
       {verdieping.length > 0 && (
         <section className="relative px-4 sm:px-6 py-12 md:py-20 max-w-7xl mx-auto w-full section-divider">
           <div className="text-center mb-10">
-            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">VERDIEPING</p>
+            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">Verdieping</p>
             <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground">Lees meer over de wetgeving</h2>
           </div>
           <div className="grid md:grid-cols-3 gap-5 max-w-5xl mx-auto">
@@ -109,7 +109,7 @@ export function SegmentPage({ eyebrow, h1, heroSubtext, segmentLabel, verdieping
                 href={`/kennisbank/${kp.slug}`}
                 className="group block bg-card rounded-2xl p-6 ring-1 ring-foreground/10 hover:ring-accent/40 hover:-translate-y-0.5 transition-all duration-300"
               >
-                <p className="text-[11px] uppercase tracking-[0.08em] font-semibold text-accent mb-3">KENNISBANK</p>
+                <p className="text-[11px] uppercase tracking-[0.08em] font-semibold text-accent mb-3">Kennisbank</p>
                 <h3 className="text-base md:text-lg font-semibold text-foreground mb-2">{kp.h1}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed mb-4">{kp.shortDescription}</p>
                 <span className="inline-flex items-center gap-1.5 text-sm font-medium text-accent">
@@ -127,7 +127,7 @@ export function SegmentPage({ eyebrow, h1, heroSubtext, segmentLabel, verdieping
       {/* ── 3. HOE HET WERKT (compact) ───── */}
       <section className="relative px-4 sm:px-6 py-12 md:py-20 max-w-5xl mx-auto w-full section-divider">
         <div className="text-center mb-10">
-          <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">HOE HET WERKT</p>
+          <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">Hoe het werkt</p>
           <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground">In drie stappen naar duidelijkheid</h2>
         </div>
         <div className="grid md:grid-cols-3 gap-4 mb-8">
@@ -151,7 +151,7 @@ export function SegmentPage({ eyebrow, h1, heroSubtext, segmentLabel, verdieping
       {/* ── 4. WAT JE KRIJGT ───── */}
       <section className="relative px-4 sm:px-6 py-12 md:py-20 max-w-7xl mx-auto w-full section-divider">
         <div className="text-center mb-12">
-          <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">WAT JE KRIJGT</p>
+          <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">Wat je krijgt</p>
           <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground">Direct bruikbaar resultaat na elke analyse</h2>
         </div>
         <div className="grid md:grid-cols-3 gap-5">
@@ -219,7 +219,7 @@ export function SegmentPage({ eyebrow, h1, heroSubtext, segmentLabel, verdieping
       {/* ── 6. FAQ ───── */}
       <section className="relative px-4 sm:px-6 py-12 md:py-20 max-w-7xl mx-auto w-full section-divider">
         <div className="text-center mb-12">
-          <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">VEELGESTELDE VRAGEN</p>
+          <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-4">Veelgestelde vragen</p>
           <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground">Voor jouw sector</h2>
         </div>
         <FaqAccordion items={faqItems} />
@@ -233,7 +233,7 @@ export function SegmentPage({ eyebrow, h1, heroSubtext, segmentLabel, verdieping
             <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] rounded-full bg-primary-foreground/10 blur-3xl" />
           </div>
           <div className="relative z-10 max-w-2xl">
-            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-5">STARTEN</p>
+            <p className="text-[13px] uppercase tracking-[0.08em] font-semibold text-accent mb-5">Starten</p>
             <h2 className="text-3xl md:text-5xl font-bold leading-tight mb-5">Toets je opdracht voor je het gesprek aangaat</h2>
             <p className="text-base md:text-lg leading-relaxed text-primary-foreground/80 mb-8 max-w-xl">
               Plak je opdracht en zie binnen een minuut waar de aandachtspunten zitten, met een herschreven opdrachtbrief als werkdocument.
