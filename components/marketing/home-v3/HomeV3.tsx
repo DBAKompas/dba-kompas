@@ -8,6 +8,7 @@ import { trackFaqOpened } from "@/lib/dba-analytics";
 import s from "./home-v3.module.css";
 
 type Plan = "monthly" | "yearly" | "one_time_dba";
+
 type Level = "laag" | "midden" | "hoog";
 type Part = { t: string; m?: "r" | "g" };
 
@@ -127,10 +128,85 @@ const LEVEL_WORD: Record<Level, string> = { laag: "Laag", midden: "Gemiddeld", h
 // Vulling van de ring: dezelfde waarden die de app bij de indicatie toont.
 const LEVEL_RING: Record<Level, number> = { laag: 88, midden: 55, hoog: 25 };
 
-function Demo() {
+
+// ── Scroll-effecten ──────────────────────────────────────────────────────────
+
+/** Laat elementen met data-reveal rustig binnenkomen en verschuift data-speed-lagen bij het scrollen. */
+function useScrollEffects(root: React.RefObject<HTMLDivElement | null>) {
+  useEffect(() => {
+    const el = root.current;
+    if (!el) return;
+    const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reveals = Array.from(el.querySelectorAll<HTMLElement>("[data-reveal]"));
+    if (calm) {
+      reveals.forEach((n) => n.classList.add(s.in));
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add(s.in);
+            io.unobserve(entry.target);
+          }
+        });
+      },
+      { rootMargin: "0px 0px -12% 0px" },
+    );
+    reveals.forEach((n) => io.observe(n));
+
+    const layers = Array.from(el.querySelectorAll<HTMLElement>("[data-speed]"));
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      const vh = window.innerHeight;
+      layers.forEach((layer) => {
+        const rect = layer.getBoundingClientRect();
+        if (rect.bottom < -200 || rect.top > vh + 200) return;
+        const offset = (rect.top + rect.height / 2 - vh / 2) / vh;
+        layer.style.transform = `translate3d(0, ${(offset * Number(layer.dataset.speed) * 100).toFixed(1)}px, 0)`;
+      });
+    };
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    update();
+    return () => {
+      io.disconnect();
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [root]);
+}
+
+/** Het woord in de kop waar de video doorheen speelt. Op smalle schermen een verloop in plaats van video. */
+function VideoWord({ children }: { children: string }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const v = ref.current;
+    if (!v) return;
+    const wide = window.matchMedia("(min-width: 921px)").matches;
+    const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!wide || calm) return;
+    v.src = "/home/gesprek.mp4";
+    v.play().catch(() => {});
+  }, []);
+  return (
+    <span className={s.vword}>
+      <video ref={ref} muted loop playsInline preload="none" aria-hidden="true" />
+      <span className={s.vtext}>{children}</span>
+    </span>
+  );
+}
+
+// ── Analyse in actie ─────────────────────────────────────────────────────────
+
+function Showcase() {
   const [idx, setIdx] = useState(0);
   const [done, setDone] = useState(false);
-  const [view, setView] = useState<"zwaarst" | "vraag" | "bron">("zwaarst");
   const ex = EXAMPLES[idx];
 
   useEffect(() => {
@@ -145,262 +221,280 @@ function Demo() {
   }
 
   return (
-    <div className={s.demo}>
-      <div className={s.demoTop}>Een greep uit een analyse. Kies een voorbeeld.</div>
-      <div className={s.tabs}>
+    <div className={s.show}>
+      <div className={s.showTabs} role="tablist">
         {EXAMPLES.map((e, i) => (
-          <button key={e.name} type="button" className={i === idx ? s.tabOn : s.tab} onClick={() => pick(i)} aria-pressed={i === idx}>
-            {e.name}
+          <button key={e.name} type="button" role="tab" aria-selected={i === idx} className={i === idx ? s.showTabOn : s.showTab} onClick={() => pick(i)}>
+            <span className={s.spark} style={{ background: LEVEL_COLOR[e.level] }} />
+            <span>
+              <b>{e.name}</b>
+              <small>{LEVEL_WORD[e.level]} risico</small>
+            </span>
           </button>
         ))}
       </div>
-      <div key={idx} className={`${s.doc} ${done ? s.done : s.run}`}>
-        <div className={s.scan} />
-        {ex.parts.map((p, i) =>
-          p.m ? (
-            <span key={i} className={p.m === "r" ? s.markR : s.markG}>
-              {p.t}
-            </span>
-          ) : (
-            <span key={i}>{p.t}</span>
-          ),
-        )}
-      </div>
-      <div className={s.res}>
-        <div className={s.ring}>
-          <svg width="132" height="132" viewBox="0 0 132 132" aria-hidden="true">
-            <circle className={s.ringBg} cx="66" cy="66" r="55" />
-            <circle
-              className={s.ringFg}
-              cx="66"
-              cy="66"
-              r="55"
-              style={{
-                stroke: LEVEL_COLOR[ex.level],
-                strokeDashoffset: done ? 345 - (345 * LEVEL_RING[ex.level]) / 100 : 345,
-              }}
-            />
-          </svg>
-          <div className={s.ringTxt}>
-            <strong className={s.ringWord}>{done ? LEVEL_WORD[ex.level] : "…"}</strong>
-            <small>{done ? "risico" : "bezig met toetsen"}</small>
+
+      <div className={s.showBody}>
+        <div className={s.mock}>
+          <div key={idx} className={`${s.doc} ${done ? s.done : s.run}`}>
+            <div className={s.scan} />
+            {ex.parts.map((p, i) =>
+              p.m ? (
+                <span key={i} className={p.m === "r" ? s.markR : s.markG}>
+                  {p.t}
+                </span>
+              ) : (
+                <span key={i}>{p.t}</span>
+              ),
+            )}
           </div>
-        </div>
-        <div className={s.bars}>
-          {ex.bars.map((b) => (
-            <div key={b.label}>
-              <div className={s.barLabel}>
-                {b.label}
-                <span>{done ? `${b.score} van 100` : ""}</span>
-              </div>
-              <div className={s.track}>
-                <i style={{ width: done ? `${b.score}%` : 0, background: LEVEL_COLOR[b.level] }} />
+          <div className={s.res}>
+            <div className={s.ring}>
+              <svg width="112" height="112" viewBox="0 0 132 132" aria-hidden="true">
+                <circle className={s.ringBg} cx="66" cy="66" r="55" />
+                <circle
+                  className={s.ringFg}
+                  cx="66"
+                  cy="66"
+                  r="55"
+                  style={{ stroke: LEVEL_COLOR[ex.level], strokeDashoffset: done ? 345 - (345 * LEVEL_RING[ex.level]) / 100 : 345 }}
+                />
+              </svg>
+              <div className={s.ringTxt}>
+                <strong>{done ? LEVEL_WORD[ex.level] : "…"}</strong>
+                <small>{done ? "risico" : "bezig"}</small>
               </div>
             </div>
-          ))}
+            <div className={s.bars}>
+              {ex.bars.map((b) => (
+                <div key={b.label}>
+                  <div className={s.barLabel}>
+                    {b.label}
+                    <span>{done ? `${b.score} van 100` : ""}</span>
                   </div>
-      </div>
-      <div className={s.insTabs}>
-        {(["zwaarst", "vraag", "bron"] as const).map((k) => (
-          <button key={k} type="button" className={view === k ? s.insTabOn : s.insTab} onClick={() => setView(k)} aria-pressed={view === k}>
-            {k === "zwaarst" ? "Wat het zwaarst weegt" : k === "vraag" ? "Vraag voor het gesprek" : "Bron"}
-          </button>
-        ))}
-      </div>
-      <div className={s.insPanel}>
-        {!done ? null : view === "zwaarst" ? (
-          <p key={`z${idx}`}>{ex.zwaarst}</p>
-        ) : view === "vraag" ? (
-          <p key={`v${idx}`}>{ex.vraag}</p>
-        ) : (
-          <p key={`b${idx}`}>
-            <a href={`https://uitspraken.rechtspraak.nl/details?id=${encodeURIComponent(ex.bron.ecli)}`} target="_blank" rel="noopener noreferrer">
-              {ex.bron.titel}
-            </a>
-            . {ex.bron.relevantie}
-          </p>
-        )}
-      </div>
-      <div className={s.demoFoot}>
-        Een fragment uit een analyse van een fictieve opdracht. De volledige analyse gaat veel verder. Indicatie, geen juridisch oordeel.
+                  <div className={s.track}>
+                    <i style={{ width: done ? `${b.score}%` : 0, background: LEVEL_COLOR[b.level] }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div key={`t${idx}`} className={`${s.showTxt} ${done ? s.showTxtIn : ""}`}>
+          <h3>
+            {ex.name}: {LEVEL_WORD[ex.level].toLowerCase()} risico
+          </h3>
+          <div>
+            <b>Wat het zwaarst weegt</b>
+            <p>{ex.zwaarst}</p>
+          </div>
+          <div>
+            <b>Vraag voor het gesprek</b>
+            <p>{ex.vraag}</p>
+          </div>
+          <div>
+            <b>Bron</b>
+            <p>
+              <a href={`https://uitspraken.rechtspraak.nl/details?id=${encodeURIComponent(ex.bron.ecli)}`} target="_blank" rel="noopener noreferrer">
+                {ex.bron.titel}
+              </a>
+              . {ex.bron.relevantie}
+            </p>
+          </div>
+          <small className={s.showNote}>
+            Een fragment uit een analyse van een fictieve opdracht. De volledige analyse gaat veel verder. Indicatie, geen juridisch oordeel.
+          </small>
+        </div>
       </div>
     </div>
   );
 }
 
-/** Laadt de achtergrondvideo alleen op brede schermen en zonder 'minder beweging'. */
-function HeroVideo() {
-  const ref = useRef<HTMLVideoElement>(null);
-  useEffect(() => {
-    const v = ref.current;
-    if (!v) return;
-    const wide = window.matchMedia("(min-width: 921px)").matches;
-    const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!wide || calm) return;
-    v.src = "/home/gesprek.mp4";
-    v.play().catch(() => {});
-  }, []);
-  return <video ref={ref} className={s.bgv} muted loop playsInline preload="none" poster="/home/gesprek-poster.jpg" aria-hidden="true" />;
-}
+// ── Pagina ───────────────────────────────────────────────────────────────────
 
 export function HomeV3({ onZelfscan, onCheck }: { onZelfscan: () => void; onCheck: (plan: Plan) => void }) {
+  const root = useRef<HTMLDivElement>(null);
+  useScrollEffects(root);
+
   return (
-    <div className={s.root}>
+    <div className={s.root} ref={root}>
       {/* HERO */}
       <section id="hero" className={s.hero}>
-        <HeroVideo />
-        <div className={`${s.wrap} ${s.heroGrid}`}>
-          <div>
-            <h1>Sta sterker in elk gesprek over je opdracht.</h1>
+        <div className={s.wrap}>
+          <h1>
+            <span>Wij helpen</span>
+            <span>zzp&apos;ers</span>
+            <span>
+              <VideoWord>sterker</VideoWord> het gesprek in
+            </span>
+          </h1>
+          <div className={s.heroRow}>
             <p className={s.sub}>
-              DBA Kompas laat je in ongeveer een minuut zien waar je opdracht vragen oproept rond de Wet DBA, wat juist voor je
-              zelfstandigheid pleit en wat je met je opdrachtgever kunt bespreken.
+              Zie in ongeveer een minuut waar je opdracht vragen oproept rond de Wet DBA, en wat je met je opdrachtgever kunt bespreken.
             </p>
             <div className={s.cta}>
               <button type="button" className={s.btnP} onClick={onZelfscan}>
                 Start je gratis zelfscan
               </button>
-              <button type="button" className={s.btnG} onClick={() => onCheck("one_time_dba")}>
+              <button type="button" className={s.btnD} onClick={() => onCheck("one_time_dba")}>
                 Toets je opdracht voor €9,95
               </button>
             </div>
-            <p className={s.quiet}>De zelfscan is gratis: vijf vragen, geen account. Een volledige check kost eenmalig €9,95.</p>
           </div>
-          <Demo />
         </div>
+        <a href="#antwoord" className={s.down} aria-label="Naar beneden">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M12 5v14M5 12l7 7 7-7" />
+          </svg>
+        </a>
       </section>
 
       {/* MISSIE */}
-      <section id="antwoord" className={s.mission}>
-        <div className={s.wrap}>
-          <p className={s.kicker}>Waar we voor staan</p>
-          <blockquote>
-            Wij helpen zzp&apos;ers hun opdracht op orde te hebben voordat iemand ernaar vraagt. Zodat je met vertrouwen het gesprek voert
-            met je opdrachtgever of intermediair, en weet waar je staat.
-          </blockquote>
-          <h2 className={s.srOnlyish}>Wat is DBA Kompas?</h2>
-          <p className={s.answer}>{LANDING.answerBlock}</p>
+      <section id="antwoord" className={s.band}>
+        <div className={`${s.wrap} ${s.two}`}>
+          <p className={s.label}>Waar we voor staan</p>
+          <div data-reveal>
+            <p className={s.statement}>
+              Wij helpen zzp&apos;ers hun opdracht op orde te hebben <mark className={s.chipO}>voordat iemand ernaar vraagt</mark>. Zodat je met
+              vertrouwen het gesprek voert met je opdrachtgever of intermediair, en weet waar je staat.
+            </p>
+            <h2 className={s.small}>Wat is DBA Kompas?</h2>
+            <p className={s.answer}>{LANDING.answerBlock}</p>
+          </div>
         </div>
       </section>
 
       {/* WAT JIJ ERUIT HAALT */}
       <section id="functies" className={s.sec}>
         <div className={s.wrap}>
-          <h2 className={s.narrow}>Wat jij eruit haalt</h2>
           <div className={s.wins}>
-            <div className={s.win}>
+            <div className={s.win} data-reveal>
+              <div className={s.art}>
+                <div className={s.shapeA}>
+                  <Image src="/home/werken.jpg" alt="Zzp'er werkt aan een opdracht op een laptop" fill sizes="(max-width: 920px) 80vw, 300px" />
+                </div>
+                <span className={`${s.deco} ${s.decoStar}`} data-speed="-0.25" aria-hidden="true" />
+              </div>
               <span className={s.num}>01</span>
               <h3>Je weet waar je staat</h3>
-              <p>
-                Een indicatie per onderdeel, met de zinnen uit jouw opdracht waar het om draait. Je ziet wat vragen oproept en wat juist
-                voor je zelfstandigheid pleit.
-              </p>
+              <p>Een indicatie per onderdeel, met de zinnen uit jouw opdracht waar het om draait. Je ziet wat vragen oproept en wat juist voor je pleit.</p>
             </div>
-            <div className={s.win}>
+            <div className={s.win} data-reveal style={{ transitionDelay: "0.12s" }}>
+              <div className={s.art}>
+                <div className={s.shapeB}>
+                  <Image src="/home/privaat.jpg" alt="Twee mensen bespreken een opdracht achter hun laptops" fill sizes="(max-width: 920px) 80vw, 300px" />
+                </div>
+                <span className={`${s.deco} ${s.decoPlus}`} data-speed="0.3" aria-hidden="true">
+                  ?
+                </span>
+              </div>
               <span className={s.num}>02</span>
               <h3>Je weet wat je moet zeggen</h3>
-              <p>
-                De weging in gewone taal, drie vragen voor het gesprek en de bronnen erbij: recente rechtspraak en de actuele stand van
-                handhaving en wetgeving.
-              </p>
+              <p>De weging in gewone taal, drie vragen voor het gesprek en de bronnen erbij: recente rechtspraak en de stand van handhaving en wetgeving.</p>
             </div>
-            <div className={s.win}>
+            <div className={s.win} data-reveal style={{ transitionDelay: "0.24s" }}>
+              <div className={s.art}>
+                <div className={s.shapeC}>
+                  <Image src="/home/publiek.jpg" alt="Zzp'er met laptop en telefoon aan een tafel bij het raam" fill sizes="(max-width: 920px) 80vw, 300px" />
+                </div>
+                <span className={`${s.deco} ${s.decoDoc}`} data-speed="-0.35" aria-hidden="true">
+                  <i />
+                  <i />
+                  <i />
+                </span>
+              </div>
               <span className={s.num}>03</span>
               <h3>Je hebt iets om voor te leggen</h3>
-              <p>
-                Concrete verbeteringen en, als je dat wilt, een herschreven opdrachtomschrijving. Te downloaden als PDF en Word, klaar om
-                te delen.
-              </p>
+              <p>Concrete verbeteringen en, als je dat wilt, een herschreven opdrachtomschrijving. Als PDF en Word, klaar om te delen.</p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ANALYSE IN ACTIE */}
+      <section className={s.band}>
+        <div className={s.wrap}>
+          <div className={s.two}>
+            <p className={s.label}>Een analyse in het echt</p>
+            <p className={s.statement} data-reveal>
+              Geen los cijfer, maar een oordeel dat je kunt volgen: <mark className={s.chipR}>wat vragen oproept</mark>,{" "}
+              <mark className={s.chipG}>wat voor je pleit</mark> en wat je ermee doet.
+            </p>
+          </div>
+          <div data-reveal>
+            <Showcase />
           </div>
         </div>
       </section>
 
       {/* DE TRAP */}
-      <section className={`${s.sec} ${s.tint}`}>
+      <section className={s.sec}>
         <div className={s.wrap}>
-          <h2 className={s.narrow}>In drie stappen naar een sterker gesprek</h2>
-          <p className={s.lead}>Elke stap brengt je dichter bij een opdracht die klopt met hoe je werkt.</p>
+          <div className={s.two}>
+            <p className={s.label}>Hoe het werkt</p>
+            <p className={s.statement} data-reveal>
+              De route <mark className={s.chipB}>Toets</mark> <mark className={s.chipG}>Verbeter</mark> <mark className={s.chipO}>Bespreek</mark> brengt je
+              stap voor stap naar een opdracht die klopt met hoe je werkt.
+            </p>
+          </div>
           <div className={s.stairs}>
-            <div className={s.stair}>
-              <span className={s.num}>01</span>
+            <div className={s.stair} data-reveal>
+              <span className={`${s.badge2} ${s.chipB}`}>01</span>
               <h3>Toets</h3>
               <b>Zie waar het schuurt</b>
-              <p>Plak je opdracht of upload een PDF of Word-bestand. De eerste uitkomst staat er snel, de rest volgt terwijl je meeleest.</p>
+              <ul>
+                <li>Plak je opdracht of upload PDF of Word</li>
+                <li>Indicatie per onderdeel</li>
+                <li>De zinnen waar het om draait</li>
+                <li>Wat de tekst niet zegt</li>
+              </ul>
             </div>
-            <div className={s.stair}>
-              <span className={s.num}>02</span>
+            <div className={s.stair} data-reveal style={{ transitionDelay: "0.12s" }}>
+              <span className={`${s.badge2} ${s.chipG}`}>02</span>
               <h3>Verbeter</h3>
               <b>Maak je opdracht sterker</b>
-              <p>Pas de tekst of de afspraak aan met de verbeterpunten. Toets opnieuw en zie naast elkaar wat er veranderd is.</p>
+              <ul>
+                <li>Drie verbeteringen, belangrijkste eerst</li>
+                <li>Tekst of afspraak: je ziet wat nodig is</li>
+                <li>Opnieuw toetsen en vergelijken</li>
+              </ul>
             </div>
-            <div className={s.stair}>
-              <span className={s.num}>03</span>
+            <div className={s.stair} data-reveal style={{ transitionDelay: "0.24s" }}>
+              <span className={`${s.badge2} ${s.chipO}`}>03</span>
               <h3>Bespreek</h3>
               <b>Ga voorbereid het gesprek in</b>
-              <p>Met gespreksvragen, bronnen en een opdrachtomschrijving die je kunt voorleggen aan je opdrachtgever of intermediair.</p>
+              <ul>
+                <li>Drie vragen voor je opdrachtgever</li>
+                <li>Bronnen en de actuele stand</li>
+                <li>Opdrachtomschrijving op afroep</li>
+                <li>Download als PDF en Word</li>
+              </ul>
             </div>
           </div>
         </div>
       </section>
 
-      {/* WAT KRIJG JE */}
-      <section className={s.sec}>
-        <div className={`${s.wrap} ${s.split}`}>
-          <figure className={s.tall}>
-            <Image src="/home/werken.jpg" alt="Zzp'er werkt aan een opdrachtomschrijving op een laptop" fill sizes="(max-width: 920px) 100vw, 480px" />
-          </figure>
-          <div>
-            <h2>Van een zin die vragen oproept naar een zin die klopt</h2>
-            <p className={s.lead}>
-              Geen los cijfer, maar een werkdocument. Zinnen die vragen oproepen worden herschreven naar resultaat, eigen werkwijze en eigen
-              risico. Jij bepaalt wat klopt met hoe je in de praktijk werkt.
-            </p>
-            <div className={s.diff}>
-              <div className={s.old}>
-                <small>Staat er nu</small>
-                <s>Werkt onder aansturing van de teammanager</s> en is <s>vier dagen per week op kantoor aanwezig</s>.
-              </div>
-              <div className={s.new}>
-                <small>Voorstel</small>
-                Levert de afgesproken resultaten op en rapporteert daarover aan de opdrachtgever. Bepaalt zelf waar en wanneer het werk
-                plaatsvindt.
-              </div>
-            </div>
-                      </div>
-        </div>
-      </section>
-
       {/* VOOR WIE */}
-      <section id="voor-wie" className={`${s.sec} ${s.tint}`}>
+      <section id="voor-wie" className={s.band}>
         <div className={s.wrap}>
-          <h2 className={s.narrow}>Voor wie is DBA Kompas bedoeld?</h2>
-          <p className={s.lead}>
-            Voor zzp&apos;ers in kenniswerk die zelf willen weten hoe hun opdracht ervoor staat, of ze nu direct voor een opdrachtgever
-            werken of via een intermediair.
-          </p>
-          <div className={s.tiles}>
-            <Link href="/voor/publieke-sector" className={s.tile}>
-              <Image src="/home/publiek.jpg" alt="Zzp'er met laptop en telefoon aan een tafel bij het raam" fill sizes="(max-width: 920px) 100vw, 560px" />
-              <div className={s.tileTxt}>
-                <h3>Publieke sector</h3>
-                <p>
-                  Interim-opdrachten bij ministeries, gemeenten en uitvoeringsorganisaties. Vaak langlopend en via een intermediair, waardoor
-                  inbedding en aansturing extra aandacht vragen.
-                </p>
-                <span className={s.more}>Bekijk de aandachtspunten</span>
-              </div>
+          <div className={s.two}>
+            <p className={s.label}>Voor wie</p>
+            <p className={s.statement} data-reveal>
+              Voor zzp&apos;ers in kenniswerk die zelf willen weten hoe hun opdracht ervoor staat, direct bij een opdrachtgever of via een
+              intermediair.
+            </p>
+          </div>
+          <div className={s.segs}>
+            <Link href="/voor/publieke-sector" className={s.seg} data-reveal>
+              <h3>Publieke sector</h3>
+              <p>Interim-opdrachten bij ministeries, gemeenten en uitvoeringsorganisaties. Vaak langlopend en via een intermediair, waardoor inbedding en aansturing extra aandacht vragen.</p>
+              <span className={s.more}>Bekijk de aandachtspunten</span>
             </Link>
-            <Link href="/voor/private-sector" className={s.tile}>
-              <Image src="/home/privaat.jpg" alt="Twee mensen werken samen aan laptops, van bovenaf gezien" fill sizes="(max-width: 920px) 100vw, 560px" />
-              <div className={s.tileTxt}>
-                <h3>Private sector</h3>
-                <p>
-                  IT, advies, projectmanagement, design en marketing. Vaak op projectbasis, waar een helder resultaat en je eigen werkwijze
-                  het verschil maken.
-                </p>
-                <span className={s.more}>Bekijk de aandachtspunten</span>
-              </div>
+            <Link href="/voor/private-sector" className={s.seg} data-reveal style={{ transitionDelay: "0.12s" }}>
+              <h3>Private sector</h3>
+              <p>IT, advies, projectmanagement, design en marketing. Vaak op projectbasis, waar een helder resultaat en je eigen werkwijze het verschil maken.</p>
+              <span className={s.more}>Bekijk de aandachtspunten</span>
             </Link>
           </div>
           <p className={s.notfor}>
@@ -451,14 +545,41 @@ export function HomeV3({ onZelfscan, onCheck }: { onZelfscan: () => void; onChec
         </div>
       </section>
 
+
+      {/* WAAR JE OP BOUWT */}
+      <section className={s.sec}>
+        <div className={s.wrap}>
+          <div className={s.two}>
+            <p className={s.label}>Waar je op bouwt</p>
+            <p className={s.statement} data-reveal>
+              Elke opdracht wordt getoetst op de <mark className={s.chipO}>negen gezichtspunten</mark> van de Hoge Raad, met rechtspraak en
+              handhaving die elke dag wordt bijgewerkt.
+            </p>
+          </div>
+          <div className={s.factGrid}>
+            <div data-reveal><strong>9</strong><span>gezichtspunten waarop elke opdracht wordt getoetst</span></div>
+            <div data-reveal><strong>3</strong><span>onderdelen met elk een eigen score en toelichting</span></div>
+            <div data-reveal><strong>Elke dag</strong><span>een bijgewerkt overzicht van rechtspraak, handhaving en wetgeving</span></div>
+            <div data-reveal><strong>± 1 min</strong><span>van opdracht naar volledige uitkomst, terwijl je al meeleest</span></div>
+          </div>
+        </div>
+      </section>
+
       {/* MAKER */}
-      <section id="methodiek" className={`${s.sec} ${s.maker}`}>
-        <div className={`${s.wrap} ${s.splitRev}`}>
-          <div>
-            <blockquote className={s.quote}>
+      <section id="methodiek" className={s.band}>
+        <div className={`${s.wrap} ${s.makerGrid}`}>
+          <div className={s.art} data-reveal>
+            <div className={s.shapeMaker}>
+              <Image src="/team/marvin-zoetemelk.jpg" alt="Marvin Zoetemelk, maker van DBA Kompas" fill sizes="(max-width: 920px) 80vw, 380px" />
+            </div>
+            <span className={`${s.deco} ${s.decoStar}`} data-speed="0.3" aria-hidden="true" />
+          </div>
+          <div data-reveal>
+            <p className={s.label}>De maker</p>
+            <blockquote className={s.statement}>
               “Ik zag dagelijks opdrachten stranden op formuleringen die makkelijk beter hadden gekund. Daar is DBA Kompas voor gebouwd.”
             </blockquote>
-            <p>
+            <p className={s.answer}>
               <b>Marvin Zoetemelk</b> bouwde DBA Kompas vanuit de praktijk van externe inhuur, waar hij dagelijks ziet hoe opdrachtgevers en
               intermediairs naar zzp-opdrachten kijken. Die kennis zit in één vaste methodiek die je zelf kunt gebruiken.
             </p>
@@ -466,41 +587,30 @@ export function HomeV3({ onZelfscan, onCheck }: { onZelfscan: () => void; onChec
               Lees over de methodiek
             </Link>
           </div>
-          <figure className={s.portrait}>
-            <Image src="/team/marvin-zoetemelk.jpg" alt="Marvin Zoetemelk, maker van DBA Kompas" fill sizes="(max-width: 920px) 100vw, 420px" />
-          </figure>
-        </div>
-      </section>
-
-      {/* FEITEN */}
-      <section className={s.facts}>
-        <div className={s.wrap}>
-          <h2 className={s.narrow}>Gebouwd om op te vertrouwen</h2>
-          <div className={s.factGrid}>
-            <div><strong>9</strong><span>gezichtspunten van de Hoge Raad waarop elke opdracht wordt getoetst</span></div>
-            <div><strong>3</strong><span>onderdelen met elk een eigen score en toelichting</span></div>
-            <div><strong>Elke dag</strong><span>wordt het overzicht van rechtspraak, handhaving en wetgeving bijgewerkt</span></div>
-            <div><strong>± 1 min</strong><span>van opdracht naar volledige uitkomst, terwijl je al meeleest</span></div>
-          </div>
         </div>
       </section>
 
       {/* KENNISBANK */}
-      <section className={`${s.sec} ${s.tint}`}>
+      <section className={s.sec}>
         <div className={s.wrap}>
-          <h2 className={s.narrow}>Uit de kennisbank</h2>
+          <div className={s.two}>
+            <p className={s.label}>Uit de kennisbank</p>
+            <p className={s.statement} data-reveal>
+              Wat er verandert voor zzp&apos;ers, kort uitgelegd.
+            </p>
+          </div>
           <div className={s.news}>
-            <Link href="/kennisbank/handhaving-2026" className={s.newsItem}>
+            <Link href="/kennisbank/handhaving-2026" className={s.newsItem} data-reveal>
               <span>Bijgewerkt november 2026</span>
               <h3>Hoe handhaaft de Belastingdienst nu?</h3>
               <p>Vergrijpboetes zijn mogelijk, verzuimboetes nog niet. Wat dat betekent voor jou en je opdrachtgever.</p>
             </Link>
-            <Link href="/kennisbank/zelfstandigenwet" className={s.newsItem}>
+            <Link href="/kennisbank/zelfstandigenwet" className={s.newsItem} data-reveal style={{ transitionDelay: "0.12s" }}>
               <span>Bijgewerkt november 2026</span>
               <h3>De nieuwe wetgeving rond zelfstandigen</h3>
               <p>De Zelfstandigenwet was in consultatie, met januari 2028 als beoogde invoering. Wat er nu geldt.</p>
             </Link>
-            <Link href="/kennisbank/deliveroo-criteria" className={s.newsItem}>
+            <Link href="/kennisbank/deliveroo-criteria" className={s.newsItem} data-reveal style={{ transitionDelay: "0.24s" }}>
               <span>Achtergrond</span>
               <h3>De gezichtspunten uit het Deliveroo-arrest</h3>
               <p>Het kader waarmee rechters en de Belastingdienst naar je opdracht kijken, uitgelegd.</p>
@@ -578,6 +688,7 @@ export function HomeV3({ onZelfscan, onCheck }: { onZelfscan: () => void; onChec
         </div>
       </section>
 
+
       {/* FAQ */}
       <section id="faq" className={s.sec}>
         <div className={`${s.wrap} ${s.splitTop}`}>
@@ -599,12 +710,16 @@ export function HomeV3({ onZelfscan, onCheck }: { onZelfscan: () => void; onChec
         </div>
       </section>
 
+
       {/* SLOT */}
-      <section className={s.final}>
-        <Image src="/home/slot.jpg" alt="" fill sizes="100vw" />
-        <div className={s.finalIn}>
-          <h2>Toets je opdracht vandaag, niet pas als iemand ernaar vraagt.</h2>
-          <p>Begin gratis met de zelfscan. Het kost je een minuut en je hebt geen account nodig.</p>
+      <section className={s.finalWrap}>
+        <div className={s.final} data-reveal>
+          <h2>
+            Toets je opdracht vandaag,
+            <br />
+            niet pas als iemand ernaar vraagt.
+          </h2>
+          <p>Begin gratis met de zelfscan. Vijf vragen, geen account.</p>
           <button type="button" className={s.btnP} onClick={onZelfscan}>
             Start je gratis zelfscan
           </button>

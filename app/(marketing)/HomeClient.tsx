@@ -147,7 +147,7 @@ export default function HomeClient() {
   };
 
   return (
-    <div className="min-h-screen bg-background relative flex flex-col">
+    <div className="min-h-screen bg-white relative flex flex-col">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA_SOFTWARE_APPLICATION) }}
@@ -165,18 +165,18 @@ export default function HomeClient() {
       <header
         className={`fixed top-0 inset-x-0 z-40 transition-all duration-300 ${
           scrolled
-            ? "bg-[#0b1d3a]/95 backdrop-blur-md shadow-sm"
+            ? "bg-white/90 backdrop-blur-md border-b border-black/5"
             : "bg-transparent"
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <BrandLogo variant="white" className="h-8 w-auto" />
+            <BrandLogo variant="dark" className="h-9 w-auto" />
           </Link>
 
           {/* Hamburger - alleen mobiel */}
           <button
-            className="md:hidden flex items-center justify-center w-9 h-9 rounded-lg text-white hover:bg-white/10 transition-colors"
+            className="md:hidden flex items-center justify-center w-9 h-9 rounded-lg text-[#0b1d3a] hover:bg-[#0b1d3a]/5 transition-colors"
             onClick={() => setMenuOpen(o => !o)}
             aria-label={menuOpen ? "Menu sluiten" : "Menu openen"}
           >
@@ -209,24 +209,24 @@ export default function HomeClient() {
 
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-6">
-            <a href="#functies" className="text-sm text-white/75 hover:text-white transition-colors font-medium">Wat je krijgt</a>
-            <a href="#voor-wie" className="text-sm text-white/75 hover:text-white transition-colors font-medium">Voor wie</a>
-            <a href="#waarom" className="text-sm text-white/75 hover:text-white transition-colors font-medium">Waarom nu</a>
-            <a href="#prijzen" className="text-sm text-white/75 hover:text-white transition-colors font-medium">{LANDING.nav.pricing}</a>
-            <Link href="/kennisbank" className="text-sm text-white/75 hover:text-white transition-colors font-medium">Kennisbank</Link>
-            <Link href="/over-dba-kompas" className="text-sm text-white/75 hover:text-white transition-colors font-medium">Over</Link>
+            <a href="#functies" className="text-sm text-[#0b1d3a]/70 hover:text-[#0b1d3a] transition-colors font-medium">Wat je krijgt</a>
+            <a href="#voor-wie" className="text-sm text-[#0b1d3a]/70 hover:text-[#0b1d3a] transition-colors font-medium">Voor wie</a>
+            <a href="#waarom" className="text-sm text-[#0b1d3a]/70 hover:text-[#0b1d3a] transition-colors font-medium">Waarom nu</a>
+            <a href="#prijzen" className="text-sm text-[#0b1d3a]/70 hover:text-[#0b1d3a] transition-colors font-medium">{LANDING.nav.pricing}</a>
+            <Link href="/kennisbank" className="text-sm text-[#0b1d3a]/70 hover:text-[#0b1d3a] transition-colors font-medium">Kennisbank</Link>
+            <Link href="/over-dba-kompas" className="text-sm text-[#0b1d3a]/70 hover:text-[#0b1d3a] transition-colors font-medium">Over</Link>
             {user ? (
               <>
-                <span className="hidden lg:block text-sm text-white/60">{user.email}</span>
+                <span className="hidden xl:block text-sm text-[#0b1d3a]/55">{user.email}</span>
                 <Button
                   variant="outline"
                   size="sm"
-                  className="rounded-full bg-transparent border-white/30 text-white hover:bg-white/10 hover:text-white"
+                  className="rounded-full bg-transparent border-[#0b1d3a]/25 text-[#0b1d3a] hover:bg-[#0b1d3a]/5 hover:text-[#0b1d3a]"
                   onClick={() => window.location.href = `${APP_URL}/dashboard`}
                 >
                   Ga naar de app
                 </Button>
-                <Button onClick={handleLogout} variant="ghost" size="sm" className="text-white hover:bg-white/10 hover:text-white" aria-label="Uitloggen">
+                <Button onClick={handleLogout} variant="ghost" size="sm" className="text-[#0b1d3a] hover:bg-[#0b1d3a]/5 hover:text-[#0b1d3a]" aria-label="Uitloggen">
                   <LogOut className="w-4 h-4" />
                 </Button>
               </>
@@ -235,7 +235,7 @@ export default function HomeClient() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="rounded-full bg-transparent border-white/30 text-white hover:bg-white/10 hover:text-white"
+                  className="rounded-full bg-transparent border-[#0b1d3a]/25 text-[#0b1d3a] hover:bg-[#0b1d3a]/5 hover:text-[#0b1d3a]"
                   onClick={() => window.location.href = `${APP_URL}/login`}
                   title="Heb je al een account? Log hier in."
                 >

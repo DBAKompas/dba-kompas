@@ -20,10 +20,10 @@ export function MarketingHeader() {
   const { openZelfscan } = useMarketingModals();
 
   return (
-    <header className="sticky top-0 z-40 bg-[#0b1d3a]">
+    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-black/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <BrandLogo variant="white" className="h-7 w-auto" />
+          <BrandLogo variant="dark" className="h-9 w-auto" />
         </Link>
         <nav className="hidden md:flex items-center gap-5">
           {NAV_ITEMS.map((item) => {
@@ -35,7 +35,7 @@ export function MarketingHeader() {
                 key={item.href}
                 href={item.href}
                 className={`text-sm transition-colors font-medium ${
-                  isActive ? "text-white font-semibold" : "text-white/75 hover:text-white"
+                  isActive ? "text-[#0b1d3a] font-semibold" : "text-[#0b1d3a]/70 hover:text-[#0b1d3a]"
                 }`}
               >
                 {item.label}
@@ -44,7 +44,7 @@ export function MarketingHeader() {
           })}
           <a
             href={`${APP_URL}/login`}
-            className="inline-flex items-center gap-2 border border-white/30 text-white font-medium px-4 py-2 rounded-full text-sm hover:bg-white/10 transition-colors"
+            className="inline-flex items-center gap-2 border border-[#0b1d3a]/25 text-[#0b1d3a] font-medium px-4 py-2 rounded-full text-sm hover:bg-[#0b1d3a]/5 transition-colors"
           >
             Ga naar de app
           </a>
